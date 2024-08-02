@@ -5,11 +5,25 @@ export const cardRewards = {
     },
     "Coral": {
       defaultRate: 1 / 50,
-      mccRates: {}
+      mccRates: {
+        "4900": 1 / 100, // Utilities and Insurance
+        "6300": 1 / 100 // Insurance
+      }
     },
     "Emeralde Private": {
       defaultRate: 6 / 200,
-      mccRates: {}
+      mccRates: {
+        "6513": 0, // No RP for Rent
+        "5541": 0 // No RP for Fuel
+      },
+      capping: {
+        categories: {
+          "Insurance": { points: 5000, maxSpent: 166666.67 },
+          "Grocery": { points: 1000, maxSpent: 33333.33 },
+          "Utilities": { points: 1000, maxSpent: 33333.33 },
+          "Education": { points: 1000, maxSpent: 33333.33 }
+        }
+      }
     },
     "Emeralde": {
       defaultRate: 4 / 100,
@@ -23,12 +37,20 @@ export const cardRewards = {
       mccRates: {}
     },
     "Rubyx": {
-      defaultRate: 1 / 50,
-      mccRates: {}
+    defaultRate: 1 / 50,
+    mccRates: {
+      "4900": 1 / 100, // Utilities and Insurance
+      "6300": 1 / 100 // Insurance
+    },
+    internationalRate: 4 / 100
     },
     "Sapphiro": {
       defaultRate: 1 / 50,
-      mccRates: {}
+      mccRates: {
+        "4900": 1 / 100, // Utilities and Insurance
+        "6300": 1 / 100 // Insurance
+      },
+      internationalRate: 4 / 100 // International spends
     },
     "Regalia": {
     defaultRate: 4 / 150,
@@ -139,7 +161,7 @@ export const cardRewards = {
   mccRates: {
     // Jewelry
     "5051": 0, "5094": 0, "5944": 0, "7631": 0,
-    
+
     // School & Educational Services
     "5111": 0, "5192": 0, "5942": 0, "5943": 0, "8211": 0, "8220": 0, 
     "8241": 0, "8244": 0, "8249": 0, "8299": 0, "8351": 0,
@@ -197,8 +219,8 @@ export const cardRewards = {
       mccRates: {}
     },
     "Neo": {
-      defaultRate: 1 / 50,
-      mccRates: {}
+    defaultRate: 1 / 200,
+    mccRates: {}
     },
     "MyZone": {
       defaultRate: 1 / 100,
@@ -220,11 +242,10 @@ export const cardRewards = {
       defaultRate: 1 / 16.666,
       mccRates: {}
     },
-    "Axis Atlas": {
+    "Atlas": {
     defaultRate: 2 / 100,
     mccRates: {
-        "mccRates": {
-        //airlines
+          //airlines
           "3000": 5 / 100, "3001": 5 / 100, "3002": 5 / 100, "3003": 5 / 100, "3004": 5 / 100, "3005": 5 / 100,
           "3006": 5 / 100, "3007": 5 / 100, "3008": 5 / 100, "3009": 5 / 100, "3010": 5 / 100, "3011": 5 / 100,
           "3012": 5 / 100, "3013": 5 / 100, "3014": 5 / 100, "3015": 5 / 100, "3016": 5 / 100, "3017": 5 / 100,
@@ -317,10 +338,9 @@ export const cardRewards = {
           "4814": 0, "4816": 0, "4899": 0, "4900": 0, // Utilities
           "5094": 0, "5944": 0, // Gold/Jewellery
           "5541": 0, "5542": 0, "5983": 0 // Fuel
-        }
       }      
     },
-    "Axis Vistara": {
+    "Vistara": {
     defaultRate: 6 / 200,
     mccRates: {
       // Wallet Load
