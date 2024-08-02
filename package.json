@@ -17,6 +17,7 @@
     "@mui/material-nextjs": "^5.16.6",
     "next": "14.2.5",
     "react": "^18",
+    "react-confetti": "^6.1.0",
     "react-dom": "^18"
   },
   "devDependencies": {
