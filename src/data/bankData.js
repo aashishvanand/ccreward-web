@@ -2,7 +2,6 @@ export const bankData = {
     "AMEX": ["Platinum", "Platinum Reserve", "Gold Charge"],
     "Axis": ["Atlas", "IOCL", "Magnus", "MyZone", "Neo", "Privilege", "Reserve", "Rewards", "Vistara", "ACE", "Flipkart", "Freecharge"],
     "BOB": ["Eterna"],
-    "Citibank": ["Indian Oil"],
     "HDFC": ["Diners Club Black Metal", "Infinia Metal", "Regalia", "Regalia Gold", "Swiggy", "Tata Neu Infinity", "Millennia", "Biz Black", "Tata Neu Plus","Marriott Bonvoy"],
     "HSBC": ["Platinum"],
     "ICICI": ["AmazonPay", "Coral", "Coral Rupay", "Emeralde", "Emeralde Private", "Rubyx", "Sapphiro", "MMT", "MMT Black"],

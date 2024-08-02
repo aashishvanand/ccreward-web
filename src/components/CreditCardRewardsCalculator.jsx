@@ -198,27 +198,33 @@ const CreditCardRewardsCalculator = () => {
   
     // Apply category-specific capping if available
     if (cardReward.capping && cardReward.capping.categories && selectedMcc) {
-      debugLog("Capping category found:", category);
+      debugLog("Checking for capping category");
       const mccName = selectedMcc.name.toLowerCase();
-      const category = Object.keys(cardReward.capping.categories).find(cat => 
+      const cappingCategories = cardReward.capping.categories;
+        
+      const matchingCategory = Object.keys(cappingCategories).find(cat => 
         mccName.includes(cat.toLowerCase())
       );
-  
-      if (category) {
-        console.log("Capping category found:", category);
-        const { points: catPoints, maxSpent: catMaxSpent } = cardReward.capping.categories[category];
+    
+      if (matchingCategory) {
+        debugLog("Capping category found:", matchingCategory);
+        const { points: catPoints, maxSpent: catMaxSpent } = cappingCategories[matchingCategory];
         const cappedAmount = Math.min(amount, catMaxSpent);
         cappedPoints = Math.min(points, catPoints, Math.floor(cappedAmount * rate));
-        
+          
         if (cappedPoints < points) {
           appliedCap = {
-            category,
+            category: matchingCategory,
             maxPoints: catPoints,
             maxSpent: catMaxSpent
           };
           debugLog("Capping applied:", appliedCap);
         }
+      } else {
+        debugLog("No matching capping category found");
       }
+    } else {
+      debugLog("No capping structure or MCC selected");
     }
   
     debugLog("Final Capped Points:", cappedPoints);
@@ -481,26 +487,26 @@ const CreditCardRewardsCalculator = () => {
             }}
           >
             <Typography variant="h5" align="center" color="textPrimary" fontWeight="bold">
-              {cappedRewardPoints > 0 ? (
-                <>
-                  🎉 {cappedRewardPoints} Reward Points {appliedCapping ? '(Capped)' : ''} 🎉
-                  {appliedCapping && (
-                    <Typography variant="body2" color="textSecondary">
-                      {`${appliedCapping.category} cap applied: Max ${appliedCapping.maxPoints} points or ₹${appliedCapping.maxSpent.toFixed(2)} spent`}
-                    </Typography>
-                  )}
-                  {rewardPoints !== cappedRewardPoints && (
-                    <Typography variant="body2" color="textSecondary">
-                      (Uncapped: {rewardPoints} points)
-                    </Typography>
-                  )}
-                </>
-              ) : (
-                <>
-                  😢 No rewards earned 😢
-                </>
-              )}
-            </Typography>
+  {cappedRewardPoints > 0 ? (
+    <>
+      🎉 {cappedRewardPoints} Reward Points {appliedCapping ? '(Capped)' : ''} 🎉
+      {appliedCapping && appliedCapping.category && (
+        <Typography variant="body2" color="textSecondary">
+          {`${appliedCapping.category} cap applied: Max ${appliedCapping.maxPoints} points or ₹${appliedCapping.maxSpent.toFixed(2)} spent`}
+        </Typography>
+      )}
+      {rewardPoints !== cappedRewardPoints && (
+        <Typography variant="body2" color="textSecondary">
+          (Uncapped: {rewardPoints} points)
+        </Typography>
+      )}
+    </>
+  ) : (
+    <>
+      😢 No rewards earned 😢
+    </>
+  )}
+</Typography>
           </Paper>
         )}
       </Paper>
