@@ -14,6 +14,7 @@ import {
   Autocomplete,
   Snackbar,
   Alert,
+  useMediaQuery
 } from '@mui/material';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
@@ -24,7 +25,8 @@ import Confetti from 'react-confetti';
 import MissingBankCardForm from './MissingBankCardForm';
 
 const CreditCardRewardsCalculator = () => {
-  const [mode, setMode] = useState('light');
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const [mode, setMode] = useState(prefersDarkMode ? 'dark' : 'light');
   const [selectedBank, setSelectedBank] = useState("");
   const [selectedCard, setSelectedCard] = useState("");
   const [selectedMcc, setSelectedMcc] = useState(null);
@@ -63,6 +65,15 @@ const CreditCardRewardsCalculator = () => {
       }),
     [mode],
   );
+
+  useEffect(() => {
+    setMode(prefersDarkMode ? 'dark' : 'light');
+  }, [prefersDarkMode]);
+
+  const toggleColorMode = () => {
+    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+  };
+
 
   useEffect(() => {
     const handleResize = () => {
@@ -176,10 +187,6 @@ const CreditCardRewardsCalculator = () => {
     setFirstSuccessfulSearch(true);
     setBankError(false);
     setCardError(false);
-  };
-
-  const toggleColorMode = () => {
-    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
   };
 
   const findMatchingBank = (inputValue) => {
