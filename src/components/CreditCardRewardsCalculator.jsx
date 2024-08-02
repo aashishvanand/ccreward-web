@@ -21,6 +21,7 @@ import { mccList } from '../data/mccData';
 import { bankData } from '../data/bankData';
 import { cardRewards } from '../data/cardRewards';
 import Confetti from 'react-confetti';
+import MissingBankCardForm from './MissingBankCardForm';
 
 const CreditCardRewardsCalculator = () => {
   const [mode, setMode] = useState('light');
@@ -38,6 +39,10 @@ const CreditCardRewardsCalculator = () => {
   const [cardError, setCardError] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [missingFormOpen, setMissingFormOpen] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   const theme = React.useMemo(
     () =>
@@ -194,6 +199,28 @@ const CreditCardRewardsCalculator = () => {
     setToastOpen(false);
   };
 
+  const handleMissingFormOpen = () => {
+    setMissingFormOpen(true);
+  };
+
+  const handleMissingFormClose = () => {
+    setMissingFormOpen(false);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+  const handleFormSubmitSuccess = (message, severity = 'success') => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -314,6 +341,15 @@ const CreditCardRewardsCalculator = () => {
             </Button>
           </Box>
 
+          <Button
+            variant="text"
+            color="primary"
+            onClick={handleMissingFormOpen}
+            sx={{ mt: 2 }}
+          >
+            Bank or Card Missing?
+          </Button>
+
           {calculationPerformed && (
             <Paper 
               elevation={3} 
@@ -340,11 +376,16 @@ const CreditCardRewardsCalculator = () => {
           )}
         </Paper>
       </Container>
-      <Snackbar open={toastOpen} autoHideDuration={6000} onClose={handleToastClose}>
-        <Alert onClose={handleToastClose} severity="warning" sx={{ width: '100%' }}>
-          {toastMessage}
+      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
         </Alert>
       </Snackbar>
+      <MissingBankCardForm 
+        open={missingFormOpen} 
+        onClose={handleMissingFormClose} 
+        onSubmitSuccess={handleFormSubmitSuccess}
+      />
     </ThemeProvider>
   );
 };
