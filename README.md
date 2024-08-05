@@ -6,7 +6,7 @@ The Credit Card Rewards India Calculator is a comprehensive tool designed to hel
 
 ## Features
 
-- Multi-bank support: Calculate rewards for cards from AMEX, Axis Bank, BOB, Citibank, HDFC, HSBC, ICICI, IDFC First, IndusInd, Kotak, OneCard, RBL, SBI, Scapia, Standard Chartered, Yes Bank, Kiwi, and AU Bank.
+- Multi-bank support: Calculate rewards for cards from AMEX, Axis Bank, BOB, HDFC, HSBC, ICICI, IDFC First, IndusInd, Kotak, OneCard, RBL, SBI, Scapia, Standard Chartered, Yes Bank, Kiwi, and AU Bank.
 - MCC-based calculations: Accurately calculate rewards based on specific Merchant Category Codes.
 - User-friendly interface: Easy-to-use calculator with intuitive design.
 - Dark mode support: Toggle between light and dark themes for comfortable viewing.

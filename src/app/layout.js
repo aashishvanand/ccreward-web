@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content="Multi-Bank Credit Card Rewards Calculator - Maximize Your Benefits" />
       <meta name="twitter:description" content="Optimize your rewards across multiple banks and credit cards with our comprehensive Credit Card Rewards Calculator. Compare rewards based on specific Merchant Category Codes (MCCs) and find the best card for your spending patterns." />
-      <meta name="keywords" content="Credit Card Rewards, Reward Calculator, AMEX, Axis Bank, BOB, Citibank, HDFC, HSBC, ICICI, IDFC First, IndusInd, Kotak, OneCard, RBL, SBI, Scapia, Standard Chartered, Yes Bank, Kiwi, AU Bank, Platinum, Atlas, Diners Club, Infinia, Regalia, Swiggy, AmazonPay, Emeralde, Sapphiro, Vistara, BPCL, Cashback, Forex Card, RuPay, MCC, Merchant Category Code" />
+      <meta name="keywords" content="Credit Card Rewards, Reward Calculator, AMEX, Axis Bank, BOB, HDFC, HSBC, ICICI, IDFC First, IndusInd, Kotak, OneCard, RBL, SBI, Scapia, Standard Chartered, Yes Bank, Kiwi, AU Bank, Platinum, Atlas, Diners Club, Infinia, Regalia, Swiggy, AmazonPay, Emeralde, Sapphiro, Vistara, BPCL, Cashback, Forex Card, RuPay, MCC, Merchant Category Code" />
   
       <Script id="microsoft-clarity" strategy="afterInteractive">
     {`
