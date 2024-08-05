@@ -340,7 +340,7 @@ export const cardRewards = {
           "5541": 0, "5542": 0, "5983": 0 // Fuel
       }      
     },
-    "Vistara": {
+    "Axis Vistara": {
     defaultRate: 6 / 200,
     mccRates: {
       // Wallet Load
@@ -364,5 +364,128 @@ export const cardRewards = {
     "Platinum Rewards": {
       defaultRate: 1 / 30,
       mccRates: {}
+    },
+    "HPCL Super Saver": {
+    defaultRate: 2 / 100,
+    mccRates: {
+      "5541": 4 / 100,  // 4% cashback on fuel purchases at all HPCL stations
+      "4900": 5 / 100,  // 5% cashback as Reward points on utility purchases
+      "5311": 5 / 100   // 5% cashback as Reward points on departmental store purchases
     }
+  },
+  "HPCL Coral": {
+    defaultRate: 2 / 100,
+    mccRates: {
+      "5541": 0  // No Reward Points on fuel purchases
+    }
+  },
+  "Mine": {
+    defaultRate: 1 / 100,  // 1% cashback on all spends for free variant
+    mccRates: {}
+  },
+  "MakeMyTrip Signature": {
+    defaultRate: 1.25 / 200,  // 1.25 My Cash on all other domestic and international spends
+    mccRates: {
+      "7011": 4 / 200,  // 4 My Cash per Rs.200 on hotel reservations on MakeMyTrip
+      "4511": 2 / 200   // 2 My Cash on flight tickets on MakeMyTrip
+    }
+  },
+  "MoneyBack Plus": {
+    defaultRate: 2 / 150,  // 2 Cash Points on every spend of Rs. 150
+    mccRates: {
+      "5399": 10 / 150,  // 10x Cash Points on Amazon, Flipkart, Big Basket, Reliance Smart Superstore, and Swiggy
+      "5310": 5 / 150    // 5x Cash Points on EMI spends
+    }
+  },
+  "UPI RuPay": {
+    defaultRate: 0,
+    mccRates: {
+      "5411": 3 / 100,  // 3% Cashpoints on Groceries
+      "5812": 3 / 100,  // 3% Cashpoints on Dining
+      "5311": 3 / 100,  // 3% Cashpoints on Supermarket Spends
+      "4900": 2 / 100   // 2% Cashpoints on Utility Spends
+    }
+  },
+  "Paytm Select": {
+    defaultRate: 1 / 100,  // 1% on All Other Retail Spends
+    mccRates: {
+      "5399": 5 / 100,  // 5% Cashback on Paytm Mall/Movies/Mini Apps
+      "5735": 2 / 100   // 2% on Other Spends on Paytm
+    }
+  },
+  "6E Rewards XL – IndiGo": {
+    defaultRate: 2 / 100,  // 2% on All Other Spends
+    mccRates: {
+      "4511": 5 / 100,  // 5% on Indigo
+      "5411": 3 / 100,  // 3% on Grocery
+      "5812": 3 / 100,  // 3% on Dining
+      "7832": 3 / 100   // 3% on Entertainment
+    }
+  },
+  "IndianOil": {
+    defaultRate: 1 / 100,  // 1% Fuel Points on All Other Spends
+    mccRates: {
+      "5541": 5 / 100,  // 5% Fuel Points on Indian Oil Outlets
+      "5411": 5 / 100   // 5% Fuel Points on Grocery spends
+    }
+  },
+  "Visa Celesta": {
+    defaultRate: 1 / 100,
+    mccRates: {
+      "4511": 3 / 100,  // 3 Reward Points on every Rs. 100 spent on international and travel categories
+      "5812": 2 / 100   // 2 Reward Points on every Rs. 100 spent on dining
+    }
+  },
+  "Visa Imperio": {
+    defaultRate: 1 / 100,
+    mccRates: {
+      "5411": 3 / 100,  // 3 Reward Points on every Rs. 100 spent on groceries
+      "8099": 3 / 100,  // 3 Reward Points on every Rs. 100 spent on healthcare
+      "4900": 2 / 100   // 2 Reward Points on every Rs. 100 spent on utility bills
+    }
+  },
+  "Visa Signet": {
+    defaultRate: 1 / 100,
+    mccRates: {
+      "5732": 3 / 100,  // 3 Reward Points on every Rs. 100 spent on electronics
+      "5651": 3 / 100,  // 3 Reward Points on every Rs. 100 spent on apparel
+      "7832": 2 / 100   // 2 Reward Points on every Rs. 100 spent on entertainment
+    }
+  },
+  "Royale Signature": {
+  defaultRate: 2 / 100,
+  mccRates: {}
+},
+
+ "Euphoria World": {
+  defaultRate: 3 / 100,
+  mccRates: {
+    "7011": 6 / 100,  // 6 Reward Points per Rs. 100 spent on hotels
+    "4511": 6 / 100,  // 6 Reward Points per Rs. 100 spent on Airlines
+    "4131": 6 / 100   // 6 Reward Points per Rs. 100 spent on Bus bookings
+  }
+},
+
+"Aspire Platinum": {
+  defaultRate: 2 / 150,
+  mccRates: {
+    "5812": 2 / 150,  // 2 Delight Points for every Rs. 150 spent on dining
+    "7832": 2 / 150,  // 2 Delight Points for every Rs. 150 spent on movies
+    "4511": 2 / 150   // 2 Delight Points for every Rs. 150 spent on traveling
+  }
+},
+
+"Imperium Platinum": {
+  defaultRate: 2 / 150,
+  mccRates: {
+    "5311": 2 / 150,  // 2 Delight points for every Rs 150 spent on shopping
+    "5812": 2 / 150,  // 2 Delight points for every Rs 150 spent on dining
+    "4511": 2 / 150   // 2 Delight points for every Rs 150 spent on traveling
+  }
+},
+
+"Winnings": {
+  defaultRate: 2 / 100,
+  mccRates: {}
+}
 };
