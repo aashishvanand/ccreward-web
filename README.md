@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Credit Card Rewards India Calculator
 
-## Getting Started
+## Overview
 
-First, run the development server:
+The Credit Card Rewards India Calculator is a comprehensive tool designed to help users optimize their credit card rewards across multiple banks and credit cards in India. This project aims to simplify the process of comparing rewards based on specific Merchant Category Codes (MCCs) and finding the best card for various spending patterns.
+
+## Features
+
+- Multi-bank support: Calculate rewards for cards from AMEX, Axis Bank, BOB, Citibank, HDFC, HSBC, ICICI, IDFC First, IndusInd, Kotak, OneCard, RBL, SBI, Scapia, Standard Chartered, Yes Bank, Kiwi, and AU Bank.
+- MCC-based calculations: Accurately calculate rewards based on specific Merchant Category Codes.
+- User-friendly interface: Easy-to-use calculator with intuitive design.
+- Dark mode support: Toggle between light and dark themes for comfortable viewing.
+- Responsive design: Works seamlessly across desktop and mobile devices.
+- Real-time calculations: Instantly see reward points or cashback for your transactions.
+- International spend option: Calculate rewards for both local and international transactions.
+
+## How to Use
+
+1. Select your bank from the dropdown menu.
+2. Choose your specific credit card.
+3. (Optional) Select the Merchant Category Code (MCC) for your transaction.
+4. Enter the spent amount in INR.
+5. If applicable, choose between local or international spend.
+6. Click "Calculate Rewards" to see your earnings.
+
+## Technology Stack
+
+- React.js
+- Material-UI (MUI)
+- Next.js (inferred from the use of 'use client')
+
+## Installation and Setup
 
 ```bash
+# Clone the repository
+git clone https://github.com/aashishvanand/credit-card-rewards-india-calculator.git
+
+# Navigate to the project directory
+cd credit-card-rewards-india-calculator
+
+# Install dependencies
+npm install
+
+# Run the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Contributing
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+We welcome contributions to improve the Credit Card Rewards India Calculator! If you notice a missing bank or card, you can use the "Bank or Card Missing?" feature within the app to submit new information.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+For more substantial contributions:
 
-## Learn More
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-To learn more about Next.js, take a look at the following resources:
+## License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Attribution Requirements
 
-## Deploy on Vercel
+If you use, modify, or distribute this project, please provide attribution by including the following:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. The name of the project: Credit Card Rewards India Calculator
+2. The project's GitHub repository URL: https://github.com/aashishvanand/credit-card-rewards-india-calculator
+3. The name of the original author: Aashish Vivekanand
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Example attribution:
+
+```
+This project is based on the Credit Card Rewards India Calculator (https://github.com/aashishvanand/credit-card-rewards-india-calculator) by Aashish Vivekanand.
+```
+
+## Acknowledgements
+
+- [List any libraries, tools, or contributors you want to acknowledge]
+
+---
+
+Visit the live calculator: [Credit Card Rewards Calculator](https://credit-card-rewards-calculator.aashishvanand.me/)
+
+Optimize your rewards and make the most of your credit card benefits with our comprehensive Credit Card Rewards Calculator!
