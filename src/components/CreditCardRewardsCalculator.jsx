@@ -14,20 +14,31 @@ import {
   Autocomplete,
   Snackbar,
   Alert,
-  useMediaQuery,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
+  useMediaQuery
 } from '@mui/material';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { mccList } from '../data/mccData';
 import { bankData } from '../data/bankData';
-import { cardRewards } from '../data/cardRewards';
 import Confetti from 'react-confetti';
 import MissingBankCardForm from './MissingBankCardForm';
+import { iciciCardRewards, calculateICICIRewards } from '../utils/iciciRewards';
+import { hdfcCardRewards, calculateHDFCRewards } from '../utils/hdfcRewards';
+import { axisCardRewards, calculateAxisRewards } from '../utils/axisRewards';
+import { auCardRewards, calculateAURewards } from '../utils/auRewards';
+import { bobCardRewards, calculateBOBRewards } from '../utils/bobRewards';
+import { federalCardRewards, calculateFederalRewards } from '../utils/federalRewards';
+import { hsbcCardRewards, calculateHSBCRewards } from '../utils/hsbcRewards';
+import { idbiCardRewards, calculateIDBIRewards } from '../utils/idbiRewards';
+import { idfcFirstCardRewards, calculateIDFCFirstRewards } from '../utils/idfcfirstRewards';
+import { indusIndCardRewards, calculateIndusIndRewards } from '../utils/indusindRewards';
+import { kotakCardRewards, calculateKotakRewards } from '../utils/kotakRewards';
+import { oneCardRewards, calculateOneCardRewards } from '../utils/onecardRewards';
+import { rblCardRewards, calculateRBLRewards } from '../utils/rblRewards';
+import { sbiCardRewards, calculateSBIRewards } from '../utils/sbiRewards';
+import { scCardRewards, calculateSCRewards } from '../utils/scRewards';
+import { yesCardRewards, calculateYesRewards } from '../utils/yesRewards';
+import DynamicCardInputs from './DynamicCardInputs';
 
 const DEBUG_MODE = true;
 
@@ -62,6 +73,8 @@ const CreditCardRewardsCalculator = () => {
   const [appliedCapping, setAppliedCapping] = useState(null);
   const [spendType, setSpendType] = useState('local');
   const [showInternationalOption, setShowInternationalOption] = useState(false);
+  const [calculationResult, setCalculationResult] = useState(null);
+  const [additionalInputs, setAdditionalInputs] = useState({});
 
   const theme = React.useMemo(
     () =>
@@ -115,16 +128,114 @@ const CreditCardRewardsCalculator = () => {
   }, [selectedBank]);
 
   useEffect(() => {
-    if (selectedCard) {
-      const cardReward = cardRewards[selectedCard];
+    if (selectedCard && selectedBank) {
+      let cardReward;
+      switch (selectedBank) {
+        case "ICICI":
+          cardReward = iciciCardRewards[selectedCard];
+          break;
+        case "HDFC":
+          cardReward = hdfcCardRewards[selectedCard];
+          break;
+        case "Axis":
+          cardReward = axisCardRewards[selectedCard];
+          break;
+        case "AU":
+          cardReward = auCardRewards[selectedCard];
+          break;
+        case "BOB":
+          cardReward = bobCardRewards[selectedCard];
+          break;
+        case "Federal Bank":
+          cardReward = federalCardRewards[selectedCard];
+          break;
+        case "HSBC":
+          cardReward = hsbcCardRewards[selectedCard];
+          break;
+        case "IDBI":
+          cardReward = idbiCardRewards[selectedCard];
+          break;
+        case "IDFC First":
+          cardReward = idfcFirstCardRewards[selectedCard];
+          break;
+        case "IndusInd":
+          cardReward = indusIndCardRewards[selectedCard];
+          break;
+        case "Kotak":
+          cardReward = kotakCardRewards[selectedCard];
+          break;
+        case "OneCard":
+          cardReward = oneCardRewards[selectedCard];
+          break;
+        case "RBL":
+          cardReward = rblCardRewards[selectedCard];
+          break;
+        case "SBI":
+          cardReward = sbiCardRewards[selectedCard];
+          break;
+        case "SC":
+          cardReward = scCardRewards[selectedCard];
+          break;
+        case "Yes Bank":
+          cardReward = yesCardRewards[selectedCard];
+          break;
+        default:
+          cardReward = null;
+      }
       setShowInternationalOption(!!cardReward?.internationalRate);
+      
+      // You can add more logic here to set other card-specific options
+      setAdditionalInputs(prevInputs => ({
+        ...prevInputs,
+        isPrimeMember: cardReward?.amazonPrimeRate ? false : undefined
+      }));
     } else {
       setShowInternationalOption(false);
+      setAdditionalInputs({});
     }
-  }, [selectedCard]);
+  }, [selectedCard, selectedBank]);
 
   const handleSpendTypeChange = (event) => {
     setSpendType(event.target.value);
+  };
+
+  const getCardConfig = (bank, card) => {
+    switch (bank) {
+      case "ICICI":
+        return iciciCardRewards[card];
+      case "HDFC":
+        return hdfcCardRewards[card];
+      case "Axis":
+        return axisCardRewards[card];
+      case "AU":
+        return auCardRewards[card];
+      case "BOB":
+        return bobCardRewards[card];
+      case "Federal Bank":
+        return federalCardRewards[card];
+      case "HSBC":
+        return hsbcCardRewards[card];
+      case "IDBI":
+        return idbiCardRewards[card];
+      case "IDFC First":
+        return idfcFirstCardRewards[card];
+      case "IndusInd":
+        return indusIndCardRewards[card];
+      case "Kotak":
+        return kotakCardRewards[card];
+      case "OneCard":
+        return oneCardRewards[card];
+      case "RBL":
+        return rblCardRewards[card];
+      case "SBI":
+        return sbiCardRewards[card];
+      case "SC":
+        return scCardRewards[card];
+      case "Yes Bank":
+        return yesCardRewards[card];
+      default:
+        return null;
+    }
   };
 
   const calculateRewards = () => {
@@ -134,6 +245,7 @@ const CreditCardRewardsCalculator = () => {
     debugLog("Selected MCC:", selectedMcc);
     debugLog("Spent Amount:", spentAmount);
   
+    // Error checking
     let isError = false;
     setBankError(false);
     setCardError(false);
@@ -153,129 +265,98 @@ const CreditCardRewardsCalculator = () => {
       setToastOpen(true);
       return;
     }
-
+  
     if (!spentAmount) {
       debugLog("Error: Spent amount not entered");
       setToastMessage("Please enter the spent amount.");
       setToastOpen(true);
       return;
     }
-
-  const normalizedCardName = selectedCard.trim();
-  const fullCardName = `${selectedBank} ${normalizedCardName}`.trim();
-  
-  debugLog("Normalized Card Name:", normalizedCardName);
-  debugLog("Full Card Name:", fullCardName);
-
-    const cardReward = cardRewards[selectedCard];
-    if (!cardReward) {
-      debugLog("Error: Card reward structure not found");
-      debugLog("Available card rewards:", Object.keys(cardRewards));
-      setCalculationPerformed(false);
-      setToastMessage("Card reward structure not found");
-      setToastOpen(true);
-      return;
-    }
-  
-    debugLog("Card Reward Structure:", cardReward);
   
     const amount = parseFloat(spentAmount);
-    let rate = cardReward.defaultRate;
-    debugLog("Default Rate:", rate);
+    const mcc = selectedMcc ? selectedMcc.mcc : null;
+    const additionalParams = {
+      isInternational: additionalInputs.isInternational || false,
+      isPrimeMember: additionalInputs.isPrimeMember || false,
+    };
   
-    if (spendType === 'international' && cardReward.internationalRate) {
-      rate = cardReward.internationalRate;
-      debugLog("International Rate Applied:", rate);
-    } else if (selectedMcc && cardReward.mccRates && cardReward.mccRates[selectedMcc.mcc]) {
-      rate = cardReward.mccRates[selectedMcc.mcc];
-      debugLog("MCC-specific Rate:", rate);
-    }
+    let result;
   
-    let points = Math.floor(amount * rate);
-    let cappedPoints = points;
-    let appliedCap = null;
-    debugLog("Calculated Points:", points);
-  
-    // Apply category-specific capping if available
-    if (cardReward.capping && cardReward.capping.categories && selectedMcc) {
-      debugLog("Checking for capping category");
-      const mccName = selectedMcc.name.toLowerCase();
-      const cappingCategories = cardReward.capping.categories;
-        
-      const matchingCategory = Object.keys(cappingCategories).find(cat => 
-        mccName.includes(cat.toLowerCase())
-      );
-    
-      if (matchingCategory) {
-        debugLog("Capping category found:", matchingCategory);
-        const { points: catPoints, maxSpent: catMaxSpent } = cappingCategories[matchingCategory];
-        const cappedAmount = Math.min(amount, catMaxSpent);
-        cappedPoints = Math.min(points, catPoints, Math.floor(cappedAmount * rate));
-          
-        if (cappedPoints < points) {
-          appliedCap = {
-            category: matchingCategory,
-            maxPoints: catPoints,
-            maxSpent: catMaxSpent
-          };
-          debugLog("Capping applied:", appliedCap);
-        }
-      } else {
-        debugLog("No matching capping category found");
-      }
-    } else {
-      debugLog("No capping structure or MCC selected");
-    }
-  
-    debugLog("Final Capped Points:", cappedPoints);
-  
-    let rewardText = "";
-  
-    switch (selectedCard) {
-      case "HDFC Swiggy":
-        rewardText = `₹${cappedPoints} Cashback`;
+    switch (selectedBank) {
+      case "ICICI":
+        result = calculateICICIRewards(selectedCard, amount, mcc, additionalParams);
         break;
-      case "Axis Atlas":
-        rewardText = rate === 0 ? "No EDGE Miles for this transaction" : `${cappedPoints} EDGE Miles`;
+      case "HDFC":
+        result = calculateHDFCRewards(selectedCard, amount, mcc, additionalParams);
         break;
-      case "Axis Vistara":
-        rewardText = rate === 0 ? "No CV Points for this transaction" : `${cappedPoints} CV Points`;
+      case "Axis":
+        result = calculateAxisRewards(selectedCard, amount, mcc, additionalParams);
         break;
-      case "Emeralde Private":
-        rewardText = `${cappedPoints} ICICI Reward Points`;
+      case "AU":
+        result = calculateAURewards(selectedCard, amount, mcc, additionalParams);
         break;
-      case "Cashback":
-        if (rate === 0) {
-          rewardText = "No cashback for this transaction";
-        } else {
-          const cashback = (cappedPoints / 100).toFixed(2);
-          rewardText = `₹${cashback} Cashback`;
-        }
+      case "BOB":
+        result = calculateBOBRewards(selectedCard, amount, mcc, additionalParams);
+        break;
+      case "Federal Bank":
+        result = calculateFederalRewards(selectedCard, amount, mcc, additionalParams);
+        break;
+      case "HSBC":
+        result = calculateHSBCRewards(selectedCard, amount, mcc, additionalParams);
+        break;
+      case "IDBI":
+        result = calculateIDBIRewards(selectedCard, amount, mcc, additionalParams);
+        break;
+      case "IDFC First":
+        result = calculateIDFCFirstRewards(selectedCard, amount, mcc, additionalParams);
+        break;
+      case "IndusInd":
+        result = calculateIndusIndRewards(selectedCard, amount, mcc, additionalParams);
+        break;
+      case "Kotak":
+        result = calculateKotakRewards(selectedCard, amount, mcc, additionalParams);
+        break;
+      case "OneCard":
+        result = calculateOneCardRewards(selectedCard, amount, mcc, additionalParams);
+        break;
+      case "RBL":
+        result = calculateRBLRewards(selectedCard, amount, mcc, additionalParams);
+        break;
+      case "SBI":
+        result = calculateSBIRewards(selectedCard, amount, mcc, additionalParams);
+        break;
+      case "SC":
+        result = calculateSCRewards(selectedCard, amount, mcc, additionalParams);
+        break;
+      case "Yes Bank":
+        result = calculateYesRewards(selectedCard, amount, mcc, additionalParams);
         break;
       default:
-        rewardText = `${cappedPoints} Reward Points`;
+        debugLog("Error: Unknown bank selected");
+        setToastMessage("Unknown bank selected");
+        setToastOpen(true);
+        return;
     }
   
-    debugLog("Reward Text:", rewardText);
+    if (result) {
+      debugLog("Calculation Result:", result);
+      setRewardPoints(result.uncappedPoints);
+      setCappedRewardPoints(result.points);
+      setAppliedCapping(result.appliedCap);
+      setCalculationResult(result);
+      setCalculationPerformed(true);
   
-    setRewardPoints(points);
-    setCappedRewardPoints(cappedPoints);
-    setAppliedCapping(appliedCap);
-    setCalculationPerformed(true);
-  
-    if (cappedPoints > 0 && firstSuccessfulSearch) {
-      setShowConfetti(true);
-      setFirstSuccessfulSearch(false);
-      setTimeout(() => setShowConfetti(false), 5000);
+      if (result.points > 0 && firstSuccessfulSearch) {
+        setShowConfetti(true);
+        setFirstSuccessfulSearch(false);
+        setTimeout(() => setShowConfetti(false), 5000);
+      }
+    } else {
+      debugLog("Error: Calculation failed");
+      setToastMessage("Failed to calculate rewards. Please try again.");
+      setToastOpen(true);
     }
   
-    const result = {
-      rewardText,
-      uncappedPoints: points,
-      cappedPoints,
-      appliedCap
-    };
-    debugLog("Calculation Result:", result);
     return result;
   };
 
@@ -327,6 +408,10 @@ const CreditCardRewardsCalculator = () => {
     setSnackbarMessage(message);
     setSnackbarSeverity(severity);
     setSnackbarOpen(true);
+  };
+
+  const handleAdditionalInputChange = (key, value) => {
+    setAdditionalInputs(prev => ({ ...prev, [key]: value }));
   };
 
 
@@ -421,50 +506,42 @@ const CreditCardRewardsCalculator = () => {
           value={selectedMcc}
         />
 
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Enter spent amount (INR)"
-          type="number"
-          value={spentAmount}
-          onChange={(e) => setSpentAmount(e.target.value)}
+<TextField
+        fullWidth
+        margin="normal"
+        label="Enter spent amount (INR)"
+        type="number"
+        value={spentAmount}
+        onChange={(e) => setSpentAmount(e.target.value)}
+        variant="outlined"
+      />
+
+{selectedCard && (
+  <DynamicCardInputs
+  cardConfig={getCardConfig(selectedBank, selectedCard)}
+    onChange={handleAdditionalInputChange}
+  />
+)}
+
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 3, mb: 2 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={calculateRewards}
+          sx={{ py: 1.5, fontSize: '1.1rem', flex: 1, mr: 1 }}
+        >
+          Calculate Rewards
+        </Button>
+        <Button
           variant="outlined"
-        />
+          color="secondary"
+          onClick={clearForm}
+          sx={{ py: 1.5, fontSize: '1.1rem', flex: 1, ml: 1 }}
+        >
+          Clear
+        </Button>
+      </Box>
 
-        {showInternationalOption && (
-          <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
-            <FormLabel component="legend">Spend Type</FormLabel>
-            <RadioGroup
-              aria-label="spend-type"
-              name="spend-type"
-              value={spendType}
-              onChange={handleSpendTypeChange}
-              row
-            >
-              <FormControlLabel value="local" control={<Radio />} label="Local" />
-              <FormControlLabel value="international" control={<Radio />} label="International" />
-            </RadioGroup>
-          </FormControl>
-        )}
-
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mt: 3, mb: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={calculateRewards}
-            sx={{ py: 1.5, fontSize: '1.1rem', flex: 1, mr: 1 }}
-          >
-            Calculate Rewards
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={clearForm}
-            sx={{ py: 1.5, fontSize: '1.1rem', flex: 1, ml: 1 }}
-          >
-            Clear
-          </Button>
-        </Box>
 
         <Button
           variant="text"
@@ -475,40 +552,40 @@ const CreditCardRewardsCalculator = () => {
           Bank or Card Missing?
         </Button>
 
-        {calculationPerformed && (
-          <Paper 
-            elevation={3} 
-            sx={{ 
-              p: 3, 
-              mt: 2, 
-              width: '100%', 
-              bgcolor: rewardPoints > 0 ? 'success.light' : 'error.light',
-              borderRadius: 2
-            }}
-          >
-            <Typography variant="h5" align="center" color="textPrimary" fontWeight="bold">
-  {cappedRewardPoints > 0 ? (
-    <>
-      🎉 {cappedRewardPoints} Reward Points {appliedCapping ? '(Capped)' : ''} 🎉
-      {appliedCapping && appliedCapping.category && (
-        <Typography variant="body2" color="textSecondary">
-          {`${appliedCapping.category} cap applied: Max ${appliedCapping.maxPoints} points or ₹${appliedCapping.maxSpent.toFixed(2)} spent`}
-        </Typography>
+        {calculationPerformed && calculationResult && (
+  <Paper 
+    elevation={3} 
+    sx={{ 
+      p: 3, 
+      mt: 2, 
+      width: '100%', 
+      bgcolor: calculationResult.points > 0 ? 'success.light' : 'error.light',
+      borderRadius: 2
+    }}
+  >
+    <Typography variant="h5" align="center" color="textPrimary" fontWeight="bold">
+      {calculationResult.points > 0 ? (
+        <>
+          🎉 {calculationResult.rewardText} 🎉
+          {calculationResult.appliedCap && (
+            <Typography variant="body2" color="textSecondary">
+              {`${calculationResult.appliedCap.category} cap applied: Max ${calculationResult.appliedCap.maxPoints} points or ₹${calculationResult.appliedCap.maxSpent.toFixed(2)} spent`}
+            </Typography>
+          )}
+          {calculationResult.uncappedPoints && calculationResult.uncappedPoints !== calculationResult.points && (
+            <Typography variant="body2" color="textSecondary">
+              (Uncapped: {calculationResult.uncappedPoints} points)
+            </Typography>
+          )}
+        </>
+      ) : (
+        <>
+          😢 No rewards earned 😢
+        </>
       )}
-      {rewardPoints !== cappedRewardPoints && (
-        <Typography variant="body2" color="textSecondary">
-          (Uncapped: {rewardPoints} points)
-        </Typography>
-      )}
-    </>
-  ) : (
-    <>
-      😢 No rewards earned 😢
-    </>
-  )}
-</Typography>
-          </Paper>
-        )}
+    </Typography>
+  </Paper>
+)}
       </Paper>
     </Container>
     <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
