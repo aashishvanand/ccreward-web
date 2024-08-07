@@ -1,5 +1,5 @@
 export const axisCardRewards = {
-  "Axis ACE": {
+  "ACE": {
     defaultRate: 1 / 100,
     mccRates: {}
   },
@@ -102,53 +102,154 @@ export const axisCardRewards = {
       }      
     },
   "Aura": {
-    defaultRate: 1 / 100,
-    mccRates: {}
-  },
-  "Axis Vistara": {
-    defaultRate: 6 / 200,
+    defaultRate: 2 / 200, // 2 edge points per ₹200
     mccRates: {
+      "6300": 5 / 200, // 5X EDGE REWARDS on insurance spends
+    },
+    capping: {
+      categories: {
+        "Insurance": { points: 250, maxSpent: 10000 }, // 5X points, max ₹10,000 spent
+      }
     }
   },
-  "Axis Vistara Infinite": {
-    defaultRate: 6 / 200,
+  "Vistara": {
+    defaultRate: 2 / 200, // 2 CV Points for every Rs 200 of eligible spends
     mccRates: {
-      // Wallet Load
-      "6540": 0,"4814": 0,
-      // Rent
-      "6513": 0,
-      // Government Services
-      "9222": 0,"9311": 0,"9399": 0,"9402": 0,
-      // Utilities
-      "4816": 0,"4899": 0,"4900": 0,
-      // Insurance
-      "6012": 0,"6051": 0,
-      // Mutual Funds
-      "6011": 0
+      // Excluded categories
+      "6513": 0, // Rental Payments
+      "6540": 0, // Wallet Load Transactions
+      "4814": 0, "4816": 0, "4899": 0, "4900": 0, // Utility Services
+      "9222": 0, "9311": 0, "9399": 0, "9402": 0, // Government Services
+      "5960": 0, "6012": 0, "6051": 0, "6300": 0, "6381": 0, // Insurance Services
+      "5094": 0, "5944": 0, // Precious Stones & Metals, Clock, Jewellery, Watch and Silverware Stores
     }
   },
-  "Axis Vistara Signature": {
-    defaultRate: 1 / 100,
-    mccRates: {}
+  "Vistara Infinite": {
+    defaultRate: 6 / 200, // 6 CV Points for every Rs. 200 of eligible spends
+    mccRates: {
+      // Excluded categories
+      "6513": 0, // Rental Payments
+      "6540": 0, // Wallet Load Transactions
+      "4814": 0, "4816": 0, "4899": 0, "4900": 0, // Utility Services
+      "9222": 0, "9311": 0, "9399": 0, "9402": 0, // Government Services
+      "5960": 0, "6012": 0, "6051": 0, "6300": 0, "6381": 0, // Insurance Services
+      "5094": 0, "5944": 0, // Precious Stones & Metals, Clock, Jewellery, Watch and Silverware Stores
+      "5541": 0, "5542": 0, // Fuel transactions
+    }
+  },
+  "Vistara Signature": {
+    defaultRate: 4 / 200, // 4 CV Points for every Rs. 200 of eligible spends
+    mccRates: {
+      // Excluded categories (same as Vistara card)
+      "6513": 0, // Rental Payments
+      "6540": 0, // Wallet Load Transactions
+      "4814": 0, "4816": 0, "4899": 0, "4900": 0, // Utility Services
+      "9222": 0, "9311": 0, "9399": 0, "9402": 0, // Government Services
+      "5960": 0, "6012": 0, "6051": 0, "6300": 0, "6381": 0, // Insurance Services
+      "5094": 0, "5944": 0, // Precious Stones & Metals, Clock, Jewellery, Watch and Silverware Stores
+    }
   },
   "Flipkart": {
-    defaultRate: 1 / 100,
-    mccRates: {}
+    defaultRate: 1 / 100, // 1% cashback
+    mccRates: {
+      // Flipkart and Cleartrip (assuming e-commerce MCC)
+      "5399": 5 / 100, // 5% cashback for general e-commerce
+      "4722": 5 / 100, // 5% cashback for travel agencies (Cleartrip)
+
+      // Preferred Merchants (examples, adjust as needed)
+      "5812": 4 / 100, // 4% cashback for restaurants (e.g., Swiggy)
+      "7832": 4 / 100, // 4% cashback for movie theaters (e.g., PVR)
+      "4121": 4 / 100, // 4% cashback for taxicabs/limousines (e.g., Uber)
+      "7997": 4 / 100, // 4% cashback for gyms/fitness centers (e.g., Cultfit)
+    }
+  },
+  "Flipkart Super Elite": {
+    defaultRate: 2 / 100, // 2 SuperCoins per ₹100 on all other spends
+    mccRates: {
+      "5399": 6 / 100 // 6 SuperCoins per ₹100 for Flipkart purchases (non-Plus members)
+    },
+    flipkartPlusRate: {
+      "5399": 12 / 100 // 12 SuperCoins per ₹100 for Flipkart purchases (Plus members)
+    }
   },
   "Freecharge": {
     defaultRate: 1 / 100,
     mccRates: {}
   },
-  "IOCL": {
-    defaultRate: 1 / 100,
-    mccRates: {}
+  "Indian Oil": {
+    defaultRate: 1 / 100, // 1 reward point per ₹100
+    mccRates: {
+      "5541": 20 / 100, // 20 reward points per ₹100 at IOCL fuel outlets
+      "5542": 20 / 100,
+      "5983": 20 / 100,
+    },
+    acceleratedRewards: {
+      onlineShopping: {
+        rate: 5 / 100, // 5 reward points per ₹100
+        maxSpend: 5000,
+      },
+    },
+    capping: {
+      categories: {
+        "Fuel": { points: 1000, maxSpent: 5000 }, // 20 points per 100, max 5000 spent
+        "OnlineShopping": { points: 250, maxSpent: 5000 }, // 5 points per 100, max 5000 spent
+      }
+    }
+  },
+  "Indian Oil Premium": {
+    defaultRate: 1 / 150, // 1 EDGE MILE per ₹150
+    mccRates: {
+      "5541": 6 / 150, // 6 EDGE MILES per ₹150 at IOCL fuel outlets
+      "5542": 6 / 150,
+      "5983": 6 / 150,
+      "5411": 2 / 150, // 2 EDGE MILES per ₹150 for Grocery & Supermarket
+    },
+    capping: {
+      categories: {
+        "Fuel": { points: 600, maxSpent: 15000 }, // 6 EDGE MILES per 150, max 15000 spent
+        "Grocery": { points: 33, maxSpent: 5000 }, // 2 EDGE MILES per 150, max 5000 spent
+      }
+    },
   },
   "Magnus": {
-    defaultRate: 1 / 16.666,
-    mccRates: {}
+    defaultRate: 12 / 200, // 12 EDGE Reward Points for every INR 200
+    mccRates: {
+      // Excluded categories
+      "6540": 0, "9222": 0, "9311": 0, "9399": 0, "9402": 0, // Wallet and Government
+      "4814": 0, "4816": 0, "4899": 0, "4900": 0, // Utilities
+      "6300": 0, "6381": 0, "5960": 0, "6051": 0, "6012": 0, // Insurance
+      "5541": 0, "5542": 0, "5983": 0, // Fuel
+      "5094": 0, "5944": 0, // Gold & Jewellery
+      "6513": 12 / 200, // Rent MCC, same as default rate
+    },
+    acceleratedRewards: {
+      regularSpend: {
+        tier1: {
+          rate: 12 / 200,
+          threshold: 150000
+        },
+        tier2: {
+          rate: 35 / 200
+        }
+      },
+      travelEdgePortal: {
+        tier1: {
+          rate: 60 / 200,
+          threshold: 200000
+        },
+        tier2: {
+          rate: 35 / 200
+        }
+      }
+    },
+    capping: {
+      categories: {
+        "Rent": { points: 3000, maxSpent: 50000 }, // 12 points per 200, max 50000 spent
+      }
+    }
   },
   "MyZone": {
-    defaultRate: 1 / 100,
+    defaultRate: 4 / 200,
     mccRates: {}
   },
   "Neo": {
@@ -156,7 +257,7 @@ export const axisCardRewards = {
     mccRates: {}
   },
   "Privilege": {
-    defaultRate: 1 / 20,
+    defaultRate: 10 / 200,
     mccRates: {}
   },
   "Reserve": {
@@ -164,12 +265,112 @@ export const axisCardRewards = {
     mccRates: {}
   },
   "Rewards": {
-    defaultRate: 1 / 62.5,
-    mccRates: {}
+    defaultRate: 2 / 125, // 2 EDGE REWARD points per ₹125
+    mccRates: {
+      "5311": 10 / 125, // 10X reward points on apparel and departmental stores
+      "5651": 10 / 125,
+      "5655": 10 / 125,
+      "5699": 10 / 125,
+    }
   },
   "Select": {
     defaultRate: 1 / 100,
     mccRates: {}
+  },
+  "Horizon": {
+    defaultRate: 2 / 100, // 2 EDGE Miles per INR 100 on all other spends
+    mccRates: {
+      // Excluded categories
+      "4111": 0, "4121": 0, "4131": 0, "4784": 0, // Transportation & Tolls
+      "4814": 0, "4816": 0, "4899": 0, "4900": 0, // Utilities
+      "6300": 0, "6381": 0, "5960": 0, "6012": 0, "6051": 0, // Insurance
+      "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0, // Educational Institutions
+      "9211": 0, "9222": 0, "9311": 0, "9399": 0, "9402": 0, "9405": 0, "8220": 0, // Govt. Institutions
+      "6540": 0, // Wallet
+      "6513": 0, // Rent
+      "5541": 0, "5542": 0, "5983": 0, "5172": 0, // Fuel
+
+      //airlines
+      "3000": 5 / 100, "3001": 5 / 100, "3002": 5 / 100, "3003": 5 / 100, "3004": 5 / 100, "3005": 5 / 100,
+      "3006": 5 / 100, "3007": 5 / 100, "3008": 5 / 100, "3009": 5 / 100, "3010": 5 / 100, "3011": 5 / 100,
+      "3012": 5 / 100, "3013": 5 / 100, "3014": 5 / 100, "3015": 5 / 100, "3016": 5 / 100, "3017": 5 / 100,
+      "3018": 5 / 100, "3019": 5 / 100, "3020": 5 / 100, "3021": 5 / 100, "3022": 5 / 100, "3023": 5 / 100,
+      "3024": 5 / 100, "3025": 5 / 100, "3026": 5 / 100, "3027": 5 / 100, "3028": 5 / 100, "3029": 5 / 100,
+      "3030": 5 / 100, "3031": 5 / 100, "3032": 5 / 100, "3033": 5 / 100, "3034": 5 / 100, "3035": 5 / 100,
+      "3036": 5 / 100, "3037": 5 / 100, "3038": 5 / 100, "3039": 5 / 100, "3040": 5 / 100, "3041": 5 / 100,
+      "3042": 5 / 100, "3043": 5 / 100, "3044": 5 / 100, "3045": 5 / 100, "3046": 5 / 100, "3047": 5 / 100,
+      "3048": 5 / 100, "3049": 5 / 100, "3050": 5 / 100, "3051": 5 / 100, "3052": 5 / 100, "3053": 5 / 100,
+      "3054": 5 / 100, "3055": 5 / 100, "3056": 5 / 100, "3057": 5 / 100, "3058": 5 / 100, "3059": 5 / 100,
+      "3060": 5 / 100, "3061": 5 / 100, "3062": 5 / 100, "3063": 5 / 100, "3064": 5 / 100, "3065": 5 / 100,
+      "3066": 5 / 100, "3067": 5 / 100, "3068": 5 / 100, "3069": 5 / 100, "3070": 5 / 100, "3071": 5 / 100,
+      "3072": 5 / 100, "3073": 5 / 100, "3074": 5 / 100, "3075": 5 / 100, "3076": 5 / 100, "3077": 5 / 100,
+      "3078": 5 / 100, "3079": 5 / 100, "3080": 5 / 100, "3081": 5 / 100, "3082": 5 / 100, "3083": 5 / 100,
+      "3084": 5 / 100, "3085": 5 / 100, "3086": 5 / 100, "3087": 5 / 100, "3088": 5 / 100, "3089": 5 / 100,
+      "3090": 5 / 100, "3091": 5 / 100, "3092": 5 / 100, "3093": 5 / 100, "3094": 5 / 100, "3095": 5 / 100,
+      "3096": 5 / 100, "3097": 5 / 100, "3098": 5 / 100, "3099": 5 / 100, "3100": 5 / 100, "3101": 5 / 100,
+      "3102": 5 / 100, "3103": 5 / 100, "3104": 5 / 100, "3105": 5 / 100, "3106": 5 / 100, "3107": 5 / 100,
+      "3108": 5 / 100, "3109": 5 / 100, "3110": 5 / 100, "3111": 5 / 100, "3112": 5 / 100, "3113": 5 / 100,
+      "3114": 5 / 100, "3115": 5 / 100, "3116": 5 / 100, "3117": 5 / 100, "3118": 5 / 100, "3119": 5 / 100,
+      "3120": 5 / 100, "3121": 5 / 100, "3122": 5 / 100, "3123": 5 / 100, "3124": 5 / 100, "3125": 5 / 100,
+      "3126": 5 / 100, "3127": 5 / 100, "3128": 5 / 100, "3129": 5 / 100, "3130": 5 / 100, "3131": 5 / 100,
+      "3132": 5 / 100, "3133": 5 / 100, "3134": 5 / 100, "3135": 5 / 100, "3136": 5 / 100, "3137": 5 / 100,
+      "3138": 5 / 100, "3139": 5 / 100, "3140": 5 / 100, "3141": 5 / 100, "3142": 5 / 100, "3143": 5 / 100,
+      "3144": 5 / 100, "3145": 5 / 100, "3146": 5 / 100, "3147": 5 / 100, "3148": 5 / 100, "3149": 5 / 100,
+      "3150": 5 / 100, "3151": 5 / 100, "3152": 5 / 100, "3153": 5 / 100, "3154": 5 / 100, "3155": 5 / 100,
+      "3156": 5 / 100, "3157": 5 / 100, "3158": 5 / 100, "3159": 5 / 100, "3160": 5 / 100, "3161": 5 / 100,
+      "3162": 5 / 100, "3163": 5 / 100, "3164": 5 / 100, "3165": 5 / 100, "3166": 5 / 100, "3167": 5 / 100,
+      "3168": 5 / 100, "3169": 5 / 100, "3170": 5 / 100, "3171": 5 / 100, "3172": 5 / 100, "3173": 5 / 100,
+      "3174": 5 / 100, "3175": 5 / 100, "3176": 5 / 100, "3177": 5 / 100, "3178": 5 / 100, "3179": 5 / 100,
+      "3180": 5 / 100, "3181": 5 / 100, "3182": 5 / 100, "3183": 5 / 100, "3184": 5 / 100, "3185": 5 / 100,
+      "3186": 5 / 100, "3187": 5 / 100, "3188": 5 / 100, "3189": 5 / 100, "3190": 5 / 100, "3191": 5 / 100,
+      "3192": 5 / 100, "3193": 5 / 100, "3194": 5 / 100, "3195": 5 / 100, "3196": 5 / 100, "3197": 5 / 100,
+      "3198": 5 / 100, "3199": 5 / 100, "3200": 5 / 100, "3201": 5 / 100, "3202": 5 / 100, "3203": 5 / 100,
+      "3204": 5 / 100, "3205": 5 / 100, "3206": 5 / 100, "3207": 5 / 100, "3208": 5 / 100, "3209": 5 / 100,
+      "3210": 5 / 100, "3211": 5 / 100, "3212": 5 / 100, "3213": 5 / 100, "3214": 5 / 100, "3215": 5 / 100,
+      "3216": 5 / 100, "3217": 5 / 100, "3218": 5 / 100, "3219": 5 / 100, "3220": 5 / 100, "3221": 5 / 100,
+      "3222": 5 / 100, "3223": 5 / 100, "3224": 5 / 100, "3225": 5 / 100, "3226": 5 / 100, "3227": 5 / 100,
+      "3228": 5 / 100, "3229": 5 / 100, "3230": 5 / 100, "3231": 5 / 100, "3232": 5 / 100, "3233": 5 / 100,
+      "3234": 5 / 100, "3235": 5 / 100, "3236": 5 / 100, "3237": 5 / 100, "3238": 5 / 100, "3239": 5 / 100,
+      "3240": 5 / 100, "3241": 5 / 100, "3242": 5 / 100, "3243": 5 / 100, "3244": 5 / 100, "3245": 5 / 100,
+      "3246": 5 / 100, "3247": 5 / 100, "3248": 5 / 100, "3249": 5 / 100, "3250": 5 / 100, "3251": 5 / 100,
+      "3252": 5 / 100, "3253": 5 / 100, "3254": 5 / 100, "3255": 5 / 100, "3256": 5 / 100, "3257": 5 / 100,
+      "3258": 5 / 100, "3259": 5 / 100, "3260": 5 / 100, "3261": 5 / 100, "3262": 5 / 100, "3263": 5 / 100,
+      "3264": 5 / 100, "3265": 5 / 100, "3266": 5 / 100, "3267": 5 / 100, "3268": 5 / 100, "3269": 5 / 100,
+      "3270": 5 / 100, "3271": 5 / 100, "3272": 5 / 100, "3273": 5 / 100, "3274": 5 / 100, "3275": 5 / 100,
+      "3276": 5 / 100, "3277": 5 / 100, "3278": 5 / 100, "3279": 5 / 100, "3280": 5 / 100, "3281": 5 / 100,
+      "3282": 5 / 100, "3283": 5 / 100, "3284": 5 / 100, "3285": 5 / 100, "3286": 5 / 100, "3287": 5 / 100,
+      "3288": 5 / 100, "3289": 5 / 100, "3290": 5 / 100, "3291": 5 / 100, "3292": 5 / 100, "3293": 5 / 100,
+      "3294": 5 / 100, "3295": 5 / 100, "3296": 5 / 100, "3297": 5 / 100, "3298": 5 / 100, "3299": 5 / 100,
+      "3300": 5 / 100, "3301": 5 / 100, "3302": 5 / 100, "3303": 5 / 100, "3304": 5 / 100, "3305": 5 / 100,
+      "3306": 5 / 100, "3307": 5 / 100, "3308": 5 / 100, "3309": 5 / 100, "3310": 5 / 100, "3311": 5 / 100,
+      "3312": 5 / 100, "3313": 5 / 100, "3314": 5 / 100, "3315": 5 / 100, "3316": 5 / 100, "3317": 5 / 100,
+      "3318": 5 / 100, "3319": 5 / 100, "3320": 5 / 100, "3321": 5 / 100, "3322": 5 / 100, "3323": 5 / 100,
+      "3324": 5 / 100, "3325": 5 / 100, "3326": 5 / 100, "3327": 5 / 100, "3328": 5 / 100, "3329": 5 / 100,
+      "3330": 5 / 100, "3331": 5 / 100, "3332": 5 / 100, "3333": 5 / 100, "3334": 5 / 100, "3335": 5 / 100,
+      "3336": 5 / 100, "3337": 5 / 100, "3338": 5 / 100, "3339": 5 / 100, "3340": 5 / 100, "3341": 5 / 100,
+      "3342": 5 / 100, "3343": 5 / 100, "3344": 5 / 100, "3345": 5 / 100, "3346": 5 / 100, "3347": 5 / 100,
+      "3348": 5 / 100, "3349": 5 / 100, "3350": 5 / 100, "4511": 5 / 100
+    },
+    acceleratedRewards: {
+      regularSpend: {
+        tier1: {
+          rate: 2 / 100,
+          threshold: 150000
+        },
+        tier2: {
+          rate: 3 / 100
+        }
+      },
+        travelEdgePortal: {
+          tier1: {
+            rate: 5 / 100,
+            threshold: 200000
+          },
+          tier2: {
+            rate: 3 / 100
+          }
+        }
+      }
   }
 };
 
@@ -187,16 +388,68 @@ export const calculateAxisRewards = (cardName, amount, mcc, additionalParams = {
 
   let rate = cardReward.defaultRate;
   let rateType = "default";
+  let category = "Other Spends";
 
-  // Check for international rate
-  if (additionalParams.isInternational && cardReward.internationalRate) {
-    rate = cardReward.internationalRate;
-    rateType = "international";
-  }
   // Check for MCC-specific rate
+  if (mcc && cardReward.mccRates && cardReward.mccRates[mcc] !== undefined) {
+    rate = cardReward.mccRates[mcc];
+    rateType = "mcc-specific";
+    category = rate === 0 ? "Excluded Category" : "Category Spend";
+  }
+  //TODO: disable MCC if travelEdgePortal is true
+  // Special handling for Magnus and Horizon card
+  if ((cardName === "Magnus" || cardName === "Horizon") && rate !== 0) {
+    const isTravelEdgePortal = additionalParams.isTravelEdgePortal || false;
+
+    if (isTravelEdgePortal) {
+      const travelEdgeRewards = cardReward.acceleratedRewards.travelEdgePortal;
+      if (amount <= travelEdgeRewards.tier1.threshold) {
+        rate = travelEdgeRewards.tier1.rate;
+      } else {
+        rate = travelEdgeRewards.tier2.rate;
+      }
+      rateType = "travel-edge";
+      category = "Travel Edge Portal";
+    } else {
+      const regularRewards = cardReward.acceleratedRewards.regularSpend;
+      if (amount <= regularRewards.tier1.threshold) {
+        rate = regularRewards.tier1.rate;
+      } else {
+        rate = regularRewards.tier2.rate;
+      }
+      rateType = amount > regularRewards.tier1.threshold ? "accelerated" : "default";
+    }
+  }
+
+  // Special handling for Flipkart Super Elite card
+  if (cardName === "Flipkart Super Elite") {
+    if (mcc === "5399") { // Flipkart purchase
+      if (additionalParams.isFlipkartPlusMember && cardReward.flipkartPlusRate) {
+        rate = cardReward.flipkartPlusRate["5399"];
+        rateType = "flipkart-plus";
+        category = "Flipkart Plus Purchase";
+      } else {
+        rate = cardReward.mccRates["5399"];
+        rateType = "flipkart-regular";
+        category = "Flipkart Purchase";
+      }
+    }
+  } 
+  // Check for MCC-specific rate for other cards
   else if (mcc && cardReward.mccRates && cardReward.mccRates[mcc]) {
     rate = cardReward.mccRates[mcc];
     rateType = "mcc-specific";
+    category = "Category Spend";
+  }
+
+  // Special handling for Horizon card
+  if (cardName === "Horizon") {
+    const isAxisTravelEdge = additionalParams.isAxisTravelEdge || false;
+    if (isAxisTravelEdge || (cardReward.airlineMCCs && cardReward.airlineMCCs.includes(mcc))) {
+      rate = cardReward.acceleratedRate;
+      rateType = "accelerated";
+      category = isAxisTravelEdge ? "Axis Travel EDGE" : "Airline Spend";
+    }
   }
 
   let points = Math.floor(amount * rate);
@@ -204,43 +457,54 @@ export const calculateAxisRewards = (cardName, amount, mcc, additionalParams = {
   let appliedCap = null;
 
   // Apply category-specific capping if available
-  if (cardReward.capping && cardReward.capping.categories && mcc) {
-    const mccName = mcc.toLowerCase();
-    const cappingCategories = cardReward.capping.categories;
-    
-    const matchingCategory = Object.keys(cappingCategories).find(cat => 
-      mccName.includes(cat.toLowerCase())
-    );
-
-    if (matchingCategory) {
-      const { points: catPoints, maxSpent: catMaxSpent } = cappingCategories[matchingCategory];
-      const cappedAmount = Math.min(amount, catMaxSpent);
-      cappedPoints = Math.min(points, catPoints, Math.floor(cappedAmount * rate));
+  if (cardReward.capping && cardReward.capping.categories && category) {
+    const cappingCategory = cardReward.capping.categories[category];
+    if (cappingCategory) {
+      const { points: maxPoints, maxSpent } = cappingCategory;
+      const cappedAmount = Math.min(amount, maxSpent);
+      cappedPoints = Math.min(points, maxPoints, Math.floor(cappedAmount * rate));
       
       if (cappedPoints < points) {
         appliedCap = {
-          category: matchingCategory,
-          maxPoints: catPoints,
-          maxSpent: catMaxSpent
+          category,
+          maxPoints,
+          maxSpent
         };
       }
     }
   }
 
-  // Default reward text
-  let rewardText = `${cappedPoints} Axis Reward Points`;
-
-  // Bank-specific logic (to be customized for each bank)
+  // Generate reward text
+  let rewardText = "";
   switch (cardName) {
-    case "Axis Atlas":
-        rewardText = rate === 0 ? "No EDGE Miles for this transaction" : `${cappedPoints} EDGE Miles`;
-        break;
-    case "Axis Vistara":
-            rewardText = rate === 0 ? "No CV Points for this transaction" : `${cappedPoints} CV Points`;
-            break;
-    default:
-      // Default case if no specific logic is needed
+    case "Magnus":
+      rewardText = rate === 0 ? "No EDGE Reward Points for this transaction" : `${cappedPoints} EDGE Reward Points`;
+      if (rateType === "travel-edge") {
+        rewardText += " (Travel Edge Portal rate applied)";
+      } else if (rateType === "accelerated") {
+        rewardText += " (Accelerated rate applied)";
+      }
       break;
+    case "Flipkart Super Elite":
+      rewardText = `${cappedPoints} SuperCoins`;
+      if (category === "Flipkart Plus Purchase") {
+        rewardText += " (Flipkart Plus rate applied)";
+      } else if (category === "Flipkart Purchase") {
+        rewardText += " (Regular Flipkart rate applied)";
+      }
+      break;
+    case "Atlas" || "Horizon":
+      rewardText = rate === 0 ? "No EDGE Miles for this transaction" : `${cappedPoints} EDGE Miles`;
+      break;
+    case "Vistara" || "Vistara Signature" || "Vistara Infinite":
+      rewardText = rate === 0 ? "No CV Points for this transaction" : `${cappedPoints} CV Points`;
+      break;
+    default:
+      rewardText = rate === 0 ? "No Axis Reward Points for this transaction" : `${cappedPoints} Axis Reward Points`;
+  }
+
+  if (category !== "Other Spends" && !rewardText.includes(category)) {
+    rewardText += ` (${category})`;
   }
 
   return {

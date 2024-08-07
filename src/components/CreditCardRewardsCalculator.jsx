@@ -278,6 +278,9 @@ const CreditCardRewardsCalculator = () => {
     const additionalParams = {
       isInternational: additionalInputs.isInternational || false,
       isPrimeMember: additionalInputs.isPrimeMember || false,
+      isFlipkartPlusMember: additionalInputs.isFlipkartPlusMember || false,
+      isBirthday: additionalInputs.isBirthday || false,
+      isTravelEdgePortal: additionalInputs.isTravelEdgePortal || false,
     };
   
     let result;
@@ -298,7 +301,7 @@ const CreditCardRewardsCalculator = () => {
       case "BOB":
         result = calculateBOBRewards(selectedCard, amount, mcc, additionalParams);
         break;
-      case "Federal Bank":
+      case "Federal":
         result = calculateFederalRewards(selectedCard, amount, mcc, additionalParams);
         break;
       case "HSBC":
@@ -429,7 +432,7 @@ const CreditCardRewardsCalculator = () => {
       <Paper elevation={6} sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', borderRadius: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mb: 3 }}>
           <Typography component="h1" variant="h4" fontWeight="bold" color="primary">
-            Rewards Calculator
+            Credit Cards Rewards Calculator
           </Typography>
           <IconButton onClick={toggleColorMode} color="inherit" sx={{ ml: 2 }}>
             {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
@@ -520,6 +523,7 @@ const CreditCardRewardsCalculator = () => {
   <DynamicCardInputs
   cardConfig={getCardConfig(selectedBank, selectedCard)}
     onChange={handleAdditionalInputChange}
+    currentInputs={additionalInputs}
   />
 )}
 

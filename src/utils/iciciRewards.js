@@ -12,7 +12,7 @@ export const iciciCardRewards = {
     }
   },
   "Coral": {
-    defaultRate: 1 / 50,
+    defaultRate: 2 / 50,
     mccRates: {
       "4900": 1 / 100,
       "6300": 1 / 100
@@ -40,12 +40,8 @@ export const iciciCardRewards = {
       "4900": 1 / 100
     }
   },
-  "Coral Rupay": {
-    defaultRate: 1 / 100,
-    mccRates: {}
-  },
   "Rubyx": {
-    defaultRate: 1 / 50,
+    defaultRate: 2 / 100,
     mccRates: {
       "4900": 1 / 100,
       "6300": 1 / 100
@@ -53,7 +49,7 @@ export const iciciCardRewards = {
     internationalRate: 4 / 100
   },
   "Sapphiro": {
-    defaultRate: 1 / 50,
+    defaultRate: 2 / 100,
     mccRates: {
       "4900": 1 / 100,
       "6300": 1 / 100
@@ -61,12 +57,19 @@ export const iciciCardRewards = {
     internationalRate: 4 / 100
   },
   "HPCL Super Saver": {
-    defaultRate: 2 / 100,
+    defaultRate: 2 / 100, // 2 ICICI Bank Reward Points per INR 100 spent on non-fuel, utility, and departmental store purchases
     mccRates: {
-      "5541": 4 / 100,
-      "4900": 5 / 100,
-      "5311": 5 / 100
-    }
+        "5541": 4 / 100, // Fuel Spends
+        "4900": 5 / 100, // Utility
+        "5311": 5 / 100  // Grocery & Departmental store
+    },
+    capping: {
+        categories: {
+            "Fuel Spends & HP Pay": { points: 200 / 0.05, maxSpent: 200 }, // Capped at Rs. 200 per month
+            "Utility, Grocery & Departmental Store": { points: 400, maxSpent: 100 / 0.05 }, // Capped at 400 points (equivalent to Rs. 100) per month
+            "HP Pay Fuel Spends": { points: 1.5 / 100 } // Additional 1.5% as points
+        }
+    },
   },
   "HPCL Coral": {
     defaultRate: 2 / 100,
@@ -84,6 +87,18 @@ export const iciciCardRewards = {
       "7011": 4 / 200,
       "4511": 2 / 200
     }
+  },
+  "Manchester United Platinum": {
+    defaultRate: 3 / 100,
+    mccRates: {}
+  },
+  "Manchester United Signature": {
+    defaultRate: 5 / 100,
+    mccRates: {}
+  },
+  "Platinum": {
+    defaultRate: 2 / 100,
+    mccRates: {}
   },
   "MMT": {
     defaultRate: 1 / 100,
@@ -105,7 +120,6 @@ export const calculateICICIRewards = (cardName, amount, mcc, additionalParams = 
   let appliedCap = null;
   let uncappedPoints = null;
 
-  // Find MCC name
   const mccName = mcc ? mccList.find(item => item.mcc === mcc)?.name.toLowerCase() : null;
 
   if (cardName === "AmazonPay") {
@@ -130,7 +144,6 @@ export const calculateICICIRewards = (cardName, amount, mcc, additionalParams = 
     points = Math.floor(amount * rate);
     uncappedPoints = points;
     
-    // Apply capping logic if needed
     if (cardReward.capping && cardReward.capping.categories && mccName) {
       const cappingCategories = cardReward.capping.categories;
       

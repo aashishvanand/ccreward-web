@@ -3975,13 +3975,13 @@ export const mccList = [
         "mcc": "4784",
         "industryname": "Transportation Services",
         "merchantCategory": "General",
-        "name": "Tolls, Road & Bridge Fees"
+        "name": "Tolls, Road & Bridge Fees, FASTag"
     },
     {
         "mcc": "4789",
         "industryname": "Transportation Services",
         "merchantCategory": "General",
-        "name": "Transportation Services "
+        "name": "Transportation Services"
     },
     {
         "mcc": "4812",
