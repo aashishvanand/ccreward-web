@@ -74,7 +74,19 @@ const CreditCardRewardsCalculator = () => {
   const [spendType, setSpendType] = useState('local');
   const [showInternationalOption, setShowInternationalOption] = useState(false);
   const [calculationResult, setCalculationResult] = useState(null);
-  const [additionalInputs, setAdditionalInputs] = useState({});
+  const [additionalInputs, setAdditionalInputs] = useState({
+    isPrimeMember: false,
+    isFlipkartPlusMember: false,
+    isInternational: false,
+    isBirthday: false,
+    isTravelEdgePortal: false,
+    isSpiceJet: false,
+    isAirtelApp: false,
+    isSamsungTransaction: false,
+    isShoppersStopExclusive: false,
+    isLICPremium: false,
+    isFreechargeTransaction: false,
+  });
 
   const theme = React.useMemo(
     () =>
@@ -276,12 +288,19 @@ const CreditCardRewardsCalculator = () => {
     const amount = parseFloat(spentAmount);
     const mcc = selectedMcc ? selectedMcc.mcc : null;
     const additionalParams = {
-      isInternational: additionalInputs.isInternational || false,
-      isPrimeMember: additionalInputs.isPrimeMember || false,
-      isFlipkartPlusMember: additionalInputs.isFlipkartPlusMember || false,
-      isBirthday: additionalInputs.isBirthday || false,
-      isTravelEdgePortal: additionalInputs.isTravelEdgePortal || false,
+      isPrimeMember: additionalInputs.isPrimeMember,
+      isFlipkartPlusMember: additionalInputs.isFlipkartPlusMember,
+      isInternational: additionalInputs.isInternational,
+      isBirthday: additionalInputs.isBirthday,
+      isTravelEdgePortal: additionalInputs.isTravelEdgePortal,
+      isSpiceJet: additionalInputs.isSpiceJet,
+      isAirtelApp: additionalInputs.isAirtelApp,
+      isSamsungTransaction: additionalInputs.isSamsungTransaction,
+      isShoppersStopExclusive: additionalInputs.isShoppersStopExclusive,
+      isLICPremium: additionalInputs.isLICPremium,
+      isFreechargeTransaction: additionalInputs.isFreechargeTransaction,
     };
+
   
     let result;
   

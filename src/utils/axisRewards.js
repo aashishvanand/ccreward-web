@@ -172,10 +172,6 @@ export const axisCardRewards = {
       "5399": 12 / 100 // 12 SuperCoins per ₹100 for Flipkart purchases (Plus members)
     }
   },
-  "Freecharge": {
-    defaultRate: 1 / 100,
-    mccRates: {}
-  },
   "Indian Oil": {
     defaultRate: 1 / 100, // 1 reward point per ₹100
     mccRates: {
@@ -257,12 +253,31 @@ export const axisCardRewards = {
     mccRates: {}
   },
   "Privilege": {
-    defaultRate: 10 / 200,
-    mccRates: {}
+    defaultRate: 10 / 200, // 10 points on every Rs. 200 spent
+    mccRates: {
+      // Excluded categories
+      "6300": 0, "6381": 0, "5960": 0, "6012": 0, "6051": 0, // Insurance
+      "6513": 0, // Rent
+      "5541": 0, "5542": 0, "5983": 0, // Fuel
+      "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0, // Educational services
+      "4900": 0, "4814": 0, "4816": 0, "4899": 0, // Utilities
+      "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0 // Government services
+    }
   },
   "Reserve": {
-    defaultRate: 1 / 13.33,
-    mccRates: {}
+    defaultRate: 15 / 200, // 15 edge points for every 200 spent
+    internationalRate: 30 / 200, // 2x on international spends
+    mccRates: {
+      // Excluded categories
+      "7832": 0, // Motion Picture Theaters
+      "4814": 0, "4816": 0, "4899": 0, "4900": 0, // Utilities
+      "9222": 0, "9311": 0, "9399": 0, "9402": 0, // Government Institutions
+      "6300": 0, "6381": 0, "5960": 0, "6051": 0, "6012": 0, // Insurance
+      "6540": 0, // Wallet
+      "5094": 0, "5944": 0, // Gold/Jewellery
+      "5541": 0, "5542": 0, "5983": 0, // Fuel
+      "6010": 0, "6011": 0 // Cash Withdrawal
+    }
   },
   "Rewards": {
     defaultRate: 2 / 125, // 2 EDGE REWARD points per ₹125
@@ -274,9 +289,79 @@ export const axisCardRewards = {
     }
   },
   "Select": {
-    defaultRate: 1 / 100,
-    mccRates: {}
+    defaultRate: 10 / 200, // 10 Axis EDGE points on every Rs. 200 spends
+    acceleratedRewards: {
+      tier1: {
+        rate: 20 / 200, // 2X EDGE REWARD Points
+        threshold: 20000 // Up to cumulative transactions of Rs.20,000 per month
+      },
+      tier2: {
+        rate: 10 / 200 // 10 EDGE REWARD Points for transactions above Rs.20,000 per month
+      }
+    },
+    mccRates: {
+      // Retail Shopping MCCs
+      "5311": 20 / 200, // Dept Stores
+      "5411": 20 / 200, // Grocery stores
+      "5611": 20 / 200, // Clothing and Accessory stores
+      "5621": 20 / 200, // Women's wear stores
+      "5641": 20 / 200, // Children's wear stores
+      "5691": 20 / 200, // Family clothing stores
+      "5699": 20 / 200, // Misc apparel and accessory stores
+
+      // Excluded categories
+      "6300": 0, "6381": 0, "5960": 0, "6012": 0, "6051": 0, // Insurance
+      "6513": 0, // Rent
+      "5541": 0, "5542": 0, "5983": 0, // Fuel
+      "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0, // Educational services
+      "4900": 0, "4814": 0, "4816": 0, "4899": 0, // Utilities
+      "6540": 0, // Wallet
+      "5094": 0, "5944": 0, // Gold/Jewellery
+      "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0 // Government services
+    }
   },
+  "Voyage": {
+    defaultRate: 3 / 200, // 3 SpiceClub Points for every Rs. 200 spent on other retail spends
+    mccRates: {
+      // Online utility bill payment, Online food ordering, Online entertainment
+      "4900": 6 / 200, // Online utility bill payment
+      "5499": 6 / 200, // Online food ordering
+      "5812": 6 / 200, // Online food ordering
+      "5814": 6 / 200, // Online food ordering
+      "7829": 6 / 200, // Online entertainment
+      "7832": 6 / 200, // Online entertainment
+
+      // Excluded categories
+      "6012": 0, "6051": 0, "5541": 0, "5983": 0, "5542": 0, "5944": 0, "6011": 0, 
+      "6540": 0, "6513": 0, "9222": 0, "9311": 0, "9399": 0, "9402": 0, "5960": 0, 
+      "6300": 0, "6381": 0, "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0
+    },
+    // SpiceJet mobile application & website
+    spicejetRate: 18 / 200, // 6 SC Points (card benefit) + 12 SC Points (SpiceClub Silver Membership)
+
+  },
+
+  "Voyage Black": {
+    defaultRate: 6 / 200, // 6 SpiceClub Points for every Rs. 200 spent on other retail spends
+    mccRates: {
+      // Online utility bill payment, Online food ordering, Online entertainment
+      "4900": 12 / 200, // Online utility bill payment
+      "5499": 12 / 200, // Online food ordering
+      "5812": 12 / 200, // Online food ordering
+      "5814": 12 / 200, // Online food ordering
+      "7829": 12 / 200, // Online entertainment
+      "7832": 12 / 200, // Online entertainment
+
+      // Excluded categories
+      "6012": 0, "6051": 0, "5541": 0, "5983": 0, "5542": 0, "5944": 0, "6011": 0, 
+      "6540": 0, "6513": 0, "9222": 0, "9311": 0, "9399": 0, "9402": 0, "5960": 0, 
+      "6300": 0, "6381": 0, "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0
+    },
+    // SpiceJet mobile application & website
+    spicejetRate: 28 / 200, // 12 SC Points (card benefit) + 16 SC Points (SpiceClub Gold Membership)
+
+  },
+
   "Horizon": {
     defaultRate: 2 / 100, // 2 EDGE Miles per INR 100 on all other spends
     mccRates: {
@@ -371,6 +456,155 @@ export const axisCardRewards = {
           }
         }
       }
+  },
+  "Samsung Signature": {
+    defaultRate: 5 / 100, // 5 reward points on all domestic & international spends per INR 100 spent
+    samsungRate: 10 / 100, // 10% cashback on Samsung purchases
+    mccRates: {
+      // Preferred merchants
+      "5812": 10 / 100, // Eating Places and Restaurants (for Zomato)
+      "5411": 10 / 100, // Grocery Stores and Supermarkets (for BigBasket)
+      "5651": 10 / 100, // Family Clothing Stores (for Myntra)
+      "5912": 10 / 100, // Drug Stores and Pharmacies (for Tata1mg)
+      "7299": 10 / 100, // Miscellaneous Personal Services (for Urban Clap)
+
+      // Excluded MCCs
+      "6012": 0, "6051": 0, "5541": 0, "5983": 0, "5542": 0, "5944": 0, "6011": 0, "6540": 0, "6513": 0
+    },
+    cashbackCap: {
+      "5732": { monthly: 2500, yearly: 10000 } // Cap for Samsung purchases
+    }
+  },
+
+  "Samsung Infinite": {
+    defaultRate: 5 / 100, // 5 EDGE REWARD POINTS on every Rs. 100 spent on all other domestic transactions
+    internationalRate: 15 / 100, // 15 EDGE REWARD POINTS on every Rs 100 spent on all international transactions
+    samsungRate: 10 / 100, // 10% cashback on Samsung purchases
+    mccRates: {
+      // Preferred partners
+      "5411": 15 / 100, // Grocery Stores and Supermarkets (for BigBasket)
+      "5912": 15 / 100, // Drug Stores and Pharmacies (for Tata1mg)
+      "7299": 15 / 100, // Miscellaneous Personal Services (for UrbanCompany)
+      "5651": 15 / 100, // Family Clothing Stores (for Myntra)
+      "5814": 15 / 100,  // Fast Food Restaurants (for Zomato)
+      
+      // Excluded MCCs
+      "6012": 0, "6051": 0, "5541": 0, "5983": 0, "5542": 0, "5944": 0, "6011": 0, "6540": 0, "6513": 0
+    }
+  },
+  "Shoppers Stop": {
+    defaultRate: 2 / 200, // 2 FC reward points on every INR 200 spent for all other spends
+    shoppersStopExclusiveBrands: 20 / 200, // 20 FC Reward Points per INR 200 spent on Shoppers Stop Exclusive Brands
+    shoppersStopOtherBrands: 12 / 200, // 12 FC Reward Points per INR 200 spent on other Shoppers Brands
+    mccRates: {
+      // Excluded MCCs
+      "4111": 0, "4121": 0, "4131": 0, "4784": 0, // Transportation & Tolls
+      "4814": 0, "4816": 0, "4899": 0, "4900": 0, // Utilities
+      "6300": 0, "6381": 0, "5960": 0, "6012": 0, "6051": 0, // Insurance
+      "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0, // Educational Institutions
+      "9211": 0, "9222": 0, "9311": 0, "9399": 0, "9402": 0, "9405": 0, "8220": 0, // Govt. Institutions
+      "6540": 0, // Wallet
+      "6513": 0, // Rent
+      "5541": 0, "5542": 0, "5983": 0 // Fuel
+    },
+    shoppersStopMCC: "5311" // Department Stores (assuming this is the MCC for Shoppers Stop)
+  },
+  "Airtel": {
+    defaultRate: 1 / 100, // 1% cashback on all other merchants/spends
+    airtelApp: true, // Flag to indicate that this card has Airtel Thanks App specific rates
+    mccRates: {
+      // Airtel Thanks App transactions
+      "4814": 25 / 100, // Telecommunication Services
+      "4816": 10 / 100, // Computer Network Services
+      "4899": 10 / 100, // Cable, Satellite, and Other Pay Television and Radio Services
+      "4900": 10 / 100, // Utilities - Electric, Gas, Water, and Sanitary
+
+      // Preferred merchants (using example MCCs, adjust as needed)
+      "5812": 10 / 100, // Eating Places and Restaurants (for Zomato)
+      "5814": 10 / 100, // Fast Food Restaurants (for Swiggy)
+      "5411": 10 / 100, // Grocery Stores and Supermarkets (for BigBasket)
+
+      // Excluded MCCs
+      "6012": 0, "6051": 0, // Cash advances
+      "5541": 0, "5983": 0, "5542": 0, // Fuel spends
+      "6513": 0, // Rent payments
+      "6011": 0, "6540": 0, // Wallet recharge
+      "5944": 0, // Jewelry
+      "5960": 0, "6300": 0, "6381": 0, // Insurance services
+      "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0, // Education services
+      "9222": 0, "9311": 0, "9399": 0, "9402": 0, // Government services
+    },
+    cashbackCaps: {
+      "4814": 250, // Airtel bill payments cap per month
+      "4816": 250, // Utility bill payments cap per month
+      "4899": 250, // Utility bill payments cap per month
+      "4900": 250, // Utility bill payments cap per month
+      "5812": 500, // Preferred merchant cap per month (combined)
+      "5814": 500, // Preferred merchant cap per month (combined)
+      "5411": 500, // Preferred merchant cap per month (combined)
+    }
+  },
+  "Miles & More World Select": {
+    defaultRate: 6 / 200, // 6 Award Miles per Rs. 200 of eligible spends
+    mccRates: {
+      // Add any specific MCC rates if applicable
+    }
+  },
+
+  "Miles & More World": {
+    defaultRate: 4 / 200, // 4 Award Miles per Rs. 200 of eligible spends
+    mccRates: {
+      // Add any specific MCC rates if applicable
+    }
+  },
+"Freecharge": {
+    defaultRate: 1 / 100, // 1 EDGE REWARD Point per Rs. 100 spent
+    milestoneRewards: {
+      tier1: { minSpend: 2000, maxSpend: 4999, points: 100 },
+      tier2: { minSpend: 5000, points: 350 }
+    },
+    mccRates: {
+      // Excluded categories
+      "6540": 0, // Wallet Load
+      "5541": 0, "5542": 0, // Fuel Spends
+      "6011": 0, // Cash Withdrawal
+      "5944": 0, // Jewelry transactions
+      "9222": 0, "9311": 0, "9399": 0, "9402": 0, // Government Services
+      "6300": 0, "6381": 0, "5960": 0, // Insurance Services
+      "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0, // Education Services
+      "4814": 0, "4816": 0, "4899": 0, "4900": 0, // Utility Services
+      "6513": 0 // Rental Payments
+    }
+  },
+
+  "Freecharge Plus": {
+    defaultRate: 1 / 100, // 1% cashback on other spends
+    mccRates: {
+      "4121": 2 / 100, "4131": 2 / 100, "4111": 2 / 100, "7512": 2 / 100, // 2% on Local Commute
+      // Excluded categories (same as Freecharge card)
+      "6540": 0, "5541": 0, "5542": 0, "6011": 0, "5944": 0,
+      "9222": 0, "9311": 0, "9399": 0, "9402": 0,
+      "6300": 0, "6381": 0, "5960": 0,
+      "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0,
+      "4814": 0, "4816": 0, "4899": 0, "4900": 0,
+      "6513": 0
+    },
+    freechargeRate: 5 / 100 // 5% cashback on Freecharge
+  },
+
+  "LIC": {
+    defaultRate: 1 / 100, // 1 Reward point for every ₹ 100 spent on all other transactions
+    licPremiumRate: 2 / 100, // 2 Reward points for every ₹ 100 spent on LIC Premium payment
+    internationalRate: 2 / 100, // 2 Reward points for every ₹ 100 spent on foreign currency transactions
+    mccRates: {
+      // Excluded categories
+      "9222": 0, "9311": 0, "9399": 0, "9402": 0, // Government services
+      "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0, // Education services
+      "4814": 0, "4816": 0, "4899": 0, "4900": 0, // Utility Services
+      "6513": 0, // Rental payments
+      "5541": 0, "5542": 0, // Fuel
+      "6540": 0 // Wallet load
+    }
   }
 };
 
@@ -386,9 +620,108 @@ export const calculateAxisRewards = (cardName, amount, mcc, additionalParams = {
     };
   }
 
+  let points = 0;
+  let cashback = 0;
   let rate = cardReward.defaultRate;
   let rateType = "default";
   let category = "Other Spends";
+  let appliedCap = null;
+  let cappedPoints = 0;
+
+  // Check for international rate
+  if (additionalParams.isInternational && cardReward.internationalRate) {
+    rate = cardReward.internationalRate;
+    rateType = "international";
+  }
+  
+  // Freecharge Plus card logic
+  if (cardName === "Freecharge Plus" && additionalParams.isFreechargeTransaction) {
+    rate = cardReward.freechargeRate;
+    category = "Freecharge Transaction";
+  }
+
+  // Check for SpiceJet transactions
+  if (additionalParams.isSpiceJet && cardReward.spicejetRate) {
+    rate = cardReward.spicejetRate;
+    rateType = "spicejet";
+    category = "SpiceJet Transaction";
+  }
+
+  // Special handling for Select card
+  if (cardName === "Select" && cardReward.acceleratedRewards) {
+    if (amount <= cardReward.acceleratedRewards.tier1.threshold) {
+      rate = cardReward.acceleratedRewards.tier1.rate;
+    } else {
+      rate = cardReward.acceleratedRewards.tier2.rate;
+    }
+    rateType = "accelerated";
+  }
+
+  //TODO: fix points calculation
+  // Airtel Axis Bank card logic
+  if (cardName === "Airtel Axis Bank") {
+    if (additionalParams.isAirtelApp && cardReward.mccRates[mcc]) {
+      rate = cardReward.mccRates[mcc];
+      category = mcc === "4814" ? "Airtel Bill Payment" : "Utility Bill Payment (Airtel App)";
+      rateType = "airtel-app";
+    } else if (cardReward.mccRates[mcc]) {
+      rate = cardReward.mccRates[mcc];
+      category = "Preferred Merchant";
+      rateType = "preferred";
+    }
+    cashback = amount * rate;
+
+    // Apply category-specific capping
+    if (cardReward.cashbackCaps && cardReward.cashbackCaps[mcc]) {
+      const cap = cardReward.cashbackCaps[mcc];
+      if (cashback > cap) {
+        cashback = cap;
+        appliedCap = { category, maxCashback: cap };
+      }
+    }
+  }
+
+  // Shoppers Stop card logic
+  if (cardName === "Shoppers Stop" && mcc === cardReward.shoppersStopMCC) {
+    if (additionalParams.isShoppersStopExclusive) {
+      rate = cardReward.shoppersStopExclusiveBrands;
+      category = "Shoppers Stop Exclusive Brands";
+    } else {
+      rate = cardReward.shoppersStopOtherBrands;
+      category = "Shoppers Stop Other Brands";
+    }
+    rateType = "shoppers-stop";
+  }
+
+  // Samsung Signature and Samsung Infinite card logic
+  if (cardName === "Samsung Signature" || cardName === "Samsung Infinite") {
+    if (additionalParams.isSamsungTransaction) {
+      rate = cardReward.samsungRate;
+      category = "Samsung Purchase";
+      rateType = "cashback";
+    } else if (additionalParams.isInternational && cardReward.internationalRate) {
+      rate = cardReward.internationalRate;
+      category = "International Transaction";
+    } else if (cardReward.mccRates[mcc]) {
+      rate = cardReward.mccRates[mcc];
+      category = "Preferred Merchant";
+    }
+
+    if (rateType === "cashback") {
+      cashback = amount * rate;
+      if (cardName === "Samsung Signature") {
+        const monthlyCap = cardReward.cashbackCap["5732"].monthly;
+        if (cashback > monthlyCap) {
+          cashback = monthlyCap;
+          appliedCap = { category: "Samsung Purchase", maxCashback: monthlyCap };
+        }
+      }
+      points = Math.floor(cashback);
+    } else {
+      points = Math.floor(amount * rate);
+    }
+  }
+
 
   // Check for MCC-specific rate
   if (mcc && cardReward.mccRates && cardReward.mccRates[mcc] !== undefined) {
@@ -419,6 +752,16 @@ export const calculateAxisRewards = (cardName, amount, mcc, additionalParams = {
       }
       rateType = amount > regularRewards.tier1.threshold ? "accelerated" : "default";
     }
+  }
+
+  // Check for LIC Premium payment
+  if (cardName === "LIC" && additionalParams.isLICPremium) {
+    rate = cardReward.licPremiumRate;
+    rateType = "lic-premium";
+    category = "LIC Premium Payment";
+  } else if (additionalParams.isInternational && cardReward.internationalRate) {
+    rate = cardReward.internationalRate;
+    rateType = "international";
   }
 
   // Special handling for Flipkart Super Elite card
@@ -452,9 +795,9 @@ export const calculateAxisRewards = (cardName, amount, mcc, additionalParams = {
     }
   }
 
-  let points = Math.floor(amount * rate);
-  let cappedPoints = points;
-  let appliedCap = null;
+  points = Math.floor(amount * rate);
+  cappedPoints = points;
+  appliedCap = null;
 
   // Apply category-specific capping if available
   if (cardReward.capping && cardReward.capping.categories && category) {
@@ -477,12 +820,62 @@ export const calculateAxisRewards = (cardName, amount, mcc, additionalParams = {
   // Generate reward text
   let rewardText = "";
   switch (cardName) {
+    case "LIC":
+      rewardText = rate === 0 ? "No Axis Reward Points for this transaction" : `${cappedPoints} Axis Reward Points`;
+      if (rateType === "lic-premium") {
+        rewardText += " (LIC Premium Payment)";
+      } else if (rateType === "international") {
+        rewardText += " (International transaction)";
+      }
+      break;
+    case "Airtel":
+      rewardText = `₹${cashback.toFixed(2)} Cashback`;
+      if (appliedCap) {
+        rewardText += ` (${appliedCap.category} - Capped at ₹${appliedCap.maxCashback})`;
+      } else if (category !== "Other Spends") {
+        rewardText += ` (${category})`;
+      }
+      break;
+    case "Samsung Infinite":
+    case "Samsung Signature":
+      if (rateType === "cashback") {
+        rewardText = `₹${cashback.toFixed(2)} Cashback`;
+        if (appliedCap) {
+          rewardText += ` (Capped at ₹${appliedCap.maxCashback} per month)`;
+        }
+      } else {
+        rewardText = `${points} EDGE Reward Points`;
+      }
+      if (category !== "Other Spends") {
+        rewardText += ` (${category})`;
+      }
+      break;
+    case "Shoppers Stop":
+      rewardText = rate === 0 ? "No FC Reward Points for this transaction" : `${cappedPoints} FC Reward Points`;
+      if (rateType === "shoppers-stop") {
+        rewardText += ` (${category})`;
+      }
+      break;
+    case "Voyage":
+    case "Voyage Black":
+      rewardText = rate === 0 ? "No SpiceClub Points for this transaction" : `${cappedPoints} SpiceClub Points`;
+      if (rateType === "spicejet") {
+        rewardText += " (Including SpiceClub Membership benefit)";
+      }
+      break;
     case "Magnus":
+    case "Reserve":
+    case "Select":
+    case "Privilege":
       rewardText = rate === 0 ? "No EDGE Reward Points for this transaction" : `${cappedPoints} EDGE Reward Points`;
       if (rateType === "travel-edge") {
         rewardText += " (Travel Edge Portal rate applied)";
-      } else if (rateType === "accelerated") {
+      } 
+      else if (rateType === "accelerated") {
         rewardText += " (Accelerated rate applied)";
+      }
+      else if (rateType === "international") {
+        rewardText += " (2x international rate applied)";
       }
       break;
     case "Flipkart Super Elite":
@@ -493,10 +886,13 @@ export const calculateAxisRewards = (cardName, amount, mcc, additionalParams = {
         rewardText += " (Regular Flipkart rate applied)";
       }
       break;
-    case "Atlas" || "Horizon":
+    case "Atlas":
+    case "Horizon":
       rewardText = rate === 0 ? "No EDGE Miles for this transaction" : `${cappedPoints} EDGE Miles`;
       break;
-    case "Vistara" || "Vistara Signature" || "Vistara Infinite":
+    case "Vistara":
+    case "Vistara Signature":
+    case "Vistara Infinite":
       rewardText = rate === 0 ? "No CV Points for this transaction" : `${cappedPoints} CV Points`;
       break;
     default:
