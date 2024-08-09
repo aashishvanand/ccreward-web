@@ -497,6 +497,7 @@ export const axisCardRewards = {
     shoppersStopExclusiveBrands: 20 / 200, // 20 FC Reward Points per INR 200 spent on Shoppers Stop Exclusive Brands
     shoppersStopOtherBrands: 12 / 200, // 12 FC Reward Points per INR 200 spent on other Shoppers Brands
     mccRates: {
+      "5311": 12 / 200, // Default rate for Shoppers Stop purchases (will be overridden if exclusive)
       // Excluded MCCs
       "4111": 0, "4121": 0, "4131": 0, "4784": 0, // Transportation & Tolls
       "4814": 0, "4816": 0, "4899": 0, "4900": 0, // Utilities
@@ -507,43 +508,42 @@ export const axisCardRewards = {
       "6513": 0, // Rent
       "5541": 0, "5542": 0, "5983": 0 // Fuel
     },
-    shoppersStopMCC: "5311" // Department Stores (assuming this is the MCC for Shoppers Stop)
   },
   "Airtel": {
-    defaultRate: 1 / 100, // 1% cashback on all other merchants/spends
-    airtelApp: true, // Flag to indicate that this card has Airtel Thanks App specific rates
-    mccRates: {
-      // Airtel Thanks App transactions
-      "4814": 25 / 100, // Telecommunication Services
-      "4816": 10 / 100, // Computer Network Services
-      "4899": 10 / 100, // Cable, Satellite, and Other Pay Television and Radio Services
-      "4900": 10 / 100, // Utilities - Electric, Gas, Water, and Sanitary
+  defaultRate: 1 / 100, // 1% cashback on all other merchants/spends
+  airtelRate: 25 / 100, // 25% cashback on Airtel Thanks App transactions
+  mccRates: {
+    // Airtel Thanks App transactions
+    "4814": 25 / 100, // Telecommunication Services
+    "4816": 10 / 100, // Computer Network Services
+    "4899": 10 / 100, // Cable, Satellite, and Other Pay Television and Radio Services
+    "4900": 10 / 100, // Utilities - Electric, Gas, Water, and Sanitary
 
-      // Preferred merchants (using example MCCs, adjust as needed)
-      "5812": 10 / 100, // Eating Places and Restaurants (for Zomato)
-      "5814": 10 / 100, // Fast Food Restaurants (for Swiggy)
-      "5411": 10 / 100, // Grocery Stores and Supermarkets (for BigBasket)
+    // Preferred merchants (using example MCCs, adjust as needed)
+    "5812": 10 / 100, // Eating Places and Restaurants (for Zomato)
+    "5814": 10 / 100, // Fast Food Restaurants (for Swiggy)
+    "5411": 10 / 100, // Grocery Stores and Supermarkets (for BigBasket)
 
-      // Excluded MCCs
-      "6012": 0, "6051": 0, // Cash advances
-      "5541": 0, "5983": 0, "5542": 0, // Fuel spends
-      "6513": 0, // Rent payments
-      "6011": 0, "6540": 0, // Wallet recharge
-      "5944": 0, // Jewelry
-      "5960": 0, "6300": 0, "6381": 0, // Insurance services
-      "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0, // Education services
-      "9222": 0, "9311": 0, "9399": 0, "9402": 0, // Government services
-    },
-    cashbackCaps: {
-      "4814": 250, // Airtel bill payments cap per month
-      "4816": 250, // Utility bill payments cap per month
-      "4899": 250, // Utility bill payments cap per month
-      "4900": 250, // Utility bill payments cap per month
-      "5812": 500, // Preferred merchant cap per month (combined)
-      "5814": 500, // Preferred merchant cap per month (combined)
-      "5411": 500, // Preferred merchant cap per month (combined)
-    }
+    // Excluded MCCs
+    "6012": 0, "6051": 0, // Cash advances
+    "5541": 0, "5983": 0, "5542": 0, // Fuel spends
+    "6513": 0, // Rent payments
+    "6011": 0, "6540": 0, // Wallet recharge
+    "5944": 0, // Jewelry
+    "5960": 0, "6300": 0, "6381": 0, // Insurance services
+    "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0, // Education services
+    "9222": 0, "9311": 0, "9399": 0, "9402": 0, // Government services
   },
+  cashbackCaps: {
+    "4814": 250, // Airtel bill payments cap per month
+    "4816": 250, // Utility bill payments cap per month
+    "4899": 250, // Utility bill payments cap per month
+    "4900": 250, // Utility bill payments cap per month
+    "5812": 500, // Preferred merchant cap per month (combined)
+    "5814": 500, // Preferred merchant cap per month (combined)
+    "5411": 500, // Preferred merchant cap per month (combined)
+  }
+},
   "Miles & More World Select": {
     defaultRate: 6 / 200, // 6 Award Miles per Rs. 200 of eligible spends
     mccRates: {
@@ -608,6 +608,7 @@ export const axisCardRewards = {
   }
 };
 
+
 export const calculateAxisRewards = (cardName, amount, mcc, additionalParams = {}) => {
   const cardReward = axisCardRewards[cardName];
   if (!cardReward) {
@@ -620,69 +621,100 @@ export const calculateAxisRewards = (cardName, amount, mcc, additionalParams = {
     };
   }
 
-  let points = 0;
-  let cashback = 0;
+  let result;
+
+  switch (cardName) {
+    case "Airtel":
+      result = calculateAirtelRewards(cardReward, amount, mcc, additionalParams);
+      break;
+    case "Samsung Signature":
+    case "Samsung Infinite":
+      result = calculateSamsungRewards(cardReward, amount, mcc, additionalParams);
+      break;
+    case "Shoppers Stop":
+      result = calculateShoppersStopRewards(cardReward, amount, mcc, additionalParams);
+      break;
+    case "Voyage":
+    case "Voyage Black":
+      result = calculateVoyageRewards(cardReward, amount, mcc, additionalParams);
+      break;
+    case "Magnus":
+    case "Horizon":
+      result = calculateMagnusHorizonRewards(cardReward, amount, mcc, additionalParams);
+      break;
+    case "Flipkart Super Elite":
+      result = calculateFlipkartRewards(cardReward, amount, mcc, additionalParams);
+      break;
+    case "LIC":
+      result = calculateLICRewards(cardReward, amount, mcc, additionalParams);
+      break;
+    case "Freecharge Plus":
+      result = calculateFreechargeRewards(cardReward, amount, mcc, additionalParams);
+      break;
+    default:
+      result = calculateDefaultRewards(cardReward, amount, mcc, additionalParams);
+  }
+
+  return applyCapping(result, cardReward, cardName);
+};
+
+
+const calculateAirtelRewards = (cardReward, amount, mcc, additionalParams) => {
   let rate = cardReward.defaultRate;
-  let rateType = "default";
   let category = "Other Spends";
-  let appliedCap = null;
-  let cappedPoints = 0;
+  let rateType = "default";
 
-  // Check for international rate
-  if (additionalParams.isInternational && cardReward.internationalRate) {
-    rate = cardReward.internationalRate;
-    rateType = "international";
-  }
-  
-  // Freecharge Plus card logic
-  if (cardName === "Freecharge Plus" && additionalParams.isFreechargeTransaction) {
-    rate = cardReward.freechargeRate;
-    category = "Freecharge Transaction";
-  }
-
-  // Check for SpiceJet transactions
-  if (additionalParams.isSpiceJet && cardReward.spicejetRate) {
-    rate = cardReward.spicejetRate;
-    rateType = "spicejet";
-    category = "SpiceJet Transaction";
-  }
-
-  // Special handling for Select card
-  if (cardName === "Select" && cardReward.acceleratedRewards) {
-    if (amount <= cardReward.acceleratedRewards.tier1.threshold) {
-      rate = cardReward.acceleratedRewards.tier1.rate;
-    } else {
-      rate = cardReward.acceleratedRewards.tier2.rate;
-    }
-    rateType = "accelerated";
-  }
-
-  //TODO: fix points calculation
-  // Airtel Axis Bank card logic
-  if (cardName === "Airtel Axis Bank") {
-    if (additionalParams.isAirtelApp && cardReward.mccRates[mcc]) {
-      rate = cardReward.mccRates[mcc];
-      category = mcc === "4814" ? "Airtel Bill Payment" : "Utility Bill Payment (Airtel App)";
-      rateType = "airtel-app";
+  if (additionalParams.isAirtelApp) {
+    if (mcc === "4814") {
+      rate = cardReward.airtelRate;
+      category = "Airtel Bill Payment";
     } else if (cardReward.mccRates[mcc]) {
       rate = cardReward.mccRates[mcc];
-      category = "Preferred Merchant";
-      rateType = "preferred";
+      category = "Utility Bill Payment (Airtel App)";
     }
-    cashback = amount * rate;
-
-    // Apply category-specific capping
-    if (cardReward.cashbackCaps && cardReward.cashbackCaps[mcc]) {
-      const cap = cardReward.cashbackCaps[mcc];
-      if (cashback > cap) {
-        cashback = cap;
-        appliedCap = { category, maxCashback: cap };
-      }
-    }
+    rateType = "airtel-app";
+  } else if (mcc && cardReward.mccRates[mcc]) {
+    rate = cardReward.mccRates[mcc];
+    category = "Preferred Merchant";
+    rateType = "preferred";
   }
 
-  // Shoppers Stop card logic
-  if (cardName === "Shoppers Stop" && mcc === cardReward.shoppersStopMCC) {
+  const cashback = amount * rate;
+  const points = Math.floor(cashback * 100);
+
+  return { points, cashback, rate, rateType, category };
+};
+
+const calculateSamsungRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+  let cashback = 0;
+
+  if (additionalParams.isSamsungTransaction) {
+    rate = cardReward.samsungRate;
+    category = "Samsung Purchase";
+    rateType = "cashback";
+    cashback = amount * rate;
+  } else if (additionalParams.isInternational && cardReward.internationalRate) {
+    rate = cardReward.internationalRate;
+    category = "International Transaction";
+  } else if (cardReward.mccRates[mcc]) {
+    rate = cardReward.mccRates[mcc];
+    category = "Preferred Merchant";
+  }
+
+  const points = rateType === "cashback" ? Math.floor(cashback) : Math.floor(amount * rate);
+
+  return { points, cashback, rate, rateType, category };
+};
+
+const calculateShoppersStopRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+
+  if (mcc === "5311") {
     if (additionalParams.isShoppersStopExclusive) {
       rate = cardReward.shoppersStopExclusiveBrands;
       category = "Shoppers Stop Exclusive Brands";
@@ -691,217 +723,172 @@ export const calculateAxisRewards = (cardName, amount, mcc, additionalParams = {
       category = "Shoppers Stop Other Brands";
     }
     rateType = "shoppers-stop";
+  } else if (cardReward.mccRates && cardReward.mccRates[mcc]) {
+    rate = cardReward.mccRates[mcc];
+    rateType = "mcc-specific";
+    category = "Category Spend";
   }
 
-  // Samsung Signature and Samsung Infinite card logic
-  if (cardName === "Samsung Signature" || cardName === "Samsung Infinite") {
-    if (additionalParams.isSamsungTransaction) {
-      rate = cardReward.samsungRate;
-      category = "Samsung Purchase";
-      rateType = "cashback";
-    } else if (additionalParams.isInternational && cardReward.internationalRate) {
-      rate = cardReward.internationalRate;
-      category = "International Transaction";
-    } else if (cardReward.mccRates[mcc]) {
-      rate = cardReward.mccRates[mcc];
-      category = "Preferred Merchant";
-    }
+  const points = Math.floor(amount * rate);
 
-    if (rateType === "cashback") {
-      cashback = amount * rate;
-      if (cardName === "Samsung Signature") {
-        const monthlyCap = cardReward.cashbackCap["5732"].monthly;
-        if (cashback > monthlyCap) {
-          cashback = monthlyCap;
-          appliedCap = { category: "Samsung Purchase", maxCashback: monthlyCap };
-        }
-      }
-      points = Math.floor(cashback);
-    } else {
-      points = Math.floor(amount * rate);
-    }
+  return { points, rate, rateType, category };
+};
+
+const calculateVoyageRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+
+  if (additionalParams.isSpiceJet && cardReward.spicejetRate) {
+    rate = cardReward.spicejetRate;
+    rateType = "spicejet";
+    category = "SpiceJet Transaction";
+  } else if (mcc && cardReward.mccRates[mcc]) {
+    rate = cardReward.mccRates[mcc];
+    rateType = "mcc-specific";
+    category = "Category Spend";
   }
 
+  const points = Math.floor(amount * rate);
 
-  // Check for MCC-specific rate
+  return { points, rate, rateType, category };
+};
+
+const calculateMagnusHorizonRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+
+  if (additionalParams.isTravelEdgePortal) {
+    const travelEdgeRewards = cardReward.acceleratedRewards.travelEdgePortal;
+    rate = amount <= travelEdgeRewards.tier1.threshold ? travelEdgeRewards.tier1.rate : travelEdgeRewards.tier2.rate;
+    rateType = "travel-edge";
+    category = "Travel Edge Portal";
+  } else {
+    const regularRewards = cardReward.acceleratedRewards.regularSpend;
+    rate = amount <= regularRewards.tier1.threshold ? regularRewards.tier1.rate : regularRewards.tier2.rate;
+    rateType = amount > regularRewards.tier1.threshold ? "accelerated" : "default";
+  }
+
   if (mcc && cardReward.mccRates && cardReward.mccRates[mcc] !== undefined) {
     rate = cardReward.mccRates[mcc];
     rateType = "mcc-specific";
     category = rate === 0 ? "Excluded Category" : "Category Spend";
   }
-  //TODO: disable MCC if travelEdgePortal is true
-  // Special handling for Magnus and Horizon card
-  if ((cardName === "Magnus" || cardName === "Horizon") && rate !== 0) {
-    const isTravelEdgePortal = additionalParams.isTravelEdgePortal || false;
 
-    if (isTravelEdgePortal) {
-      const travelEdgeRewards = cardReward.acceleratedRewards.travelEdgePortal;
-      if (amount <= travelEdgeRewards.tier1.threshold) {
-        rate = travelEdgeRewards.tier1.rate;
-      } else {
-        rate = travelEdgeRewards.tier2.rate;
-      }
-      rateType = "travel-edge";
-      category = "Travel Edge Portal";
+  const points = Math.floor(amount * rate);
+
+  return { points, rate, rateType, category };
+};
+
+const calculateFlipkartRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+
+  if (mcc === "5399") { // Flipkart purchase
+    if (additionalParams.isFlipkartPlusMember && cardReward.flipkartPlusRate) {
+      rate = cardReward.flipkartPlusRate["5399"];
+      rateType = "flipkart-plus";
+      category = "Flipkart Plus Purchase";
     } else {
-      const regularRewards = cardReward.acceleratedRewards.regularSpend;
-      if (amount <= regularRewards.tier1.threshold) {
-        rate = regularRewards.tier1.rate;
-      } else {
-        rate = regularRewards.tier2.rate;
-      }
-      rateType = amount > regularRewards.tier1.threshold ? "accelerated" : "default";
+      rate = cardReward.mccRates["5399"];
+      rateType = "flipkart-regular";
+      category = "Flipkart Purchase";
     }
+  } else if (mcc && cardReward.mccRates && cardReward.mccRates[mcc]) {
+    rate = cardReward.mccRates[mcc];
+    rateType = "mcc-specific";
+    category = "Category Spend";
   }
 
-  // Check for LIC Premium payment
-  if (cardName === "LIC" && additionalParams.isLICPremium) {
+  const points = Math.floor(amount * rate);
+
+  return { points, rate, rateType, category };
+};
+
+const calculateFreechargeRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+
+  if (additionalParams.isFreechargeTransaction) {
+    rate = cardReward.freechargeRate;
+    category = "Freecharge Transaction";
+    rateType = "freecharge";
+  } else if (mcc && cardReward.mccRates && cardReward.mccRates[mcc]) {
+    rate = cardReward.mccRates[mcc];
+    rateType = "mcc-specific";
+    category = "Category Spend";
+  }
+
+  const points = Math.floor(amount * rate);
+
+  return { points, rate, rateType, category };
+};
+
+const calculateLICRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+
+  if (additionalParams.isLICPremium) {
     rate = cardReward.licPremiumRate;
     rateType = "lic-premium";
     category = "LIC Premium Payment";
   } else if (additionalParams.isInternational && cardReward.internationalRate) {
     rate = cardReward.internationalRate;
     rateType = "international";
-  }
-
-  // Special handling for Flipkart Super Elite card
-  if (cardName === "Flipkart Super Elite") {
-    if (mcc === "5399") { // Flipkart purchase
-      if (additionalParams.isFlipkartPlusMember && cardReward.flipkartPlusRate) {
-        rate = cardReward.flipkartPlusRate["5399"];
-        rateType = "flipkart-plus";
-        category = "Flipkart Plus Purchase";
-      } else {
-        rate = cardReward.mccRates["5399"];
-        rateType = "flipkart-regular";
-        category = "Flipkart Purchase";
-      }
-    }
-  } 
-  // Check for MCC-specific rate for other cards
-  else if (mcc && cardReward.mccRates && cardReward.mccRates[mcc]) {
+    category = "International Transaction";
+  } else if (mcc && cardReward.mccRates && cardReward.mccRates[mcc] !== undefined) {
     rate = cardReward.mccRates[mcc];
     rateType = "mcc-specific";
-    category = "Category Spend";
+    category = rate === 0 ? "Excluded Category" : "Category Spend";
   }
 
-  // Special handling for Horizon card
-  if (cardName === "Horizon") {
-    const isAxisTravelEdge = additionalParams.isAxisTravelEdge || false;
-    if (isAxisTravelEdge || (cardReward.airlineMCCs && cardReward.airlineMCCs.includes(mcc))) {
-      rate = cardReward.acceleratedRate;
-      rateType = "accelerated";
-      category = isAxisTravelEdge ? "Axis Travel EDGE" : "Airline Spend";
-    }
+  const points = Math.floor(amount * rate);
+
+  return { points, rate, rateType, category };
+};
+
+const calculateDefaultRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+
+  if (additionalParams.isInternational && cardReward.internationalRate) {
+    rate = cardReward.internationalRate;
+    rateType = "international";
+  } else if (mcc && cardReward.mccRates && cardReward.mccRates[mcc] !== undefined) {
+    rate = cardReward.mccRates[mcc];
+    rateType = "mcc-specific";
+    category = rate === 0 ? "Excluded Category" : "Category Spend";
   }
 
-  points = Math.floor(amount * rate);
-  cappedPoints = points;
-  appliedCap = null;
+  const points = Math.floor(amount * rate);
 
-  // Apply category-specific capping if available
+  return { points, rate, rateType, category };
+};
+
+const applyCapping = (result, cardReward, cardName) => {
+  let { points, cashback, rate, rateType, category } = result;
+  let cappedPoints = points;
+  let appliedCap = null;
+
   if (cardReward.capping && cardReward.capping.categories && category) {
     const cappingCategory = cardReward.capping.categories[category];
     if (cappingCategory) {
       const { points: maxPoints, maxSpent } = cappingCategory;
-      const cappedAmount = Math.min(amount, maxSpent);
+      const cappedAmount = Math.min(result.amount, maxSpent);
       cappedPoints = Math.min(points, maxPoints, Math.floor(cappedAmount * rate));
       
       if (cappedPoints < points) {
-        appliedCap = {
-          category,
-          maxPoints,
-          maxSpent
-        };
+        appliedCap = { category, maxPoints, maxSpent };
       }
     }
   }
 
-  // Generate reward text
-  let rewardText = "";
-  switch (cardName) {
-    case "LIC":
-      rewardText = rate === 0 ? "No Axis Reward Points for this transaction" : `${cappedPoints} Axis Reward Points`;
-      if (rateType === "lic-premium") {
-        rewardText += " (LIC Premium Payment)";
-      } else if (rateType === "international") {
-        rewardText += " (International transaction)";
-      }
-      break;
-    case "Airtel":
-      rewardText = `₹${cashback.toFixed(2)} Cashback`;
-      if (appliedCap) {
-        rewardText += ` (${appliedCap.category} - Capped at ₹${appliedCap.maxCashback})`;
-      } else if (category !== "Other Spends") {
-        rewardText += ` (${category})`;
-      }
-      break;
-    case "Samsung Infinite":
-    case "Samsung Signature":
-      if (rateType === "cashback") {
-        rewardText = `₹${cashback.toFixed(2)} Cashback`;
-        if (appliedCap) {
-          rewardText += ` (Capped at ₹${appliedCap.maxCashback} per month)`;
-        }
-      } else {
-        rewardText = `${points} EDGE Reward Points`;
-      }
-      if (category !== "Other Spends") {
-        rewardText += ` (${category})`;
-      }
-      break;
-    case "Shoppers Stop":
-      rewardText = rate === 0 ? "No FC Reward Points for this transaction" : `${cappedPoints} FC Reward Points`;
-      if (rateType === "shoppers-stop") {
-        rewardText += ` (${category})`;
-      }
-      break;
-    case "Voyage":
-    case "Voyage Black":
-      rewardText = rate === 0 ? "No SpiceClub Points for this transaction" : `${cappedPoints} SpiceClub Points`;
-      if (rateType === "spicejet") {
-        rewardText += " (Including SpiceClub Membership benefit)";
-      }
-      break;
-    case "Magnus":
-    case "Reserve":
-    case "Select":
-    case "Privilege":
-      rewardText = rate === 0 ? "No EDGE Reward Points for this transaction" : `${cappedPoints} EDGE Reward Points`;
-      if (rateType === "travel-edge") {
-        rewardText += " (Travel Edge Portal rate applied)";
-      } 
-      else if (rateType === "accelerated") {
-        rewardText += " (Accelerated rate applied)";
-      }
-      else if (rateType === "international") {
-        rewardText += " (2x international rate applied)";
-      }
-      break;
-    case "Flipkart Super Elite":
-      rewardText = `${cappedPoints} SuperCoins`;
-      if (category === "Flipkart Plus Purchase") {
-        rewardText += " (Flipkart Plus rate applied)";
-      } else if (category === "Flipkart Purchase") {
-        rewardText += " (Regular Flipkart rate applied)";
-      }
-      break;
-    case "Atlas":
-    case "Horizon":
-      rewardText = rate === 0 ? "No EDGE Miles for this transaction" : `${cappedPoints} EDGE Miles`;
-      break;
-    case "Vistara":
-    case "Vistara Signature":
-    case "Vistara Infinite":
-      rewardText = rate === 0 ? "No CV Points for this transaction" : `${cappedPoints} CV Points`;
-      break;
-    default:
-      rewardText = rate === 0 ? "No Axis Reward Points for this transaction" : `${cappedPoints} Axis Reward Points`;
-  }
-
-  if (category !== "Other Spends" && !rewardText.includes(category)) {
-    rewardText += ` (${category})`;
-  }
+  const rewardText = generateRewardText(cardName, cappedPoints, rate, rateType, category, cashback, appliedCap);
 
   return {
     points: cappedPoints,
@@ -912,4 +899,92 @@ export const calculateAxisRewards = (cardName, amount, mcc, additionalParams = {
     rateUsed: rate,
     rateType
   };
+};
+
+const generateRewardText = (cardName, points, rate, rateType, category, cashback, appliedCap) => {
+  let rewardText = "";
+
+  switch (cardName) {
+    case "LIC":
+      rewardText = rate === 0 ? "No Axis Reward Points for this transaction" : `${points} Axis Reward Points`;
+      if (rateType === "lic-premium") {
+        rewardText += " (LIC Premium Payment)";
+      } else if (rateType === "international") {
+        rewardText += " (International transaction)";
+      }
+      break;
+    case "Airtel":
+      rewardText = `₹${cashback.toFixed(2)} Cashback`;
+      if (appliedCap) {
+        rewardText += ` (${appliedCap.category} - Capped at ₹${appliedCap.maxPoints})`;
+      } else if (category !== "Other Spends") {
+        rewardText += ` (${category})`;
+      }
+      break;
+    case "Samsung Infinite":
+    case "Samsung Signature":
+      if (rateType === "cashback") {
+        rewardText = `₹${cashback.toFixed(2)} Cashback`;
+        if (appliedCap) {
+          rewardText += ` (Capped at ₹${appliedCap.maxPoints} per month)`;
+        }
+      } else {
+        rewardText = `${points} EDGE Reward Points`;
+      }
+      if (category !== "Other Spends") {
+        rewardText += ` (${category})`;
+      }
+      break;
+    case "Shoppers Stop":
+      rewardText = rate === 0 ? "No FC Reward Points for this transaction" : `${points} FC Reward Points`;
+      if (rateType === "shoppers-stop") {
+        rewardText += ` (${category})`;
+      }
+      break;
+    case "Voyage":
+    case "Voyage Black":
+      rewardText = rate === 0 ? "No SpiceClub Points for this transaction" : `${points} SpiceClub Points`;
+      if (rateType === "spicejet") {
+        rewardText += " (Including SpiceClub Membership benefit)";
+      }
+      break;
+    case "Magnus":
+    case "Horizon":
+    case "Reserve":
+    case "Select":
+    case "Privilege":
+      rewardText = rate === 0 ? "No EDGE Reward Points for this transaction" : `${points} EDGE Reward Points`;
+      if (rateType === "travel-edge") {
+        rewardText += " (Travel Edge Portal rate applied)";
+      } else if (rateType === "accelerated") {
+        rewardText += " (Accelerated rate applied)";
+      } else if (rateType === "international") {
+        rewardText += " (International rate applied)";
+      }
+      break;
+    case "Flipkart Super Elite":
+      rewardText = `${points} SuperCoins`;
+      if (category === "Flipkart Plus Purchase") {
+        rewardText += " (Flipkart Plus rate applied)";
+      } else if (category === "Flipkart Purchase") {
+        rewardText += " (Regular Flipkart rate applied)";
+      }
+      break;
+    case "Atlas":
+      rewardText = rate === 0 ? "No EDGE Miles for this transaction" : `${points} EDGE Miles`;
+      break;
+    case "Vistara":
+    case "Vistara Signature":
+    case "Vistara Infinite":
+      rewardText = rate === 0 ? "No CV Points for this transaction" : `${points} CV Points`;
+      break;
+    default:
+      rewardText = rate === 0 ? "No Axis Reward Points for this transaction" : `${points} Axis Reward Points`;
+  }
+
+  if (category !== "Other Spends" && !rewardText.includes(category)) {
+    rewardText += ` (${category})`;
+  }
+
+  return rewardText;
 };

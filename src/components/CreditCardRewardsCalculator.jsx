@@ -543,6 +543,7 @@ const CreditCardRewardsCalculator = () => {
   cardConfig={getCardConfig(selectedBank, selectedCard)}
     onChange={handleAdditionalInputChange}
     currentInputs={additionalInputs}
+    selectedMcc={selectedMcc}
   />
 )}
 

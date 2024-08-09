@@ -4257,7 +4257,7 @@ export const mccList = [
         "mcc": "5311",
         "industryname": "Retail Outlet Services",
         "merchantCategory": "General",
-        "name": "Department Stores"
+        "name": "Department Stores, Shoppers Stop"
     },
     {
         "mcc": "5331",

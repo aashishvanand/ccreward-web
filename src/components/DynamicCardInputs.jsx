@@ -7,8 +7,18 @@ import {
   Radio,
 } from '@mui/material';
 
-const DynamicCardInputs = ({ cardConfig, onChange, currentInputs }) => {
+const DynamicCardInputs = ({ cardConfig, onChange, currentInputs, selectedMcc }) => {
   if (!cardConfig) return null;
+
+  const handleTransactionTypeChange = (value) => {
+    onChange('isLICPremium', value === 'premium');
+    onChange('isSamsungTransaction', value === 'samsung');
+    onChange('isInternational', value === 'international');
+  };
+
+  const isSpecialCard = cardConfig.licPremiumRate || cardConfig.samsungRate;
+  const isShoppersStopTransaction = selectedMcc && selectedMcc.name.toLowerCase().includes('shoppers stop');
+  const isFlipkartTransaction = selectedMcc && selectedMcc.name.toLowerCase().includes('flipkart');
 
   return (
     <>
@@ -28,7 +38,7 @@ const DynamicCardInputs = ({ cardConfig, onChange, currentInputs }) => {
         </FormControl>
       )}
 
-      {cardConfig.flipkartPlusRate && (
+{cardConfig.flipkartPlusRate && isFlipkartTransaction && (
         <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
           <FormLabel component="legend">Are you a Flipkart Plus member?</FormLabel>
           <RadioGroup
@@ -36,22 +46,6 @@ const DynamicCardInputs = ({ cardConfig, onChange, currentInputs }) => {
             name="isFlipkartPlusMember"
             value={currentInputs.isFlipkartPlusMember ? 'true' : 'false'}
             onChange={(e) => onChange('isFlipkartPlusMember', e.target.value === 'true')}
-            row
-          >
-            <FormControlLabel value="true" control={<Radio />} label="Yes" />
-            <FormControlLabel value="false" control={<Radio />} label="No" />
-          </RadioGroup>
-        </FormControl>
-      )}
-      
-      {cardConfig.internationalRate && (
-        <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
-          <FormLabel component="legend">Is this an international transaction?</FormLabel>
-          <RadioGroup
-            aria-label="international-transaction"
-            name="isInternational"
-            value={currentInputs.isInternational ? 'true' : 'false'}
-            onChange={(e) => onChange('isInternational', e.target.value === 'true')}
             row
           >
             <FormControlLabel value="true" control={<Radio />} label="Yes" />
@@ -92,7 +86,7 @@ const DynamicCardInputs = ({ cardConfig, onChange, currentInputs }) => {
         </FormControl>
       )}
 
-{cardConfig.spicejetRate && (
+      {cardConfig.spicejetRate && (
         <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
           <FormLabel component="legend">Is this a SpiceJet transaction?</FormLabel>
           <RadioGroup
@@ -107,7 +101,8 @@ const DynamicCardInputs = ({ cardConfig, onChange, currentInputs }) => {
           </RadioGroup>
         </FormControl>
       )}
-      {cardConfig.airtelApp && (
+
+      {cardConfig.airtelRate && (
         <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
           <FormLabel component="legend">Is this an Airtel Thanks App transaction?</FormLabel>
           <RadioGroup
@@ -123,7 +118,7 @@ const DynamicCardInputs = ({ cardConfig, onChange, currentInputs }) => {
         </FormControl>
       )}
 
-      {cardConfig.shoppersStopExclusiveBrands && (
+{cardConfig.shoppersStopExclusiveBrands && isShoppersStopTransaction && (
         <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
           <FormLabel component="legend">Is this a Shoppers Stop Exclusive Brand purchase?</FormLabel>
           <RadioGroup
@@ -131,37 +126,6 @@ const DynamicCardInputs = ({ cardConfig, onChange, currentInputs }) => {
             name="isShoppersStopExclusive"
             value={currentInputs.isShoppersStopExclusive ? 'true' : 'false'}
             onChange={(e) => onChange('isShoppersStopExclusive', e.target.value === 'true')}
-            row
-          >
-            <FormControlLabel value="true" control={<Radio />} label="Yes" />
-            <FormControlLabel value="false" control={<Radio />} label="No" />
-          </RadioGroup>
-        </FormControl>
-      )}
-
-{cardConfig.samsungRate && (
-        <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
-          <FormLabel component="legend">Is this a Samsung purchase?</FormLabel>
-          <RadioGroup
-            aria-label="samsung-transaction"
-            name="isSamsungTransaction"
-            value={currentInputs.isSamsungTransaction ? 'true' : 'false'}
-            onChange={(e) => onChange('isSamsungTransaction', e.target.value === 'true')}
-            row
-          >
-            <FormControlLabel value="true" control={<Radio />} label="Yes" />
-            <FormControlLabel value="false" control={<Radio />} label="No" />
-          </RadioGroup>
-        </FormControl>
-      )}
-      {cardConfig.licPremiumRate && (
-        <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
-          <FormLabel component="legend">Is this an LIC Premium payment?</FormLabel>
-          <RadioGroup
-            aria-label="lic-premium-payment"
-            name="isLICPremium"
-            value={currentInputs.isLICPremium ? 'true' : 'false'}
-            onChange={(e) => onChange('isLICPremium', e.target.value === 'true')}
             row
           >
             <FormControlLabel value="true" control={<Radio />} label="Yes" />
@@ -186,10 +150,32 @@ const DynamicCardInputs = ({ cardConfig, onChange, currentInputs }) => {
         </FormControl>
       )}
 
+{cardConfig.internationalRate && (
+        <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
+          <FormLabel component="legend">
+            {isSpecialCard ? "Transaction Type" : "Is this an international transaction?"}
+          </FormLabel>
+          <RadioGroup
+            aria-label="transaction-type"
+            name="transactionType"
+            value={
+              currentInputs.isLICPremium ? 'premium' :
+              currentInputs.isSamsungTransaction ? 'samsung' :
+              currentInputs.isInternational ? 'international' : 'other'
+            }
+            onChange={(e) => handleTransactionTypeChange(e.target.value)}
+            row={!isSpecialCard}
+          >
+            {cardConfig.licPremiumRate && <FormControlLabel value="premium" control={<Radio />} label="LIC Premium Payment" />}
+            {cardConfig.samsungRate && <FormControlLabel value="samsung" control={<Radio />} label="Samsung Purchase" />}
+            <FormControlLabel value="international" control={<Radio />} label={isSpecialCard ? "International Transaction" : "Yes"} />
+            <FormControlLabel value="other" control={<Radio />} label={isSpecialCard ? "Other Transaction" : "No"} />
+          </RadioGroup>
+        </FormControl>
+      )}
 
 
 
-      {/* Add more dynamic inputs here based on card configurations */}
     </>
   );
 };
