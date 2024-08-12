@@ -45,7 +45,36 @@ export const hdfcCardRewards = {
   },
   "Infinia Metal": {
     defaultRate: 5 / 150,
-    mccRates: {}
+    mccRates: {
+      // Exclusions
+      "6011": 0,  // ATM
+      "6012": 0,  // Financial institutions
+      "6051": 0,  // Non-financial institutions
+      "6529": 0,  // Wire transfer money orders
+      "6530": 0,  // Remote stored value load
+      "6534": 0,  // Money transfer
+      "6540": 0,  // POI funding transactions
+      "9211": 0,  // Court costs
+      "9222": 0,  // Fines
+      "9223": 0,  // Bail
+      "9311": 0,  // Tax payments
+      "9399": 0,  // Government services
+      "9402": 0,  // Postal services
+      "9405": 0,  // Intra-government purchases
+      "9702": 0,  // Emergency services
+      "9703": 0,  // Counseling services
+      "9950": 0,  // Intra-company purchases
+      // Add other MCC codes if needed
+    },
+    capping: {
+      categories: {
+        "Regular Spends": { points: 200000, maxSpent: 6000000 },
+        "Hotels (Via Smartbuy)": { points: 15000, maxSpent: 50000, rate: 50 / 150 },
+        "Flights / eVouchers (Via Smartbuy)": { points: 15000, maxSpent: 114000, rate: 25 / 150 },
+        "Grocery": { points: 2000, maxSpent: 60000 }, 
+        "Insurance": { points: 5000, maxSpent: 150000 }, 
+      }
+    }
   },
   "IRCTC HDFC": {
     defaultRate: 1 / 100,
@@ -54,12 +83,12 @@ export const hdfcCardRewards = {
   "Marriott Bonvoy": {
   defaultRate: 2 / 150,
   mccRates: {
-    // Hotels participating in Marriott Bonvoy
+    // Marriott Hotels 8 points per 150 INR
     "3501": 8 / 150, "3502": 8 / 150, "3503": 8 / 150, "3504": 8 / 150, "3505": 8 / 150,
     "3506": 8 / 150, "3507": 8 / 150, "3508": 8 / 150, "3509": 8 / 150, "3510": 8 / 150,
     // ... (add all Marriott Bonvoy hotel MCCs)
     "3790": 8 / 150, "7011": 8 / 150,
-    // Travel
+    // Travel 4 points per 150 INR
     "3000": 4 / 150, "3001": 4 / 150, "3002": 4 / 150, "3003": 4 / 150, "3004": 4 / 150, "3005": 4 / 150,
     "3006": 4 / 150, "3007": 4 / 150, "3008": 4 / 150, "3009": 4 / 150, "3010": 4 / 150, "3011": 4 / 150,
     "3012": 4 / 150, "3013": 4 / 150, "3014": 4 / 150, "3015": 4 / 150, "3016": 4 / 150, "3017": 4 / 150,
@@ -125,24 +154,46 @@ export const hdfcCardRewards = {
     "4411": 4 / 150, // Steamship/Cruise Lines
     "4722": 4 / 150, // Travel Agencies and Tour Operators
 
-    // Dining
+    //Dining 4 points per 150 INR
     "5812": 4 / 150, // Eating Places and Restaurants
     "5813": 4 / 150, // Drinking Places (Alcoholic Beverages), Bars, Taverns, Cocktail lounges, Nightclubs and Discotheques
     "5814": 4 / 150, // Fast Food Restaurants
 
-    // Entertainment
+    // Entertainment (4 points per 150 INR
     "7832": 4 / 150, // Motion Picture Theaters
     "7922": 4 / 150, // Theatrical Producers (Except Motion Pictures) and Ticket Agencies
     "7929": 4 / 150, // Bands, Orchestras, and Miscellaneous Entertainers (Not Elsewhere Classified)
     "7991": 4 / 150, // Tourist Attractions and Exhibits
     "7996": 4 / 150, // Amusement Parks, Circuses, Carnivals, and Fortune Tellers
     "7998": 4 / 150, // Aquariums, Seaquariums, Dolphinariums
-    "7999": 4 / 150  // Recreation Services (Not Elsewhere Classified)
+    "7999": 4 / 150,  // Recreation Services (Not Elsewhere Classified)
+
+     // Exclusions (0 points)
+     "5541": 0, // Fuel
+     "5542": 0, // Fuel
+     "6540": 0, // Wallet load
+     "9211": 0, // Government services
+     "9222": 0, // Government services
+     "9223": 0, // Government services
+     "9311": 0, // Government services
+     "9399": 0, // Government services
+     "6513": 0  // Rent
   }
 },
   "Millennia": {
     defaultRate: 1 / 100,
-    mccRates: {}
+    mccRates: {
+      // Accelerated Rewards (5% cashback) for select merchants
+      // Using example MCCs; adjust as needed for accurate merchant categorization
+      "5399": 5 / 100,  // Amazon, Flipkart (Misc. General Merchandise Stores)
+      "7829": 5 / 100,  // BookMyShow (Motion Picture Distribution)
+      "7298": 5 / 100,  // Cult.fit (Health and Beauty Spas)
+      "5691": 5 / 100,  // Myntra (Men's and Women's Clothing Stores)
+      "4899": 5 / 100,  // Sony LIV (Cable and Other Pay Television Services)
+      "5814": 5 / 100,  // Swiggy, Zomato (Fast Food Restaurants)
+      "5311": 5 / 100,  // Tata CLiQ (Department Stores)
+      "4121": 5 / 100   // Uber (Taxicabs and Limousines)
+    },
   },
   "MoneyBack Plus": {
     defaultRate: 2 / 150,
@@ -171,9 +222,47 @@ export const hdfcCardRewards = {
       "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0
     }
   },
-  "Regalia Gold": {
+ "Regalia Gold": {
     defaultRate: 4 / 150,
-    mccRates: {}
+    mccRates: {
+      // Fuel
+      "5541": 0,
+      "5542": 0,
+      "9311": 0, // Tax payments
+      "6513": 0, // Rent payments
+      "6540": 0, // Wallet top-ups (example MCCs, adjust as needed)
+      
+      // Grocery MCCs (for capping purposes)
+      "5411": 4 / 150, // Grocery stores
+      "5422": 4 / 150, // Freezer and locker meat provisioners
+      "5441": 4 / 150, // Candy, nut, and confectionery stores
+      "5451": 4 / 150, // Dairy products stores
+      "5462": 4 / 150, // Bakeries
+      "5499": 4 / 150  // Miscellaneous food stores
+    },
+    acceleratedSpends: {
+      rate: 20 / 150,
+      mccRates: {
+        "5311": 20 / 150, // Department Stores (for Marks & Spencer)
+        "5651": 20 / 150, // Family Clothing Stores (for Myntra)
+        "5977": 20 / 150, // Cosmetic Stores (for Nykaa)
+        "5732": 20 / 150  // Electronics Stores (for Reliance Digital)
+      }
+    },
+    smartbuyRates: {
+      "hotels": 40 / 150,
+      "flights": 20 / 150,
+      "vouchers": 20 / 150
+    },
+    capping: {
+      categories: {
+        "Regular Spends": { points: 200000, maxSpent: 200000 * (150 / 4) },
+        "Accelerated Spends": { points: 5000, maxSpent: 5000 * (150 / 20) },
+        "Hotels (Via Smartbuy)": { points: 4000, maxSpent: 4000 * (150 / 40), rate: 40 / 150 },
+        "Flights / eVouchers (Via Smartbuy)": { points: 4000, maxSpent: 4000 * (150 / 20), rate: 20 / 150 },
+        "Grocery": { points: 2000, maxSpent: 2000 * (150 / 4) }
+      }
+    }
   },
   "Shoppers Stop": {
     defaultRate: 1 / 100,

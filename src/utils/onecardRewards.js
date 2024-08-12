@@ -1,7 +1,15 @@
 export const oneCardRewards = {
   "One Card": {
-    defaultRate: 1 / 50,
-    mccRates: {}
+    defaultRate: 1 / 50, // 1 point for every Rs. 50 spent
+    oneCard: true,
+    topCategoryRate: 5 / 50, // 5 points for every Rs. 50 spent in top categories
+    mccRates: {
+      // Excluded categories
+      "5541": 0, // Fuel
+      "5542": 0, // Fuel
+      "5983": 0, // Fuel
+      // Add any other excluded MCCs for transfers here
+    }
   }
 };
 
@@ -19,62 +27,40 @@ export const calculateOneCardRewards = (cardName, amount, mcc, additionalParams 
 
   let rate = cardReward.defaultRate;
   let rateType = "default";
+  let category = "Other Spends";
 
-  // Check for international rate
-  if (additionalParams.isInternational && cardReward.internationalRate) {
-    rate = cardReward.internationalRate;
-    rateType = "international";
+  // Check if it's a top category spend
+  if (additionalParams.isTopCategorySpend) {
+    rate = cardReward.topCategoryRate;
+    rateType = "top-category";
+    category = "Top Category Spend";
   }
-  // Check for MCC-specific rate
-  else if (mcc && cardReward.mccRates && cardReward.mccRates[mcc]) {
+
+  // Check for excluded categories
+  if (mcc && cardReward.mccRates && cardReward.mccRates[mcc] !== undefined) {
     rate = cardReward.mccRates[mcc];
     rateType = "mcc-specific";
+    category = rate === 0 ? "Excluded Category" : "Category Spend";
   }
 
-  let points = Math.floor(amount * rate);
-  let cappedPoints = points;
-  let appliedCap = null;
+  // Calculate points with fractional precision
+  let points = amount * rate;
+  
+  // Round to 2 decimal places for display
+  points = Math.round(points * 100) / 100;
 
-  // Apply category-specific capping if available
-  if (cardReward.capping && cardReward.capping.categories && mcc) {
-    const mccName = mcc.toLowerCase();
-    const cappingCategories = cardReward.capping.categories;
-    
-    const matchingCategory = Object.keys(cappingCategories).find(cat => 
-      mccName.includes(cat.toLowerCase())
-    );
+  let rewardText = rate === 0 ? "No OneCard Reward Points for this transaction" : `${points} OneCard Reward Points`;
 
-    if (matchingCategory) {
-      const { points: catPoints, maxSpent: catMaxSpent } = cappingCategories[matchingCategory];
-      const cappedAmount = Math.min(amount, catMaxSpent);
-      cappedPoints = Math.min(points, catPoints, Math.floor(cappedAmount * rate));
-      
-      if (cappedPoints < points) {
-        appliedCap = {
-          category: matchingCategory,
-          maxPoints: catPoints,
-          maxSpent: catMaxSpent
-        };
-      }
-    }
-  }
-
-  // Default reward text
-  let rewardText = `${cappedPoints} OneCard Reward Points`;
-
-  // Bank-specific logic (to be customized for each bank)
-  switch (cardName) {
-    default:
-      // Default case if no specific logic is needed
-      break;
+  if (category !== "Other Spends") {
+    rewardText += ` (${category})`;
   }
 
   return {
-    points: cappedPoints,
+    points: points,
     rewardText,
     uncappedPoints: points,
-    cappedPoints,
-    appliedCap,
+    cappedPoints: points, // OneCard doesn't seem to have capping
+    appliedCap: null,
     rateUsed: rate,
     rateType
   };

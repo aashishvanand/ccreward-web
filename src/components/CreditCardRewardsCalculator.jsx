@@ -39,6 +39,7 @@ import { sbiCardRewards, calculateSBIRewards } from '../utils/sbiRewards';
 import { scCardRewards, calculateSCRewards } from '../utils/scRewards';
 import { yesCardRewards, calculateYesRewards } from '../utils/yesRewards';
 import DynamicCardInputs from './DynamicCardInputs';
+import IncorrectRewardReportForm from './IncorrectRewardReportForm';
 
 const DEBUG_MODE = true;
 
@@ -74,7 +75,21 @@ const CreditCardRewardsCalculator = () => {
   const [spendType, setSpendType] = useState('local');
   const [showInternationalOption, setShowInternationalOption] = useState(false);
   const [calculationResult, setCalculationResult] = useState(null);
-  const [additionalInputs, setAdditionalInputs] = useState({});
+  const [additionalInputs, setAdditionalInputs] = useState({
+    isPrimeMember: false,
+    isFlipkartPlusMember: false,
+    isInternational: false,
+    isBirthday: false,
+    isTravelEdgePortal: false,
+    isSpiceJet: false,
+    isAirtelApp: false,
+    isSamsungTransaction: false,
+    isShoppersStopExclusive: false,
+    isLICPremium: false,
+    isFreechargeTransaction: false,
+    isTopCategorySpend: false
+  });
+  const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] = useState(false);
 
   const theme = React.useMemo(
     () =>
@@ -276,9 +291,20 @@ const CreditCardRewardsCalculator = () => {
     const amount = parseFloat(spentAmount);
     const mcc = selectedMcc ? selectedMcc.mcc : null;
     const additionalParams = {
-      isInternational: additionalInputs.isInternational || false,
-      isPrimeMember: additionalInputs.isPrimeMember || false,
+      isPrimeMember: additionalInputs.isPrimeMember,
+      isFlipkartPlusMember: additionalInputs.isFlipkartPlusMember,
+      isInternational: additionalInputs.isInternational,
+      isBirthday: additionalInputs.isBirthday,
+      isTravelEdgePortal: additionalInputs.isTravelEdgePortal,
+      isSpiceJet: additionalInputs.isSpiceJet,
+      isAirtelApp: additionalInputs.isAirtelApp,
+      isSamsungTransaction: additionalInputs.isSamsungTransaction,
+      isShoppersStopExclusive: additionalInputs.isShoppersStopExclusive,
+      isLICPremium: additionalInputs.isLICPremium,
+      isFreechargeTransaction: additionalInputs.isFreechargeTransaction,
+      isTopCategorySpend: additionalInputs.isTopCategorySpend
     };
+
   
     let result;
   
@@ -298,7 +324,7 @@ const CreditCardRewardsCalculator = () => {
       case "BOB":
         result = calculateBOBRewards(selectedCard, amount, mcc, additionalParams);
         break;
-      case "Federal Bank":
+      case "Federal":
         result = calculateFederalRewards(selectedCard, amount, mcc, additionalParams);
         break;
       case "HSBC":
@@ -370,6 +396,7 @@ const CreditCardRewardsCalculator = () => {
     setFirstSuccessfulSearch(true);
     setBankError(false);
     setCardError(false);
+    setCalculationResult(null);
   };
 
   const findMatchingBank = (inputValue) => {
@@ -380,13 +407,6 @@ const CreditCardRewardsCalculator = () => {
   const findMatchingCard = (inputValue) => {
     const lowerInput = inputValue.toLowerCase();
     return filteredCards.find(card => card.toLowerCase() === lowerInput);
-  };
-
-  const handleToastClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setToastOpen(false);
   };
 
   const handleMissingFormOpen = () => {
@@ -429,7 +449,7 @@ const CreditCardRewardsCalculator = () => {
       <Paper elevation={6} sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', borderRadius: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mb: 3 }}>
           <Typography component="h1" variant="h4" fontWeight="bold" color="primary">
-            Rewards Calculator
+            Credit Cards Rewards Calculator
           </Typography>
           <IconButton onClick={toggleColorMode} color="inherit" sx={{ ml: 2 }}>
             {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
@@ -520,6 +540,8 @@ const CreditCardRewardsCalculator = () => {
   <DynamicCardInputs
   cardConfig={getCardConfig(selectedBank, selectedCard)}
     onChange={handleAdditionalInputChange}
+    currentInputs={additionalInputs}
+    selectedMcc={selectedMcc}
   />
 )}
 
@@ -542,7 +564,16 @@ const CreditCardRewardsCalculator = () => {
         </Button>
       </Box>
 
-
+      {calculationPerformed ? (
+        <Button
+          variant="text"
+          color="primary"
+          onClick={() => setIncorrectRewardReportOpen(true)}
+          sx={{ mt: 2 }}
+        >
+          Report Incorrect Reward
+        </Button>
+      ) : (
         <Button
           variant="text"
           color="primary"
@@ -551,41 +582,42 @@ const CreditCardRewardsCalculator = () => {
         >
           Bank or Card Missing?
         </Button>
+      )}
 
         {calculationPerformed && calculationResult && (
-  <Paper 
-    elevation={3} 
-    sx={{ 
-      p: 3, 
-      mt: 2, 
-      width: '100%', 
-      bgcolor: calculationResult.points > 0 ? 'success.light' : 'error.light',
-      borderRadius: 2
-    }}
-  >
-    <Typography variant="h5" align="center" color="textPrimary" fontWeight="bold">
-      {calculationResult.points > 0 ? (
-        <>
-          🎉 {calculationResult.rewardText} 🎉
-          {calculationResult.appliedCap && (
-            <Typography variant="body2" color="textSecondary">
-              {`${calculationResult.appliedCap.category} cap applied: Max ${calculationResult.appliedCap.maxPoints} points or ₹${calculationResult.appliedCap.maxSpent.toFixed(2)} spent`}
+          <Paper 
+            elevation={3} 
+            sx={{ 
+              p: 3, 
+              mt: 2, 
+              width: '100%', 
+              bgcolor: calculationResult.points > 0 ? 'success.light' : 'error.light',
+              borderRadius: 2
+            }}
+          >
+            <Typography variant="h5" align="center" color="textPrimary" fontWeight="bold">
+              {calculationResult.points > 0 ? (
+                <>
+                  🎉 {calculationResult.rewardText} 🎉
+                  {calculationResult.appliedCap && (
+                    <Typography variant="body2" color="textSecondary">
+                      {`${calculationResult.appliedCap.category} cap applied: Max ${calculationResult.appliedCap.maxPoints} points or ₹${calculationResult.appliedCap.maxSpent.toFixed(2)} spent`}
+                    </Typography>
+                  )}
+                  {calculationResult.uncappedPoints && calculationResult.uncappedPoints !== calculationResult.points && (
+                    <Typography variant="body2" color="textSecondary">
+                      (Uncapped: {calculationResult.uncappedPoints} points)
+                    </Typography>
+                  )}
+                </>
+              ) : (
+                <>
+                  😢 No rewards earned 😢
+                </>
+              )}
             </Typography>
-          )}
-          {calculationResult.uncappedPoints && calculationResult.uncappedPoints !== calculationResult.points && (
-            <Typography variant="body2" color="textSecondary">
-              (Uncapped: {calculationResult.uncappedPoints} points)
-            </Typography>
-          )}
-        </>
-      ) : (
-        <>
-          😢 No rewards earned 😢
-        </>
-      )}
-    </Typography>
-  </Paper>
-)}
+          </Paper>
+        )}
       </Paper>
     </Container>
     <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
@@ -597,6 +629,19 @@ const CreditCardRewardsCalculator = () => {
       open={missingFormOpen} 
       onClose={handleMissingFormClose} 
       onSubmitSuccess={handleFormSubmitSuccess}
+    />
+    <IncorrectRewardReportForm
+      open={incorrectRewardReportOpen}
+      onClose={() => setIncorrectRewardReportOpen(false)}
+      onSubmitSuccess={handleFormSubmitSuccess}
+      formData={{
+        bank: selectedBank,
+        card: selectedCard,
+        mcc: selectedMcc ? `${selectedMcc.mcc} - ${selectedMcc.name}` : 'Not selected',
+        spentAmount,
+        additionalInputs,
+        calculationResult
+      }}
     />
   </ThemeProvider>
   );
