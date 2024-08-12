@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Button,
   Dialog,
@@ -8,44 +8,60 @@ import {
   TextField,
   Typography,
   Backdrop,
-} from '@mui/material';
+} from "@mui/material";
 
-const IncorrectRewardReportForm = ({ open, onClose, onSubmitSuccess, formData }) => {
-  const [userFeedback, setUserFeedback] = useState('');
+const IncorrectRewardReportForm = ({
+  open,
+  onClose,
+  onSubmitSuccess,
+  formData,
+}) => {
+  const [userFeedback, setUserFeedback] = useState("");
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    
+
     // Prepare the form data
     const consoleLog = JSON.stringify(formData);
-    
-    const submissionData = new FormData();
-    submissionData.append('entry.1871812572', consoleLog); // Console log field
-    submissionData.append('entry.507295039', userFeedback); // User feedback field
 
-    fetch('https://docs.google.com/forms/u/0/d/e/1FAIpQLSeW-n8et15bE8wajTKTVXi39dn_sJ4LFzPy9K2BOjlaeSul5A/formResponse', {
-      method: 'POST',
-      body: submissionData,
-      mode: 'no-cors'
-    }).then(() => {
-      onSubmitSuccess('Report submitted successfully!');
-      setUserFeedback('');
-      onClose();
-    }).catch((error) => {
-      console.error('Error:', error);
-      onSubmitSuccess('There was an error submitting the report. Please try again.', 'error');
-    });
+    const submissionData = new FormData();
+    submissionData.append("entry.1871812572", consoleLog); // Console log field
+    submissionData.append("entry.507295039", userFeedback); // User feedback field
+
+    fetch(
+      "https://docs.google.com/forms/u/0/d/e/1FAIpQLSeW-n8et15bE8wajTKTVXi39dn_sJ4LFzPy9K2BOjlaeSul5A/formResponse",
+      {
+        method: "POST",
+        body: submissionData,
+        mode: "no-cors",
+      }
+    )
+      .then(() => {
+        onSubmitSuccess("Report submitted successfully!");
+        setUserFeedback("");
+        onClose();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        onSubmitSuccess(
+          "There was an error submitting the report. Please try again.",
+          "error"
+        );
+      });
   };
 
   return (
     <>
-      <Backdrop open={open} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} />
-      <Dialog 
-        open={open} 
+      <Backdrop
+        open={open}
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      />
+      <Dialog
+        open={open}
         onClose={onClose}
-        sx={{ 
-          '& .MuiDialog-paper': { 
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+        sx={{
+          "& .MuiDialog-paper": {
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
           },
         }}
       >
@@ -53,7 +69,8 @@ const IncorrectRewardReportForm = ({ open, onClose, onSubmitSuccess, formData })
           <DialogTitle>Report Incorrect Reward Points</DialogTitle>
           <DialogContent>
             <Typography variant="body2" color="textSecondary" paragraph>
-              Please provide feedback about the issue with the reward point calculation.
+              Please provide feedback about the issue with the reward point
+              calculation.
             </Typography>
             <TextField
               fullWidth

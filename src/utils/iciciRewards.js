@@ -59,16 +59,16 @@ export const iciciCardRewards = {
   "HPCL Super Saver": {
     defaultRate: 2 / 100, // 2 ICICI Bank Reward Points per INR 100 spent on non-fuel, utility, and departmental store purchases
     mccRates: {
-        "5541": 4 / 100, // Fuel Spends
-        "4900": 5 / 100, // Utility
-        "5311": 5 / 100  // Grocery & Departmental store
+      "5541": 4 / 100, // Fuel Spends
+      "4900": 5 / 100, // Utility
+      "5311": 5 / 100  // Grocery & Departmental store
     },
     capping: {
-        categories: {
-            "Fuel Spends & HP Pay": { points: 200 / 0.05, maxSpent: 200 }, // Capped at Rs. 200 per month
-            "Utility, Grocery & Departmental Store": { points: 400, maxSpent: 100 / 0.05 }, // Capped at 400 points (equivalent to Rs. 100) per month
-            "HP Pay Fuel Spends": { points: 1.5 / 100 } // Additional 1.5% as points
-        }
+      categories: {
+        "Fuel Spends & HP Pay": { points: 200 / 0.05, maxSpent: 200 }, // Capped at Rs. 200 per month
+        "Utility, Grocery & Departmental Store": { points: 400, maxSpent: 100 / 0.05 }, // Capped at 400 points (equivalent to Rs. 100) per month
+        "HP Pay Fuel Spends": { points: 1.5 / 100 } // Additional 1.5% as points
+      }
     },
   },
   "HPCL Coral": {
@@ -260,7 +260,7 @@ const applyCapping = (result, cardReward, cardName) => {
       const { points: maxPoints, maxSpent } = cappingCategory;
       const cappedAmount = Math.min(result.amount, maxSpent);
       cappedPoints = Math.min(points, maxPoints, Math.floor(cappedAmount * rate));
-      
+
       if (cappedPoints < points) {
         appliedCap = { category, maxPoints, maxSpent };
       }

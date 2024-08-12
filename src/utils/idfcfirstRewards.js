@@ -32,7 +32,7 @@ export const idfcFirstCardRewards = {
       "4814": 1 / 200, // Utility
       "4816": 1 / 200, // Utility
       "4899": 1 / 200, // Utility
-      
+
       // Excluded categories
       "6012": 0, // Financial institutions (for EMI)
       "6011": 0, // ATM cash withdrawal
@@ -103,10 +103,10 @@ export const idfcFirstCardRewards = {
   "SYWP": {
     defaultRate: 0,
     mccRates: {
-       // Excluded categories
-       "6011": 0, // Cash withdrawal
-       "5541": 0, // Fuel
-       "5542": 0, // Fuel
+      // Excluded categories
+      "6011": 0, // Cash withdrawal
+      "5541": 0, // Fuel
+      "5542": 0, // Fuel
     },
     acceleratedRewards: {
       tier1: {
@@ -331,7 +331,7 @@ const applyCapping = (result, cardReward, cardName) => {
       const { points: maxPoints, maxSpent } = cappingCategory;
       const cappedAmount = Math.min(result.amount, maxSpent);
       cappedPoints = Math.min(points, maxPoints, Math.floor(cappedAmount * rate));
-      
+
       if (cappedPoints < points) {
         appliedCap = { category, maxPoints, maxSpent };
       }

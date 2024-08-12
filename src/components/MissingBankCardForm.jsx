@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Button,
   Dialog,
@@ -8,45 +8,56 @@ import {
   TextField,
   Typography,
   Backdrop,
-} from '@mui/material';
+} from "@mui/material";
 
 const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
-  const [bankName, setBankName] = useState('');
-  const [cardName, setCardName] = useState('');
+  const [bankName, setBankName] = useState("");
+  const [cardName, setCardName] = useState("");
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
-    
-    fetch('https://docs.google.com/forms/u/0/d/e/1FAIpQLScN5YIru311tyglwI3vLjAbeOEHnW8BRWE2ce1qwgch-1mDbQ/formResponse', {
-      method: 'POST',
-      body: formData,
-      mode: 'no-cors'
-    }).then(() => {
-      onSubmitSuccess('Submitted successfully!');
-      clearForm();
-      onClose();
-    }).catch((error) => {
-      console.error('Error:', error);
-      onSubmitSuccess('There was an error submitting. Please try again.', 'error');
-    });
+
+    fetch(
+      "https://docs.google.com/forms/u/0/d/e/1FAIpQLScN5YIru311tyglwI3vLjAbeOEHnW8BRWE2ce1qwgch-1mDbQ/formResponse",
+      {
+        method: "POST",
+        body: formData,
+        mode: "no-cors",
+      }
+    )
+      .then(() => {
+        onSubmitSuccess("Submitted successfully!");
+        clearForm();
+        onClose();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        onSubmitSuccess(
+          "There was an error submitting. Please try again.",
+          "error"
+        );
+      });
   };
 
   const clearForm = () => {
-    setBankName('');
-    setCardName('');
+    setBankName("");
+    setCardName("");
   };
 
   return (
     <>
-      <Backdrop open={open} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} />
-      <Dialog 
-        open={open} 
+      <Backdrop
+        open={open}
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      />
+      <Dialog
+        open={open}
         onClose={onClose}
-        sx={{ 
-          '& .MuiDialog-paper': { 
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+        sx={{
+          "& .MuiDialog-paper": {
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
           },
         }}
       >

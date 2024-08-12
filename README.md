@@ -75,10 +75,6 @@ Example attribution:
 This project is based on the Credit Card Rewards India Calculator (https://github.com/aashishvanand/credit-card-rewards-india-calculator) by Aashish Vivekanand.
 ```
 
-## Acknowledgements
-
-- [List any libraries, tools, or contributors you want to acknowledge]
-
 ---
 
 Visit the live calculator: [Credit Card Rewards Calculator](https://credit-card-rewards-calculator.aashishvanand.me/)

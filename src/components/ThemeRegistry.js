@@ -13,7 +13,6 @@ export default function ThemeRegistry({ children }) {
         palette: {
           mode: prefersDarkMode ? 'dark' : 'light',
         },
-        // You can add more theme customizations here
       }),
     [prefersDarkMode]
   );

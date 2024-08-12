@@ -20,7 +20,6 @@ export default function ThemeRegistry({ children }) {
         palette: {
           mode,
         },
-        // You can add more theme customizations here
       }),
     [mode]
   );

@@ -45,7 +45,7 @@ export const calculateOneCardRewards = (cardName, amount, mcc, additionalParams 
 
   // Calculate points with fractional precision
   let points = amount * rate;
-  
+
   // Round to 2 decimal places for display
   points = Math.round(points * 100) / 100;
 
