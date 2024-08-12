@@ -53,7 +53,7 @@ import { yesCardRewards, calculateYesRewards } from "../utils/yesRewards";
 import DynamicCardInputs from "./DynamicCardInputs";
 import IncorrectRewardReportForm from "./IncorrectRewardReportForm";
 
-const DEBUG_MODE = true;
+const DEBUG_MODE = false;
 
 const debugLog = (...args) => {
   if (DEBUG_MODE) {
@@ -214,7 +214,6 @@ const CreditCardRewardsCalculator = () => {
       }
       setShowInternationalOption(!!cardReward?.internationalRate);
 
-      // You can add more logic here to set other card-specific options
       setAdditionalInputs((prevInputs) => ({
         ...prevInputs,
         isPrimeMember: cardReward?.amazonPrimeRate ? false : undefined,
@@ -275,7 +274,6 @@ const CreditCardRewardsCalculator = () => {
     debugLog("Selected MCC:", selectedMcc);
     debugLog("Spent Amount:", spentAmount);
 
-    // Error checking
     let isError = false;
     setBankError(false);
     setCardError(false);
@@ -568,7 +566,7 @@ const CreditCardRewardsCalculator = () => {
               justifyContent: "space-between",
               alignItems: "center",
               width: "100%",
-              mb: 1, // Reduce margin bottom
+              mb: 1,
               flexDirection: { xs: "row", sm: "row" },
             }}
           >
@@ -578,12 +576,12 @@ const CreditCardRewardsCalculator = () => {
               fontWeight="bold"
               color="primary"
               sx={{
-                fontSize: { xs: "1.2rem", sm: "1.5rem" }, // Slightly reduce font size
+                fontSize: { xs: "1.2rem", sm: "1.5rem" },
                 flexGrow: 1,
                 textAlign: { xs: "left", sm: "center" },
               }}
             >
-              Credit Cards Rewards Calculator
+            Credit Cards Rewards Calculator
             </Typography>
             <IconButton onClick={toggleColorMode} color="inherit" size="small">
               {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
