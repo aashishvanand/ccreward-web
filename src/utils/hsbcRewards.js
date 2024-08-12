@@ -47,8 +47,8 @@ export const calculateHSBCRewards = (cardName, amount, mcc, additionalParams = {
   if (cardReward.capping && cardReward.capping.categories && mcc) {
     const mccName = mcc.toLowerCase();
     const cappingCategories = cardReward.capping.categories;
-    
-    const matchingCategory = Object.keys(cappingCategories).find(cat => 
+
+    const matchingCategory = Object.keys(cappingCategories).find(cat =>
       mccName.includes(cat.toLowerCase())
     );
 
@@ -56,7 +56,7 @@ export const calculateHSBCRewards = (cardName, amount, mcc, additionalParams = {
       const { points: catPoints, maxSpent: catMaxSpent } = cappingCategories[matchingCategory];
       const cappedAmount = Math.min(amount, catMaxSpent);
       cappedPoints = Math.min(points, catPoints, Math.floor(cappedAmount * rate));
-      
+
       if (cappedPoints < points) {
         appliedCap = {
           category: matchingCategory,

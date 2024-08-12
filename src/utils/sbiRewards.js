@@ -27,7 +27,7 @@ export const sbiCardRewards = {
     defaultRate: 1 / 100,
     mccRates: {
       "5051": 0, "5094": 0, "5944": 0, "7631": 0,
-      "5111": 0, "5192": 0, "5942": 0, "5943": 0, "8211": 0, "8220": 0, 
+      "5111": 0, "5192": 0, "5942": 0, "5943": 0, "8211": 0, "8220": 0,
       "8241": 0, "8244": 0, "8249": 0, "8299": 0, "8351": 0,
       "4814": 0, "4900": 0, "9399": 0, "4816": 0, "4899": 0,
       "5960": 0, "6300": 0, "6381": 0,
@@ -204,8 +204,8 @@ export const calculateSBIRewards = (cardName, amount, mcc, additionalParams = {}
   if (cardReward.capping && cardReward.capping.categories && mcc) {
     const mccName = mcc.toLowerCase();
     const cappingCategories = cardReward.capping.categories;
-    
-    const matchingCategory = Object.keys(cappingCategories).find(cat => 
+
+    const matchingCategory = Object.keys(cappingCategories).find(cat =>
       mccName.includes(cat.toLowerCase())
     );
 
@@ -213,7 +213,7 @@ export const calculateSBIRewards = (cardName, amount, mcc, additionalParams = {}
       const { points: catPoints, maxSpent: catMaxSpent } = cappingCategories[matchingCategory];
       const cappedAmount = Math.min(amount, catMaxSpent);
       cappedPoints = Math.min(points, catPoints, Math.floor(cappedAmount * rate));
-      
+
       if (cappedPoints < points) {
         appliedCap = {
           category: matchingCategory,
