@@ -165,7 +165,6 @@ export const idfcFirstCardRewards = {
 };
 
 export const calculateIDFCFirstRewards = (cardName, amount, mcc, additionalParams = {}) => {
-
   const cardReward = idfcFirstCardRewards[cardName];
   if (!cardReward) {
     return {
@@ -177,25 +176,40 @@ export const calculateIDFCFirstRewards = (cardName, amount, mcc, additionalParam
     };
   }
 
-  let points = 0;
-  let rate = cardReward.defaultRate;
-  let rateType = "default";
-  let category = "Other Retail Spends";
+  let result;
 
-  // Check for birthday rate
+  switch (cardName) {
+    case "Classic":
+    case "Millennia":
+    case "Wealth":
+      result = calculateAcceleratedRewards(cardReward, amount, mcc, additionalParams);
+      break;
+    case "Club Vistara":
+      result = calculateClubVistaraRewards(cardReward, amount, mcc, additionalParams);
+      break;
+    case "Power":
+      result = calculatePowerRewards(cardReward, amount, mcc, additionalParams);
+      break;
+    case "SYWP":
+      result = calculateSYWPRewards(cardReward, amount, mcc, additionalParams);
+      break;
+    default:
+      result = calculateDefaultRewards(cardReward, amount, mcc, additionalParams);
+  }
+
+  return applyCapping(result, cardReward, cardName);
+};
+
+const calculateAcceleratedRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+
   if (additionalParams.isBirthday && cardReward.birthdayRate) {
     rate = cardReward.birthdayRate;
     rateType = "birthday";
     category = "Birthday Spend";
-  }
-  // Check for MCC-specific rate
-  else if (mcc && cardReward.mccRates && cardReward.mccRates[mcc] !== undefined) {
-    rate = cardReward.mccRates[mcc];
-    rateType = "mcc-specific";
-    category = rate === 0 ? "Excluded Category" : "Special Category";
-  }
-  // Check for accelerated rewards
-  else if (cardReward.acceleratedRewards) {
+  } else if (cardReward.acceleratedRewards) {
     const tiers = Object.values(cardReward.acceleratedRewards).sort((a, b) => b.threshold - a.threshold);
     for (const tier of tiers) {
       if (amount > tier.threshold) {
@@ -207,60 +221,124 @@ export const calculateIDFCFirstRewards = (cardName, amount, mcc, additionalParam
     }
   }
 
-  // Calculate points
-  if (cardName === "Club Vistara") {
-    points = Math.floor(amount / 200) * (rate * 200);
-  } else {
-    points = Math.floor(amount * rate);
+  if (mcc && cardReward.mccRates && cardReward.mccRates[mcc] !== undefined) {
+    rate = cardReward.mccRates[mcc];
+    rateType = "mcc-specific";
+    category = rate === 0 ? "Excluded Category" : "Category Spend";
   }
 
-  let cappedPoints = points;
-  let appliedCap = null;
+  const points = Math.floor(amount * rate);
 
-  // Apply category-specific capping if available
-  if (cardReward.capping && cardReward.capping.categories && mcc) {
-    const mccName = mcc.toLowerCase();
-    const cappingCategories = cardReward.capping.categories;
-    
-    const matchingCategory = Object.keys(cappingCategories).find(cat => 
-      mccName.includes(cat.toLowerCase())
-    );
+  return { points, rate, rateType, category };
+};
 
-    if (matchingCategory) {
-      const { points: catPoints, maxSpent: catMaxSpent } = cappingCategories[matchingCategory];
-      const cappedAmount = Math.min(amount, catMaxSpent);
-      cappedPoints = Math.min(points, catPoints, Math.floor(cappedAmount * rate));
-      
-      if (cappedPoints < points) {
-        appliedCap = {
-          category: matchingCategory,
-          maxPoints: catPoints,
-          maxSpent: catMaxSpent
-        };
+const calculateClubVistaraRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+
+  if (additionalParams.isBirthday && cardReward.birthdayRate) {
+    rate = cardReward.birthdayRate;
+    rateType = "birthday";
+    category = "Birthday Spend";
+  } else if (amount > cardReward.acceleratedRewards.tier1.threshold) {
+    rate = cardReward.acceleratedRewards.tier1.rate;
+    rateType = "accelerated";
+    category = "Accelerated Spend";
+  }
+
+  if (mcc && cardReward.mccRates && cardReward.mccRates[mcc] !== undefined) {
+    rate = cardReward.mccRates[mcc];
+    rateType = "mcc-specific";
+    category = rate === 0 ? "Excluded Category" : "Category Spend";
+  }
+
+  const points = Math.floor(amount / 200) * (rate * 200);
+
+  return { points, rate, rateType, category };
+};
+
+const calculatePowerRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+
+  if (mcc && cardReward.mccRates && cardReward.mccRates[mcc] !== undefined) {
+    rate = cardReward.mccRates[mcc];
+    rateType = "mcc-specific";
+    category = rate === 0 ? "Excluded Category" : "Category Spend";
+    if (mcc === "5541" || mcc === "5542") category = "Fuel";
+    else if (mcc === "5411") category = "Grocery";
+    else if (mcc === "4900") category = "Utility";
+    else if (mcc === "4784") category = "FASTag";
+  }
+
+  const points = Math.floor(amount * rate);
+
+  return { points, rate, rateType, category };
+};
+
+const calculateSYWPRewards = (cardReward, amount, mcc, additionalParams) => {
+  let points = 0;
+  let rate = 0;
+  let category = "Other Spends";
+  let rateType = "default";
+
+  if (mcc && cardReward.mccRates && cardReward.mccRates[mcc] !== undefined) {
+    rate = cardReward.mccRates[mcc];
+    rateType = "mcc-specific";
+    category = rate === 0 ? "Excluded Category" : "Category Spend";
+  } else {
+    const tiers = Object.values(cardReward.acceleratedRewards).sort((a, b) => b.threshold - a.threshold);
+    for (const tier of tiers) {
+      if (amount >= tier.threshold) {
+        points = Math.min(tier.maxPoints, Math.floor(amount * tier.rate));
+        rate = tier.rate;
+        rateType = "accelerated";
+        category = "Accelerated Spend";
+        break;
       }
     }
   }
 
-  // Generate reward text
-  let rewardText;
-  switch (cardName) {
-    case "Club Vistara":
-      rewardText = rate === 0 ? "No CV Points earned for this transaction" : `${cappedPoints} CV Points`;
-      break;
-    default:
-      rewardText = rate === 0 ? "No IDFC Reward Points earned for this transaction" : `${cappedPoints} IDFC Reward Points`;
-      break;
+  return { points, rate, rateType, category };
+};
+
+const calculateDefaultRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+
+  if (mcc && cardReward.mccRates && cardReward.mccRates[mcc] !== undefined) {
+    rate = cardReward.mccRates[mcc];
+    rateType = "mcc-specific";
+    category = rate === 0 ? "Excluded Category" : "Category Spend";
   }
 
-  // Add category and rate information to reward text
-  if (category !== "Other Retail Spends" && category !== "Excluded Category") {
-    rewardText += ` (${category})`;
+  const points = Math.floor(amount * rate);
+
+  return { points, rate, rateType, category };
+};
+
+const applyCapping = (result, cardReward, cardName) => {
+  let { points, rate, rateType, category } = result;
+  let cappedPoints = points;
+  let appliedCap = null;
+
+  if (cardReward.capping && cardReward.capping.categories && category) {
+    const cappingCategory = cardReward.capping.categories[category];
+    if (cappingCategory) {
+      const { points: maxPoints, maxSpent } = cappingCategory;
+      const cappedAmount = Math.min(result.amount, maxSpent);
+      cappedPoints = Math.min(points, maxPoints, Math.floor(cappedAmount * rate));
+      
+      if (cappedPoints < points) {
+        appliedCap = { category, maxPoints, maxSpent };
+      }
+    }
   }
-  if (rateType === "accelerated") {
-    rewardText += " (Accelerated rate applied)";
-  } else if (rateType === "birthday") {
-    rewardText += " (Birthday bonus applied)";
-  }
+
+  const rewardText = generateRewardText(cardName, cappedPoints, rate, rateType, category, appliedCap);
 
   return {
     points: cappedPoints,
@@ -269,7 +347,43 @@ export const calculateIDFCFirstRewards = (cardName, amount, mcc, additionalParam
     cappedPoints,
     appliedCap,
     rateUsed: rate,
-    rateType,
-    category
+    rateType
   };
+};
+
+const generateRewardText = (cardName, points, rate, rateType, category, appliedCap) => {
+  let rewardText = "";
+
+  switch (cardName) {
+    case "Club Vistara":
+      rewardText = rate === 0 ? "No CV Points for this transaction" : `${points} CV Points`;
+      break;
+    case "SYWP":
+      rewardText = `${points} SYWP Points`;
+      break;
+    case "Power":
+      rewardText = rate === 0 ? "No IDFC First Reward Points for this transaction" : `${points} IDFC First Reward Points`;
+      if (category === "Fuel" || category === "Grocery" || category === "Utility" || category === "FASTag") {
+        rewardText += ` (${category})`;
+      }
+      break;
+    default:
+      rewardText = rate === 0 ? "No IDFC First Reward Points for this transaction" : `${points} IDFC First Reward Points`;
+  }
+
+  if (rateType === "birthday") {
+    rewardText += " (Birthday bonus applied)";
+  } else if (rateType === "accelerated") {
+    rewardText += " (Accelerated rate applied)";
+  }
+
+  if (category !== "Other Spends" && !rewardText.includes(category)) {
+    rewardText += ` (${category})`;
+  }
+
+  if (appliedCap) {
+    rewardText += ` (Capped at ${appliedCap.maxPoints} points or ₹${appliedCap.maxSpent.toFixed(2)} spent for ${appliedCap.category})`;
+  }
+
+  return rewardText;
 };

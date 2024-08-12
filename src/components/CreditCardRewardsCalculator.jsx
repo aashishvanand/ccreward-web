@@ -86,6 +86,7 @@ const CreditCardRewardsCalculator = () => {
     isShoppersStopExclusive: false,
     isLICPremium: false,
     isFreechargeTransaction: false,
+    isTopCategorySpend: false
   });
 
   const theme = React.useMemo(
@@ -299,6 +300,7 @@ const CreditCardRewardsCalculator = () => {
       isShoppersStopExclusive: additionalInputs.isShoppersStopExclusive,
       isLICPremium: additionalInputs.isLICPremium,
       isFreechargeTransaction: additionalInputs.isFreechargeTransaction,
+      isTopCategorySpend: additionalInputs.isTopCategorySpend
     };
 
   

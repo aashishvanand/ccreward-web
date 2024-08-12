@@ -112,69 +112,203 @@ export const iciciCardRewards = {
 
 export const calculateICICIRewards = (cardName, amount, mcc, additionalParams = {}) => {
   const cardReward = iciciCardRewards[cardName];
-  if (!cardReward) return { points: 0, rewardText: "Card not found" };
-
-  let points = 0;
-  let rewardText = "";
-  let rate = cardReward.defaultRate;
-  let appliedCap = null;
-  let uncappedPoints = null;
-
-  const mccName = mcc ? mccList.find(item => item.mcc === mcc)?.name.toLowerCase() : null;
-
-  if (cardName === "AmazonPay") {
-    const isPrimeMember = additionalParams.isPrimeMember || false;
-    
-    if (isPrimeMember && cardReward.amazonPrimeRate && cardReward.amazonPrimeRate[mcc]) {
-      rate = cardReward.amazonPrimeRate[mcc];
-    } else if (cardReward.mccRates && cardReward.mccRates[mcc]) {
-      rate = cardReward.mccRates[mcc];
-    }
-
-    points = Math.floor(amount * rate);
-    const cashback = points / 100;
-    rewardText = `₹${cashback.toFixed(2)} Cashback`;
-  } else {
-    if (additionalParams.isInternational && cardReward.internationalRate) {
-      rate = cardReward.internationalRate;
-    } else if (mcc && cardReward.mccRates && cardReward.mccRates[mcc]) {
-      rate = cardReward.mccRates[mcc];
-    }
-
-    points = Math.floor(amount * rate);
-    uncappedPoints = points;
-    
-    if (cardReward.capping && cardReward.capping.categories && mccName) {
-      const cappingCategories = cardReward.capping.categories;
-      
-      const matchingCategory = Object.keys(cappingCategories).find(cat => 
-        mccName.includes(cat.toLowerCase())
-      );
-    
-      if (matchingCategory) {
-        const { points: catPoints, maxSpent: catMaxSpent } = cappingCategories[matchingCategory];
-        const cappedAmount = Math.min(amount, catMaxSpent);
-        const cappedPoints = Math.min(points, catPoints, Math.floor(cappedAmount * rate));
-        
-        if (cappedPoints < points) {
-          points = cappedPoints;
-          appliedCap = {
-            category: matchingCategory,
-            maxPoints: catPoints,
-            maxSpent: catMaxSpent
-          };
-        }
-      }
-    }
-  
-    rewardText = `${points} ICICI Reward Points`;
+  if (!cardReward) {
+    return {
+      points: 0,
+      rewardText: "Card not found",
+      uncappedPoints: 0,
+      cappedPoints: 0,
+      appliedCap: null
+    };
   }
 
-  return { 
-    points, 
+  let result;
+
+  const mccName = mcc ? mccList.find(item => item.mcc === mcc)?.name.toLowerCase() : '';
+  const isAmazonTransaction = mccName.includes('amazon');
+
+  switch (cardName) {
+    case "AmazonPay":
+      result = calculateAmazonPayRewards(cardReward, amount, mcc, { ...additionalParams, isAmazonTransaction });
+      break;
+    case "HPCL Super Saver":
+      result = calculateHPCLSuperSaverRewards(cardReward, amount, mcc, additionalParams);
+      break;
+    case "Emeralde Private":
+      result = calculateEmeraldePrivateRewards(cardReward, amount, mcc, additionalParams);
+      break;
+    case "Rubyx":
+    case "Sapphiro":
+      result = calculateInternationalRewards(cardReward, amount, mcc, additionalParams);
+      break;
+    default:
+      result = calculateDefaultRewards(cardReward, amount, mcc, additionalParams);
+  }
+
+  return applyCapping(result, cardReward, cardName);
+};
+
+const calculateAmazonPayRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+
+  if (additionalParams.isAmazonTransaction) {
+    if (additionalParams.isPrimeMember && cardReward.amazonPrimeRate) {
+      rate = cardReward.amazonPrimeRate[mcc] || cardReward.amazonPrimeRate["default"] || cardReward.defaultRate;
+      category = "Amazon Prime Purchase";
+      rateType = "amazon-prime";
+    } else if (cardReward.mccRates) {
+      rate = cardReward.mccRates[mcc] || cardReward.mccRates["default"] || cardReward.defaultRate;
+      category = "Amazon Purchase";
+      rateType = "amazon";
+    }
+  } else if (cardReward.mccRates && cardReward.mccRates[mcc]) {
+    rate = cardReward.mccRates[mcc];
+    rateType = "mcc-specific";
+    category = "Category Spend";
+  }
+
+  const points = Math.floor(amount * rate);
+  const cashback = points / 100;
+
+  return { points, cashback, rate, rateType, category };
+};
+
+const calculateHPCLSuperSaverRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+
+  if (mcc && cardReward.mccRates[mcc]) {
+    rate = cardReward.mccRates[mcc];
+    rateType = "mcc-specific";
+    category = mcc === "5541" ? "Fuel Spends" : (mcc === "4900" ? "Utility" : "Grocery & Departmental Store");
+  }
+
+  if (additionalParams.isHPPayFuelSpend) {
+    rate = cardReward.capping.categories["HP Pay Fuel Spends"].points;
+    category = "HP Pay Fuel Spends";
+    rateType = "hp-pay";
+  }
+
+  const points = Math.floor(amount * rate);
+
+  return { points, rate, rateType, category };
+};
+
+const calculateEmeraldePrivateRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+
+  if (mcc && cardReward.mccRates[mcc] !== undefined) {
+    rate = cardReward.mccRates[mcc];
+    rateType = "mcc-specific";
+    category = rate === 0 ? "Excluded Category" : "Category Spend";
+  }
+
+  const points = Math.floor(amount * rate);
+
+  return { points, rate, rateType, category };
+};
+
+const calculateInternationalRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+
+  if (additionalParams.isInternational && cardReward.internationalRate) {
+    rate = cardReward.internationalRate;
+    rateType = "international";
+    category = "International Transaction";
+  } else if (mcc && cardReward.mccRates && cardReward.mccRates[mcc]) {
+    rate = cardReward.mccRates[mcc];
+    rateType = "mcc-specific";
+    category = "Category Spend";
+  }
+
+  const points = Math.floor(amount * rate);
+
+  return { points, rate, rateType, category };
+};
+
+const calculateDefaultRewards = (cardReward, amount, mcc, additionalParams) => {
+  let rate = cardReward.defaultRate;
+  let category = "Other Spends";
+  let rateType = "default";
+
+  if (mcc && cardReward.mccRates && cardReward.mccRates[mcc]) {
+    rate = cardReward.mccRates[mcc];
+    rateType = "mcc-specific";
+    category = "Category Spend";
+  }
+
+  const points = Math.floor(amount * rate);
+
+  return { points, rate, rateType, category };
+};
+
+const applyCapping = (result, cardReward, cardName) => {
+  let { points, cashback, rate, rateType, category } = result;
+  let cappedPoints = points;
+  let appliedCap = null;
+
+  if (cardReward.capping && cardReward.capping.categories && category) {
+    const cappingCategory = cardReward.capping.categories[category];
+    if (cappingCategory) {
+      const { points: maxPoints, maxSpent } = cappingCategory;
+      const cappedAmount = Math.min(result.amount, maxSpent);
+      cappedPoints = Math.min(points, maxPoints, Math.floor(cappedAmount * rate));
+      
+      if (cappedPoints < points) {
+        appliedCap = { category, maxPoints, maxSpent };
+      }
+    }
+  }
+
+  const rewardText = generateRewardText(cardName, cappedPoints, rate, rateType, category, cashback, appliedCap);
+
+  return {
+    points: cappedPoints,
     rewardText,
-    rate,
-    ...(uncappedPoints !== points && { uncappedPoints }),
-    ...(appliedCap && { appliedCap })
+    uncappedPoints: points,
+    cappedPoints,
+    appliedCap,
+    rateUsed: rate,
+    rateType
   };
+};
+
+const generateRewardText = (cardName, points, rate, rateType, category, cashback, appliedCap) => {
+  let rewardText = "";
+
+  switch (cardName) {
+    case "AmazonPay":
+      rewardText = `₹${cashback.toFixed(2)} Cashback`;
+      if (rateType === "amazon-prime") {
+        rewardText += " (Amazon Prime Purchase)";
+      } else if (rateType === "amazon") {
+        rewardText += " (Amazon Purchase)";
+      }
+      break;
+    case "HPCL Super Saver":
+      rewardText = `${points} ICICI Bank Reward Points`;
+      if (category !== "Other Spends") {
+        rewardText += ` (${category})`;
+      }
+      if (appliedCap) {
+        rewardText += ` (Capped at ${appliedCap.maxPoints} points)`;
+      }
+      break;
+    default:
+      rewardText = `${points} ICICI Reward Points`;
+      if (rateType === "international") {
+        rewardText += " (International Transaction)";
+      } else if (category !== "Other Spends") {
+        rewardText += ` (${category})`;
+      }
+  }
+
+  return rewardText;
 };

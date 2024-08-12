@@ -19,10 +19,11 @@ const DynamicCardInputs = ({ cardConfig, onChange, currentInputs, selectedMcc })
   const isSpecialCard = cardConfig.licPremiumRate || cardConfig.samsungRate;
   const isShoppersStopTransaction = selectedMcc && selectedMcc.name.toLowerCase().includes('shoppers stop');
   const isFlipkartTransaction = selectedMcc && selectedMcc.name.toLowerCase().includes('flipkart');
+  const isAmazonTransaction = selectedMcc && selectedMcc.name.toLowerCase().includes('amazon');
 
   return (
     <>
-      {cardConfig.amazonPrimeRate && (
+      {cardConfig.amazonPrimeRate && isAmazonTransaction && (
         <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
           <FormLabel component="legend">Are you an Amazon Prime member?</FormLabel>
           <RadioGroup
@@ -38,7 +39,7 @@ const DynamicCardInputs = ({ cardConfig, onChange, currentInputs, selectedMcc })
         </FormControl>
       )}
 
-{cardConfig.flipkartPlusRate && isFlipkartTransaction && (
+      {cardConfig.flipkartPlusRate && isFlipkartTransaction && (
         <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
           <FormLabel component="legend">Are you a Flipkart Plus member?</FormLabel>
           <RadioGroup
@@ -118,7 +119,7 @@ const DynamicCardInputs = ({ cardConfig, onChange, currentInputs, selectedMcc })
         </FormControl>
       )}
 
-{cardConfig.shoppersStopExclusiveBrands && isShoppersStopTransaction && (
+      {cardConfig.shoppersStopExclusiveBrands && isShoppersStopTransaction && (
         <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
           <FormLabel component="legend">Is this a Shoppers Stop Exclusive Brand purchase?</FormLabel>
           <RadioGroup
@@ -150,7 +151,7 @@ const DynamicCardInputs = ({ cardConfig, onChange, currentInputs, selectedMcc })
         </FormControl>
       )}
 
-{cardConfig.internationalRate && (
+      {cardConfig.internationalRate && (
         <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
           <FormLabel component="legend">
             {isSpecialCard ? "Transaction Type" : "Is this an international transaction?"}
@@ -170,6 +171,22 @@ const DynamicCardInputs = ({ cardConfig, onChange, currentInputs, selectedMcc })
             {cardConfig.samsungRate && <FormControlLabel value="samsung" control={<Radio />} label="Samsung Purchase" />}
             <FormControlLabel value="international" control={<Radio />} label={isSpecialCard ? "International Transaction" : "Yes"} />
             <FormControlLabel value="other" control={<Radio />} label={isSpecialCard ? "Other Transaction" : "No"} />
+          </RadioGroup>
+        </FormControl>
+      )}
+
+      {cardConfig.oneCard && (
+        <FormControl component="fieldset" sx={{ mt: 2, width: '100%' }}>
+          <FormLabel component="legend">Is this a top category spend?</FormLabel>
+          <RadioGroup
+            aria-label="top-category-spend"
+            name="isTopCategorySpend"
+            value={currentInputs.isTopCategorySpend ? 'true' : 'false'}
+            onChange={(e) => onChange('isTopCategorySpend', e.target.value === 'true')}
+            row
+          >
+            <FormControlLabel value="true" control={<Radio />} label="Yes" />
+            <FormControlLabel value="false" control={<Radio />} label="No" />
           </RadioGroup>
         </FormControl>
       )}
