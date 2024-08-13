@@ -679,10 +679,28 @@ const calculateAirtelRewards = (cardReward, amount, mcc, additionalParams) => {
     rateType = "preferred";
   }
 
-  const cashback = amount * rate;
+  let cashback = amount * rate;
+  
+  // Apply capping
+  const cappingCategory = cardReward.cashbackCaps[mcc];
+  if (cappingCategory) {
+    cashback = Math.min(cashback, cappingCategory);
+  }
+
   const points = Math.floor(cashback * 100);
 
-  return { points, cashback, rate, rateType, category };
+  return { 
+    points, 
+    cashback, 
+    rate, 
+    rateType, 
+    category,
+    appliedCap: cappingCategory ? {
+      category: "Utility Bill Payment",
+      maxPoints: cappingCategory * 100,
+      maxSpent: cappingCategory / rate
+    } : null
+  };
 };
 
 const calculateSamsungRewards = (cardReward, amount, mcc, additionalParams) => {
