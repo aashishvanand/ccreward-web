@@ -793,63 +793,67 @@ const CreditCardRewardsCalculator = () => {
           )}
 
 {calculationPerformed && calculationResult && (
-  <Paper
-    elevation={3}
-    sx={{
-      p: 2,
-      mt: 2,
-      width: "100%",
-      bgcolor:
-        (calculationResult.points > 0 || calculationResult.cashback > 0)
-          ? "success.light"
-          : "error.light",
-      borderRadius: 2,
-    }}
-  >
-    <Typography
-      variant="h6"
-      align="center"
-      color="textPrimary"
-      fontWeight="bold"
-      sx={{
-        fontSize: { xs: "1rem", sm: "1.25rem" },
-        whiteSpace: "normal",
-        wordBreak: "break-word",
-      }}
-    >
-      {(calculationResult.points > 0 || calculationResult.cashback > 0) ? (
-        <>
-          🎉 {calculationResult.rewardText} 🎉
-          {calculationResult.appliedCap && (
-            <Typography variant="body2" color="textSecondary">
-              {`${
-                calculationResult.appliedCap.category
-              } cap applied: Max ${
-                calculationResult.appliedCap.maxPoints || calculationResult.appliedCap.maxCashback
-              } ${calculationResult.points ? 'points' : 'cashback'} or ₹${calculationResult.appliedCap.maxSpent.toFixed(
-                2
-              )} spent`}
-            </Typography>
+      <Paper
+        elevation={3}
+        sx={{
+          p: 2,
+          mt: 2,
+          width: "100%",
+          bgcolor:
+            calculationResult.points > 0 || calculationResult.cashback > 0
+              ? "success.light"
+              : "error.light",
+          borderRadius: 2,
+        }}
+      >
+        <Typography
+          variant="h6"
+          align="center"
+          color="textPrimary"
+          fontWeight="bold"
+          sx={{
+            fontSize: { xs: "1rem", sm: "1.25rem" },
+            whiteSpace: "normal",
+            wordBreak: "break-word",
+          }}
+        >
+          {calculationResult.points > 0 || calculationResult.cashback > 0 ? (
+            <>
+              🎉 {calculationResult.rewardText} 🎉
+              {calculationResult.appliedCap && (
+                <Typography variant="body2" color="textSecondary">
+                  {`${
+                    calculationResult.appliedCap.category
+                  } cap applied: Max ${
+                    calculationResult.appliedCap.maxPoints || calculationResult.appliedCap.maxCashback
+                  } ${calculationResult.points ? 'points' : 'cashback'}${
+                    calculationResult.appliedCap.maxSpent 
+                      ? ` or ₹${calculationResult.appliedCap.maxSpent.toFixed(2)} spent`
+                      : ''
+                  }`}
+                </Typography>
+              )}
+              {calculationResult.uncappedPoints &&
+                calculationResult.uncappedPoints !==
+                  calculationResult.points && (
+                  <Typography variant="body2" color="textSecondary">
+                    (Uncapped: {calculationResult.uncappedPoints} points)
+                  </Typography>
+                )}
+              {calculationResult.uncappedCashback &&
+                calculationResult.uncappedCashback !==
+                  calculationResult.cashback && (
+                  <Typography variant="body2" color="textSecondary">
+                    (Uncapped: ₹{calculationResult.uncappedCashback.toFixed(2)} cashback)
+                  </Typography>
+                )}
+            </>
+          ) : (
+            <>😢 No rewards earned 😢</>
           )}
-          {calculationResult.uncappedPoints > 0 &&
-            calculationResult.uncappedPoints !== calculationResult.points && (
-            <Typography variant="body2" color="textSecondary">
-              (Uncapped: {calculationResult.uncappedPoints} points)
-            </Typography>
-          )}
-          {calculationResult.uncappedCashback > 0 &&
-            calculationResult.uncappedCashback !== calculationResult.cashback && (
-            <Typography variant="body2" color="textSecondary">
-              (Uncapped: ₹{calculationResult.uncappedCashback.toFixed(2)} cashback)
-            </Typography>
-          )}
-        </>
-      ) : (
-        <>😢 No rewards earned 😢</>
-      )}
-    </Typography>
-  </Paper>
-)}
+        </Typography>
+      </Paper>
+    )}
         </Paper>
       </Container>
       <Snackbar
