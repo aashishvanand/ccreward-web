@@ -1,11 +1,11 @@
 export const bankData = {
-    // "AMEX": ["Gold", "Platinum", "Platinum Reserve", "Platinum Travel", "SmartEarn"],
+    "AMEX": ["Gold", "Platinum", "Platinum Reserve", "Platinum Travel", "SmartEarn"],
     // "AU": ["Altura", "Altura Plus", "LIT", "Vetta", "Zenith"],
     "Axis": ["ACE", "Airtel", "Atlas", "Aura", "Flipkart", "Flipkart Super Elite", "Freecharge", "Freecharge Plus", "Horizon", "Indian Oil", "Indian Oil Premium", "LIC", "Magnus", "Miles & More World", "Miles & More World Select", "MyZone", "Neo", "Privilege", "Reserve", "Rewards", "Samsung Infinite", "Samsung Signature", "Select", "Shoppers Stop", "Vistara", "Vistara Infinite", "Vistara Signature", "Voyage", "Voyage Black"],
     // "BOB": ["Easy", "Eterna", "HPCL Energie", "IRCTC BOBCard", "BOB Premier", "BOB Prime", "Select BOBCard", "Snapdeal"],
     // "Federal": ["Celesta", "Imperio", "Scapia", "Signet", "Wave"],
     "HDFC": ["6E Rewards – IndiGo", "6E Rewards XL – IndiGo", "Diners Club Black Metal", "Diners Club Privilege", "Freedom", "H.O.G Diners", "Harley Davidson", "IndianOil", "Infinia Metal", "IRCTC", "Marriott Bonvoy", "Millennia", "MoneyBack Plus", "Paytm", "Paytm Select", "Paytm Mobile", "Paytm Digital", "Pixel Go", "Pixel Play", "Regalia", "Regalia Gold", "Shoppers Stop", "Shoppers Stop Black", "Swiggy", "Tata Neu Infinity", "Tata Neu Plus", "Times", "Times Platinum", "UPI RuPay"],
-    // "HSBC": ["Live+", "Platinum", "HSBC Premier"],
+    "HSBC": ["Live+", "Platinum", "Premier"],
     "ICICI": ["AmazonPay", "Coral", "Emeralde", "Emeralde Private", "HPCL Coral", "HPCL Super Saver", "MakeMyTrip Signature", "Mine", "MMT", "MMT Black", "Rubyx", "Sapphiro"],
     // "IDBI": ["Aspire Platinum", "Euphoria World", "Imperium Platinum", "Royale Signature", "Winnings"],
     "IDFC First": ["Classic", "Club Vistara", "Millennia", "Power", "Select", "SYWP", "Wealth", "WOW"],

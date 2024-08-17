@@ -63,6 +63,7 @@ import {
 // import { hsbcCardRewards, calculateHSBCRewards, getCardInputs as getHSBCCardInputs } from "../utils/hsbcRewards";
 // import { idbiCardRewards, calculateIDBIRewards, getCardInputs as getIDBICardInputs } from "../utils/idbiRewards";
 // import { yesCardRewards, calculateYesRewards, getCardInputs as getYesCardInputs } from "../utils/yesRewards";
+import { amexCardRewards, calculateAmexRewards, getCardInputs as getAmexCardInputs } from "../utils/amexRewards";
 import DynamicCardInputs from "./DynamicCardInputs";
 import IncorrectRewardReportForm from "./IncorrectRewardReportForm";
 
@@ -190,6 +191,9 @@ const CreditCardRewardsCalculator = () => {
     if (selectedCard && selectedBank) {
       let cardReward;
       switch (selectedBank) {
+        case "AMEX":
+          cardReward = amexCardRewards[selectedCard];
+          break;
         case "ICICI":
           cardReward = iciciCardRewards[selectedCard];
           break;
@@ -255,6 +259,8 @@ const CreditCardRewardsCalculator = () => {
 
   const getCardConfig = (bank, card) => {
     switch (bank) {
+      case "AMEX":
+      return amexCardRewards[card];
       case "ICICI":
         return iciciCardRewards[card];
       case "HDFC":
@@ -335,6 +341,14 @@ const CreditCardRewardsCalculator = () => {
     let result;
 
     switch (selectedBank) {
+      case "AMEX":
+        result = calculateAmexRewards(
+          selectedCard,
+          amount,
+          mcc,
+          additionalParams
+        );
+        break;
       case "ICICI":
         result = calculateICICIRewards(
           selectedCard,
@@ -478,7 +492,7 @@ const CreditCardRewardsCalculator = () => {
       setCalculationResult(result);
       setCalculationPerformed(true);
 
-      const hasReward = (result.points > 0 || result.cashback > 0);
+      const hasReward = result.points > 0 || result.cashback > 0;
       if (hasReward && firstSuccessfulSearch) {
         setShowConfetti(true);
         setFirstSuccessfulSearch(false);
@@ -792,68 +806,74 @@ const CreditCardRewardsCalculator = () => {
             </Button>
           )}
 
-{calculationPerformed && calculationResult && (
-      <Paper
-        elevation={3}
-        sx={{
-          p: 2,
-          mt: 2,
-          width: "100%",
-          bgcolor:
-            calculationResult.points > 0 || calculationResult.cashback > 0
-              ? "success.light"
-              : "error.light",
-          borderRadius: 2,
-        }}
-      >
-        <Typography
-          variant="h6"
-          align="center"
-          color="textPrimary"
-          fontWeight="bold"
-          sx={{
-            fontSize: { xs: "1rem", sm: "1.25rem" },
-            whiteSpace: "normal",
-            wordBreak: "break-word",
-          }}
-        >
-          {calculationResult.points > 0 || calculationResult.cashback > 0 ? (
-            <>
-              🎉 {calculationResult.rewardText} 🎉
-              {calculationResult.appliedCap && (
-                <Typography variant="body2" color="textSecondary">
-                  {`${
-                    calculationResult.appliedCap.category
-                  } cap applied: Max ${
-                    calculationResult.appliedCap.maxPoints || calculationResult.appliedCap.maxCashback
-                  } ${calculationResult.points ? 'points' : 'cashback'}${
-                    calculationResult.appliedCap.maxSpent 
-                      ? ` or ₹${calculationResult.appliedCap.maxSpent.toFixed(2)} spent`
-                      : ''
-                  }`}
-                </Typography>
-              )}
-              {calculationResult.uncappedPoints &&
-                calculationResult.uncappedPoints !==
-                  calculationResult.points && (
-                  <Typography variant="body2" color="textSecondary">
-                    (Uncapped: {calculationResult.uncappedPoints} points)
-                  </Typography>
+          {calculationPerformed && calculationResult && (
+            <Paper
+              elevation={3}
+              sx={{
+                p: 2,
+                mt: 2,
+                width: "100%",
+                bgcolor:
+                  calculationResult.points > 0 || calculationResult.cashback > 0
+                    ? "success.light"
+                    : "error.light",
+                borderRadius: 2,
+              }}
+            >
+              <Typography
+                variant="h6"
+                align="center"
+                color="textPrimary"
+                fontWeight="bold"
+                sx={{
+                  fontSize: { xs: "1rem", sm: "1.25rem" },
+                  whiteSpace: "normal",
+                  wordBreak: "break-word",
+                }}
+              >
+                {calculationResult.points > 0 ||
+                calculationResult.cashback > 0 ? (
+                  <>
+                    🎉 {calculationResult.rewardText} 🎉
+                    {calculationResult.appliedCap && (
+                      <Typography variant="body2" color="textSecondary">
+                        {`${
+                          calculationResult.appliedCap.category
+                        } cap applied: Max ${
+                          calculationResult.appliedCap.maxPoints ||
+                          calculationResult.appliedCap.maxCashback
+                        } ${calculationResult.points ? "points" : "cashback"}${
+                          calculationResult.appliedCap.maxSpent
+                            ? ` or ₹${calculationResult.appliedCap.maxSpent.toFixed(
+                                2
+                              )} spent`
+                            : ""
+                        }`}
+                      </Typography>
+                    )}
+                    {calculationResult.uncappedPoints &&
+                      calculationResult.uncappedPoints !==
+                        calculationResult.points && (
+                        <Typography variant="body2" color="textSecondary">
+                          (Uncapped: {calculationResult.uncappedPoints} points)
+                        </Typography>
+                      )}
+                    {calculationResult.uncappedCashback &&
+                      calculationResult.uncappedCashback !==
+                        calculationResult.cashback && (
+                        <Typography variant="body2" color="textSecondary">
+                          (Uncapped: ₹
+                          {calculationResult.uncappedCashback.toFixed(2)}{" "}
+                          cashback)
+                        </Typography>
+                      )}
+                  </>
+                ) : (
+                  <>😢 No rewards earned 😢</>
                 )}
-              {calculationResult.uncappedCashback &&
-                calculationResult.uncappedCashback !==
-                  calculationResult.cashback && (
-                  <Typography variant="body2" color="textSecondary">
-                    (Uncapped: ₹{calculationResult.uncappedCashback.toFixed(2)} cashback)
-                  </Typography>
-                )}
-            </>
-          ) : (
-            <>😢 No rewards earned 😢</>
+              </Typography>
+            </Paper>
           )}
-        </Typography>
-      </Paper>
-    )}
         </Paper>
       </Container>
       <Snackbar
