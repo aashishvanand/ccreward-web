@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   ThemeProvider,
   createTheme,
@@ -22,38 +22,51 @@ import { mccList } from "../data/mccData";
 import { bankData } from "../data/bankData";
 import Confetti from "react-confetti";
 import MissingBankCardForm from "./MissingBankCardForm";
-import { iciciCardRewards, calculateICICIRewards } from "../utils/iciciRewards";
-import { hdfcCardRewards, calculateHDFCRewards } from "../utils/hdfcRewards";
-import { axisCardRewards, calculateAxisRewards } from "../utils/axisRewards";
-import { auCardRewards, calculateAURewards } from "../utils/auRewards";
-import { bobCardRewards, calculateBOBRewards } from "../utils/bobRewards";
 import {
-  federalCardRewards,
-  calculateFederalRewards,
-} from "../utils/federalRewards";
-import { hsbcCardRewards, calculateHSBCRewards } from "../utils/hsbcRewards";
-import { idbiCardRewards, calculateIDBIRewards } from "../utils/idbiRewards";
+  iciciCardRewards,
+  calculateICICIRewards,
+  getCardInputs as getICICICardInputs,
+} from "../utils/iciciRewards";
+import {
+  hdfcCardRewards,
+  calculateHDFCRewards,
+  getCardInputs as getHDFCCardInputs,
+} from "../utils/hdfcRewards";
+import {
+  axisCardRewards,
+  calculateAxisRewards,
+  getCardInputs as getAxisCardInputs,
+} from "../utils/axisRewards";
 import {
   idfcFirstCardRewards,
   calculateIDFCFirstRewards,
+  getCardInputs as getIDFCFirstCardInputs,
 } from "../utils/idfcfirstRewards";
-import {
-  indusIndCardRewards,
-  calculateIndusIndRewards,
-} from "../utils/indusindRewards";
-import { kotakCardRewards, calculateKotakRewards } from "../utils/kotakRewards";
+
 import {
   oneCardRewards,
   calculateOneCardRewards,
+  getCardInputs as getOneCardCardInputs,
 } from "../utils/onecardRewards";
-import { rblCardRewards, calculateRBLRewards } from "../utils/rblRewards";
-import { sbiCardRewards, calculateSBIRewards } from "../utils/sbiRewards";
-import { scCardRewards, calculateSCRewards } from "../utils/scRewards";
-import { yesCardRewards, calculateYesRewards } from "../utils/yesRewards";
+import {
+  scCardRewards,
+  calculateSCRewards,
+  getCardInputs as getSCCardInputs,
+} from "../utils/scRewards";
+// import { indusIndCardRewards, calculateIndusIndRewards, getCardInputs as getIndusIndCardInputs } from "../utils/indusindRewards";
+// import { kotakCardRewards, calculateKotakRewards, getCardInputs as getKotakCardInputs } from "../utils/kotakRewards";
+// import { rblCardRewards, calculateRBLRewards, getCardInputs as getRBLCardInputs } from "../utils/rblRewards";
+// import { sbiCardRewards, calculateSBIRewards, getCardInputs as getSBICardInputs } from "../utils/sbiRewards";
+// import { auCardRewards, calculateAURewards, getCardInputs as getAUCardInputs } from "../utils/auRewards";
+// import { bobCardRewards, calculateBOBRewards, getCardInputs as getBOBCardInputs } from "../utils/bobRewards";
+// import { federalCardRewards, calculateFederalRewards, getCardInputs as getFederalCardInputs } from "../utils/federalRewards";
+// import { hsbcCardRewards, calculateHSBCRewards, getCardInputs as getHSBCCardInputs } from "../utils/hsbcRewards";
+// import { idbiCardRewards, calculateIDBIRewards, getCardInputs as getIDBICardInputs } from "../utils/idbiRewards";
+// import { yesCardRewards, calculateYesRewards, getCardInputs as getYesCardInputs } from "../utils/yesRewards";
 import DynamicCardInputs from "./DynamicCardInputs";
 import IncorrectRewardReportForm from "./IncorrectRewardReportForm";
 
-const DEBUG_MODE = false;
+const DEBUG_MODE = true;
 
 const debugLog = (...args) => {
   if (DEBUG_MODE) {
@@ -91,21 +104,37 @@ const CreditCardRewardsCalculator = () => {
   const [showInternationalOption, setShowInternationalOption] = useState(false);
   const [calculationResult, setCalculationResult] = useState(null);
   const [additionalInputs, setAdditionalInputs] = useState({
+    isIndigoBooking: false,
+    isInternational: false,
+    isWeekday: false,
+    isWeekend: false,
+    isSmartBuy: false,
     isPrimeMember: false,
     isFlipkartPlusMember: false,
-    isInternational: false,
     isBirthday: false,
     isTravelEdgePortal: false,
     isSpiceJet: false,
-    isAirtelApp: false,
     isSamsungTransaction: false,
-    isShoppersStopExclusive: false,
+    isShoppersStopTransaction: false,
     isLICPremium: false,
-    isFreechargeTransaction: false,
     isTopCategorySpend: false,
+    selectedPacks: [],
+    selectedEcommerce: "",
+    isTataSpend: false,
+    isUPI: false,
+    isNeuPass: false,
+    isNeuPassCategory: false,
+    isUtilityOrShopping: false,
+    isPaytmTransaction: false,
+    isScanAndPay: false,
+    smartbuyCategory: "",
   });
   const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] =
     useState(false);
+
+  useEffect(() => {
+    setAdditionalInputs({}); // Reset additional inputs when bank or card changes
+  }, [selectedBank, selectedCard]);
 
   const theme = React.useMemo(
     () =>
@@ -143,7 +172,7 @@ const CreditCardRewardsCalculator = () => {
       });
     };
 
-    handleResize(); // Set initial dimensions
+    handleResize();
     window.addEventListener("resize", handleResize);
 
     return () => window.removeEventListener("resize", handleResize);
@@ -224,10 +253,6 @@ const CreditCardRewardsCalculator = () => {
     }
   }, [selectedCard, selectedBank]);
 
-  const handleSpendTypeChange = (event) => {
-    setSpendType(event.target.value);
-  };
-
   const getCardConfig = (bank, card) => {
     switch (bank) {
       case "ICICI":
@@ -304,18 +329,7 @@ const CreditCardRewardsCalculator = () => {
     const amount = parseFloat(spentAmount);
     const mcc = selectedMcc ? selectedMcc.mcc : null;
     const additionalParams = {
-      isPrimeMember: additionalInputs.isPrimeMember,
-      isFlipkartPlusMember: additionalInputs.isFlipkartPlusMember,
-      isInternational: additionalInputs.isInternational,
-      isBirthday: additionalInputs.isBirthday,
-      isTravelEdgePortal: additionalInputs.isTravelEdgePortal,
-      isSpiceJet: additionalInputs.isSpiceJet,
-      isAirtelApp: additionalInputs.isAirtelApp,
-      isSamsungTransaction: additionalInputs.isSamsungTransaction,
-      isShoppersStopExclusive: additionalInputs.isShoppersStopExclusive,
-      isLICPremium: additionalInputs.isLICPremium,
-      isFreechargeTransaction: additionalInputs.isFreechargeTransaction,
-      isTopCategorySpend: additionalInputs.isTopCategorySpend,
+      ...additionalInputs,
     };
 
     let result;
@@ -524,9 +538,42 @@ const CreditCardRewardsCalculator = () => {
     setSnackbarOpen(true);
   };
 
-  const handleAdditionalInputChange = (key, value) => {
-    setAdditionalInputs((prev) => ({ ...prev, [key]: value }));
-  };
+  const handleAdditionalInputChange = useCallback((key, value) => {
+    setAdditionalInputs((prev) => {
+      const newInputs = { ...prev };
+
+      // Convert 'true' and 'false' strings to boolean
+      if (value === "true") value = true;
+      if (value === "false") value = false;
+
+      // Handle special cases
+      switch (key) {
+        case "isShoppersStopTransaction":
+          newInputs[key] = value;
+          if (!value) newInputs.isWeekendTransaction = false;
+          if (value) newInputs.isInternational = false;
+          break;
+        case "selectedPacks":
+          // Ensure selectedPacks is always an array and limit to 2 selections
+          newInputs[key] = Array.isArray(value) ? value.slice(0, 2) : [value];
+          break;
+        case "smartbuyCategory":
+          // Handle smartbuy category selection
+          newInputs[key] = value;
+          newInputs.isSmartBuy = !!value;
+          break;
+        default:
+          newInputs[key] = value;
+      }
+
+      return newInputs;
+    });
+  }, []);
+
+  const MemoizedDynamicCardInputs = useMemo(
+    () => React.memo(DynamicCardInputs),
+    []
+  );
 
   return (
     <ThemeProvider theme={theme}>
@@ -581,7 +628,7 @@ const CreditCardRewardsCalculator = () => {
                 textAlign: { xs: "left", sm: "center" },
               }}
             >
-            Credit Cards Rewards Calculator
+              Credit Cards Rewards Calculator
             </Typography>
             <IconButton onClick={toggleColorMode} color="inherit" size="small">
               {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
@@ -675,8 +722,8 @@ const CreditCardRewardsCalculator = () => {
             variant="outlined"
           />
 
-          {selectedCard && (
-            <DynamicCardInputs
+          {selectedCard && selectedBank && (
+            <MemoizedDynamicCardInputs
               cardConfig={getCardConfig(selectedBank, selectedCard)}
               onChange={handleAdditionalInputChange}
               currentInputs={additionalInputs}
@@ -752,7 +799,7 @@ const CreditCardRewardsCalculator = () => {
                 mt: 2,
                 width: "100%",
                 bgcolor:
-                  calculationResult.points > 0
+                  calculationResult.points > 0 || calculationResult.cashback > 0
                     ? "success.light"
                     : "error.light",
                 borderRadius: 2,
@@ -769,7 +816,8 @@ const CreditCardRewardsCalculator = () => {
                   wordBreak: "break-word",
                 }}
               >
-                {calculationResult.points > 0 ? (
+                {calculationResult.points > 0 ||
+                calculationResult.cashback > 0 ? (
                   <>
                     🎉 {calculationResult.rewardText} 🎉
                     {calculationResult.appliedCap && (
@@ -783,13 +831,28 @@ const CreditCardRewardsCalculator = () => {
                         )} spent`}
                       </Typography>
                     )}
-                    {calculationResult.uncappedPoints &&
+                    {((calculationResult.uncappedPoints &&
                       calculationResult.uncappedPoints !==
-                        calculationResult.points && (
-                        <Typography variant="body2" color="textSecondary">
-                          (Uncapped: {calculationResult.uncappedPoints} points)
-                        </Typography>
-                      )}
+                        calculationResult.points) ||
+                      (calculationResult.uncappedCashback &&
+                        calculationResult.uncappedCashback !==
+                          calculationResult.cashback)) && (
+                      <Typography
+                        variant="body2"
+                        color="textSecondary"
+                        align="center"
+                      >
+                        (Uncapped:{" "}
+                        {calculationResult.uncappedPoints &&
+                        calculationResult.uncappedPoints !==
+                          calculationResult.points
+                          ? `${calculationResult.uncappedPoints} points`
+                          : `₹${calculationResult.uncappedCashback.toFixed(
+                              2
+                            )} cashback`}
+                        )
+                      </Typography>
+                    )}
                   </>
                 ) : (
                   <>😢 No rewards earned 😢</>

@@ -1,50 +1,631 @@
 export const hdfcCardRewards = {
+  "Pixel Go": {
+    defaultRate: 1 / 100,
+    smartbuyRates: 5 / 100,
+    mccRates: {
+      "5541": 0, "5542": 0, "5983": 0,
+      "6540": 0,
+      "6513": 0,
+      "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0, "9405": 0,
+      "6011": 0,
+    },
+    capping: {
+      categories: {
+        "Smartbuy": { points: 500, maxSpent: 10000 },
+        "Insurance": { points: 2000, maxSpent: 200000 }
+      }
+    },
+    fuelSurchargeWaiver: {
+      rate: 1 / 100,
+      minTransaction: 400,
+      maxTransaction: 5000,
+      maxWaiver: 250
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Pixel Go"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (additionalParams.isSmartbuy) {
+        rate = hdfcCardRewards["Pixel Go"].smartbuyRates;
+        category = "Smartbuy";
+        rateType = "smartbuy";
+      } else if (mcc && hdfcCardRewards["Pixel Go"].mccRates[mcc] !== undefined) {
+        rate = hdfcCardRewards["Pixel Go"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+
+      const cashback = amount * rate;
+      const points = Math.floor(cashback * 100);
+
+      return { points, cashback, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Smartbuy transaction?',
+        name: 'isSmartbuy',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isSmartbuy || false,
+        onChange: (value) => onChange('isSmartbuy', value === 'true')
+      }
+    ]
+  },
+  "Pixel Play": {
+    defaultRate: 1 / 100,
+    smartbuyRates: 5 / 100,
+    selectedPacksRate: 5 / 100,
+    ecommerceRate: 3 / 100,
+    payzappRate: 3 / 100,
+    packs: [
+      { name: "Dining & Entertainment", mccs: ["7832", "5812", "5814"] },
+      { name: "Travel", mccs: ["4511", "4111", "4112", "4121", "4131"] },
+      { name: "Grocery", mccs: ["5411", "5422", "5499"] },
+      { name: "Electronics", mccs: ["5732", "5045", "5065"] },
+      { name: "Fashion", mccs: ["5611", "5621", "5631", "5651", "5691", "5699"] },
+    ],
+    ecommerceMccs: ["5399", "5310"],
+    mccRates: {
+      "5541": 0, "5542": 0, "5983": 0,
+      "6540": 0,
+      "6513": 0,
+      "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0, "9405": 0,
+      "6011": 0,
+    },
+    capping: {
+      categories: {
+        "Selected Packs": { points: 500, maxSpent: 10000 },
+        "Smartbuy": { points: 500, maxSpent: 10000 },
+        "E-commerce": { points: 500, maxSpent: 16667 },
+        "Insurance": { points: 2000, maxSpent: 200000 }
+      }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Pixel Play"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (additionalParams.isSmartbuy) {
+        rate = hdfcCardRewards["Pixel Play"].smartbuyRates;
+        category = "Smartbuy";
+        rateType = "smartbuy";
+      } else if (additionalParams.selectedPacks && additionalParams.selectedPacks.length > 0) {
+        const packMccs = additionalParams.selectedPacks.flatMap(pack =>
+          hdfcCardRewards["Pixel Play"].packs.find(p => p.name === pack)?.mccs || []
+        );
+        if (packMccs.includes(mcc)) {
+          rate = hdfcCardRewards["Pixel Play"].selectedPacksRate;
+          category = "Selected Packs";
+          rateType = "selected-packs";
+        }
+      } else if (additionalParams.selectedEcommerce && hdfcCardRewards["Pixel Play"].ecommerceMccs.includes(mcc)) {
+        rate = hdfcCardRewards["Pixel Play"].ecommerceRate;
+        category = "E-commerce";
+        rateType = "ecommerce";
+      } else if (additionalParams.isPayzappTransaction) {
+        rate = hdfcCardRewards["Pixel Play"].payzappRate;
+        category = "PayZapp";
+        rateType = "payzapp";
+      } else if (mcc && hdfcCardRewards["Pixel Play"].mccRates[mcc] !== undefined) {
+        rate = hdfcCardRewards["Pixel Play"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+
+      const cashback = amount * rate;
+      const points = Math.floor(cashback * 100);
+
+      return { points, cashback, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Smartbuy transaction?',
+        name: 'isSmartbuy',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isSmartbuy || false,
+        onChange: (value) => onChange('isSmartbuy', value === 'true')
+      },
+      {
+        type: 'multiselect',
+        label: 'Selected Packs (Choose up to 2)',
+        name: 'selectedPacks',
+        options: hdfcCardRewards["Pixel Play"].packs.map(pack => ({ label: pack.name, value: pack.name })),
+        value: currentInputs.selectedPacks || [],
+        onChange: (value) => onChange('selectedPacks', value),
+        maxSelect: 2
+      },
+      {
+        type: 'select',
+        label: 'Selected E-commerce Merchant',
+        name: 'selectedEcommerce',
+        options: [
+          { label: 'Amazon', value: 'amazon' },
+          { label: 'Flipkart', value: 'flipkart' }
+        ],
+        value: currentInputs.selectedEcommerce || '',
+        onChange: (value) => onChange('selectedEcommerce', value)
+      },
+      {
+        type: 'radio',
+        label: 'Is this a PayZapp transaction?',
+        name: 'isPayzappTransaction',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isPayzappTransaction || false,
+        onChange: (value) => onChange('isPayzappTransaction', value === 'true')
+      }
+    ]
+  },
   "6E Rewards – IndiGo": {
     defaultRate: 1 / 100,
-    mccRates: {}
+    indigoRate: 2.5 / 100,
+    groceryDiningEntertainmentRate: 2 / 100,
+    fuelRate: 1 / 100,
+    redemptionRate: 1, // 1 6E Reward = ₹1
+    mccRates: {
+      "5411": 2 / 100, // Grocery stores
+      "5812": 2 / 100, // Dining
+      "5813": 2 / 100, // Bars
+      "5814": 2 / 100, // Fast Food
+      "7832": 2 / 100, // Entertainment
+      "5541": 1 / 100, // Fuel
+      "5542": 1 / 100  // Fuel
+    },
+    capping: {
+      categories: {
+        "Grocery": { points: 1000, maxSpent: 50000 }, // 1000 RP cap for grocery
+        "Fuel": { points: 250, maxSpent: 25000 } // 250 6E Rewards cap for fuel
+      }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["6E Rewards – IndiGo"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (additionalParams.isIndigoBooking) {
+        rate = hdfcCardRewards["6E Rewards – IndiGo"].indigoRate;
+        category = "IndiGo Booking";
+        rateType = "indigo";
+      } else if (mcc && hdfcCardRewards["6E Rewards – IndiGo"].mccRates[mcc]) {
+        rate = hdfcCardRewards["6E Rewards – IndiGo"].mccRates[mcc];
+        rateType = "mcc-specific";
+        if (["5411"].includes(mcc)) {
+          category = "Grocery";
+        } else if (["5812", "5813", "5814"].includes(mcc)) {
+          category = "Dining";
+        } else if (["7832"].includes(mcc)) {
+          category = "Entertainment";
+        } else if (["5541", "5542"].includes(mcc)) {
+          category = "Fuel";
+        }
+      }
+
+      const points = Math.floor(amount * rate);
+      const pointsValue = points * hdfcCardRewards["6E Rewards – IndiGo"].redemptionRate;
+
+      return { points, rate, rateType, category, pointsValue };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this an IndiGo flight booking on IndiGo App/Website?',
+        name: 'isIndigoBooking',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isIndigoBooking || false,
+        onChange: (value) => onChange('isIndigoBooking', value === 'true')
+      }
+    ]
   },
   "6E Rewards XL – IndiGo": {
     defaultRate: 2 / 100,
+    indigoRate: 5 / 100,
+    groceryDiningEntertainmentRate: 3 / 100,
+    redemptionRate: 1, // 1 6E Reward = ₹1
     mccRates: {
-      "4511": 5 / 100,
-      "5411": 3 / 100,
-      "5812": 3 / 100,
-      "7832": 3 / 100
-    }
-  },
-  "Biz Black": {
-    defaultRate: 1 / 100,
-    mccRates: {}
+      "5411": 3 / 100, // Grocery stores
+      "5812": 3 / 100, // Dining
+      "5813": 3 / 100, // Bars
+      "5814": 3 / 100, // Fast Food
+      "7832": 3 / 100  // Entertainment
+    },
+    capping: {
+      categories: {
+        "Grocery": { points: 2000, maxSpent: 66667 } // 2000 RP cap for grocery
+      }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["6E Rewards XL – IndiGo"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (additionalParams.isIndigoBooking) {
+        rate = hdfcCardRewards["6E Rewards XL – IndiGo"].indigoRate;
+        category = "IndiGo Booking";
+        rateType = "indigo";
+      } else if (mcc && hdfcCardRewards["6E Rewards XL – IndiGo"].mccRates[mcc]) {
+        rate = hdfcCardRewards["6E Rewards XL – IndiGo"].mccRates[mcc];
+        rateType = "mcc-specific";
+        if (["5411"].includes(mcc)) {
+          category = "Grocery";
+        } else if (["5812", "5813", "5814"].includes(mcc)) {
+          category = "Dining";
+        } else if (["7832"].includes(mcc)) {
+          category = "Entertainment";
+        }
+      }
+
+      const points = Math.floor(amount * rate);
+      const pointsValue = points * hdfcCardRewards["6E Rewards XL – IndiGo"].redemptionRate;
+
+      return { points, rate, rateType, category, pointsValue };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this an IndiGo flight booking on IndiGo App/Website?',
+        name: 'isIndigoBooking',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isIndigoBooking || false,
+        onChange: (value) => onChange('isIndigoBooking', value === 'true')
+      }
+    ]
   },
   "Diners Club Black Metal": {
     defaultRate: 5 / 150,
-    mccRates: {}
+    weekendDiningRate: 10 / 150,
+    smartBuyRate: 10 / 150,
+    redemptionRate: {
+      airmiles: 1, // 1 Reward Point = up to 1 Airmile
+      productVouchers: 0.50 // 1 Reward Point = up to ₹0.50 for products and vouchers
+    },
+    mccRates: {
+      "5812": 10 / 150, // Restaurants (for weekend dining)
+      "5813": 10 / 150, // Bars (for weekend dining)
+      "5814": 10 / 150, // Fast Food (for weekend dining)
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Diners Club Black Metal"].defaultRate;
+      let category = "Other Retail Spends";
+      let rateType = "default";
+
+      const isDiningMCC = ["5812", "5813", "5814"].includes(mcc);
+
+      if (isDiningMCC) {
+        rate = hdfcCardRewards["Diners Club Black Metal"].mccRates[mcc];
+        category = "Dining";
+        rateType = "dining";
+
+        if (additionalParams.isWeekend) {
+          rate = hdfcCardRewards["Diners Club Black Metal"].weekendDiningRate;
+          category = "Weekend Dining";
+          rateType = "weekend-dining";
+        }
+      } else if (additionalParams.isSmartBuy) {
+        rate = hdfcCardRewards["Diners Club Black Metal"].smartBuyRate;
+        category = "SmartBuy Purchase";
+        rateType = "smartbuy";
+      }
+
+      const points = Math.floor(amount * rate);
+      const airmilesValue = points * hdfcCardRewards["Diners Club Black Metal"].redemptionRate.airmiles;
+      const productVoucherValue = points * hdfcCardRewards["Diners Club Black Metal"].redemptionRate.productVouchers;
+
+      return { points, rate, rateType, category, airmilesValue, productVoucherValue };
+    },
+    dynamicInputs: (currentInputs, onChange, selectedMcc) => {
+      const isDiningMCC = ["5812", "5813", "5814"].includes(selectedMcc);
+
+      if (isDiningMCC) {
+        return [{
+          type: 'radio',
+          label: 'Is this a weekend transaction?',
+          name: 'isWeekend',
+          options: [
+            { label: 'Yes', value: true },
+            { label: 'No', value: false }
+          ],
+          value: currentInputs.isWeekend || false,
+          onChange: (value) => onChange('isWeekend', value === 'true')
+        }];
+      } else {
+        return [{
+          type: 'radio',
+          label: 'Is this a SmartBuy purchase?',
+          name: 'isSmartBuy',
+          options: [
+            { label: 'Yes', value: true },
+            { label: 'No', value: false }
+          ],
+          value: currentInputs.isSmartBuy || false,
+          onChange: (value) => onChange('isSmartBuy', value === 'true')
+        }];
+      }
+    }
   },
   "Diners Club Privilege": {
     defaultRate: 1 / 100,
-    mccRates: {}
+    mccRates: {},
+    calculateRewards: (amount, mcc, additionalParams) => {
+      const rate = hdfcCardRewards["Diners Club Privilege"].defaultRate;
+      const category = "Other Spends";
+      const rateType = "default";
+
+      const points = Math.floor(amount * rate);
+
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Freedom": {
-    defaultRate: 1 / 100,
-    mccRates: {}
+    defaultRate: 1 / 150, // 1 CashPoint per ₹150 spent on other spends
+    mccRates: {
+      // 10X CashPoints on specific merchants
+      "5411": 10 / 150, // BigBasket (Grocery Stores)
+      "7829": 10 / 150, // BookMyShow (Motion Picture Distribution)
+      "7011": 10 / 150, // OYO (Hotels, Motels, Resorts)
+      "5814": 10 / 150, // Swiggy (Fast Food Restaurants)
+      "4121": 10 / 150, // Uber (Taxicabs and Limousines)
+
+      // Excluded categories
+      "5541": 0, "5542": 0, "5983": 0, "1361": 0, "5172": 0, "9752": 0, // Fuel
+      "6540": 0, // Wallet loads
+      "6513": 0, // Rent payments
+      "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0, // Government transactions
+
+      // Capped categories (effective 1st September 2024)
+      "4812": 1 / 150, "4814": 1 / 150, "4899": 1 / 150, // Telecom & Cable
+      "4900": 1 / 150, // Utility
+
+      // Education (will not earn rewards from Sept 1, 2024, if paid through third-party apps)
+      "8211": 1 / 150, "8220": 1 / 150, "8241": 1 / 150, "8244": 1 / 150, "8249": 1 / 150, "8299": 1 / 150,
+    },
+    capping: {
+      categories: {
+        "10X CashPoints": { points: 2500, maxSpent: 37500 }, // 2500 CashPoints max per calendar month
+        "Grocery": { points: 1000, maxSpent: 150000 }, // 1000 points cap on grocery transactions per month
+        "Telecom & Cable": { points: 2000, maxSpent: 300000 }, // 2000 points cap per month (effective 1st Sep 2024)
+      }
+    },
+    pointValue: 0.15, // 1 CashPoint = ₹0.15
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Freedom"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (["5411", "7829", "7011", "5814", "4121"].includes(mcc)) {
+        rate = 10 / 150;
+        category = "10X CashPoints";
+        rateType = "accelerated";
+      } else if (hdfcCardRewards["Freedom"].mccRates[mcc] !== undefined) {
+        rate = hdfcCardRewards["Freedom"].mccRates[mcc];
+        rateType = "mcc-specific";
+        if (["4812", "4814", "4899"].includes(mcc)) {
+          category = "Telecom & Cable";
+        } else if (mcc === "4900") {
+          category = "Utility";
+        } else if (["8211", "8220", "8241", "8244", "8249", "8299"].includes(mcc)) {
+          category = "Education";
+          if (additionalParams.isThirdPartyApp) {
+            rate = 0;
+          }
+        } else if (mcc === "5411") {
+          category = "Grocery";
+        } else {
+          category = rate === 0 ? "Excluded Category" : "Category Spend";
+        }
+      }
+
+      const points = Math.floor(amount * rate);
+      const cashback = points * hdfcCardRewards["Freedom"].pointValue;
+
+      return { points, cashback, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange, selectedMcc) => {
+      const educationMCCs = ["8211", "8220", "8241", "8244", "8249", "8299"];
+
+      if (educationMCCs.includes(selectedMcc)) {
+        return [{
+          type: 'radio',
+          label: 'Is this an education payment through a third-party app?',
+          name: 'isThirdPartyApp',
+          options: [
+            { label: 'Yes', value: true },
+            { label: 'No', value: false }
+          ],
+          value: currentInputs.isThirdPartyApp || false,
+          onChange: (value) => onChange('isThirdPartyApp', value === 'true')
+        }];
+      }
+
+      return [];
+    }
   },
   "H.O.G Diners": {
-    defaultRate: 1 / 100,
-    mccRates: {}
+    defaultRate: 5 / 150,
+    harleyDavidsonRate: 10 / 150,
+    weekendDiningRate: 10 / 150,
+    smartBuyRate: 10 / 150,
+    mccRates: {
+      "5812": 10 / 150, // Restaurants (for weekend dining)
+      "5813": 10 / 150, // Bars (for weekend dining)
+      "5814": 10 / 150, // Fast Food (for weekend dining)
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["H.O.G Diners"].defaultRate;
+      let category = "Other Retail Spends";
+      let rateType = "default";
+
+      const isDiningMCC = ["5812", "5813", "5814"].includes(mcc);
+
+      if (isDiningMCC) {
+        if (additionalParams.isWeekend) {
+          rate = hdfcCardRewards["H.O.G Diners"].weekendDiningRate;
+          category = "Weekend Dining";
+          rateType = "weekend-dining";
+        } else {
+          rate = hdfcCardRewards["H.O.G Diners"].mccRates[mcc];
+          category = "Dining";
+          rateType = "dining";
+        }
+      } else if (additionalParams.isHarleyDavidsonPurchase) {
+        rate = hdfcCardRewards["H.O.G Diners"].harleyDavidsonRate;
+        category = "Harley-Davidson Purchase";
+        rateType = "harley-davidson";
+      } else if (additionalParams.isSmartBuy) {
+        rate = hdfcCardRewards["H.O.G Diners"].smartBuyRate;
+        category = "SmartBuy Purchase";
+        rateType = "smartbuy";
+      }
+
+      const points = Math.floor(amount * rate);
+
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange, selectedMcc) => {
+      const isDiningMCC = ["5812", "5813", "5814"].includes(selectedMcc);
+      const isAutomobileBikeMCC = ["5571"].includes(selectedMcc); // Add more MCCs if needed
+
+      if (isDiningMCC) {
+        return [{
+          type: 'radio',
+          label: 'Is this a weekend transaction?',
+          name: 'isWeekend',
+          options: [
+            { label: 'Yes', value: true },
+            { label: 'No', value: false }
+          ],
+          value: currentInputs.isWeekend || false,
+          onChange: (value) => onChange('isWeekend', value === 'true')
+        }];
+      } else if (isAutomobileBikeMCC) {
+        return [{
+          type: 'radio',
+          label: 'Is this a Harley-Davidson merchandise or service purchase from an authorized dealer?',
+          name: 'isHarleyDavidsonPurchase',
+          options: [
+            { label: 'Yes', value: true },
+            { label: 'No', value: false }
+          ],
+          value: currentInputs.isHarleyDavidsonPurchase || false,
+          onChange: (value) => onChange('isHarleyDavidsonPurchase', value === 'true')
+        }];
+      } else {
+        return [{
+          type: 'radio',
+          label: 'Is this a SmartBuy purchase?',
+          name: 'isSmartBuy',
+          options: [
+            { label: 'Yes', value: true },
+            { label: 'No', value: false }
+          ],
+          value: currentInputs.isSmartBuy || false,
+          onChange: (value) => onChange('isSmartBuy', value === 'true')
+        }];
+      }
+    }
   },
   "Harley Davidson": {
-    defaultRate: 1 / 100,
-    mccRates: {}
+    defaultRate: 4 / 150,
+    swiggyZomatoRate: 20 / 150,
+    smartBuyRate: 10 / 150,
+    redemptionRate: 0.20, // 1 Reward Point = ₹0.20
+    mccRates: {
+      "5814": 20 / 150, // Fast Food (for Swiggy and Zomato)
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Harley Davidson"].defaultRate;
+      let category = "Other Retail Spends";
+      let rateType = "default";
+
+      if (mcc === "5814" && additionalParams.isSwiggyZomato) {
+        rate = hdfcCardRewards["Harley Davidson"].swiggyZomatoRate;
+        category = "Swiggy/Zomato";
+        rateType = "swiggy-zomato";
+      } else if (additionalParams.isSmartBuy) {
+        rate = hdfcCardRewards["Harley Davidson"].smartBuyRate;
+        category = "SmartBuy Purchase";
+        rateType = "smartbuy";
+      }
+
+      const points = Math.floor(amount * rate);
+      const cashbackValue = points * hdfcCardRewards["Harley Davidson"].redemptionRate;
+
+      return { points, rate, rateType, category, cashbackValue };
+    },
+    dynamicInputs: (currentInputs, onChange, selectedMcc) => {
+      if (selectedMcc === "5814") {
+        return [{
+          type: 'radio',
+          label: 'Is this a Swiggy or Zomato transaction?',
+          name: 'isSwiggyZomato',
+          options: [
+            { label: 'Yes', value: true },
+            { label: 'No', value: false }
+          ],
+          value: currentInputs.isSwiggyZomato || false,
+          onChange: (value) => onChange('isSwiggyZomato', value === 'true')
+        }];
+      } else {
+        return [{
+          type: 'radio',
+          label: 'Is this a SmartBuy purchase?',
+          name: 'isSmartBuy',
+          options: [
+            { label: 'Yes', value: true },
+            { label: 'No', value: false }
+          ],
+          value: currentInputs.isSmartBuy || false,
+          onChange: (value) => onChange('isSmartBuy', value === 'true')
+        }];
+      }
+    }
   },
   "IndianOil": {
     defaultRate: 1 / 100,
     mccRates: {
-      "5541": 5 / 100,
-      "5411": 5 / 100
-    }
+      "5541": 5 / 100, // Fuel stations
+      "5411": 5 / 100  // Grocery stores
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards.IndianOil.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && hdfcCardRewards.IndianOil.mccRates[mcc]) {
+        rate = hdfcCardRewards.IndianOil.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = mcc === "5541" ? "Fuel" : "Grocery";
+      }
+
+      const points = Math.floor(amount * rate);
+
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Infinia Metal": {
     defaultRate: 5 / 150,
+    smartbuyRates: {
+      hotels: 50 / 150,
+      flights: 25 / 150,
+      vouchers: 25 / 150
+    },
     mccRates: {
       // Exclusions
       "6011": 0,  // ATM
@@ -74,11 +655,135 @@ export const hdfcCardRewards = {
         "Grocery": { points: 2000, maxSpent: 60000 },
         "Insurance": { points: 5000, maxSpent: 150000 },
       }
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Infinia Metal"].defaultRate;
+      let category = "Regular Spends";
+      let rateType = "default";
+
+      if (additionalParams.isSmartbuy) {
+        if (additionalParams.smartbuyCategory === "hotels") {
+          rate = hdfcCardRewards["Infinia Metal"].smartbuyRates.hotels;
+          category = "Hotels (Via Smartbuy)";
+        } else if (additionalParams.smartbuyCategory === "flights" || additionalParams.smartbuyCategory === "vouchers") {
+          rate = hdfcCardRewards["Infinia Metal"].smartbuyRates.flights;
+          category = "Flights / eVouchers (Via Smartbuy)";
+        }
+        rateType = "smartbuy";
+      } else if (mcc && hdfcCardRewards["Infinia Metal"].mccRates[mcc] !== undefined) {
+        rate = hdfcCardRewards["Infinia Metal"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+
+      const points = Math.floor(amount * rate);
+
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Smartbuy transaction?',
+        name: 'isSmartbuy',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isSmartbuy || false,
+        onChange: (value) => onChange('isSmartbuy', value === 'true')
+      },
+      {
+        type: 'select',
+        label: 'Smartbuy Category',
+        name: 'smartbuyCategory',
+        options: [
+          { label: 'Hotels', value: 'hotels' },
+          { label: 'Flights', value: 'flights' },
+          { label: 'Vouchers', value: 'vouchers' }
+        ],
+        value: currentInputs.smartbuyCategory || '',
+        onChange: (value) => onChange('smartbuyCategory', value),
+        condition: (inputs) => inputs.isSmartbuy
+      }
+    ]
   },
-  "IRCTC HDFC": {
+  "IRCTC": {
     defaultRate: 1 / 100,
-    mccRates: {}
+    irctcRate: 5 / 100,
+    smartbuyRate: 5 / 100,
+    mccRates: {
+      "4112": 5 / 100,
+      "4011": 5 / 100,
+      "4511": 5 / 100,
+      "5541": 0, "5542": 0, "5983": 0,
+      "6513": 0,
+      "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0,
+      "6011": 0,
+    },
+    capping: {
+      categories: {
+        "IRCTC": { points: 1000, maxSpent: 20000 },
+        "Smartbuy": { cashback: 500, maxSpent: 10000 },
+      }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["IRCTC"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+      let cashback = 0;
+
+      if (additionalParams.isIRCTC || (mcc && ["4112", "4011"].includes(mcc))) {
+        rate = hdfcCardRewards["IRCTC"].irctcRate;
+        rateType = "irctc";
+        category = "IRCTC";
+      } else if (additionalParams.isSmartbuy) {
+        rate = hdfcCardRewards["IRCTC"].smartbuyRate;
+        rateType = "smartbuy";
+        category = "Smartbuy";
+        cashback = amount * rate;
+      } else if (mcc && hdfcCardRewards["IRCTC"].mccRates[mcc] !== undefined) {
+        rate = hdfcCardRewards["IRCTC"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+
+      const points = Math.floor(amount * rate);
+
+      return { points, cashback, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange, selectedMcc) => {
+      const isRailwaysMcc = selectedMcc && ["4112", "4011"].includes(selectedMcc);
+
+      if (isRailwaysMcc) {
+        return [
+          {
+            type: 'radio',
+            label: 'Is this an IRCTC transaction?',
+            name: 'isIRCTC',
+            options: [
+              { label: 'Yes', value: true },
+              { label: 'No', value: false }
+            ],
+            value: currentInputs.isIRCTC || false,
+            onChange: (value) => onChange('isIRCTC', value === 'true')
+          }
+        ];
+      } else {
+        return [
+          {
+            type: 'radio',
+            label: 'Is this a Smartbuy transaction?',
+            name: 'isSmartbuy',
+            options: [
+              { label: 'Yes', value: true },
+              { label: 'No', value: false }
+            ],
+            value: currentInputs.isSmartbuy || false,
+            onChange: (value) => onChange('isSmartbuy', value === 'true')
+          }
+        ];
+      }
+    }
   },
   "Marriott Bonvoy": {
     defaultRate: 2 / 150,
@@ -178,40 +883,532 @@ export const hdfcCardRewards = {
       "9311": 0, // Government services
       "9399": 0, // Government services
       "6513": 0  // Rent
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Marriott Bonvoy"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && hdfcCardRewards["Marriott Bonvoy"].mccRates[mcc]) {
+        rate = hdfcCardRewards["Marriott Bonvoy"].mccRates[mcc];
+        rateType = "mcc-specific";
+        if (mcc.startsWith("35") || mcc === "7011") {
+          category = "Marriott Hotels";
+        } else if (mcc.startsWith("30") || mcc === "4511" || mcc === "4112" || mcc === "4411" || mcc === "4722") {
+          category = "Travel";
+        } else if (["5812", "5813", "5814"].includes(mcc)) {
+          category = "Dining";
+        } else if (["7832", "7922", "7929", "7991", "7996", "7998", "7999"].includes(mcc)) {
+          category = "Entertainment";
+        } else {
+          category = "Category Spend";
+        }
+      }
+
+      const points = Math.floor(amount * rate);
+
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Millennia": {
-    defaultRate: 1 / 100,
+    defaultRate: 1 / 100, // 1% cashback on all other spends
     mccRates: {
-      // Accelerated Rewards (5% cashback) for select merchants
-      // Using example MCCs; adjust as needed for accurate merchant categorization
-      "5399": 5 / 100,  // Amazon, Flipkart (Misc. General Merchandise Stores)
-      "7829": 5 / 100,  // BookMyShow (Motion Picture Distribution)
-      "7298": 5 / 100,  // Cult.fit (Health and Beauty Spas)
-      "5691": 5 / 100,  // Myntra (Men's and Women's Clothing Stores)
-      "4899": 5 / 100,  // Sony LIV (Cable and Other Pay Television Services)
-      "5814": 5 / 100,  // Swiggy, Zomato (Fast Food Restaurants)
-      "5311": 5 / 100,  // Tata CLiQ (Department Stores)
-      "4121": 5 / 100   // Uber (Taxicabs and Limousines)
+      // 5% Cashback on specific merchants
+      "5399": 5 / 100, // Amazon, Flipkart (General Merchandise Stores)
+      "7829": 5 / 100, // BookMyShow (Motion Picture Distribution)
+      "7298": 5 / 100, // Cult.fit (Health and Beauty Spas)
+      "5691": 5 / 100, // Myntra (Men's and Women's Clothing Stores)
+      "4899": 5 / 100, // Sony LIV (Cable and Other Pay Television Services)
+      "5814": 5 / 100, // Swiggy, Zomato (Fast Food Restaurants)
+      "5311": 5 / 100, // Tata CLiQ (Department Stores)
+      "4121": 5 / 100, // Uber (Taxicabs and Limousines)
+
+      // Excluded categories
+      "5541": 0, "5542": 0, "5983": 0, "1361": 0, "5172": 0, "9752": 0, // Fuel
+      "6540": 0, // Wallet loads
+      "6513": 0, // Rent payments
+      "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0, // Government transactions
+      "8211": 0, "8220": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0, // Education
+      "4900": 0, // Utilities
     },
+    capping: {
+      categories: {
+        "5% Cashback": { cashback: 1000, maxSpent: 20000 }, // Max ₹1000 cashback on 5% category
+        "Other Spends": { cashback: 1000, maxSpent: 100000 }, // Max ₹1000 cashback on 1% category
+      }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Millennia"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      // Check for 5% Cashback merchants
+      if (["5399", "7829", "7298", "5691", "4899", "5814", "5311", "4121"].includes(mcc)) {
+        rate = 5 / 100;
+        category = "5% Cashback";
+        rateType = "accelerated";
+      } else if (hdfcCardRewards["Millennia"].mccRates[mcc] !== undefined) {
+        rate = hdfcCardRewards["Millennia"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+
+      const cashback = amount * rate;
+      const points = Math.floor(cashback * 100); // 1 CashPoint = ₹1
+
+      return { points, cashback, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => []
   },
   "MoneyBack Plus": {
-    defaultRate: 2 / 150,
+    defaultRate: 2 / 150, // 2 CashPoints per ₹150 spent on other spends
     mccRates: {
-      "5399": 10 / 150,
-      "5310": 5 / 150
+      "5399": 20 / 150, // 10X CashPoints (20 per ₹150) for Amazon, Flipkart
+      "5411": 20 / 150, // 10X CashPoints for BigBasket
+      "5310": 20 / 150, // 10X CashPoints for Reliance Smart SuperStore
+      "5814": 20 / 150, // 10X CashPoints for Swiggy
+
+      // Excluded categories
+      "5541": 0, "5542": 0, "5983": 0, // Fuel
+      "6513": 0, // Rent payments
+      "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0, // Government transactions
+      "6540": 0, // Wallet loads
+      "5944": 0, // Jewelry (often used for gift cards)
+      "6011": 0, // Cash Advances
+
+      // Educational MCCs (will not earn rewards from Sept 1, 2024, if paid through third-party apps)
+      "8211": 2 / 150, "8220": 2 / 150, "8241": 2 / 150, "8244": 2 / 150, "8249": 2 / 150, "8299": 2 / 150,
+
+      // Excluded transactions (mapped to placeholder MCCs)
+      "9000": 0, // Wallet loading (placeholder MCC)
+    },
+    capping: {
+      categories: {
+        "10X CashPoints": { points: 2500, maxSpent: 18750 }, // 2500 CashPoints max per calendar month
+        "Grocery": { points: 1000, maxSpent: 75000 }, // 1000 points cap on grocery transactions per month
+        "UPI": { points: 500, maxSpent: 37500 } // 500 points cap on UPI transactions per month (for RuPay cards)
+      }
+    },
+    specialRates: {
+      upi: {
+        rate: 2 / 150, // 2 RPs for every Rs.150 spent on UPI (for RuPay cards)
+        exclusions: ["5541", "5542", "5983", "6540", "5944"] // Excluding fuel, wallet loads, and voucher purchases
+      }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["MoneyBack Plus"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      // Check for 10X CashPoints merchants
+      if (["5399", "5411", "5310", "5814"].includes(mcc)) {
+        rate = hdfcCardRewards["MoneyBack Plus"].mccRates[mcc];
+        category = "10X CashPoints";
+        rateType = "accelerated";
+      } else if (mcc && hdfcCardRewards["MoneyBack Plus"].mccRates[mcc] !== undefined) {
+        rate = hdfcCardRewards["MoneyBack Plus"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+
+      // Check for UPI transactions (RuPay cards only)
+      if (additionalParams.isUPI && additionalParams.isRuPay) {
+        const upiRate = hdfcCardRewards["MoneyBack Plus"].specialRates.upi;
+        if (!upiRate.exclusions.includes(mcc)) {
+          rate = upiRate.rate;
+          category = "UPI Spend";
+          rateType = "upi";
+        }
+      }
+
+      if (additionalParams.isWalletLoading) {
+        mcc = "9000"; // Use placeholder MCC for wallet loading
+        rate = 0;
+        category = "Excluded Transaction";
+      }
+
+      const points = Math.floor(amount * rate);
+      const cashback = points / 100; // 1 CashPoint = ₹0.01
+
+      return { points, cashback, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange, selectedMcc) => {
+      const inputs = [];
+      const walletMccs = ["6540"]; // MCC for wallet loads
+
+      inputs.push({
+        type: 'radio',
+        label: 'Is this a RuPay card?',
+        name: 'isRuPay',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isRuPay || false,
+        onChange: (value) => {
+          onChange('isRuPay', value === 'true');
+          if (value === 'false') {
+            onChange('isUPI', false); // Reset UPI if not RuPay
+          }
+        }
+      });
+
+      if (currentInputs.isRuPay) {
+        inputs.push({
+          type: 'radio',
+          label: 'Is this a UPI transaction?',
+          name: 'isUPI',
+          options: [
+            { label: 'Yes', value: true },
+            { label: 'No', value: false }
+          ],
+          value: currentInputs.isUPI || false,
+          onChange: (value) => {
+            onChange('isUPI', value === 'true');
+            if (value === 'true') {
+              onChange('isWalletLoading', false); // Reset wallet loading if UPI
+            }
+          }
+        });
+      }
+
+      if (!currentInputs.isUPI && walletMccs.includes(selectedMcc)) {
+        inputs.push({
+          type: 'radio',
+          label: 'Is this a wallet loading transaction?',
+          name: 'isWalletLoading',
+          options: [
+            { label: 'Yes', value: true },
+            { label: 'No', value: false }
+          ],
+          value: currentInputs.isWalletLoading || false,
+          onChange: (value) => onChange('isWalletLoading', value === 'true')
+        });
+      }
+
+      return inputs;
     }
   },
   "Paytm": {
-    defaultRate: 1 / 100,
-    mccRates: {}
+    defaultRate: 1 / 100, // 1% cashback on all other retail spends
+    paytmAppRate: 3 / 100, // 3% cashback on Paytm app purchases
+    paytmSpendRate: 2 / 100, // 2% cashback on other select Paytm spends
+    mccRates: {
+      "5541": 0, "5542": 0, // Fuel spends
+      "6513": 0, // Rental spends
+      "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0, // Government spends
+      "5411": 1 / 100, "5422": 1 / 100, "5441": 1 / 100, "5451": 1 / 100, "5462": 1 / 100, "5499": 1 / 100, // Grocery
+    },
+    capping: {
+      categories: {
+        "Paytm App": { cashback: 500, maxSpent: 500 * (100 / 3) },
+        "Paytm Spends": { cashback: 500, maxSpent: 500 * (100 / 2) },
+        "Other Retail": { cashback: 1000, maxSpent: 100000 },
+        "Grocery": { cashback: 10, maxSpent: 1000 }
+      }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards.Paytm.defaultRate;
+      let category = "Other Retail";
+      let rateType = "default";
+
+      switch (additionalParams.isPaytmTransaction) {
+        case 'app':
+          rate = hdfcCardRewards.Paytm.paytmAppRate;
+          category = "Paytm App";
+          rateType = "paytm-app";
+          break;
+        case 'spend':
+          rate = hdfcCardRewards.Paytm.paytmSpendRate;
+          category = "Paytm Spends";
+          rateType = "paytm-spend";
+          break;
+        case 'none':
+        default:
+          if (mcc && hdfcCardRewards.Paytm.mccRates[mcc] !== undefined) {
+            rate = hdfcCardRewards.Paytm.mccRates[mcc];
+            rateType = "mcc-specific";
+            category = ["5411", "5422", "5441", "5451", "5462", "5499"].includes(mcc) ? "Grocery" : "Category Spend";
+          }
+          break;
+      }
+
+      let cashback = amount * rate;
+      let cappedAmount = amount;
+
+      // Apply capping
+      const cappingCategory = hdfcCardRewards.Paytm.capping.categories[category] || hdfcCardRewards.Paytm.capping.categories["Other Retail"];
+      if (cappingCategory) {
+        cappedAmount = Math.min(amount, cappingCategory.maxSpent);
+        cashback = Math.min(cashback, cappingCategory.cashback);
+      }
+
+      // Round cashback to 2 decimal places
+      cashback = Math.round(cashback * 100) / 100;
+
+      const appliedCap = cappedAmount < amount || cashback < amount * rate ? cappingCategory : null;
+
+      return {
+        cashback,
+        rate,
+        rateType,
+        category,
+        appliedCap,
+        cappedAmount
+      };
+    },
+    dynamicInputs: (currentInputs, onChange) => [{
+      type: 'radio',
+      label: 'Is this a Paytm transaction?',
+      name: 'isPaytmTransaction',
+      options: [
+        { label: 'Yes, Paytm app transaction', value: 'app' },
+        { label: 'Yes, other Paytm spend', value: 'spend' },
+        { label: 'No', value: 'none' }
+      ],
+      value: currentInputs.isPaytmTransaction || 'none',
+      onChange: (value) => onChange('isPaytmTransaction', value)
+    }]
   },
   "Paytm Select": {
-    defaultRate: 1 / 100,
+    defaultRate: 1 / 100, // 1% cashback on all other retail transactions
+    paytmAppRate: 5 / 100, // 5% cashback on Paytm app purchases
+    acceleratedRate: 3 / 100, // 3% cashback on accelerated categories
     mccRates: {
-      "5399": 5 / 100,
-      "5735": 2 / 100
-    }
+      "5541": 0, "5542": 0, // Fuel spends
+      "6513": 0, // Rental spends
+      "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0, // Government spends
+      "5814": 3 / 100, // Swiggy
+      "5651": 3 / 100, // AJIO (assuming this MCC, please verify)
+      "5411": 3 / 100, // Big Basket (assuming this MCC, please verify)
+      "4121": 3 / 100, // Uber
+      "5422": 3 / 100, "5441": 3 / 100, "5451": 3 / 100, "5462": 3 / 100, "5499": 3 / 100, // Other Grocery
+    },
+    capping: {
+      categories: {
+        "Paytm App": { cashback: 1500, maxSpent: 1500 * (100 / 5) },
+        "Accelerated": { cashback: 500, maxSpent: 500 * (100 / 3) },
+        "Other Retail": { cashback: 2000, maxSpent: 200000 },
+        "Grocery": { cashback: 10, maxSpent: 1000 } // 1000 cashpoints = Rs. 10 cashback
+      }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Paytm Select"].defaultRate;
+      let category = "Other Retail";
+      let rateType = "default";
+
+      switch (additionalParams.isPaytmTransaction) {
+        case 'app':
+          rate = hdfcCardRewards["Paytm Select"].paytmAppRate;
+          category = "Paytm App";
+          rateType = "paytm-app";
+          break;
+        case 'none':
+        default:
+          if (mcc && hdfcCardRewards["Paytm Select"].mccRates[mcc] !== undefined) {
+            rate = hdfcCardRewards["Paytm Select"].mccRates[mcc];
+            rateType = "mcc-specific";
+            category = ["5411", "5422", "5441", "5451", "5462", "5499"].includes(mcc) ? "Grocery" : "Accelerated";
+          }
+          break;
+      }
+
+      let cashback = amount * rate;
+      let cappedAmount = amount;
+
+      // Apply capping
+      const cappingCategory = hdfcCardRewards["Paytm Select"].capping.categories[category] || hdfcCardRewards["Paytm Select"].capping.categories["Other Retail"];
+      if (cappingCategory) {
+        cappedAmount = Math.min(amount, cappingCategory.maxSpent);
+        cashback = Math.min(cashback, cappingCategory.cashback);
+      }
+
+      // Round cashback to 2 decimal places
+      cashback = Math.round(cashback * 100) / 100;
+
+      const appliedCap = cappedAmount < amount || cashback < amount * rate ? cappingCategory : null;
+
+      return {
+        cashback,
+        rate,
+        rateType,
+        category,
+        appliedCap,
+        cappedAmount
+      };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Paytm transaction?',
+        name: 'isPaytmTransaction',
+        options: [
+          { label: 'Paytm App', value: 'app' },
+          { label: 'Other', value: 'none' }
+        ],
+        value: currentInputs.isPaytmTransaction || 'none',
+        onChange: (value) => onChange('isPaytmTransaction', value)
+      }
+    ]
+  },
+
+  "Paytm Mobile": {
+    defaultRate: 0.5 / 100, // 0.5% cashback on all other retail transactions
+    paytmAppRate: 2 / 100, // 2% cashback on Paytm app purchases
+    paytmSpendRate: 1 / 100, // 1% cashback on other select Paytm spends
+    mccRates: {
+      "5541": 0, "5542": 0, // Fuel spends
+      "6513": 0, // Rental spends
+      "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0, // Government spends
+      "5411": 0.5 / 100, "5422": 0.5 / 100, "5441": 0.5 / 100, "5451": 0.5 / 100, "5462": 0.5 / 100, "5499": 0.5 / 100, // Grocery
+    },
+    capping: {
+      categories: {
+        "Paytm App": { cashback: 250, maxSpent: 250 * (100 / 2) },
+        "Paytm Spends": { cashback: 250, maxSpent: 250 * 100 },
+        "Other Retail": { cashback: 500, maxSpent: 100000 },
+        "Grocery": { cashback: 10, maxSpent: 1000 } // 1000 cashpoints = Rs. 10 cashback
+      }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Paytm Mobile"].defaultRate;
+      let category = "Other Retail";
+      let rateType = "default";
+
+      switch (additionalParams.isPaytmTransaction) {
+        case 'app':
+          rate = hdfcCardRewards["Paytm Mobile"].paytmAppRate;
+          category = "Paytm App";
+          rateType = "paytm-app";
+          break;
+        case 'spend':
+          rate = hdfcCardRewards["Paytm Mobile"].paytmSpendRate;
+          category = "Paytm Spends";
+          rateType = "paytm-spend";
+          break;
+        case 'none':
+        default:
+          if (mcc && hdfcCardRewards["Paytm Mobile"].mccRates[mcc] !== undefined) {
+            rate = hdfcCardRewards["Paytm Mobile"].mccRates[mcc];
+            rateType = "mcc-specific";
+            category = ["5411", "5422", "5441", "5451", "5462", "5499"].includes(mcc) ? "Grocery" : "Category Spend";
+          }
+          break;
+      }
+
+      let cashback = amount * rate;
+      let cappedAmount = amount;
+
+      // Apply capping
+      const cappingCategory = hdfcCardRewards["Paytm Mobile"].capping.categories[category] || hdfcCardRewards["Paytm Mobile"].capping.categories["Other Retail"];
+      if (cappingCategory) {
+        cappedAmount = Math.min(amount, cappingCategory.maxSpent);
+        cashback = Math.min(cashback, cappingCategory.cashback);
+      }
+
+      // Round cashback to 2 decimal places
+      cashback = Math.round(cashback * 100) / 100;
+
+      const appliedCap = cappedAmount < amount || cashback < amount * rate ? cappingCategory : null;
+
+      return {
+        cashback,
+        rate,
+        rateType,
+        category,
+        appliedCap,
+        cappedAmount
+      };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Paytm transaction?',
+        name: 'isPaytmTransaction',
+        options: [
+          { label: 'Paytm App', value: 'app' },
+          { label: 'Paytm Spend', value: 'spend' },
+          { label: 'Other', value: 'none' }
+        ],
+        value: currentInputs.isPaytmTransaction || 'none',
+        onChange: (value) => onChange('isPaytmTransaction', value)
+      }
+    ]
+  },
+
+  "Paytm Digital": {
+    defaultRate: 1 / 100, // 1% cashback on all other retail spends
+    scanAndPayRate: 2 / 100, // 2% cashback on Scan & Pay feature
+    acceleratedRate: 2 / 100, // 2% cashback on key accelerated categories
+    mccRates: {
+      "5541": 0, "5542": 0, // Fuel spends
+      "6513": 0, // Rental spends
+      "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0, // Government spends
+      "5814": 2 / 100, // Swiggy
+      "4121": 2 / 100, // Uber
+      "5411": 1 / 100, "5422": 1 / 100, "5441": 1 / 100, "5451": 1 / 100, "5462": 1 / 100, "5499": 1 / 100, // Grocery
+    },
+    capping: {
+      categories: {
+        "Scan & Pay": { cashback: 250, maxSpent: 250 * (100 / 2) },
+        "Accelerated": { cashback: 250, maxSpent: 250 * (100 / 2) },
+        "Other Retail": { cashback: 500, maxSpent: 50000 },
+        "Grocery": { cashback: 10, maxSpent: 1000 } // 1000 cashpoints = Rs. 10 cashback
+      }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Paytm Digital"].defaultRate;
+      let category = "Other Retail";
+      let rateType = "default";
+
+      if (additionalParams.isScanAndPay) {
+        rate = hdfcCardRewards["Paytm Digital"].scanAndPayRate;
+        category = "Scan & Pay";
+        rateType = "scan-and-pay";
+      } else if (mcc && hdfcCardRewards["Paytm Digital"].mccRates[mcc] !== undefined) {
+        rate = hdfcCardRewards["Paytm Digital"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = ["5411", "5422", "5441", "5451", "5462", "5499"].includes(mcc) ? "Grocery" : "Accelerated";
+      }
+
+      let cashback = amount * rate;
+      let cappedAmount = amount;
+
+      // Apply capping
+      const cappingCategory = hdfcCardRewards["Paytm Digital"].capping.categories[category] || hdfcCardRewards["Paytm Digital"].capping.categories["Other Retail"];
+      if (cappingCategory) {
+        cappedAmount = Math.min(amount, cappingCategory.maxSpent);
+        cashback = Math.min(cashback, cappingCategory.cashback);
+      }
+
+      // Round cashback to 2 decimal places
+      cashback = Math.round(cashback * 100) / 100;
+
+      const appliedCap = cappedAmount < amount || cashback < amount * rate ? cappingCategory : null;
+
+      return {
+        cashback,
+        rate,
+        rateType,
+        category,
+        appliedCap,
+        cappedAmount
+      };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Scan & Pay transaction?',
+        name: 'isScanAndPay',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isScanAndPay || false,
+        onChange: (value) => onChange('isScanAndPay', value === 'true')
+      }
+    ]
   },
   "Regalia": {
     defaultRate: 4 / 150,
@@ -220,7 +1417,23 @@ export const hdfcCardRewards = {
       "7399": 0,
       "4214": 0,
       "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards.Regalia.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && hdfcCardRewards.Regalia.mccRates[mcc] !== undefined) {
+        rate = hdfcCardRewards.Regalia.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+
+      const points = Math.floor(amount * rate);
+
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Regalia Gold": {
     defaultRate: 4 / 150,
@@ -262,20 +1475,233 @@ export const hdfcCardRewards = {
         "Flights / eVouchers (Via Smartbuy)": { points: 4000, maxSpent: 4000 * (150 / 20), rate: 20 / 150 },
         "Grocery": { points: 2000, maxSpent: 2000 * (150 / 4) }
       }
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Regalia Gold"].defaultRate;
+      let category = "Regular Spends";
+      let rateType = "default";
+
+      if (additionalParams.isSmartbuy) {
+        if (additionalParams.smartbuyCategory === "hotels") {
+          rate = hdfcCardRewards["Regalia Gold"].smartbuyRates.hotels;
+          category = "Hotels (Via Smartbuy)";
+        } else if (additionalParams.smartbuyCategory === "flights" || additionalParams.smartbuyCategory === "vouchers") {
+          rate = hdfcCardRewards["Regalia Gold"].smartbuyRates.flights;
+          category = "Flights / eVouchers (Via Smartbuy)";
+        }
+        rateType = "smartbuy";
+      } else if (mcc && hdfcCardRewards["Regalia Gold"].acceleratedSpends.mccRates[mcc]) {
+        rate = hdfcCardRewards["Regalia Gold"].acceleratedSpends.rate;
+        rateType = "accelerated";
+        category = "Accelerated Spends";
+      } else if (mcc && hdfcCardRewards["Regalia Gold"].mccRates[mcc] !== undefined) {
+        rate = hdfcCardRewards["Regalia Gold"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : (["5411", "5422", "5441", "5451", "5462", "5499"].includes(mcc) ? "Grocery" : "Category Spend");
+      }
+
+      const points = Math.floor(amount * rate);
+
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Smartbuy transaction?',
+        name: 'isSmartbuy',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isSmartbuy || false,
+        onChange: (value) => onChange('isSmartbuy', value === 'true')
+      },
+      {
+        type: 'select',
+        label: 'Smartbuy Category',
+        name: 'smartbuyCategory',
+        options: [
+          { label: 'Hotels', value: 'hotels' },
+          { label: 'Flights', value: 'flights' },
+          { label: 'Vouchers', value: 'vouchers' }
+        ],
+        value: currentInputs.smartbuyCategory || '',
+        onChange: (value) => onChange('smartbuyCategory', value),
+        condition: (inputs) => inputs.isSmartbuy
+      }
+    ]
   },
   "Shoppers Stop": {
-    defaultRate: 1 / 100,
-    mccRates: {}
+    defaultRate: 1 / 100, // 1% Reward points on non-Shoppers Stop spends
+    shoppersStopRate: 3 / 100, // 3% Reward points on Shoppers Stop spends
+    mccRates: {
+      "5411": 1 / 100, // Grocery stores (capped)
+      "6513": 0, // Rental transactions
+      "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0 // Government transactions
+    },
+    transactionTypes: {
+      grocery: ['5411', '5422', '5441', '5451', '5462', '5499'],
+      utility: ['4900', '4814', '4816', '4821', '4899'],
+      rental: ['6513'],
+      government: ['9211', '9222', '9223', '9311', '9399', '9402', '9405']
+    },
+    capping: {
+      categories: {
+        "Shoppers Stop": { points: 500, maxSpent: 500 * (100 / 3) }, // Monthly cap of Rs 500 on Shoppers Stop spends
+        "Non-Shoppers Stop": { points: 1000, maxSpent: 100000 }, // Monthly cap of Rs 1000 on non-Shoppers Stop spends
+        "Grocery": { points: 1000, maxSpent: 100000 } // Monthly cap of 1000 points on grocery spends
+      }
+    },
+    weekendOffer: {
+      minSpend: 15000,
+      reward: 500,
+      maxTimesPerMonth: 1,
+      maxTimesPerYear: 5
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Shoppers Stop"].defaultRate;
+      let category = "Non-Shoppers Stop";
+      let rateType = "default";
+      let weekendOfferReward = 0;
+
+      let transactionType = 'other';
+      for (const [type, mccs] of Object.entries(hdfcCardRewards["Shoppers Stop"].transactionTypes)) {
+        if (mccs.includes(mcc)) {
+          transactionType = type;
+          break;
+        }
+      }
+
+      if (additionalParams.isShoppersStopTransaction) {
+        rate = hdfcCardRewards["Shoppers Stop"].shoppersStopRate;
+        category = "Shoppers Stop";
+        if (additionalParams.isWeekendTransaction && amount >= hdfcCardRewards["Shoppers Stop"].weekendOffer.minSpend) {
+          weekendOfferReward = hdfcCardRewards["Shoppers Stop"].weekendOffer.reward;
+          category = "Shoppers Stop Weekend";
+        }
+      } else if (transactionType !== 'other') {
+        category = transactionType.charAt(0).toUpperCase() + transactionType.slice(1);
+      }
+
+      const points = Math.floor(amount * rate);
+      const totalPoints = points + weekendOfferReward;
+
+      return { points: totalPoints, rate, rateType, category, weekendOfferReward };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Shoppers Stop transaction?',
+        name: 'isShoppersStopTransaction',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isShoppersStopTransaction || false,
+        onChange: (value) => onChange('isShoppersStopTransaction', value === 'true')
+      },
+      {
+        type: 'radio',
+        label: 'Is this a weekend transaction?',
+        name: 'isWeekendTransaction',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isWeekendTransaction || false,
+        onChange: (value) => onChange('isWeekendTransaction', value === 'true'),
+        condition: (inputs) => inputs.isShoppersStopTransaction
+      }
+    ]
   },
+
   "Shoppers Stop Black": {
-    defaultRate: 1 / 100,
-    mccRates: {}
+    defaultRate: 2 / 100, // 2% Reward points on non-Shoppers Stop spends
+    shoppersStopRate: 7 / 100, // 7% Reward points on Shoppers Stop spends
+    mccRates: {
+      "5411": 2 / 100, // Grocery stores (capped)
+      "6513": 0, // Rental transactions
+      "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0 // Government transactions
+    },
+    transactionTypes: {
+      grocery: ['5411', '5422', '5441', '5451', '5462', '5499'],
+      utility: ['4900', '4814', '4816', '4821', '4899'],
+      rental: ['6513'],
+      government: ['9211', '9222', '9223', '9311', '9399', '9402', '9405']
+    },
+    capping: {
+      categories: {
+        "Shoppers Stop": { points: 2000, maxSpent: 2000 * (100 / 7) }, // Monthly cap of Rs 2000 on Shoppers Stop spends
+        "Non-Shoppers Stop": { points: 2000, maxSpent: 100000 }, // Monthly cap of Rs 2000 on non-Shoppers Stop spends
+        "Grocery": { points: 1000, maxSpent: 50000 } // Monthly cap of 1000 points on grocery spends
+      }
+    },
+    weekendOffer: {
+      minSpend: 50000,
+      reward: 2000,
+      maxTimesPerMonth: 1,
+      maxTimesPerYear: 5
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Shoppers Stop Black"].defaultRate;
+      let category = "Non-Shoppers Stop";
+      let rateType = "default";
+      let weekendOfferReward = 0;
+
+      let transactionType = 'other';
+      for (const [type, mccs] of Object.entries(hdfcCardRewards["Shoppers Stop Black"].transactionTypes)) {
+        if (mccs.includes(mcc)) {
+          transactionType = type;
+          break;
+        }
+      }
+
+      if (additionalParams.isShoppersStopTransaction) {
+        rate = hdfcCardRewards["Shoppers Stop Black"].shoppersStopRate;
+        category = "Shoppers Stop";
+        if (additionalParams.isWeekendTransaction && amount >= hdfcCardRewards["Shoppers Stop Black"].weekendOffer.minSpend) {
+          weekendOfferReward = hdfcCardRewards["Shoppers Stop Black"].weekendOffer.reward;
+          category = "Shoppers Stop Weekend";
+        }
+      } else if (transactionType !== 'other') {
+        category = transactionType.charAt(0).toUpperCase() + transactionType.slice(1);
+      }
+
+      const points = Math.floor(amount * rate);
+      const totalPoints = points + weekendOfferReward;
+
+      return { points: totalPoints, rate, rateType, category, weekendOfferReward };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Shoppers Stop transaction?',
+        name: 'isShoppersStopTransaction',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isShoppersStopTransaction || false,
+        onChange: (value) => onChange('isShoppersStopTransaction', value === 'true')
+      },
+      {
+        type: 'radio',
+        label: 'Is this a weekend transaction?',
+        name: 'isWeekendTransaction',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isWeekendTransaction || false,
+        onChange: (value) => onChange('isWeekendTransaction', value === 'true'),
+        condition: (inputs) => inputs.isShoppersStopTransaction
+      }
+    ]
   },
   "Swiggy": {
     defaultRate: 0.01, // 1% cashback as default
+    swiggyAppRate: 0.10, // 10% cashback for Swiggy app transactions
     mccRates: {
-      "5814": 0.10, // 10% cashback for Swiggy app (assuming this MCC, please verify)
       "5137": 0.05, "5139": 0.05, "5611": 0.05, "5621": 0.05, "5631": 0.05, "5641": 0.05, "5651": 0.05,
       "5655": 0.05, "5661": 0.05, "5691": 0.05, "5697": 0.05, "5699": 0.05, "5948": 0.05, // Apparels 5% CB
       "5200": 0.05, "5300": 0.05, "5311": 0.05, "5331": 0.05, "5949": 0.05, "5973": 0.05, // Department Store 5% CB
@@ -293,23 +1719,324 @@ export const hdfcCardRewards = {
       "7829": 0.05, "7941": 0.05, // Online Pet Stores 5% CB
       "5399": 0.05, // Discount Stores 5% CB
       "5541": 0, "5542": 0, "6513": 0, "6540": 0, "5944": 0, "9222": 0, "9311": 0, "9399": 0, "9402": 0 // No CB
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards.Swiggy.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (additionalParams.isSwiggyTransaction) {
+        rate = hdfcCardRewards.Swiggy.swiggyAppRate;
+        category = "Swiggy App";
+        rateType = "swiggy-app";
+      } else if (mcc && hdfcCardRewards.Swiggy.mccRates[mcc] !== undefined) {
+        rate = hdfcCardRewards.Swiggy.mccRates[mcc];
+        rateType = "mcc-specific";
+        if (rate === 0.05) {
+          category = "5% Cashback Category";
+        } else if (rate === 0) {
+          category = "Excluded Category";
+        } else {
+          category = "Category Spend";
+        }
+      }
+
+      const cashback = amount * rate;
+      const points = Math.floor(cashback * 100); // Convert cashback to points
+
+      return { points, cashback, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Swiggy app transaction?',
+        name: 'isSwiggyTransaction',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isSwiggyTransaction || false,
+        onChange: (value) => onChange('isSwiggyTransaction', value === 'true')
+      }
+    ]
   },
   "Tata Neu Infinity": {
-    defaultRate: 1 / 66.66,
-    mccRates: {}
+    defaultRate: 1.5 / 100, // 1.5% back as NeuCoins on Non-Tata Brand Spends
+    tataRate: 5 / 100, // 5% back as NeuCoins on Tata Neu and partner Tata Brands
+    upiRate: 1.5 / 100, // 1.5% back on UPI spends
+    neuPassRate: 5 / 100, // Additional 5% back on selected categories with NeuPass
+    mccRates: {
+      "6513": 0, // Rental transactions
+      "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0, // Government transactions
+    },
+    capping: {
+      categories: {
+        "UPI": { points: 500, maxSpent: 500 * (100 / 1.5) }, // 500 NeuCoins per month
+        "Grocery": { points: 2000, maxSpent: 2000 * (100 / 5) }, // 2000 NeuCoins per month
+        "Utility": { points: 2000, maxSpent: 2000 * (100 / 5) }, // 2000 NeuCoins per month (from 1st Sep 2024)
+        "Telecom & Cable": { points: 2000, maxSpent: 2000 * (100 / 5) } // 2000 NeuCoins per month (from 1st Sep 2024)
+      }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Tata Neu Infinity"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (additionalParams.isTataSpend) {
+        rate = hdfcCardRewards["Tata Neu Infinity"].tataRate;
+        rateType = "tata";
+        category = "Tata Brand Spend";
+      } else if (additionalParams.isUPI) {
+        rate = hdfcCardRewards["Tata Neu Infinity"].upiRate;
+        rateType = "upi";
+        category = "UPI";
+      }
+
+      if (additionalParams.isNeuPass && additionalParams.isNeuPassCategory) {
+        rate += hdfcCardRewards["Tata Neu Infinity"].neuPassRate;
+        rateType += "-neupass";
+        category = "NeuPass Category";
+      }
+
+      const points = Math.floor(amount * rate);
+
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Tata brand transaction?',
+        name: 'isTataSpend',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isTataSpend || false,
+        onChange: (value) => {
+          onChange('isTataSpend', value === 'true');
+          if (value === 'true') {
+            onChange('isUPI', false);
+          }
+        }
+      },
+      {
+        type: 'radio',
+        label: 'Is this a UPI transaction?',
+        name: 'isUPI',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isUPI || false,
+        onChange: (value) => onChange('isUPI', value === 'true'),
+        condition: (inputs) => !inputs.isTataSpend
+      },
+      {
+        type: 'radio',
+        label: 'Do you have NeuPass membership and is this a NeuPass category transaction?',
+        name: 'isNeuPassTransaction',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isNeuPassTransaction || false,
+        onChange: (value) => {
+          onChange('isNeuPassTransaction', value === 'true');
+          onChange('isNeuPass', value === 'true');
+          onChange('isNeuPassCategory', value === 'true');
+        }
+      }
+    ]
   },
   "Tata Neu Plus": {
-    defaultRate: 1 / 100,
-    mccRates: {}
+    defaultRate: 1 / 100, // 1% back as NeuCoins on Non-Tata Brand Spends
+    tataRate: 2 / 100, // 2% back as NeuCoins on Tata Neu and partner Tata Brands
+    upiRate: 1 / 100, // 1% back on UPI spends
+    neuPassRate: 5 / 100, // Additional 5% back on selected categories with NeuPass
+    mccRates: {
+      "6513": 0, // Rental transactions
+      "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0, // Government transactions
+    },
+    capping: {
+      categories: {
+        "UPI": { points: 500, maxSpent: 500 * 100 }, // 500 NeuCoins per month
+        "Grocery": { points: 1000, maxSpent: 1000 * (100 / 2) }, // 1000 NeuCoins per month
+        "Utility": { points: 2000, maxSpent: 2000 * (100 / 2) }, // 2000 NeuCoins per month (from 1st Sep 2024)
+        "Telecom & Cable": { points: 2000, maxSpent: 2000 * (100 / 2) } // 2000 NeuCoins per month (from 1st Sep 2024)
+      }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Tata Neu Plus"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (additionalParams.isTataSpend) {
+        rate = hdfcCardRewards["Tata Neu Plus"].tataRate;
+        rateType = "tata";
+        category = "Tata Brand Spend";
+      } else if (additionalParams.isUPI) {
+        rate = hdfcCardRewards["Tata Neu Plus"].upiRate;
+        rateType = "upi";
+        category = "UPI";
+      }
+
+      if (additionalParams.isNeuPass && additionalParams.isNeuPassCategory) {
+        rate += hdfcCardRewards["Tata Neu Plus"].neuPassRate;
+        rateType += "-neupass";
+        category = "NeuPass Category";
+      }
+
+      const points = Math.floor(amount * rate);
+
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Tata brand transaction?',
+        name: 'isTataSpend',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isTataSpend || false,
+        onChange: (value) => {
+          onChange('isTataSpend', value === 'true');
+          if (value === 'true') {
+            onChange('isUPI', false);
+          }
+        }
+      },
+      {
+        type: 'radio',
+        label: 'Is this a UPI transaction?',
+        name: 'isUPI',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isUPI || false,
+        onChange: (value) => onChange('isUPI', value === 'true'),
+        condition: (inputs) => !inputs.isTataSpend
+      },
+      {
+        type: 'radio',
+        label: 'Do you have NeuPass membership and is this a NeuPass category transaction?',
+        name: 'isNeuPassTransaction',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isNeuPassTransaction || false,
+        onChange: (value) => {
+          onChange('isNeuPassTransaction', value === 'true');
+          onChange('isNeuPass', value === 'true');
+          onChange('isNeuPassCategory', value === 'true');
+        }
+      }
+    ]
   },
   "Times": {
-    defaultRate: 1 / 100,
-    mccRates: {}
+    defaultRate: 2 / 150,
+    diningRate: 5 / 150,
+    redemptionRate: 0.1, // 1 Reward Point = ₹0.1
+    mccRates: {
+      "5812": 5 / 150, // Restaurants
+      "5813": 5 / 150, // Bars
+      "5814": 5 / 150, // Fast Food
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards.Times.defaultRate;
+      let category = "Other Retail Spends";
+      let rateType = "default";
+
+      if (["5812", "5813", "5814"].includes(mcc) && additionalParams.isWeekday) {
+        rate = hdfcCardRewards["Times Platinum"].diningRate;
+        category = "Weekday Dining";
+        rateType = "dining";
+      }
+
+      const points = Math.floor(amount * rate);
+      const pointsValue = points * hdfcCardRewards.Times.redemptionRate;
+
+      return { points, rate, rateType, category, pointsValue };
+    },
+    dynamicInputs: (currentInputs, onChange, selectedMcc) => {
+      if (["5812", "5813", "5814"].includes(selectedMcc)) {
+        return [{
+          type: 'radio',
+          label: 'Is this a weekday transaction?',
+          name: 'isWeekday',
+          options: [
+            { label: 'Yes', value: true },
+            { label: 'No', value: false }
+          ],
+          value: currentInputs.isWeekday || false,
+          onChange: (value) => onChange('isWeekday', value === 'true')
+        }];
+      } else {
+        return []
+      }
+    }
   },
   "Times Platinum": {
-    defaultRate: 1 / 100,
-    mccRates: {}
+    defaultRate: 3 / 150,
+    diningRate: 10 / 150,
+    utilityShoppingRate: 0.05, // 5% cashback
+    redemptionRate: 0.15, // 1 Reward Point = ₹0.15
+    mccRates: {
+      "5812": 10 / 150, // Restaurants
+      "5813": 10 / 150, // Bars
+      "5814": 10 / 150, // Fast Food
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["Times Platinum"].defaultRate;
+      let category = "Other Retail Spends";
+      let rateType = "default";
+      let cashback = 0;
+
+      if (["5812", "5813", "5814"].includes(mcc) && additionalParams.isWeekday) {
+        rate = hdfcCardRewards["Times Platinum"].diningRate;
+        category = "Weekday Dining";
+        rateType = "dining";
+      } else if (additionalParams.isUtilityOrShopping) {
+        cashback = amount * hdfcCardRewards["Times Platinum"].utilityShoppingRate;
+        category = "Utility Bills/Shopping";
+        rateType = "utility-shopping";
+      }
+
+      const points = Math.floor(amount * rate);
+      const pointsValue = points * hdfcCardRewards["Times Platinum"].redemptionRate;
+
+      return { points, cashback, rate, rateType, category, pointsValue };
+    },
+    dynamicInputs: (currentInputs, onChange, selectedMcc) => {
+      if (["5812", "5813", "5814"].includes(selectedMcc)) {
+        return [{
+          type: 'radio',
+          label: 'Is this a weekday transaction?',
+          name: 'isWeekday',
+          options: [
+            { label: 'Yes', value: true },
+            { label: 'No', value: false }
+          ],
+          value: currentInputs.isWeekday || false,
+          onChange: (value) => onChange('isWeekday', value === 'true')
+        }];
+      } else {
+        return [{
+          type: 'radio',
+          label: 'Is this a utility bill or shopping transaction?',
+          name: 'isUtilityOrShopping',
+          options: [
+            { label: 'Yes', value: true },
+            { label: 'No', value: false }
+          ],
+          value: currentInputs.isUtilityOrShopping || false,
+          onChange: (value) => onChange('isUtilityOrShopping', value === 'true')
+        }];
+      }
+    }
   },
   "UPI RuPay": {
     defaultRate: 0,
@@ -318,7 +2045,24 @@ export const hdfcCardRewards = {
       "5812": 3 / 100,
       "5311": 3 / 100,
       "4900": 2 / 100
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = hdfcCardRewards["UPI RuPay"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && hdfcCardRewards["UPI RuPay"].mccRates[mcc]) {
+        rate = hdfcCardRewards["UPI RuPay"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = mcc === "5411" ? "Grocery" : mcc === "5812" ? "Dining" : mcc === "5311" ? "Department Stores" : mcc === "4900" ? "Utilities" : "Category Spend";
+      }
+
+      const cashback = amount * rate;
+      const points = Math.floor(cashback * 100);
+
+      return { points, cashback, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   }
 };
 
@@ -327,6 +2071,7 @@ export const calculateHDFCRewards = (cardName, amount, mcc, additionalParams = {
   if (!cardReward) {
     return {
       points: 0,
+      cashback: 0,
       rewardText: "Card not found",
       uncappedPoints: 0,
       cappedPoints: 0,
@@ -334,68 +2079,63 @@ export const calculateHDFCRewards = (cardName, amount, mcc, additionalParams = {
     };
   }
 
-  let rate = cardReward.defaultRate;
-  let rateType = "default";
+  const result = cardReward.calculateRewards(amount, mcc, additionalParams);
+  return applyCapping(result, cardReward, cardName);
+};
 
-  // Check for international rate
-  if (additionalParams.isInternational && cardReward.internationalRate) {
-    rate = cardReward.internationalRate;
-    rateType = "international";
-  }
-  // Check for MCC-specific rate
-  else if (mcc && cardReward.mccRates && cardReward.mccRates[mcc]) {
-    rate = cardReward.mccRates[mcc];
-    rateType = "mcc-specific";
-  }
+const applyCapping = (result, cardReward, cardName) => {
+  let { points, cashback, rate, rateType, category, appliedCap, cappedAmount } = result;
 
-  let points = Math.floor(amount * rate);
-  let cappedPoints = points;
-  let appliedCap = null;
-
-  // Apply category-specific capping if available
-  if (cardReward.capping && cardReward.capping.categories && mcc) {
-    const mccName = mcc.toLowerCase();
-    const cappingCategories = cardReward.capping.categories;
-
-    const matchingCategory = Object.keys(cappingCategories).find(cat =>
-      mccName.includes(cat.toLowerCase())
-    );
-
-    if (matchingCategory) {
-      const { points: catPoints, maxSpent: catMaxSpent } = cappingCategories[matchingCategory];
-      const cappedAmount = Math.min(amount, catMaxSpent);
-      cappedPoints = Math.min(points, catPoints, Math.floor(cappedAmount * rate));
-
-      if (cappedPoints < points) {
-        appliedCap = {
-          category: matchingCategory,
-          maxPoints: catPoints,
-          maxSpent: catMaxSpent
-        };
-      }
-    }
-  }
-
-  // Default reward text
-  let rewardText = `${cappedPoints} HDFC Points`;
-
-  // Bank-specific logic (to be customized for each bank)
-  switch (cardName) {
-    case "HDFC Swiggy":
-      rewardText = `₹${cappedPoints} Cashback`;
-      break;
-    default:
-      // Default case if no specific logic is needed
-      break;
-  }
+  const rewardText = generateRewardText(cardName, points, cashback, rate, rateType, category, appliedCap);
 
   return {
-    points: cappedPoints,
+    points: points || 0,
+    cashback: cashback || 0,
     rewardText,
-    uncappedPoints: points,
-    cappedPoints,
+    uncappedPoints: points || 0,
+    cappedPoints: points || 0,
     appliedCap,
     rateUsed: rate,
-    rateType
+    rateType,
+    category,
+    cappedAmount
   };
+};
+
+const generateRewardText = (cardName, points, cashback, rate, rateType, category, appliedCap) => {
+  let rewardText = "";
+  let rewardType = "";
+
+  switch (true) {
+    case cardName.includes("Pixel") || cardName === "Swiggy" || cardName === "Millennia" || cardName === "Paytm" || cardName === "Paytm Select" || cardName === "Paytm Mobile" || cardName === "Paytm Digital":
+      const cashbackAmount = cashback !== undefined ? cashback : (points / 100);
+      rewardText = `₹${cashbackAmount.toFixed(2)} Cashback`;
+      rewardType = "cashback";
+      break;
+    case cardName.includes("Tata Neu"):
+      rewardText = `${points} NeuCoins`;
+      rewardType = "neucoins";
+      break;
+    default:
+      rewardText = `${points} HDFC Reward Points`;
+      rewardType = "points";
+  }
+
+  if (category && category !== "Other Spends" && category !== "Regular Spends") {
+    rewardText += ` (${category})`;
+  }
+
+  if (appliedCap) {
+    const capValue = appliedCap.maxPoints || appliedCap.maxCashback;
+    const capUnit = rewardType === "neucoins" ? "NeuCoins" :
+      rewardType === "cashback" ? "₹" : "points";
+    rewardText += ` (Capped at ${capUnit}${capValue})`;
+  }
+
+  return rewardText;
+};
+
+export const getCardInputs = (cardName, currentInputs, onChange) => {
+  const cardReward = hdfcCardRewards[cardName];
+  return cardReward && cardReward.dynamicInputs ? cardReward.dynamicInputs(currentInputs, onChange) : [];
 };

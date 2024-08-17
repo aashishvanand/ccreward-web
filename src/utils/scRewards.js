@@ -7,28 +7,91 @@ export const scCardRewards = {
       "5814": 5 / 150, // Assuming this MCC also covers fine-dining
       "5541": 5 / 150, // 5x reward points for fuel
       "5542": 5 / 150  // Including both common fuel MCCs
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = scCardRewards["Platinum Rewards"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && scCardRewards["Platinum Rewards"].mccRates[mcc]) {
+        rate = scCardRewards["Platinum Rewards"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = (mcc === "5541" || mcc === "5542") ? "Fuel" : "Fine Dining";
+      }
+
+      const points = Math.floor(amount * rate);
+
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Ultimate": {
     defaultRate: 5 / 150, // 5 reward points per INR 150 spent
     mccRates: {
       "5309": 0.05 // 5% cashback on duty-free spends
     },
-    pointValue: 1 // 1 Reward point equals to INR 1
+    pointValue: 1, // 1 Reward point equals to INR 1
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = scCardRewards.Ultimate.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc === "5309") {
+        rate = scCardRewards.Ultimate.mccRates["5309"];
+        rateType = "cashback";
+        category = "Duty-Free";
+      }
+
+      const points = Math.floor(amount * rate);
+      const cashback = mcc === "5309" ? amount * rate : 0;
+
+      return { points, cashback, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Smart": {
     defaultRate: 0.01, // 1% cashback on other spends
+    onlineRate: 0.02, // 2% cashback on online spends
     mccRates: {
-      // Online spends (using general e-commerce MCC as an example)
-      "5399": 0.02, // 2% cashback on online spends
-      // Excluded categories
       "5541": 0, // Fuel transactions are not eligible for cashback
       "5542": 0
     },
     cashbackCaps: {
       online: 1000, // Max INR 1000 per month on online spends
       other: 500   // Max INR 500 per month on other spends
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = scCardRewards.Smart.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (additionalParams.isOnlineSpend) {
+        rate = scCardRewards.Smart.onlineRate;
+        category = "Online Spend";
+        rateType = "online";
+      } else if (mcc && scCardRewards.Smart.mccRates[mcc] !== undefined) {
+        rate = scCardRewards.Smart.mccRates[mcc];
+        rateType = "excluded";
+        category = "Excluded Category";
+      }
+
+      const cashback = amount * rate;
+
+      return { cashback, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this an online transaction?',
+        name: 'isOnlineSpend',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isOnlineSpend || false,
+        onChange: (value) => onChange('isOnlineSpend', value === 'true')
+      }
+    ]
   },
   "EaseMyTrip": {
     defaultRate: 2 / 100, // 2x reward points for every INR 100 spent on all other category
@@ -40,7 +103,23 @@ export const scCardRewards = {
       // ... (include all hotel MCCs)
       "4511": 10 / 100 // Airlines
     },
-    pointValue: 0.25 // 1 reward point = INR 0.25
+    pointValue: 0.25, // 1 reward point = INR 0.25
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = scCardRewards.EaseMyTrip.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && scCardRewards.EaseMyTrip.mccRates[mcc]) {
+        rate = scCardRewards.EaseMyTrip.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = "Travel Booking";
+      }
+
+      const points = Math.floor(amount * rate);
+
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Rewards": {
     defaultRate: 4 / 150, // 4 reward points per INR 150 on all Retail spends
@@ -58,7 +137,36 @@ export const scCardRewards = {
     },
     rewardsCap: {
       bonusPoints: 2000 // Max 2000 bonus reward points per statement cycle
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = scCardRewards.Rewards.defaultRate;
+      let category = "Retail Spend";
+      let rateType = "default";
+
+      if (mcc && scCardRewards.Rewards.mccRates[mcc] !== undefined) {
+        rate = scCardRewards.Rewards.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Government/Insurance Spend";
+      }
+
+      if (additionalParams.monthlySpend && additionalParams.monthlySpend > scCardRewards.Rewards.acceleratedRewards.tier1.threshold) {
+        rate = scCardRewards.Rewards.acceleratedRewards.tier1.rate;
+        rateType = "accelerated";
+      }
+
+      const points = Math.floor(amount * rate);
+
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'number',
+        label: 'Total monthly spend so far',
+        name: 'monthlySpend',
+        value: currentInputs.monthlySpend || 0,
+        onChange: (value) => onChange('monthlySpend', parseFloat(value))
+      }
+    ]
   }
 };
 
@@ -67,108 +175,64 @@ export const calculateSCRewards = (cardName, amount, mcc, additionalParams = {})
   if (!cardReward) {
     return {
       points: 0,
+      cashback: 0,
       rewardText: "Card not found",
       uncappedPoints: 0,
+      uncappedCashback: 0,
       cappedPoints: 0,
-      appliedCap: null
+      cappedCashback: 0,
+      appliedCap: null,
+      rateUsed: 0,
+      rateType: null
     };
   }
 
-  let result;
+  const result = cardReward.calculateRewards(amount, mcc, additionalParams);
+  return applyCapping(result, cardReward, cardName, amount);
+};
+
+const applyCapping = (result, cardReward, cardName, amount) => {
+  let { points, cashback, rate, rateType, category } = result;
+  let cappedPoints = points || 0;
+  let cappedCashback = cashback || 0;
+  let appliedCap = null;
 
   switch (cardName) {
     case "Smart":
-      result = calculateSmartRewards(cardReward, amount, mcc, additionalParams);
+      const smartCap = rateType === "online" ? cardReward.cashbackCaps.online : cardReward.cashbackCaps.other;
+      if (cappedCashback > smartCap) {
+        cappedCashback = smartCap;
+        appliedCap = { category, maxCashback: smartCap };
+      }
       break;
+
     case "Rewards":
-      result = calculateRewardsCardRewards(cardReward, amount, mcc, additionalParams);
+      if (rateType === "accelerated") {
+        const bonusCap = cardReward.rewardsCap.bonusPoints;
+        const basePoints = Math.floor(amount * cardReward.defaultRate);
+        const bonusPoints = cappedPoints - basePoints;
+        if (bonusPoints > bonusCap) {
+          cappedPoints = basePoints + bonusCap;
+          appliedCap = { category: "Bonus Rewards", maxPoints: bonusCap };
+        }
+      }
       break;
+
     default:
-      result = calculateDefaultRewards(cardReward, amount, mcc, additionalParams);
+      // For any other cards, keep the original values
+      break;
   }
 
-  return applyCapping(result, cardReward, cardName);
-};
-
-const calculateSmartRewards = (cardReward, amount, mcc, additionalParams) => {
-  let rate = cardReward.defaultRate;
-  let category = "Other Spends";
-  let rateType = "default";
-
-  if (mcc && cardReward.mccRates[mcc] !== undefined) {
-    rate = cardReward.mccRates[mcc];
-    rateType = "online";
-    category = "Online Spend";
-  }
-
-  const cashback = amount * rate;
-
-  return { cashback, rate, rateType, category };
-};
-
-const calculateRewardsCardRewards = (cardReward, amount, mcc, additionalParams) => {
-  let rate = cardReward.defaultRate;
-  let category = "Retail Spend";
-  let rateType = "default";
-
-  if (mcc && cardReward.mccRates[mcc] !== undefined) {
-    rate = cardReward.mccRates[mcc];
-    rateType = "mcc-specific";
-    category = "Government/Insurance Spend";
-  }
-
-  if (additionalParams.monthlySpend && additionalParams.monthlySpend > cardReward.acceleratedRewards.tier1.threshold) {
-    rate = cardReward.acceleratedRewards.tier1.rate;
-    rateType = "accelerated";
-  }
-
-  const points = Math.floor(amount * rate);
-
-  return { points, rate, rateType, category };
-};
-
-const calculateDefaultRewards = (cardReward, amount, mcc, additionalParams) => {
-  let rate = cardReward.defaultRate;
-  let category = "Other Spends";
-  let rateType = "default";
-
-  if (mcc && cardReward.mccRates && cardReward.mccRates[mcc] !== undefined) {
-    rate = cardReward.mccRates[mcc];
-    rateType = "mcc-specific";
-    category = "Category Spend";
-  }
-
-  const points = Math.floor(amount * rate);
-
-  return { points, rate, rateType, category };
-};
-
-const applyCapping = (result, cardReward, cardName) => {
-  let { points, cashback, rate, rateType, category } = result;
-  let cappedPoints = points;
-  let appliedCap = null;
-
-  if (cardName === "Smart") {
-    const cap = rateType === "online" ? cardReward.cashbackCaps.online : cardReward.cashbackCaps.other;
-    if (cashback > cap) {
-      cashback = cap;
-      appliedCap = { category, maxCashback: cap };
-    }
-  } else if (cardName === "Rewards" && rateType === "accelerated") {
-    const bonusCap = cardReward.rewardsCap.bonusPoints;
-    if (points > bonusCap) {
-      cappedPoints = bonusCap;
-      appliedCap = { category: "Bonus Rewards", maxPoints: bonusCap };
-    }
-  }
-
-  const rewardText = generateRewardText(cardName, cappedPoints, cashback, rate, rateType, category, appliedCap);
+  const rewardText = generateRewardText(cardName, cappedPoints, cappedCashback, rate, rateType, category, appliedCap);
 
   return {
     points: cappedPoints,
+    cashback: cappedCashback,
     rewardText,
-    uncappedPoints: points,
+    uncappedPoints: points || 0,
+    uncappedCashback: cashback || 0,
     cappedPoints,
+    cappedCashback,
     appliedCap,
     rateUsed: rate,
     rateType
@@ -181,24 +245,43 @@ const generateRewardText = (cardName, points, cashback, rate, rateType, category
   switch (cardName) {
     case "Smart":
       rewardText = `₹${cashback.toFixed(2)} Cashback`;
-      if (appliedCap) {
+      if (appliedCap && appliedCap.maxCashback) {
         rewardText += ` (Capped at ₹${appliedCap.maxCashback} per month)`;
       }
       break;
+
     case "Ultimate":
-      rewardText = `${points} Reward Points (Worth ₹${points})`;
+      if (rateType === "cashback") {
+        rewardText = `₹${cashback.toFixed(2)} Cashback`;
+      } else {
+        rewardText = `${points} Reward Points (Worth ₹${points})`;
+      }
       break;
+
     case "EaseMyTrip":
-      const value = points * 0.25;
+      const value = points * scCardRewards.EaseMyTrip.pointValue;
       rewardText = `${points} Reward Points (Worth ₹${value.toFixed(2)})`;
       break;
+
+    case "Platinum Rewards":
+    case "Rewards":
     default:
       rewardText = `${points} SC Reward Points`;
+      break;
   }
 
   if (category !== "Other Spends" && !rewardText.includes(category)) {
     rewardText += ` (${category})`;
   }
 
-  return rewardText;
+  if (appliedCap && appliedCap.maxPoints && !rewardText.includes("Capped")) {
+    rewardText += ` (Capped at ${appliedCap.maxPoints} points)`;
+  }
+
+  return rewardText.trim();
+}
+
+export const getCardInputs = (cardName, currentInputs, onChange) => {
+  const cardReward = scCardRewards[cardName];
+  return cardReward && cardReward.dynamicInputs ? cardReward.dynamicInputs(currentInputs, onChange) : [];
 };

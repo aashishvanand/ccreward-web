@@ -1,12 +1,21 @@
+import { mccList } from '../data/mccData';
 export const axisCardRewards = {
   "ACE": {
     defaultRate: 1 / 100,
-    mccRates: {}
+    mccRates: {},
+    calculateRewards: (amount, mcc, additionalParams) => {
+      const rate = axisCardRewards.ACE.defaultRate;
+      const category = "Other Spends";
+      const rateType = "default";
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Atlas": {
     defaultRate: 2 / 100,
     mccRates: {
-      //airlines
+      // Airlines and Hotels (5X rewards)
       "3000": 5 / 100, "3001": 5 / 100, "3002": 5 / 100, "3003": 5 / 100, "3004": 5 / 100, "3005": 5 / 100,
       "3006": 5 / 100, "3007": 5 / 100, "3008": 5 / 100, "3009": 5 / 100, "3010": 5 / 100, "3011": 5 / 100,
       "3012": 5 / 100, "3013": 5 / 100, "3014": 5 / 100, "3015": 5 / 100, "3016": 5 / 100, "3017": 5 / 100,
@@ -99,7 +108,28 @@ export const axisCardRewards = {
       "4814": 0, "4816": 0, "4899": 0, "4900": 0, // Utilities
       "5094": 0, "5944": 0, // Gold/Jewellery
       "5541": 0, "5542": 0, "5983": 0 // Fuel
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards.Atlas.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && axisCardRewards.Atlas.mccRates[mcc] !== undefined) {
+        rate = axisCardRewards.Atlas.mccRates[mcc];
+        rateType = "mcc-specific";
+        if (["3000", "3001", "3501", "3502", "7011"].includes(mcc)) {
+          category = "Travel";
+        } else if (rate === 0) {
+          category = "Excluded Category";
+        } else {
+          category = "Category Spend";
+        }
+      }
+
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Aura": {
     defaultRate: 2 / 200, // 2 edge points per ₹200
@@ -110,7 +140,22 @@ export const axisCardRewards = {
       categories: {
         "Insurance": { points: 250, maxSpent: 10000 }, // 5X points, max ₹10,000 spent
       }
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards.Aura.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && axisCardRewards.Aura.mccRates[mcc]) {
+        rate = axisCardRewards.Aura.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = "Insurance";
+      }
+
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Vistara": {
     defaultRate: 2 / 200, // 2 CV Points for every Rs 200 of eligible spends
@@ -122,7 +167,22 @@ export const axisCardRewards = {
       "9222": 0, "9311": 0, "9399": 0, "9402": 0, // Government Services
       "5960": 0, "6012": 0, "6051": 0, "6300": 0, "6381": 0, // Insurance Services
       "5094": 0, "5944": 0, // Precious Stones & Metals, Clock, Jewellery, Watch and Silverware Stores
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards.Vistara.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && axisCardRewards.Vistara.mccRates[mcc] !== undefined) {
+        rate = axisCardRewards.Vistara.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Vistara Infinite": {
     defaultRate: 6 / 200, // 6 CV Points for every Rs. 200 of eligible spends
@@ -135,7 +195,22 @@ export const axisCardRewards = {
       "5960": 0, "6012": 0, "6051": 0, "6300": 0, "6381": 0, // Insurance Services
       "5094": 0, "5944": 0, // Precious Stones & Metals, Clock, Jewellery, Watch and Silverware Stores
       "5541": 0, "5542": 0, // Fuel transactions
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards["Vistara Infinite"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && axisCardRewards["Vistara Infinite"].mccRates[mcc] !== undefined) {
+        rate = axisCardRewards["Vistara Infinite"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Vistara Signature": {
     defaultRate: 4 / 200, // 4 CV Points for every Rs. 200 of eligible spends
@@ -147,7 +222,22 @@ export const axisCardRewards = {
       "9222": 0, "9311": 0, "9399": 0, "9402": 0, // Government Services
       "5960": 0, "6012": 0, "6051": 0, "6300": 0, "6381": 0, // Insurance Services
       "5094": 0, "5944": 0, // Precious Stones & Metals, Clock, Jewellery, Watch and Silverware Stores
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards["Vistara Signature"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && axisCardRewards["Vistara Signature"].mccRates[mcc] !== undefined) {
+        rate = axisCardRewards["Vistara Signature"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Flipkart": {
     defaultRate: 1 / 100, // 1% cashback
@@ -161,7 +251,22 @@ export const axisCardRewards = {
       "7832": 4 / 100, // 4% cashback for movie theaters (e.g., PVR)
       "4121": 4 / 100, // 4% cashback for taxicabs/limousines (e.g., Uber)
       "7997": 4 / 100, // 4% cashback for gyms/fitness centers (e.g., Cultfit)
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards.Flipkart.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && axisCardRewards.Flipkart.mccRates[mcc]) {
+        rate = axisCardRewards.Flipkart.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = "Preferred Merchant";
+      }
+
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Flipkart Super Elite": {
     defaultRate: 2 / 100, // 2 SuperCoins per ₹100 on all other spends
@@ -170,6 +275,48 @@ export const axisCardRewards = {
     },
     flipkartPlusRate: {
       "5399": 12 / 100 // 12 SuperCoins per ₹100 for Flipkart purchases (Plus members)
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards["Flipkart Super Elite"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc === "5399") {
+        if (additionalParams.isFlipkartPlusMember) {
+          rate = axisCardRewards["Flipkart Super Elite"].flipkartPlusRate["5399"];
+          category = "Flipkart Plus Purchase";
+          rateType = "flipkart-plus";
+        } else {
+          rate = axisCardRewards["Flipkart Super Elite"].mccRates["5399"];
+          category = "Flipkart Purchase";
+          rateType = "flipkart-regular";
+        }
+      }
+
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange, selectedMcc) => {
+      const isFlipkart = selectedMcc
+        ? mccList.find(item => item.mcc === selectedMcc)?.name.toLowerCase().includes('flipkart')
+        : false;
+      
+      if (isFlipkart) {
+        return [
+          {
+            type: 'radio',
+            label: 'Are you a Flipkart Plus member?',
+            name: 'isFlipkartPlusMember',
+            options: [
+              { label: 'Yes', value: true },
+              { label: 'No', value: false }
+            ],
+            value: currentInputs.isFlipkartPlusMember || false,
+            onChange: (value) => onChange('isFlipkartPlusMember', value === true)
+          }
+        ];
+      }
+      return [];
     }
   },
   "Indian Oil": {
@@ -190,7 +337,38 @@ export const axisCardRewards = {
         "Fuel": { points: 1000, maxSpent: 5000 }, // 20 points per 100, max 5000 spent
         "OnlineShopping": { points: 250, maxSpent: 5000 }, // 5 points per 100, max 5000 spent
       }
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards["Indian Oil"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && axisCardRewards["Indian Oil"].mccRates[mcc]) {
+        rate = axisCardRewards["Indian Oil"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = "Fuel";
+      } else if (additionalParams.isOnlineShopping) {
+        rate = axisCardRewards["Indian Oil"].acceleratedRewards.onlineShopping.rate;
+        rateType = "accelerated";
+        category = "OnlineShopping";
+      }
+
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this an online shopping transaction?',
+        name: 'isOnlineShopping',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isOnlineShopping || false,
+        onChange: (value) => onChange('isOnlineShopping', value === 'true')
+      }
+    ]
   },
   "Indian Oil Premium": {
     defaultRate: 1 / 150, // 1 EDGE MILE per ₹150
@@ -206,6 +384,21 @@ export const axisCardRewards = {
         "Grocery": { points: 33, maxSpent: 5000 }, // 2 EDGE MILES per 150, max 5000 spent
       }
     },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards["Indian Oil Premium"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && axisCardRewards["Indian Oil Premium"].mccRates[mcc]) {
+        rate = axisCardRewards["Indian Oil Premium"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = ["5541", "5542", "5983"].includes(mcc) ? "Fuel" : "Grocery";
+      }
+
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Magnus": {
     defaultRate: 12 / 200, // 12 EDGE Reward Points for every INR 200
@@ -242,15 +435,69 @@ export const axisCardRewards = {
       categories: {
         "Rent": { points: 3000, maxSpent: 50000 }, // 12 points per 200, max 50000 spent
       }
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards.Magnus.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (additionalParams.isTravelEdgePortal) {
+        const travelEdgeRewards = axisCardRewards.Magnus.acceleratedRewards.travelEdgePortal;
+        rate = amount <= travelEdgeRewards.tier1.threshold ? travelEdgeRewards.tier1.rate : travelEdgeRewards.tier2.rate;
+        rateType = "travel-edge";
+        category = "Travel Edge Portal";
+      } else {
+        const regularRewards = axisCardRewards.Magnus.acceleratedRewards.regularSpend;
+        rate = amount <= regularRewards.tier1.threshold ? regularRewards.tier1.rate : regularRewards.tier2.rate;
+        rateType = amount > regularRewards.tier1.threshold ? "accelerated" : "default";
+      }
+
+      if (mcc && axisCardRewards.Magnus.mccRates[mcc] !== undefined) {
+        rate = axisCardRewards.Magnus.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = mcc === "6513" ? "Rent" : (rate === 0 ? "Excluded Category" : "Category Spend");
+      }
+
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Travel Edge Portal transaction?',
+        name: 'isTravelEdgePortal',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isTravelEdgePortal || false,
+        onChange: (value) => onChange('isTravelEdgePortal', value === 'true')
+      }
+    ]
   },
   "MyZone": {
     defaultRate: 4 / 200,
-    mccRates: {}
+    mccRates: {},
+    calculateRewards: (amount, mcc, additionalParams) => {
+      const rate = axisCardRewards.MyZone.defaultRate;
+      const category = "Other Spends";
+      const rateType = "default";
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Neo": {
     defaultRate: 1 / 200,
-    mccRates: {}
+    mccRates: {},
+    calculateRewards: (amount, mcc, additionalParams) => {
+      const rate = axisCardRewards.Neo.defaultRate;
+      const category = "Other Spends";
+      const rateType = "default";
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Privilege": {
     defaultRate: 10 / 200, // 10 points on every Rs. 200 spent
@@ -262,7 +509,22 @@ export const axisCardRewards = {
       "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0, // Educational services
       "4900": 0, "4814": 0, "4816": 0, "4899": 0, // Utilities
       "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0 // Government services
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards.Privilege.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && axisCardRewards.Privilege.mccRates[mcc] !== undefined) {
+        rate = axisCardRewards.Privilege.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Reserve": {
     defaultRate: 15 / 200, // 15 edge points for every 200 spent
@@ -277,7 +539,38 @@ export const axisCardRewards = {
       "5094": 0, "5944": 0, // Gold/Jewellery
       "5541": 0, "5542": 0, "5983": 0, // Fuel
       "6010": 0, "6011": 0 // Cash Withdrawal
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards.Reserve.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (additionalParams.isInternational) {
+        rate = axisCardRewards.Reserve.internationalRate;
+        rateType = "international";
+        category = "International Transaction";
+      } else if (mcc && axisCardRewards.Reserve.mccRates[mcc] !== undefined) {
+        rate = axisCardRewards.Reserve.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this an international transaction?',
+        name: 'isInternational',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isInternational || false,
+        onChange: (value) => onChange('isInternational', value === 'true')
+      }
+    ]
   },
   "Rewards": {
     defaultRate: 2 / 125, // 2 EDGE REWARD points per ₹125
@@ -286,7 +579,22 @@ export const axisCardRewards = {
       "5651": 10 / 125,
       "5655": 10 / 125,
       "5699": 10 / 125,
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards.Rewards.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && axisCardRewards.Rewards.mccRates[mcc]) {
+        rate = axisCardRewards.Rewards.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = "Apparel and Departmental Stores";
+      }
+
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Select": {
     defaultRate: 10 / 200, // 10 Axis EDGE points on every Rs. 200 spends
@@ -318,10 +626,31 @@ export const axisCardRewards = {
       "6540": 0, // Wallet
       "5094": 0, "5944": 0, // Gold/Jewellery
       "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0 // Government services
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards.Select.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc && axisCardRewards.Select.mccRates[mcc] !== undefined) {
+        rate = axisCardRewards.Select.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Retail Shopping";
+      } else if (amount <= axisCardRewards.Select.acceleratedRewards.tier1.threshold) {
+        rate = axisCardRewards.Select.acceleratedRewards.tier1.rate;
+        rateType = "accelerated";
+        category = "Accelerated Spend";
+      }
+
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Voyage": {
     defaultRate: 3 / 200, // 3 SpiceClub Points for every Rs. 200 spent on other retail spends
+    // SpiceJet mobile application & website
+    spicejetRate: 18 / 200, // 6 SC Points (card benefit) + 12 SC Points (SpiceClub Silver Membership)
     mccRates: {
       // Online utility bill payment, Online food ordering, Online entertainment
       "4900": 6 / 200, // Online utility bill payment
@@ -336,13 +665,43 @@ export const axisCardRewards = {
       "6540": 0, "6513": 0, "9222": 0, "9311": 0, "9399": 0, "9402": 0, "5960": 0,
       "6300": 0, "6381": 0, "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0
     },
-    // SpiceJet mobile application & website
-    spicejetRate: 18 / 200, // 6 SC Points (card benefit) + 12 SC Points (SpiceClub Silver Membership)
-
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards.Voyage.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+  
+      if (additionalParams.isSpiceJet) {
+        rate = axisCardRewards.Voyage.spicejetRate;
+        category = "SpiceJet Transaction";
+        rateType = "spicejet";
+      } else if (mcc && axisCardRewards.Voyage.mccRates[mcc] !== undefined) {
+        rate = axisCardRewards.Voyage.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+  
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a SpiceJet transaction?',
+        name: 'isSpiceJet',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isSpiceJet || false,
+        onChange: (value) => onChange('isSpiceJet', value === 'true')
+      }
+    ]
   },
 
   "Voyage Black": {
     defaultRate: 6 / 200, // 6 SpiceClub Points for every Rs. 200 spent on other retail spends
+    // SpiceJet mobile application & website
+    spicejetRate: 28 / 200, // 12 SC Points (card benefit) + 16 SC Points (SpiceClub Gold Membership)
     mccRates: {
       // Online utility bill payment, Online food ordering, Online entertainment
       "4900": 12 / 200, // Online utility bill payment
@@ -357,9 +716,37 @@ export const axisCardRewards = {
       "6540": 0, "6513": 0, "9222": 0, "9311": 0, "9399": 0, "9402": 0, "5960": 0,
       "6300": 0, "6381": 0, "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0
     },
-    // SpiceJet mobile application & website
-    spicejetRate: 28 / 200, // 12 SC Points (card benefit) + 16 SC Points (SpiceClub Gold Membership)
-
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards["Voyage Black"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+  
+      if (additionalParams.isSpiceJet) {
+        rate = axisCardRewards["Voyage Black"].spicejetRate;
+        category = "SpiceJet Transaction";
+        rateType = "spicejet";
+      } else if (mcc && axisCardRewards["Voyage Black"].mccRates[mcc] !== undefined) {
+        rate = axisCardRewards["Voyage Black"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+  
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a SpiceJet transaction?',
+        name: 'isSpiceJet',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isSpiceJet || false,
+        onChange: (value) => onChange('isSpiceJet', value === 'true')
+      }
+    ]
   },
 
   "Horizon": {
@@ -455,7 +842,45 @@ export const axisCardRewards = {
           rate: 3 / 100
         }
       }
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards.Horizon.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+  
+      if (additionalParams.isTravelEdgePortal) {
+        const travelEdgeRewards = axisCardRewards.Horizon.acceleratedRewards.travelEdgePortal;
+        rate = amount <= travelEdgeRewards.tier1.threshold ? travelEdgeRewards.tier1.rate : travelEdgeRewards.tier2.rate;
+        rateType = "travel-edge";
+        category = "Travel Edge Portal";
+      } else {
+        const regularRewards = axisCardRewards.Horizon.acceleratedRewards.regularSpend;
+        rate = amount <= regularRewards.tier1.threshold ? regularRewards.tier1.rate : regularRewards.tier2.rate;
+        rateType = amount > regularRewards.tier1.threshold ? "accelerated" : "default";
+      }
+  
+      if (mcc && axisCardRewards.Horizon.mccRates[mcc] !== undefined) {
+        rate = axisCardRewards.Horizon.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Travel";
+      }
+  
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Travel Edge Portal transaction?',
+        name: 'isTravelEdgePortal',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isTravelEdgePortal || false,
+        onChange: (value) => onChange('isTravelEdgePortal', value === 'true')
+      }
+    ]
   },
   "Samsung Signature": {
     defaultRate: 5 / 100, // 5 reward points on all domestic & international spends per INR 100 spent
@@ -473,7 +898,40 @@ export const axisCardRewards = {
     },
     cashbackCap: {
       "5732": { monthly: 2500, yearly: 10000 } // Cap for Samsung purchases
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards["Samsung Signature"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+      let cashback = 0;
+  
+      if (additionalParams.isSamsungTransaction) {
+        rate = axisCardRewards["Samsung Signature"].samsungRate;
+        category = "Samsung Purchase";
+        rateType = "cashback";
+        cashback = amount * rate;
+      } else if (axisCardRewards["Samsung Signature"].mccRates[mcc]) {
+        rate = axisCardRewards["Samsung Signature"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = "Preferred Merchant";
+      }
+  
+      const points = rateType === "cashback" ? Math.floor(cashback) : Math.floor(amount * rate);
+      return { points, cashback, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Samsung purchase?',
+        name: 'isSamsungTransaction',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isSamsungTransaction || false,
+        onChange: (value) => onChange('isSamsungTransaction', value === 'true')
+      }
+    ]
   },
 
   "Samsung Infinite": {
@@ -490,7 +948,61 @@ export const axisCardRewards = {
 
       // Excluded MCCs
       "6012": 0, "6051": 0, "5541": 0, "5983": 0, "5542": 0, "5944": 0, "6011": 0, "6540": 0, "6513": 0
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards["Samsung Infinite"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+      let cashback = 0;
+
+      if (additionalParams.isSamsungTransaction) {
+        rate = axisCardRewards["Samsung Infinite"].samsungRate;
+        category = "Samsung Purchase";
+        rateType = "cashback";
+        cashback = amount * rate;
+      } else if (additionalParams.isInternational) {
+        rate = axisCardRewards["Samsung Infinite"].internationalRate;
+        category = "International Transaction";
+        rateType = "international";
+      } else if (axisCardRewards["Samsung Infinite"].mccRates[mcc]) {
+        rate = axisCardRewards["Samsung Infinite"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = "Preferred Merchant";
+      }
+
+      const points = rateType === "cashback" ? Math.floor(cashback * 100) : Math.floor(amount * rate);
+      return { points, cashback, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Samsung purchase?',
+        name: 'isSamsungTransaction',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isSamsungTransaction || false,
+        onChange: (value) => {
+          onChange('isSamsungTransaction', value === 'true');
+          if (value === 'true') {
+            onChange('isInternational', false);
+          }
+        }
+      },
+      {
+        type: 'radio',
+        label: 'Is this an international transaction?',
+        name: 'isInternational',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isInternational || false,
+        onChange: (value) => onChange('isInternational', value === 'true'),
+        condition: (inputs) => !inputs.isSamsungTransaction
+      }
+    ]
   },
   "Shoppers Stop": {
     defaultRate: 2 / 200, // 2 FC reward points on every INR 200 spent for all other spends
@@ -508,6 +1020,51 @@ export const axisCardRewards = {
       "6513": 0, // Rent
       "5541": 0, "5542": 0, "5983": 0 // Fuel
     },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards["Shoppers Stop"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (mcc === "5311") {
+        if (additionalParams.isShoppersStopExclusive) {
+          rate = axisCardRewards["Shoppers Stop"].shoppersStopExclusiveBrands;
+          category = "Shoppers Stop Exclusive Brands";
+        } else {
+          rate = axisCardRewards["Shoppers Stop"].shoppersStopOtherBrands;
+          category = "Shoppers Stop Other Brands";
+        }
+        rateType = "shoppers-stop";
+      } else if (axisCardRewards["Shoppers Stop"].mccRates[mcc] !== undefined) {
+        rate = axisCardRewards["Shoppers Stop"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange, selectedMcc) => {
+      const isShoppersStop = selectedMcc 
+        ? mccList.find(item => item.mcc === selectedMcc)?.name.toLowerCase().includes('shoppers stop') 
+        : false;
+      
+      if (isShoppersStop) {
+        return [
+          {
+            type: 'radio',
+            label: 'Is this a Shoppers Stop Exclusive Brand purchase?',
+            name: 'isShoppersStopExclusive',
+            options: [
+              { label: 'Yes', value: true },
+              { label: 'No', value: false }
+            ],
+            value: currentInputs.isShoppersStopExclusive || false,
+            onChange: (value) => onChange('isShoppersStopExclusive', value === 'true')
+          }
+        ];
+      }
+      return [];
+    }
   },
   "Airtel": {
     defaultRate: 1 / 100, // 1% cashback on all other merchants/spends
@@ -542,20 +1099,89 @@ export const axisCardRewards = {
       "5812": 500, // Preferred merchant cap per month (combined)
       "5814": 500, // Preferred merchant cap per month (combined)
       "5411": 500, // Preferred merchant cap per month (combined)
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards.Airtel.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      const relevantMCCs = ["4814", "4816", "4899", "4900"];
+      if (relevantMCCs.includes(mcc)) {
+        if (additionalParams.isAirtelApp === true) {
+          rate = axisCardRewards.Airtel.airtelRate;
+          rateType = "airtel-app";
+          category = "Airtel Thanks App";
+        } else {
+          rate = axisCardRewards.Airtel.mccRates[mcc];
+          rateType = "mcc-specific";
+          category = "Category Spend";
+        }
+      } else if (axisCardRewards.Airtel.mccRates[mcc] !== undefined) {
+        rate = axisCardRewards.Airtel.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = "Category Spend";
+      }
+
+      let cashback = amount * rate;
+      const cap = axisCardRewards.Airtel.cashbackCaps[mcc];
+      
+      if (cap) {
+        cashback = Math.min(cashback, cap);
+      }
+
+      cashback = Math.round(cashback * 100) / 100; // Round to 2 decimal places
+
+      return { cashback, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange, selectedMcc) => {
+      const relevantMCCs = ["4814", "4816", "4899", "4900"];
+      
+      if (relevantMCCs.includes(selectedMcc)) {
+        return [
+          {
+            type: 'radio',
+            label: 'Is this an Airtel Thanks App transaction?',
+            name: 'isAirtelApp',
+            options: [
+              { label: 'Yes', value: 'true' },
+              { label: 'No', value: 'false' }
+            ],
+            value: currentInputs.isAirtelApp ? 'true' : 'false',
+            onChange: (value) => {
+              onChange('isAirtelApp', value === 'true');
+            }
+          }
+        ];
+      }
+      return [];
     }
   },
   "Miles & More World Select": {
     defaultRate: 6 / 200, // 6 Award Miles per Rs. 200 of eligible spends
     mccRates: {
-      // Add any specific MCC rates if applicable
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      const rate = axisCardRewards["Miles & More World Select"].defaultRate;
+      const category = "Other Spends";
+      const rateType = "default";
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
 
   "Miles & More World": {
     defaultRate: 4 / 200, // 4 Award Miles per Rs. 200 of eligible spends
     mccRates: {
-      // Add any specific MCC rates if applicable
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      const rate = axisCardRewards["Miles & More World"].defaultRate;
+      const category = "Other Spends";
+      const rateType = "default";
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
   "Freecharge": {
     defaultRate: 1 / 100, // 1 EDGE REWARD Point per Rs. 100 spent
@@ -574,11 +1200,37 @@ export const axisCardRewards = {
       "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0, // Education Services
       "4814": 0, "4816": 0, "4899": 0, "4900": 0, // Utility Services
       "6513": 0 // Rental Payments
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards.Freecharge.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+  
+      if (axisCardRewards.Freecharge.mccRates[mcc] !== undefined) {
+        rate = axisCardRewards.Freecharge.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+  
+      let points = Math.floor(amount * rate);
+  
+      // Apply milestone rewards
+      if (amount >= axisCardRewards.Freecharge.milestoneRewards.tier2.minSpend) {
+        points += axisCardRewards.Freecharge.milestoneRewards.tier2.points;
+        category = "Milestone Reward Tier 2";
+      } else if (amount >= axisCardRewards.Freecharge.milestoneRewards.tier1.minSpend) {
+        points += axisCardRewards.Freecharge.milestoneRewards.tier1.points;
+        category = "Milestone Reward Tier 1";
+      }
+  
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
 
   "Freecharge Plus": {
     defaultRate: 1 / 100, // 1% cashback on other spends
+    freechargeRate: 5 / 100, // 5% cashback on Freecharge transactions
     mccRates: {
       "4121": 2 / 100, "4131": 2 / 100, "4111": 2 / 100, "7512": 2 / 100, // 2% on Local Commute
       // Excluded categories (same as Freecharge card)
@@ -589,7 +1241,37 @@ export const axisCardRewards = {
       "4814": 0, "4816": 0, "4899": 0, "4900": 0,
       "6513": 0
     },
-    freechargeRate: 5 / 100 // 5% cashback on Freecharge
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards["Freecharge Plus"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+  
+      if (additionalParams.isFreechargeTransaction) {
+        rate = axisCardRewards["Freecharge Plus"].freechargeRate;
+        category = "Freecharge Transaction";
+        rateType = "freecharge";
+      } else if (axisCardRewards["Freecharge Plus"].mccRates[mcc] !== undefined) {
+        rate = axisCardRewards["Freecharge Plus"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : (["4121", "4131", "4111", "7512"].includes(mcc) ? "Local Commute" : "Category Spend");
+      }
+  
+      const points = Math.floor(amount * rate * 100); // Convert to points (1 point = ₹1)
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Freecharge transaction?',
+        name: 'isFreechargeTransaction',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isFreechargeTransaction || false,
+        onChange: (value) => onChange('isFreechargeTransaction', value === 'true')
+      }
+    ]
   },
 
   "LIC": {
@@ -604,16 +1286,68 @@ export const axisCardRewards = {
       "6513": 0, // Rental payments
       "5541": 0, "5542": 0, // Fuel
       "6540": 0 // Wallet load
-    }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = axisCardRewards.LIC.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (additionalParams.isLICPremium) {
+        rate = axisCardRewards.LIC.licPremiumRate;
+        category = "LIC Premium Payment";
+        rateType = "lic-premium";
+      } else if (additionalParams.isInternational) {
+        rate = axisCardRewards.LIC.internationalRate;
+        category = "International Transaction";
+        rateType = "international";
+      } else if (mcc && axisCardRewards.LIC.mccRates[mcc] !== undefined) {
+        rate = axisCardRewards.LIC.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+      }
+
+      const points = Math.floor(amount * rate);
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this an LIC Premium payment?',
+        name: 'isLICPremium',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isLICPremium || false,
+        onChange: (value) => {
+          onChange('isLICPremium', value === 'true');
+          if (value === 'true') {
+            onChange('isInternational', false);
+          }
+        }
+      },
+      {
+        type: 'radio',
+        label: 'Is this an international transaction?',
+        name: 'isInternational',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isInternational || false,
+        onChange: (value) => onChange('isInternational', value === 'true'),
+        condition: (inputs) => !inputs.isLICPremium
+      }
+    ]
   }
 };
-
 
 export const calculateAxisRewards = (cardName, amount, mcc, additionalParams = {}) => {
   const cardReward = axisCardRewards[cardName];
   if (!cardReward) {
     return {
       points: 0,
+      cashback: 0,
       rewardText: "Card not found",
       uncappedPoints: 0,
       cappedPoints: 0,
@@ -621,295 +1355,45 @@ export const calculateAxisRewards = (cardName, amount, mcc, additionalParams = {
     };
   }
 
-  let result;
+  const result = cardReward.calculateRewards(amount, mcc, additionalParams);
 
-  switch (cardName) {
-    case "Airtel":
-      result = calculateAirtelRewards(cardReward, amount, mcc, additionalParams);
-      break;
-    case "Samsung Signature":
-    case "Samsung Infinite":
-      result = calculateSamsungRewards(cardReward, amount, mcc, additionalParams);
-      break;
-    case "Shoppers Stop":
-      result = calculateShoppersStopRewards(cardReward, amount, mcc, additionalParams);
-      break;
-    case "Voyage":
-    case "Voyage Black":
-      result = calculateVoyageRewards(cardReward, amount, mcc, additionalParams);
-      break;
-    case "Magnus":
-    case "Horizon":
-      result = calculateMagnusHorizonRewards(cardReward, amount, mcc, additionalParams);
-      break;
-    case "Flipkart Super Elite":
-      result = calculateFlipkartRewards(cardReward, amount, mcc, additionalParams);
-      break;
-    case "LIC":
-      result = calculateLICRewards(cardReward, amount, mcc, additionalParams);
-      break;
-    case "Freecharge Plus":
-      result = calculateFreechargeRewards(cardReward, amount, mcc, additionalParams);
-      break;
-    default:
-      result = calculateDefaultRewards(cardReward, amount, mcc, additionalParams);
-  }
-
-  return applyCapping(result, cardReward, cardName);
+  return applyCapping(result, cardReward, cardName, amount);
 };
 
-
-const calculateAirtelRewards = (cardReward, amount, mcc, additionalParams) => {
-  let rate = cardReward.defaultRate;
-  let category = "Other Spends";
-  let rateType = "default";
-
-  if (additionalParams.isAirtelApp) {
-    if (mcc === "4814") {
-      rate = cardReward.airtelRate;
-      category = "Airtel Bill Payment";
-    } else if (cardReward.mccRates[mcc]) {
-      rate = cardReward.mccRates[mcc];
-      category = "Utility Bill Payment (Airtel App)";
-    }
-    rateType = "airtel-app";
-  } else if (mcc && cardReward.mccRates[mcc]) {
-    rate = cardReward.mccRates[mcc];
-    category = "Preferred Merchant";
-    rateType = "preferred";
-  }
-
-  let cashback = amount * rate;
-  
-  // Apply capping
-  const cappingCategory = cardReward.cashbackCaps[mcc];
-  if (cappingCategory) {
-    cashback = Math.min(cashback, cappingCategory);
-  }
-
-  const points = Math.floor(cashback * 100);
-
-  return { 
-    points, 
-    cashback, 
-    rate, 
-    rateType, 
-    category,
-    appliedCap: cappingCategory ? {
-      category: "Utility Bill Payment",
-      maxPoints: cappingCategory * 100,
-      maxSpent: cappingCategory / rate
-    } : null
-  };
-};
-
-const calculateSamsungRewards = (cardReward, amount, mcc, additionalParams) => {
-  let rate = cardReward.defaultRate;
-  let category = "Other Spends";
-  let rateType = "default";
-  let cashback = 0;
-
-  if (additionalParams.isSamsungTransaction) {
-    rate = cardReward.samsungRate;
-    category = "Samsung Purchase";
-    rateType = "cashback";
-    cashback = amount * rate;
-  } else if (additionalParams.isInternational && cardReward.internationalRate) {
-    rate = cardReward.internationalRate;
-    category = "International Transaction";
-  } else if (cardReward.mccRates[mcc]) {
-    rate = cardReward.mccRates[mcc];
-    category = "Preferred Merchant";
-  }
-
-  const points = rateType === "cashback" ? Math.floor(cashback) : Math.floor(amount * rate);
-
-  return { points, cashback, rate, rateType, category };
-};
-
-const calculateShoppersStopRewards = (cardReward, amount, mcc, additionalParams) => {
-  let rate = cardReward.defaultRate;
-  let category = "Other Spends";
-  let rateType = "default";
-
-  if (mcc === "5311") {
-    if (additionalParams.isShoppersStopExclusive) {
-      rate = cardReward.shoppersStopExclusiveBrands;
-      category = "Shoppers Stop Exclusive Brands";
-    } else {
-      rate = cardReward.shoppersStopOtherBrands;
-      category = "Shoppers Stop Other Brands";
-    }
-    rateType = "shoppers-stop";
-  } else if (cardReward.mccRates && cardReward.mccRates[mcc]) {
-    rate = cardReward.mccRates[mcc];
-    rateType = "mcc-specific";
-    category = "Category Spend";
-  }
-
-  const points = Math.floor(amount * rate);
-
-  return { points, rate, rateType, category };
-};
-
-const calculateVoyageRewards = (cardReward, amount, mcc, additionalParams) => {
-  let rate = cardReward.defaultRate;
-  let category = "Other Spends";
-  let rateType = "default";
-
-  if (additionalParams.isSpiceJet && cardReward.spicejetRate) {
-    rate = cardReward.spicejetRate;
-    rateType = "spicejet";
-    category = "SpiceJet Transaction";
-  } else if (mcc && cardReward.mccRates[mcc]) {
-    rate = cardReward.mccRates[mcc];
-    rateType = "mcc-specific";
-    category = "Category Spend";
-  }
-
-  const points = Math.floor(amount * rate);
-
-  return { points, rate, rateType, category };
-};
-
-const calculateMagnusHorizonRewards = (cardReward, amount, mcc, additionalParams) => {
-  let rate = cardReward.defaultRate;
-  let category = "Other Spends";
-  let rateType = "default";
-
-  if (additionalParams.isTravelEdgePortal) {
-    const travelEdgeRewards = cardReward.acceleratedRewards.travelEdgePortal;
-    rate = amount <= travelEdgeRewards.tier1.threshold ? travelEdgeRewards.tier1.rate : travelEdgeRewards.tier2.rate;
-    rateType = "travel-edge";
-    category = "Travel Edge Portal";
-  } else {
-    const regularRewards = cardReward.acceleratedRewards.regularSpend;
-    rate = amount <= regularRewards.tier1.threshold ? regularRewards.tier1.rate : regularRewards.tier2.rate;
-    rateType = amount > regularRewards.tier1.threshold ? "accelerated" : "default";
-  }
-
-  if (mcc && cardReward.mccRates && cardReward.mccRates[mcc] !== undefined) {
-    rate = cardReward.mccRates[mcc];
-    rateType = "mcc-specific";
-    category = rate === 0 ? "Excluded Category" : "Category Spend";
-  }
-
-  const points = Math.floor(amount * rate);
-
-  return { points, rate, rateType, category };
-};
-
-const calculateFlipkartRewards = (cardReward, amount, mcc, additionalParams) => {
-  let rate = cardReward.defaultRate;
-  let category = "Other Spends";
-  let rateType = "default";
-
-  if (mcc === "5399") { // Flipkart purchase
-    if (additionalParams.isFlipkartPlusMember && cardReward.flipkartPlusRate) {
-      rate = cardReward.flipkartPlusRate["5399"];
-      rateType = "flipkart-plus";
-      category = "Flipkart Plus Purchase";
-    } else {
-      rate = cardReward.mccRates["5399"];
-      rateType = "flipkart-regular";
-      category = "Flipkart Purchase";
-    }
-  } else if (mcc && cardReward.mccRates && cardReward.mccRates[mcc]) {
-    rate = cardReward.mccRates[mcc];
-    rateType = "mcc-specific";
-    category = "Category Spend";
-  }
-
-  const points = Math.floor(amount * rate);
-
-  return { points, rate, rateType, category };
-};
-
-const calculateFreechargeRewards = (cardReward, amount, mcc, additionalParams) => {
-  let rate = cardReward.defaultRate;
-  let category = "Other Spends";
-  let rateType = "default";
-
-  if (additionalParams.isFreechargeTransaction) {
-    rate = cardReward.freechargeRate;
-    category = "Freecharge Transaction";
-    rateType = "freecharge";
-  } else if (mcc && cardReward.mccRates && cardReward.mccRates[mcc]) {
-    rate = cardReward.mccRates[mcc];
-    rateType = "mcc-specific";
-    category = "Category Spend";
-  }
-
-  const points = Math.floor(amount * rate);
-
-  return { points, rate, rateType, category };
-};
-
-const calculateLICRewards = (cardReward, amount, mcc, additionalParams) => {
-  let rate = cardReward.defaultRate;
-  let category = "Other Spends";
-  let rateType = "default";
-
-  if (additionalParams.isLICPremium) {
-    rate = cardReward.licPremiumRate;
-    rateType = "lic-premium";
-    category = "LIC Premium Payment";
-  } else if (additionalParams.isInternational && cardReward.internationalRate) {
-    rate = cardReward.internationalRate;
-    rateType = "international";
-    category = "International Transaction";
-  } else if (mcc && cardReward.mccRates && cardReward.mccRates[mcc] !== undefined) {
-    rate = cardReward.mccRates[mcc];
-    rateType = "mcc-specific";
-    category = rate === 0 ? "Excluded Category" : "Category Spend";
-  }
-
-  const points = Math.floor(amount * rate);
-
-  return { points, rate, rateType, category };
-};
-
-const calculateDefaultRewards = (cardReward, amount, mcc, additionalParams) => {
-  let rate = cardReward.defaultRate;
-  let category = "Other Spends";
-  let rateType = "default";
-
-  if (additionalParams.isInternational && cardReward.internationalRate) {
-    rate = cardReward.internationalRate;
-    rateType = "international";
-  } else if (mcc && cardReward.mccRates && cardReward.mccRates[mcc] !== undefined) {
-    rate = cardReward.mccRates[mcc];
-    rateType = "mcc-specific";
-    category = rate === 0 ? "Excluded Category" : "Category Spend";
-  }
-
-  const points = Math.floor(amount * rate);
-
-  return { points, rate, rateType, category };
-};
-
-const applyCapping = (result, cardReward, cardName) => {
+const applyCapping = (result, cardReward, cardName, amount) => {
   let { points, cashback, rate, rateType, category } = result;
   let cappedPoints = points;
+  let cappedCashback = cashback;
   let appliedCap = null;
 
   if (cardReward.capping && cardReward.capping.categories && category) {
     const cappingCategory = cardReward.capping.categories[category];
     if (cappingCategory) {
-      const { points: maxPoints, maxSpent } = cappingCategory;
-      const cappedAmount = Math.min(result.amount, maxSpent);
-      cappedPoints = Math.min(points, maxPoints, Math.floor(cappedAmount * rate));
+      if (cardName === "Airtel") {
+        const { maxCashback, maxSpent } = cappingCategory;
+        const cappedAmount = Math.min(amount, maxSpent);
+        cappedCashback = Math.min(cashback, maxCashback, cappedAmount * rate);
 
-      if (cappedPoints < points) {
-        appliedCap = { category, maxPoints, maxSpent };
+        if (cappedCashback < cashback) {
+          appliedCap = { category, maxCashback, maxSpent };
+        }
+      } else {
+        const { points: maxPoints, maxSpent } = cappingCategory;
+        const cappedAmount = Math.min(amount, maxSpent);
+        cappedPoints = Math.min(points, maxPoints, Math.floor(cappedAmount * rate));
+
+        if (cappedPoints < points) {
+          appliedCap = { category, maxPoints, maxSpent };
+        }
       }
     }
   }
 
-  const rewardText = generateRewardText(cardName, cappedPoints, rate, rateType, category, cashback, appliedCap);
+  const rewardText = generateRewardText(cardName, cappedPoints, cappedCashback, rate, rateType, category, appliedCap);
 
   return {
     points: cappedPoints,
+    cashback: cappedCashback,
     rewardText,
     uncappedPoints: points,
     cappedPoints,
@@ -919,66 +1403,12 @@ const applyCapping = (result, cardReward, cardName) => {
   };
 };
 
-const generateRewardText = (cardName, points, rate, rateType, category, cashback, appliedCap) => {
+const generateRewardText = (cardName, points, cashback, rate, rateType, category, appliedCap) => {
   let rewardText = "";
 
   switch (cardName) {
-    case "LIC":
-      rewardText = rate === 0 ? "No Axis Reward Points for this transaction" : `${points} Axis Reward Points`;
-      if (rateType === "lic-premium") {
-        rewardText += " (LIC Premium Payment)";
-      } else if (rateType === "international") {
-        rewardText += " (International transaction)";
-      }
-      break;
-    case "Airtel":
-      rewardText = `₹${cashback.toFixed(2)} Cashback`;
-      if (appliedCap) {
-        rewardText += ` (${appliedCap.category} - Capped at ₹${appliedCap.maxPoints})`;
-      } else if (category !== "Other Spends") {
-        rewardText += ` (${category})`;
-      }
-      break;
-    case "Samsung Infinite":
-    case "Samsung Signature":
-      if (rateType === "cashback") {
-        rewardText = `₹${cashback.toFixed(2)} Cashback`;
-        if (appliedCap) {
-          rewardText += ` (Capped at ₹${appliedCap.maxPoints} per month)`;
-        }
-      } else {
-        rewardText = `${points} EDGE Reward Points`;
-      }
-      if (category !== "Other Spends") {
-        rewardText += ` (${category})`;
-      }
-      break;
-    case "Shoppers Stop":
-      rewardText = rate === 0 ? "No FC Reward Points for this transaction" : `${points} FC Reward Points`;
-      if (rateType === "shoppers-stop") {
-        rewardText += ` (${category})`;
-      }
-      break;
-    case "Voyage":
-    case "Voyage Black":
-      rewardText = rate === 0 ? "No SpiceClub Points for this transaction" : `${points} SpiceClub Points`;
-      if (rateType === "spicejet") {
-        rewardText += " (Including SpiceClub Membership benefit)";
-      }
-      break;
-    case "Magnus":
-    case "Horizon":
-    case "Reserve":
-    case "Select":
-    case "Privilege":
-      rewardText = rate === 0 ? "No EDGE Reward Points for this transaction" : `${points} EDGE Reward Points`;
-      if (rateType === "travel-edge") {
-        rewardText += " (Travel Edge Portal rate applied)";
-      } else if (rateType === "accelerated") {
-        rewardText += " (Accelerated rate applied)";
-      } else if (rateType === "international") {
-        rewardText += " (International rate applied)";
-      }
+    case "Atlas":
+      rewardText = rate === 0 ? "No EDGE Miles for this transaction" : `${points} EDGE Miles`;
       break;
     case "Flipkart Super Elite":
       rewardText = `${points} SuperCoins`;
@@ -988,21 +1418,31 @@ const generateRewardText = (cardName, points, rate, rateType, category, cashback
         rewardText += " (Regular Flipkart rate applied)";
       }
       break;
-    case "Atlas":
-      rewardText = rate === 0 ? "No EDGE Miles for this transaction" : `${points} EDGE Miles`;
-      break;
-    case "Vistara":
-    case "Vistara Signature":
-    case "Vistara Infinite":
-      rewardText = rate === 0 ? "No CV Points for this transaction" : `${points} CV Points`;
+    case "Airtel":
+      rewardText = `₹${cashback.toFixed(2)} Cashback`;
+      if (category !== "Other Spends") {
+        rewardText += ` (${category})`;
+      }
+      if (appliedCap) {
+        rewardText += ` (Capped at ₹${appliedCap.maxCashback})`;
+      }
       break;
     default:
       rewardText = rate === 0 ? "No Axis Reward Points for this transaction" : `${points} Axis Reward Points`;
-  }
+    }
 
   if (category !== "Other Spends" && !rewardText.includes(category)) {
     rewardText += ` (${category})`;
   }
 
+  if (appliedCap) {
+    rewardText += ` (Capped at ${appliedCap.maxPoints} points)`;
+  }
+
   return rewardText;
+};
+
+export const getCardInputs = (cardName, currentInputs, onChange) => {
+  const cardReward = axisCardRewards[cardName];
+  return cardReward && cardReward.dynamicInputs ? cardReward.dynamicInputs(currentInputs, onChange) : [];
 };
