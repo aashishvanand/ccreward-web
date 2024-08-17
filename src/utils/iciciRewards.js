@@ -38,9 +38,9 @@ export const iciciCardRewards = {
       return { cashback, rate, rateType, category };
     },
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
-  const isAmazonMcc = selectedMcc && mccList.find(item => item.mcc === selectedMcc)?.name.toLowerCase().includes('amazon');
-  
-  if (isAmazonMcc) {
+      const isAmazonMcc = selectedMcc && mccList.find(item => item.mcc === selectedMcc)?.name.toLowerCase().includes('amazon');
+
+      if (isAmazonMcc) {
         return [
           {
             type: 'radio',
@@ -58,7 +58,7 @@ export const iciciCardRewards = {
       return [];
     }
   },
-  
+
   "Coral": {
     cardType: "points",
     defaultRate: 2 / 100,
@@ -209,24 +209,24 @@ export const iciciCardRewards = {
         category = "Category Spend";
       }
 
-    const points = Math.floor(amount * rate);
+      const points = Math.floor(amount * rate);
 
-    return { points, rate, rateType, category };
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this an international transaction?',
+        name: 'isInternational',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isInternational || false,
+        onChange: (value) => onChange('isInternational', value === 'true')
+      }
+    ]
   },
-  dynamicInputs: (currentInputs, onChange) => [
-    {
-      type: 'radio',
-      label: 'Is this an international transaction?',
-      name: 'isInternational',
-      options: [
-        { label: 'Yes', value: true },
-        { label: 'No', value: false }
-      ],
-      value: currentInputs.isInternational || false,
-      onChange: (value) => onChange('isInternational', value === 'true')
-    }
-  ]
-},
 
   "HPCL Super Saver": {
     cardType: "points",
@@ -266,7 +266,7 @@ export const iciciCardRewards = {
     },
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
       const isFuelMcc = selectedMcc ? mccList.find(item => item.mcc === selectedMcc)?.name.toLowerCase().includes('fuel') : false;
-      
+
       if (isFuelMcc) {
         return [
           {
@@ -382,7 +382,7 @@ export const iciciCardRewards = {
     },
     dynamicInputs: () => []
   },
-  
+
   "Platinum": {
     cardType: "points",
     defaultRate: 2 / 100,

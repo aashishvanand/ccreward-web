@@ -376,29 +376,29 @@ export const idfcFirstCardRewards = {
       "6011": 0, // Cash withdrawal
       "5541": 0, // Fuel
     },
-  calculateRewards: (amount, mcc, additionalParams) => {
-    let rate = idfcFirstCardRewards.WOW.defaultRate;
-    let category = "Other Spends";
-    let rateType = "default";
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = idfcFirstCardRewards.WOW.defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
 
-    if (mcc && idfcFirstCardRewards.WOW.mccRates[mcc] !== undefined) {
-      rate = idfcFirstCardRewards.WOW.mccRates[mcc];
-      rateType = "mcc-specific";
-      if (rate === 0) {
-        category = "Excluded Category";
-      } else if (["4814", "4816", "4899", "4900"].includes(mcc)) {
-        category = "Utility";
-      } else if (["5541", "5542"].includes(mcc)) {
-        category = "Fuel";
+      if (mcc && idfcFirstCardRewards.WOW.mccRates[mcc] !== undefined) {
+        rate = idfcFirstCardRewards.WOW.mccRates[mcc];
+        rateType = "mcc-specific";
+        if (rate === 0) {
+          category = "Excluded Category";
+        } else if (["4814", "4816", "4899", "4900"].includes(mcc)) {
+          category = "Utility";
+        } else if (["5541", "5542"].includes(mcc)) {
+          category = "Fuel";
+        }
       }
-    }
 
-    const points = Math.floor(amount * rate);
+      const points = Math.floor(amount * rate);
 
-    return { points, rate, rateType, category };
+      return { points, rate, rateType, category };
+    },
+    dynamicInputs: () => []
   },
-  dynamicInputs: () => []
-},
 };
 
 export const calculateIDFCFirstRewards = (cardName, amount, mcc, additionalParams = {}) => {

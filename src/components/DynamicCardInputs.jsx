@@ -15,19 +15,24 @@ const DynamicCardInputs = ({
   cardConfig,
   onChange,
   currentInputs,
-  selectedMcc
+  selectedMcc,
 }) => {
-  const dynamicInputs = cardConfig && typeof cardConfig.dynamicInputs === 'function' 
-    ? cardConfig.dynamicInputs(currentInputs, onChange, selectedMcc?.mcc)
-    : [];
+  const dynamicInputs =
+    cardConfig && typeof cardConfig.dynamicInputs === "function"
+      ? cardConfig.dynamicInputs(currentInputs, onChange, selectedMcc?.mcc)
+      : [];
 
   return (
     <>
       {dynamicInputs.map((input, index) => {
         switch (input.type) {
-          case 'radio':
+          case "radio":
             return (
-              <FormControl key={index} component="fieldset" sx={{ mt: 2, width: "100%" }}>
+              <FormControl
+                key={index}
+                component="fieldset"
+                sx={{ mt: 2, width: "100%" }}
+              >
                 <FormLabel component="legend">{input.label}</FormLabel>
                 <RadioGroup
                   aria-label={input.name}
@@ -47,12 +52,12 @@ const DynamicCardInputs = ({
                 </RadioGroup>
               </FormControl>
             );
-          case 'select':
+          case "select":
             return (
               <FormControl key={index} fullWidth sx={{ mt: 2 }}>
                 <FormLabel component="legend">{input.label}</FormLabel>
                 <Select
-                  value={currentInputs[input.name] || ''}
+                  value={currentInputs[input.name] || ""}
                   onChange={(e) => input.onChange(e.target.value)}
                   displayEmpty
                 >
@@ -67,9 +72,13 @@ const DynamicCardInputs = ({
                 </Select>
               </FormControl>
             );
-          case 'checkbox':
+          case "checkbox":
             return (
-              <FormControl key={index} component="fieldset" sx={{ mt: 2, width: "100%" }}>
+              <FormControl
+                key={index}
+                component="fieldset"
+                sx={{ mt: 2, width: "100%" }}
+              >
                 <FormControlLabel
                   control={
                     <Checkbox
