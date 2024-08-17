@@ -676,6 +676,13 @@ export const hdfcCardRewards = {
         category = rate === 0 ? "Excluded Category" : "Category Spend";
       }
 
+      // Check for grocery and insurance MCCs
+      if (["5411", "5422", "5451", "5499"].includes(mcc)) {
+        category = "Grocery";
+      } else if (["6300", "5960"].includes(mcc)) {
+        category = "Insurance";
+      }
+
       const points = Math.floor(amount * rate);
 
       return { points, rate, rateType, category };
@@ -1766,6 +1773,10 @@ export const hdfcCardRewards = {
     upiRate: 1.5 / 100, // 1.5% back on UPI spends
     neuPassRate: 5 / 100, // Additional 5% back on selected categories with NeuPass
     mccRates: {
+      "4900": 5 / 100, // Utilities
+      "4814": 5 / 100, // Telecommunication services
+      "4899": 5 / 100, // Cable services
+      "5411": 5 / 100, "5422": 5 / 100, "5441": 5 / 100, "5451": 5 / 100, "5462": 5 / 100, "5499": 5 / 100, // Grocery
       "6513": 0, // Rental transactions
       "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0, // Government transactions
     },
@@ -1790,12 +1801,23 @@ export const hdfcCardRewards = {
         rate = hdfcCardRewards["Tata Neu Infinity"].upiRate;
         rateType = "upi";
         category = "UPI";
+      } else if (mcc && hdfcCardRewards["Tata Neu Infinity"].mccRates[mcc] !== undefined) {
+        rate = hdfcCardRewards["Tata Neu Infinity"].mccRates[mcc];
+        rateType = "mcc-specific";
+        if (mcc === "4900") {
+          category = "Utility";
+        } else if (["4814", "4899"].includes(mcc)) {
+          category = "Telecom & Cable";
+        } else if (["5411", "5422", "5441", "5451", "5462", "5499"].includes(mcc)) {
+          category = "Grocery";
+        } else {
+          category = rate === 0 ? "Excluded Category" : "Category Spend";
+        }
       }
 
-      if (additionalParams.isNeuPass && additionalParams.isNeuPassCategory) {
+      if (additionalParams.isNeuPassTransaction) {
         rate += hdfcCardRewards["Tata Neu Infinity"].neuPassRate;
         rateType += "-neupass";
-        category = "NeuPass Category";
       }
 
       const points = Math.floor(amount * rate);
@@ -2083,22 +2105,36 @@ export const calculateHDFCRewards = (cardName, amount, mcc, additionalParams = {
   return applyCapping(result, cardReward, cardName);
 };
 
-const applyCapping = (result, cardReward, cardName) => {
-  let { points, cashback, rate, rateType, category, appliedCap, cappedAmount } = result;
+const applyCapping = (result, cardReward, cardName, amount) => {
+  let { points, rate, rateType, category } = result;
+  let cappedPoints = points;
+  let appliedCap = null;
 
-  const rewardText = generateRewardText(cardName, points, cashback, rate, rateType, category, appliedCap);
+  if (cardReward.capping && cardReward.capping.categories) {
+    const cappingCategory = cardReward.capping.categories[category];
+    if (cappingCategory) {
+      const { points: maxPoints, maxSpent } = cappingCategory;
+      const cappedAmount = Math.min(result.amount, maxSpent);
+      cappedPoints = Math.min(points, maxPoints);
+
+      if (cappedPoints < points) {
+        appliedCap = { category, maxPoints, maxSpent };
+      }
+    }
+  }
+
+  const rewardText = generateRewardText(cardName, cappedPoints, 0, rate, rateType, category, appliedCap);
 
   return {
-    points: points || 0,
-    cashback: cashback || 0,
+    points: cappedPoints,
+    cashback: 0,
     rewardText,
-    uncappedPoints: points || 0,
-    cappedPoints: points || 0,
+    uncappedPoints: points,
+    cappedPoints,
     appliedCap,
     rateUsed: rate,
     rateType,
-    category,
-    cappedAmount
+    category
   };
 };
 

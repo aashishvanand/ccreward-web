@@ -1,18 +1,72 @@
 import { mccList } from '../data/mccData';
 export const axisCardRewards = {
   "ACE": {
-    defaultRate: 1 / 100,
-    mccRates: {},
-    calculateRewards: (amount, mcc, additionalParams) => {
-      const rate = axisCardRewards.ACE.defaultRate;
-      const category = "Other Spends";
-      const rateType = "default";
-      const points = Math.floor(amount * rate);
-      return { points, rate, rateType, category };
-    },
-    dynamicInputs: () => []
+  cardType: "cashback",
+  defaultRate: 1.5 / 100,
+  mccRates: {
+    // Google Pay bill payments, DTH, and mobile recharges
+    "4814": 5 / 100, "4816": 5 / 100, "4899": 5 / 100, "4900": 5 / 100,
+    // Swiggy, Zomato & Ola
+    "5812": 4 / 100, "5814": 4 / 100, "4121": 4 / 100,
+    // Excluded categories
+    "5541": 0, "5542": 0, "5983": 0, // Fuel
+    "5944": 0, // Jewelry
+    "5960": 0, "6300": 0, "6381": 0, // Insurance
+    "6011": 0, "6012": 0, "6051": 0, // Financial institutions
+    "6513": 0, // Rental payments
+    "6540": 0, // Wallet load
+    "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0, // Educational services
+    "9399": 0, "9311": 0, "9222": 0, "9402": 0 // Government services
   },
+  capping: {
+    categories: {
+      "Google Pay and Food Delivery": { cashback: 500, maxSpent: 10000 } // Combined cap for 5% and 4% categories
+    }
+  },
+  calculateRewards: (amount, mcc, additionalParams) => {
+    let rate = axisCardRewards.ACE.defaultRate;
+    let category = "Other Spends";
+    let rateType = "default";
+
+    if (additionalParams.isGooglePay && ["4814", "4816", "4899", "4900"].includes(mcc)) {
+      rate = 5 / 100;
+      category = "Google Pay Bill Payments";
+      rateType = "google-pay";
+    } else if (["5812", "5814", "4121"].includes(mcc)) {
+      rate = 4 / 100;
+      category = "Food Delivery and Ola";
+      rateType = "food-and-ola";
+    } else if (axisCardRewards.ACE.mccRates[mcc] !== undefined) {
+      rate = axisCardRewards.ACE.mccRates[mcc];
+      rateType = "mcc-specific";
+      category = rate === 0 ? "Excluded Category" : "Category Spend";
+    }
+
+    const cashback = amount * rate;
+
+    return {cashback, rate, rateType, category };
+  },
+  dynamicInputs: (currentInputs, onChange, selectedMcc) => {
+    if (["4814", "4816", "4899", "4900"].includes(selectedMcc)) {
+      return [
+        {
+          type: 'radio',
+          label: 'Is this a Google Pay transaction?',
+          name: 'isGooglePay',
+          options: [
+            { label: 'Yes', value: true },
+            { label: 'No', value: false }
+          ],
+          value: currentInputs.isGooglePay || false,
+          onChange: (value) => onChange('isGooglePay', value === 'true')
+        }
+      ];
+    }
+    return [];
+  }
+},
   "Atlas": {
+    cardType: "points",
     defaultRate: 2 / 100,
     mccRates: {
       // Airlines and Hotels (5X rewards)
@@ -132,6 +186,7 @@ export const axisCardRewards = {
     dynamicInputs: () => []
   },
   "Aura": {
+    cardType: "points",
     defaultRate: 2 / 200, // 2 edge points per ₹200
     mccRates: {
       "6300": 5 / 200, // 5X EDGE REWARDS on insurance spends
@@ -158,6 +213,7 @@ export const axisCardRewards = {
     dynamicInputs: () => []
   },
   "Vistara": {
+    cardType: "points",
     defaultRate: 2 / 200, // 2 CV Points for every Rs 200 of eligible spends
     mccRates: {
       // Excluded categories
@@ -185,6 +241,7 @@ export const axisCardRewards = {
     dynamicInputs: () => []
   },
   "Vistara Infinite": {
+    cardType: "points",
     defaultRate: 6 / 200, // 6 CV Points for every Rs. 200 of eligible spends
     mccRates: {
       // Excluded categories
@@ -213,6 +270,7 @@ export const axisCardRewards = {
     dynamicInputs: () => []
   },
   "Vistara Signature": {
+    cardType: "points",
     defaultRate: 4 / 200, // 4 CV Points for every Rs. 200 of eligible spends
     mccRates: {
       // Excluded categories (same as Vistara card)
@@ -240,6 +298,7 @@ export const axisCardRewards = {
     dynamicInputs: () => []
   },
   "Flipkart": {
+    cardType: "cashback",
     defaultRate: 1 / 100, // 1% cashback
     mccRates: {
       // Flipkart and Cleartrip (assuming e-commerce MCC)
@@ -263,12 +322,13 @@ export const axisCardRewards = {
         category = "Preferred Merchant";
       }
 
-      const points = Math.floor(amount * rate);
-      return { points, rate, rateType, category };
+      const cashback = amount * rate;
+      return { cashback, rate, rateType, category };
     },
     dynamicInputs: () => []
   },
   "Flipkart Super Elite": {
+    cardType: "points",
     defaultRate: 2 / 100, // 2 SuperCoins per ₹100 on all other spends
     mccRates: {
       "5399": 6 / 100 // 6 SuperCoins per ₹100 for Flipkart purchases (non-Plus members)
@@ -320,6 +380,7 @@ export const axisCardRewards = {
     }
   },
   "Indian Oil": {
+    cardType: "points",
     defaultRate: 1 / 100, // 1 reward point per ₹100
     mccRates: {
       "5541": 20 / 100, // 20 reward points per ₹100 at IOCL fuel outlets
@@ -371,6 +432,7 @@ export const axisCardRewards = {
     ]
   },
   "Indian Oil Premium": {
+    cardType: "points",
     defaultRate: 1 / 150, // 1 EDGE MILE per ₹150
     mccRates: {
       "5541": 6 / 150, // 6 EDGE MILES per ₹150 at IOCL fuel outlets
@@ -401,6 +463,7 @@ export const axisCardRewards = {
     dynamicInputs: () => []
   },
   "Magnus": {
+    cardType: "points",
     defaultRate: 12 / 200, // 12 EDGE Reward Points for every INR 200
     mccRates: {
       // Excluded categories
@@ -476,6 +539,7 @@ export const axisCardRewards = {
     ]
   },
   "MyZone": {
+    cardType: "points",
     defaultRate: 4 / 200,
     mccRates: {},
     calculateRewards: (amount, mcc, additionalParams) => {
@@ -488,6 +552,7 @@ export const axisCardRewards = {
     dynamicInputs: () => []
   },
   "Neo": {
+    cardType: "points",
     defaultRate: 1 / 200,
     mccRates: {},
     calculateRewards: (amount, mcc, additionalParams) => {
@@ -500,6 +565,7 @@ export const axisCardRewards = {
     dynamicInputs: () => []
   },
   "Privilege": {
+    cardType: "points",
     defaultRate: 10 / 200, // 10 points on every Rs. 200 spent
     mccRates: {
       // Excluded categories
@@ -527,6 +593,7 @@ export const axisCardRewards = {
     dynamicInputs: () => []
   },
   "Reserve": {
+    cardType: "points",
     defaultRate: 15 / 200, // 15 edge points for every 200 spent
     internationalRate: 30 / 200, // 2x on international spends
     mccRates: {
@@ -573,6 +640,7 @@ export const axisCardRewards = {
     ]
   },
   "Rewards": {
+    cardType: "points",
     defaultRate: 2 / 125, // 2 EDGE REWARD points per ₹125
     mccRates: {
       "5311": 10 / 125, // 10X reward points on apparel and departmental stores
@@ -597,6 +665,7 @@ export const axisCardRewards = {
     dynamicInputs: () => []
   },
   "Select": {
+    cardType: "points",
     defaultRate: 10 / 200, // 10 Axis EDGE points on every Rs. 200 spends
     acceleratedRewards: {
       tier1: {
@@ -648,6 +717,7 @@ export const axisCardRewards = {
     dynamicInputs: () => []
   },
   "Voyage": {
+    cardType: "points",
     defaultRate: 3 / 200, // 3 SpiceClub Points for every Rs. 200 spent on other retail spends
     // SpiceJet mobile application & website
     spicejetRate: 18 / 200, // 6 SC Points (card benefit) + 12 SC Points (SpiceClub Silver Membership)
@@ -699,6 +769,7 @@ export const axisCardRewards = {
   },
 
   "Voyage Black": {
+    cardType: "points",
     defaultRate: 6 / 200, // 6 SpiceClub Points for every Rs. 200 spent on other retail spends
     // SpiceJet mobile application & website
     spicejetRate: 28 / 200, // 12 SC Points (card benefit) + 16 SC Points (SpiceClub Gold Membership)
@@ -750,6 +821,7 @@ export const axisCardRewards = {
   },
 
   "Horizon": {
+    cardType: "points",
     defaultRate: 2 / 100, // 2 EDGE Miles per INR 100 on all other spends
     mccRates: {
       // Excluded categories
@@ -883,84 +955,94 @@ export const axisCardRewards = {
     ]
   },
   "Samsung Signature": {
-    defaultRate: 5 / 100, // 5 reward points on all domestic & international spends per INR 100 spent
-    samsungRate: 10 / 100, // 10% cashback on Samsung purchases
-    mccRates: {
-      // Preferred merchants
-      "5812": 10 / 100, // Eating Places and Restaurants (for Zomato)
-      "5411": 10 / 100, // Grocery Stores and Supermarkets (for BigBasket)
-      "5651": 10 / 100, // Family Clothing Stores (for Myntra)
-      "5912": 10 / 100, // Drug Stores and Pharmacies (for Tata1mg)
-      "7299": 10 / 100, // Miscellaneous Personal Services (for Urban Clap)
+  cardType: "hybrid",
+  defaultRate: 5 / 100, // 5 reward points on all domestic & international spends per INR 100 spent
+  samsungRate: 10 / 100, // 10% cashback on Samsung purchases
+  mccRates: {
+    // Preferred merchants
+    "5812": 10 / 100, // Eating Places and Restaurants (for Zomato)
+    "5411": 10 / 100, // Grocery Stores and Supermarkets (for BigBasket)
+    "5651": 10 / 100, // Family Clothing Stores (for Myntra)
+    "5912": 10 / 100, // Drug Stores and Pharmacies (for Tata1mg)
+    "7299": 10 / 100, // Miscellaneous Personal Services (for Urban Clap)
 
-      // Excluded MCCs
-      "6012": 0, "6051": 0, "5541": 0, "5983": 0, "5542": 0, "5944": 0, "6011": 0, "6540": 0, "6513": 0
-    },
-    cashbackCap: {
-      "5732": { monthly: 2500, yearly: 10000 } // Cap for Samsung purchases
-    },
-    calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = axisCardRewards["Samsung Signature"].defaultRate;
-      let category = "Other Spends";
-      let rateType = "default";
-      let cashback = 0;
-  
-      if (additionalParams.isSamsungTransaction) {
-        rate = axisCardRewards["Samsung Signature"].samsungRate;
-        category = "Samsung Purchase";
-        rateType = "cashback";
-        cashback = amount * rate;
-      } else if (axisCardRewards["Samsung Signature"].mccRates[mcc]) {
-        rate = axisCardRewards["Samsung Signature"].mccRates[mcc];
-        rateType = "mcc-specific";
-        category = "Preferred Merchant";
-      }
-  
-      const points = rateType === "cashback" ? Math.floor(cashback) : Math.floor(amount * rate);
-      return { points, cashback, rate, rateType, category };
-    },
-    dynamicInputs: (currentInputs, onChange) => [
-      {
-        type: 'radio',
-        label: 'Is this a Samsung purchase?',
-        name: 'isSamsungTransaction',
-        options: [
-          { label: 'Yes', value: true },
-          { label: 'No', value: false }
-        ],
-        value: currentInputs.isSamsungTransaction || false,
-        onChange: (value) => onChange('isSamsungTransaction', value === 'true')
-      }
-    ]
+    // Excluded MCCs
+    "6012": 0, "6051": 0, "5541": 0, "5983": 0, "5542": 0, "5944": 0, "6011": 0, "6540": 0, "6513": 0
   },
+  capping: {
+    samsung: { maxCashback: 2500, period: "monthly" }
+  },
+  calculateRewards: (amount, mcc, additionalParams) => {
+    let rate = axisCardRewards["Samsung Signature"].defaultRate;
+    let category = "Other Spends";
+    let rateType = "default";
+    let cashback = 0;
+    let points = 0;
+
+    if (additionalParams.isSamsungTransaction) {
+      rate = axisCardRewards["Samsung Signature"].samsungRate;
+      category = "Samsung Purchase";
+      rateType = "cashback";
+      cashback = Math.min(amount * rate, axisCardRewards["Samsung Signature"].capping.samsung.maxCashback);
+    } else if (axisCardRewards["Samsung Signature"].mccRates[mcc]) {
+      rate = axisCardRewards["Samsung Signature"].mccRates[mcc];
+      rateType = "mcc-specific";
+      category = "Preferred Merchant";
+      points = Math.floor(amount * rate);
+    } else {
+      points = Math.floor(amount * rate);
+    }
+
+    return { points, cashback, rate, rateType, category };
+  },
+  dynamicInputs: (currentInputs, onChange) => [
+    {
+      type: 'radio',
+      label: 'Is this a Samsung purchase?',
+      name: 'isSamsungTransaction',
+      options: [
+        { label: 'Yes', value: true },
+        { label: 'No', value: false }
+      ],
+      value: currentInputs.isSamsungTransaction || false,
+      onChange: (value) => onChange('isSamsungTransaction', value === 'true')
+    }
+  ]
+},
 
   "Samsung Infinite": {
-    defaultRate: 5 / 100, // 5 EDGE REWARD POINTS on every Rs. 100 spent on all other domestic transactions
-    internationalRate: 15 / 100, // 15 EDGE REWARD POINTS on every Rs 100 spent on all international transactions
-    samsungRate: 10 / 100, // 10% cashback on Samsung purchases
-    mccRates: {
-      // Preferred partners
-      "5411": 15 / 100, // Grocery Stores and Supermarkets (for BigBasket)
-      "5912": 15 / 100, // Drug Stores and Pharmacies (for Tata1mg)
-      "7299": 15 / 100, // Miscellaneous Personal Services (for UrbanCompany)
-      "5651": 15 / 100, // Family Clothing Stores (for Myntra)
-      "5814": 15 / 100,  // Fast Food Restaurants (for Zomato)
+  cardType: "hybrid",
+  defaultRate: 5 / 100, // 5 EDGE REWARD POINTS on every Rs. 100 spent on all other domestic transactions
+  internationalRate: 15 / 100, // 15 EDGE REWARD POINTS on every Rs 100 spent on all international transactions
+  samsungRate: 10 / 100, // 10% cashback on Samsung purchases
+  mccRates: {
+    // Preferred partners
+    "5411": 15 / 100, // Grocery Stores and Supermarkets (for BigBasket)
+    "5912": 15 / 100, // Drug Stores and Pharmacies (for Tata1mg)
+    "7299": 15 / 100, // Miscellaneous Personal Services (for UrbanCompany)
+    "5651": 15 / 100, // Family Clothing Stores (for Myntra)
+    "5814": 15 / 100,  // Fast Food Restaurants (for Zomato)
 
-      // Excluded MCCs
-      "6012": 0, "6051": 0, "5541": 0, "5983": 0, "5542": 0, "5944": 0, "6011": 0, "6540": 0, "6513": 0
-    },
-    calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = axisCardRewards["Samsung Infinite"].defaultRate;
-      let category = "Other Spends";
-      let rateType = "default";
-      let cashback = 0;
+    // Excluded MCCs
+    "6012": 0, "6051": 0, "5541": 0, "5983": 0, "5542": 0, "5944": 0, "6011": 0, "6540": 0, "6513": 0
+  },
+  capping: {
+    samsung: { maxCashback: 5000, period: "monthly" }
+  },
+  calculateRewards: (amount, mcc, additionalParams) => {
+    let rate = axisCardRewards["Samsung Infinite"].defaultRate;
+    let category = "Other Spends";
+    let rateType = "default";
+    let cashback = 0;
+    let points = 0;
 
-      if (additionalParams.isSamsungTransaction) {
-        rate = axisCardRewards["Samsung Infinite"].samsungRate;
-        category = "Samsung Purchase";
-        rateType = "cashback";
-        cashback = amount * rate;
-      } else if (additionalParams.isInternational) {
+    if (additionalParams.isSamsungTransaction) {
+      rate = axisCardRewards["Samsung Infinite"].samsungRate;
+      category = "Samsung Purchase";
+      rateType = "cashback";
+      cashback = Math.min(amount * rate, axisCardRewards["Samsung Infinite"].capping.samsung.maxCashback);
+    } else {
+      if (additionalParams.isInternational) {
         rate = axisCardRewards["Samsung Infinite"].internationalRate;
         category = "International Transaction";
         rateType = "international";
@@ -969,42 +1051,44 @@ export const axisCardRewards = {
         rateType = "mcc-specific";
         category = "Preferred Merchant";
       }
+      points = Math.floor(amount * rate);
+    }
 
-      const points = rateType === "cashback" ? Math.floor(cashback * 100) : Math.floor(amount * rate);
-      return { points, cashback, rate, rateType, category };
-    },
-    dynamicInputs: (currentInputs, onChange) => [
-      {
-        type: 'radio',
-        label: 'Is this a Samsung purchase?',
-        name: 'isSamsungTransaction',
-        options: [
-          { label: 'Yes', value: true },
-          { label: 'No', value: false }
-        ],
-        value: currentInputs.isSamsungTransaction || false,
-        onChange: (value) => {
-          onChange('isSamsungTransaction', value === 'true');
-          if (value === 'true') {
-            onChange('isInternational', false);
-          }
-        }
-      },
-      {
-        type: 'radio',
-        label: 'Is this an international transaction?',
-        name: 'isInternational',
-        options: [
-          { label: 'Yes', value: true },
-          { label: 'No', value: false }
-        ],
-        value: currentInputs.isInternational || false,
-        onChange: (value) => onChange('isInternational', value === 'true'),
-        condition: (inputs) => !inputs.isSamsungTransaction
-      }
-    ]
+    return { points, cashback, rate, rateType, category };
   },
+  dynamicInputs: (currentInputs, onChange) => [
+    {
+      type: 'radio',
+      label: 'Is this a Samsung purchase?',
+      name: 'isSamsungTransaction',
+      options: [
+        { label: 'Yes', value: true },
+        { label: 'No', value: false }
+      ],
+      value: currentInputs.isSamsungTransaction || false,
+      onChange: (value) => {
+        onChange('isSamsungTransaction', value === 'true');
+        if (value === 'true') {
+          onChange('isInternational', false);
+        }
+      }
+    },
+    {
+      type: 'radio',
+      label: 'Is this an international transaction?',
+      name: 'isInternational',
+      options: [
+        { label: 'Yes', value: true },
+        { label: 'No', value: false }
+      ],
+      value: currentInputs.isInternational || false,
+      onChange: (value) => onChange('isInternational', value === 'true'),
+      condition: (inputs) => !inputs.isSamsungTransaction
+    }
+  ]
+},
   "Shoppers Stop": {
+    cardType: "points",
     defaultRate: 2 / 200, // 2 FC reward points on every INR 200 spent for all other spends
     shoppersStopExclusiveBrands: 20 / 200, // 20 FC Reward Points per INR 200 spent on Shoppers Stop Exclusive Brands
     shoppersStopOtherBrands: 12 / 200, // 12 FC Reward Points per INR 200 spent on other Shoppers Brands
@@ -1067,6 +1151,7 @@ export const axisCardRewards = {
     }
   },
   "Airtel": {
+    cardType: "cashback",
     defaultRate: 1 / 100, // 1% cashback on all other merchants/spends
     airtelRate: 25 / 100, // 25% cashback on Airtel Thanks App transactions
     mccRates: {
@@ -1157,6 +1242,7 @@ export const axisCardRewards = {
     }
   },
   "Miles & More World Select": {
+    cardType: "points",
     defaultRate: 6 / 200, // 6 Award Miles per Rs. 200 of eligible spends
     mccRates: {
     },
@@ -1184,6 +1270,7 @@ export const axisCardRewards = {
     dynamicInputs: () => []
   },
   "Freecharge": {
+    cardType: "points",
     defaultRate: 1 / 100, // 1 EDGE REWARD Point per Rs. 100 spent
     milestoneRewards: {
       tier1: { minSpend: 2000, maxSpend: 4999, points: 100 },
@@ -1229,6 +1316,7 @@ export const axisCardRewards = {
   },
 
   "Freecharge Plus": {
+    cardType: "cashback",
     defaultRate: 1 / 100, // 1% cashback on other spends
     freechargeRate: 5 / 100, // 5% cashback on Freecharge transactions
     mccRates: {
@@ -1256,8 +1344,8 @@ export const axisCardRewards = {
         category = rate === 0 ? "Excluded Category" : (["4121", "4131", "4111", "7512"].includes(mcc) ? "Local Commute" : "Category Spend");
       }
   
-      const points = Math.floor(amount * rate * 100); // Convert to points (1 point = ₹1)
-      return { points, rate, rateType, category };
+      const cashback = amount * rate;
+      return { cashback, rate, rateType, category };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -1275,6 +1363,7 @@ export const axisCardRewards = {
   },
 
   "LIC": {
+    cardType: "points",
     defaultRate: 1 / 100, // 1 Reward point for every ₹ 100 spent on all other transactions
     licPremiumRate: 2 / 100, // 2 Reward points for every ₹ 100 spent on LIC Premium payment
     internationalRate: 2 / 100, // 2 Reward points for every ₹ 100 spent on foreign currency transactions
@@ -1357,58 +1446,123 @@ export const calculateAxisRewards = (cardName, amount, mcc, additionalParams = {
 
   const result = cardReward.calculateRewards(amount, mcc, additionalParams);
 
-  return applyCapping(result, cardReward, cardName, amount);
+  if (cardName === "Samsung Infinite" || cardName === "Samsung Signature") {
+    return applyHybridCapping(result, cardReward, cardName);
+  } else if (cardName === "Flipkart" || cardReward.cardType === "cashback") {
+    return applyCashbackCapping(result, cardReward, cardName);
+  } else {
+    return applyPointsCapping(result, cardReward, cardName);
+  }
 };
 
-const applyCapping = (result, cardReward, cardName, amount) => {
+const applyHybridCapping = (result, cardReward, cardName) => {
   let { points, cashback, rate, rateType, category } = result;
   let cappedPoints = points;
   let cappedCashback = cashback;
   let appliedCap = null;
 
-  if (cardReward.capping && cardReward.capping.categories && category) {
-    const cappingCategory = cardReward.capping.categories[category];
-    if (cappingCategory) {
-      if (cardName === "Airtel") {
-        const { maxCashback, maxSpent } = cappingCategory;
-        const cappedAmount = Math.min(amount, maxSpent);
-        cappedCashback = Math.min(cashback, maxCashback, cappedAmount * rate);
-
-        if (cappedCashback < cashback) {
-          appliedCap = { category, maxCashback, maxSpent };
-        }
-      } else {
-        const { points: maxPoints, maxSpent } = cappingCategory;
-        const cappedAmount = Math.min(amount, maxSpent);
-        cappedPoints = Math.min(points, maxPoints, Math.floor(cappedAmount * rate));
-
-        if (cappedPoints < points) {
-          appliedCap = { category, maxPoints, maxSpent };
-        }
-      }
+  if (category === "Samsung Purchase") {
+    const maxCashback = cardReward.capping.samsung.maxCashback;
+    if (cashback > maxCashback) {
+      cappedCashback = maxCashback;
+      appliedCap = {
+        category: "Samsung Purchase",
+        maxCashback: maxCashback,
+        period: cardReward.capping.samsung.period
+      };
     }
   }
 
-  const rewardText = generateRewardText(cardName, cappedPoints, cappedCashback, rate, rateType, category, appliedCap);
+  const rewardText = generateHybridRewardText(cardName, cappedPoints, cappedCashback, rate, rateType, category, appliedCap);
 
   return {
     points: cappedPoints,
     cashback: cappedCashback,
     rewardText,
     uncappedPoints: points,
+    uncappedCashback: cashback,
     cappedPoints,
+    cappedCashback,
     appliedCap,
     rateUsed: rate,
-    rateType
+    rateType,
+    category
   };
 };
 
-const generateRewardText = (cardName, points, cashback, rate, rateType, category, appliedCap) => {
+const applyCashbackCapping = (result, cardReward, cardName) => {
+  let { cashback, rate, rateType, category } = result;
+  let cappedCashback = cashback;
+  let appliedCap = null;
+
+  if (cardReward.capping && cardReward.capping.categories && category) {
+    const cappingCategory = cardReward.capping.categories[category];
+    if (cappingCategory) {
+      const { maxCashback, maxSpent } = cappingCategory;
+      cappedCashback = Math.min(cashback, maxCashback);
+
+      if (cappedCashback < cashback) {
+        appliedCap = { category, maxCashback, maxSpent };
+      }
+    }
+  }
+
+  const rewardText = generateRewardText(cardName, null, cappedCashback, rate, rateType, category, appliedCap, "cashback");
+
+  return {
+    cashback: cappedCashback,
+    rewardText,
+    uncappedCashback: cashback,
+    cappedCashback,
+    appliedCap,
+    rateUsed: rate,
+    rateType,
+    category
+  };
+};
+
+const applyPointsCapping = (result, cardReward, cardName) => {
+  let { points, rate, rateType, category } = result;
+  let cappedPoints = points;
+  let appliedCap = null;
+
+  if (cardReward.capping && cardReward.capping.categories && category) {
+    const cappingCategory = cardReward.capping.categories[category];
+    if (cappingCategory) {
+      const { points: maxPoints, maxSpent } = cappingCategory;
+      cappedPoints = Math.min(points, maxPoints);
+
+      if (cappedPoints < points) {
+        appliedCap = { category, maxPoints, maxSpent };
+      }
+    }
+  }
+
+  const rewardText = generatePointsRewardText(cardName, cappedPoints, rate, rateType, category, appliedCap);
+
+  return {
+    points: cappedPoints,
+    rewardText,
+    uncappedPoints: points,
+    cappedPoints,
+    appliedCap,
+    rateUsed: rate,
+    rateType,
+    category
+  };
+};
+
+const generatePointsRewardText = (cardName, points, rate, rateType, category, appliedCap) => {
   let rewardText = "";
 
   switch (cardName) {
     case "Atlas":
       rewardText = rate === 0 ? "No EDGE Miles for this transaction" : `${points} EDGE Miles`;
+      break;
+    case "Vistara":
+    case "Vistara Signature":
+    case "Vistara Infinite":
+      rewardText = rate === 0 ? "No CV Points for this transaction" : `${points} CV Points`;
       break;
     case "Flipkart Super Elite":
       rewardText = `${points} SuperCoins`;
@@ -1418,18 +1572,9 @@ const generateRewardText = (cardName, points, cashback, rate, rateType, category
         rewardText += " (Regular Flipkart rate applied)";
       }
       break;
-    case "Airtel":
-      rewardText = `₹${cashback.toFixed(2)} Cashback`;
-      if (category !== "Other Spends") {
-        rewardText += ` (${category})`;
-      }
-      if (appliedCap) {
-        rewardText += ` (Capped at ₹${appliedCap.maxCashback})`;
-      }
-      break;
     default:
       rewardText = rate === 0 ? "No Axis Reward Points for this transaction" : `${points} Axis Reward Points`;
-    }
+  }
 
   if (category !== "Other Spends" && !rewardText.includes(category)) {
     rewardText += ` (${category})`;
@@ -1441,6 +1586,55 @@ const generateRewardText = (cardName, points, cashback, rate, rateType, category
 
   return rewardText;
 };
+
+const generateRewardText = (cardName, points, cashback, rate, rateType, category, appliedCap, cardType) => {
+  if (cardName === "Samsung Infinite") {
+    return generateHybridRewardText(cardName, points, cashback, rate, rateType, category, appliedCap);
+  } else if (cardType === "cashback") {
+    return generateCashbackRewardText(cardName, cashback, rate, rateType, category, appliedCap);
+  } else {
+    return generatePointsRewardText(cardName, points, rate, rateType, category, appliedCap);
+  }
+};
+
+const generateHybridRewardText = (cardName, points, cashback, rate, rateType, category, appliedCap) => {
+  let rewardText = "";
+
+  if (cashback > 0) {
+    rewardText = `₹${cashback.toFixed(2)} Cashback`;
+  } else {
+    rewardText = `${points} EDGE REWARD POINTS`;
+  }
+
+  if (category !== "Other Spends") {
+    rewardText += ` (${category})`;
+  }
+
+  if (appliedCap) {
+    if (cashback > 0) {
+      rewardText += ` (Capped at ₹${appliedCap.maxCashback})`;
+    } else {
+      rewardText += ` (Capped at ${appliedCap.maxPoints} points)`;
+    }
+  }
+
+  return rewardText;
+};
+
+const generateCashbackRewardText = (cardName, cashback, rate, rateType, category, appliedCap) => {
+  let rewardText = rate === 0 ? "No cashback for this transaction" : `₹${cashback.toFixed(2)} Cashback`;
+
+  if (category !== "Other Spends" && !rewardText.includes(category)) {
+    rewardText += ` (${category})`;
+  }
+
+  if (appliedCap) {
+    rewardText += ` (Capped at ₹${appliedCap.maxCashback})`;
+  }
+
+  return rewardText;
+};
+
 
 export const getCardInputs = (cardName, currentInputs, onChange) => {
   const cardReward = axisCardRewards[cardName];
