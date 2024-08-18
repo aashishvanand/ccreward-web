@@ -56,14 +56,22 @@ import {
 // import { indusIndCardRewards, calculateIndusIndRewards, getCardInputs as getIndusIndCardInputs } from "../utils/indusindRewards";
 // import { kotakCardRewards, calculateKotakRewards, getCardInputs as getKotakCardInputs } from "../utils/kotakRewards";
 // import { rblCardRewards, calculateRBLRewards, getCardInputs as getRBLCardInputs } from "../utils/rblRewards";
-// import { sbiCardRewards, calculateSBIRewards, getCardInputs as getSBICardInputs } from "../utils/sbiRewards";
+import {
+  sbiCardRewards,
+  calculateSBIRewards,
+  getCardInputs as getSBICardInputs,
+} from "../utils/sbiRewards";
 // import { auCardRewards, calculateAURewards, getCardInputs as getAUCardInputs } from "../utils/auRewards";
 // import { bobCardRewards, calculateBOBRewards, getCardInputs as getBOBCardInputs } from "../utils/bobRewards";
 // import { federalCardRewards, calculateFederalRewards, getCardInputs as getFederalCardInputs } from "../utils/federalRewards";
 // import { hsbcCardRewards, calculateHSBCRewards, getCardInputs as getHSBCCardInputs } from "../utils/hsbcRewards";
 // import { idbiCardRewards, calculateIDBIRewards, getCardInputs as getIDBICardInputs } from "../utils/idbiRewards";
 // import { yesCardRewards, calculateYesRewards, getCardInputs as getYesCardInputs } from "../utils/yesRewards";
-import { amexCardRewards, calculateAmexRewards, getCardInputs as getAmexCardInputs } from "../utils/amexRewards";
+import {
+  amexCardRewards,
+  calculateAmexRewards,
+  getCardInputs as getAmexCardInputs,
+} from "../utils/amexRewards";
 import DynamicCardInputs from "./DynamicCardInputs";
 import IncorrectRewardReportForm from "./IncorrectRewardReportForm";
 
@@ -260,7 +268,7 @@ const CreditCardRewardsCalculator = () => {
   const getCardConfig = (bank, card) => {
     switch (bank) {
       case "AMEX":
-      return amexCardRewards[card];
+        return amexCardRewards[card];
       case "ICICI":
         return iciciCardRewards[card];
       case "HDFC":
@@ -492,7 +500,7 @@ const CreditCardRewardsCalculator = () => {
       setCalculationResult(result);
       setCalculationPerformed(true);
 
-      const hasReward = result.points > 0 || result.cashback > 0;
+      const hasReward = result.points > 0 || result.cashback > 0 || result.miles > 0;
       if (hasReward && firstSuccessfulSearch) {
         setShowConfetti(true);
         setFirstSuccessfulSearch(false);
@@ -806,74 +814,68 @@ const CreditCardRewardsCalculator = () => {
             </Button>
           )}
 
-          {calculationPerformed && calculationResult && (
-            <Paper
-              elevation={3}
-              sx={{
-                p: 2,
-                mt: 2,
-                width: "100%",
-                bgcolor:
-                  calculationResult.points > 0 || calculationResult.cashback > 0
-                    ? "success.light"
-                    : "error.light",
-                borderRadius: 2,
-              }}
-            >
-              <Typography
-                variant="h6"
-                align="center"
-                color="textPrimary"
-                fontWeight="bold"
-                sx={{
-                  fontSize: { xs: "1rem", sm: "1.25rem" },
-                  whiteSpace: "normal",
-                  wordBreak: "break-word",
-                }}
-              >
-                {calculationResult.points > 0 ||
-                calculationResult.cashback > 0 ? (
-                  <>
-                    🎉 {calculationResult.rewardText} 🎉
-                    {calculationResult.appliedCap && (
-                      <Typography variant="body2" color="textSecondary">
-                        {`${
-                          calculationResult.appliedCap.category
-                        } cap applied: Max ${
-                          calculationResult.appliedCap.maxPoints ||
-                          calculationResult.appliedCap.maxCashback
-                        } ${calculationResult.points ? "points" : "cashback"}${
-                          calculationResult.appliedCap.maxSpent
-                            ? ` or ₹${calculationResult.appliedCap.maxSpent.toFixed(
-                                2
-                              )} spent`
-                            : ""
-                        }`}
-                      </Typography>
-                    )}
-                    {calculationResult.uncappedPoints &&
-                      calculationResult.uncappedPoints !==
-                        calculationResult.points && (
-                        <Typography variant="body2" color="textSecondary">
-                          (Uncapped: {calculationResult.uncappedPoints} points)
-                        </Typography>
-                      )}
-                    {calculationResult.uncappedCashback &&
-                      calculationResult.uncappedCashback !==
-                        calculationResult.cashback && (
-                        <Typography variant="body2" color="textSecondary">
-                          (Uncapped: ₹
-                          {calculationResult.uncappedCashback.toFixed(2)}{" "}
-                          cashback)
-                        </Typography>
-                      )}
-                  </>
-                ) : (
-                  <>😢 No rewards earned 😢</>
-                )}
-              </Typography>
-            </Paper>
+{calculationPerformed && calculationResult && (
+  <Paper
+    elevation={3}
+    sx={{
+      p: 2,
+      mt: 2,
+      width: "100%",
+      bgcolor: (calculationResult.points > 0 || calculationResult.cashback > 0 || calculationResult.miles > 0)
+        ? "success.light"
+        : "error.light",
+      borderRadius: 2,
+    }}
+  >
+    <Typography
+      variant="h6"
+      align="center"
+      color="textPrimary"
+      fontWeight="bold"
+      sx={{
+        fontSize: { xs: "1rem", sm: "1.25rem" },
+        whiteSpace: "normal",
+        wordBreak: "break-word",
+      }}
+    >
+      {(calculationResult.points > 0 || calculationResult.cashback > 0 || calculationResult.miles > 0) ? (
+        <>
+          🎉 {calculationResult.rewardText} 🎉
+          {calculationResult.appliedCap && (
+            <Typography variant="body2" color="textSecondary">
+              {`${calculationResult.appliedCap.category} cap applied: Max ${
+                calculationResult.appliedCap.maxPoints ||
+                calculationResult.appliedCap.maxCashback ||
+                calculationResult.appliedCap.maxMiles
+              } ${calculationResult.points ? "points" : (calculationResult.cashback ? "cashback" : "miles")}${
+                calculationResult.appliedCap.maxSpent
+                  ? ` or ₹${calculationResult.appliedCap.maxSpent.toFixed(2)} spent`
+                  : ""
+              }`}
+            </Typography>
           )}
+          {calculationResult.uncappedPoints > 0 && calculationResult.uncappedPoints !== calculationResult.points && (
+            <Typography variant="body2" color="textSecondary">
+              (Uncapped: {calculationResult.uncappedPoints} points)
+            </Typography>
+          )}
+          {calculationResult.uncappedCashback > 0 && calculationResult.uncappedCashback !== calculationResult.cashback && (
+            <Typography variant="body2" color="textSecondary">
+              (Uncapped: ₹{calculationResult.uncappedCashback.toFixed(2)} cashback)
+            </Typography>
+          )}
+          {calculationResult.uncappedMiles > 0 && calculationResult.uncappedMiles !== calculationResult.miles && (
+            <Typography variant="body2" color="textSecondary">
+              (Uncapped: {calculationResult.uncappedMiles} miles)
+            </Typography>
+          )}
+        </>
+      ) : (
+        <>😢 No rewards earned 😢</>
+      )}
+    </Typography>
+  </Paper>
+)}
         </Paper>
       </Container>
       <Snackbar
