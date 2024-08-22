@@ -287,20 +287,4 @@ function LoginPage() {
   );
 }
 
-function base64UrlDecode(input) {
-  input = input.replace(/-/g, "+").replace(/_/g, "/");
-  const pad = input.length % 4;
-  if (pad) {
-    input += new Array(5 - pad).join("=");
-  }
-  return Uint8Array.from(atob(input), (c) => c.charCodeAt(0));
-}
-
-function base64UrlEncode(arrayBuffer) {
-  return btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=/g, "");
-}
-
 export default withTheme(LoginPage);
