@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useRouter } from "next/router";
 import {
   ThemeProvider,
   createTheme,
@@ -140,6 +141,7 @@ const CreditCardRewardsCalculator = () => {
   });
   const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] =
     useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setAdditionalInputs({}); // Reset additional inputs when bank or card changes
@@ -303,6 +305,16 @@ const CreditCardRewardsCalculator = () => {
         return yesCardRewards[card];
       default:
         return null;
+    }
+  };
+
+  const handleAddCard = () => {
+    if (isAuthenticated) {
+      // Logic to add the card to the user's account
+      // This could involve making an API call to your backend
+      console.log("Adding card to user's account");
+    } else {
+      router.push("/signin");
     }
   };
 
@@ -500,7 +512,8 @@ const CreditCardRewardsCalculator = () => {
       setCalculationResult(result);
       setCalculationPerformed(true);
 
-      const hasReward = result.points > 0 || result.cashback > 0 || result.miles > 0;
+      const hasReward =
+        result.points > 0 || result.cashback > 0 || result.miles > 0;
       if (hasReward && firstSuccessfulSearch) {
         setShowConfetti(true);
         setFirstSuccessfulSearch(false);
@@ -601,6 +614,7 @@ const CreditCardRewardsCalculator = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      {/* <Topbar /> */}
       {showConfetti && (
         <Confetti
           width={windowDimensions.width}
@@ -814,68 +828,91 @@ const CreditCardRewardsCalculator = () => {
             </Button>
           )}
 
-{calculationPerformed && calculationResult && (
-  <Paper
-    elevation={3}
-    sx={{
-      p: 2,
-      mt: 2,
-      width: "100%",
-      bgcolor: (calculationResult.points > 0 || calculationResult.cashback > 0 || calculationResult.miles > 0)
-        ? "success.light"
-        : "error.light",
-      borderRadius: 2,
-    }}
-  >
-    <Typography
-      variant="h6"
-      align="center"
-      color="textPrimary"
-      fontWeight="bold"
-      sx={{
-        fontSize: { xs: "1rem", sm: "1.25rem" },
-        whiteSpace: "normal",
-        wordBreak: "break-word",
-      }}
-    >
-      {(calculationResult.points > 0 || calculationResult.cashback > 0 || calculationResult.miles > 0) ? (
-        <>
-          🎉 {calculationResult.rewardText} 🎉
-          {calculationResult.appliedCap && (
-            <Typography variant="body2" color="textSecondary">
-              {`${calculationResult.appliedCap.category} cap applied: Max ${
-                calculationResult.appliedCap.maxPoints ||
-                calculationResult.appliedCap.maxCashback ||
-                calculationResult.appliedCap.maxMiles
-              } ${calculationResult.points ? "points" : (calculationResult.cashback ? "cashback" : "miles")}${
-                calculationResult.appliedCap.maxSpent
-                  ? ` or ₹${calculationResult.appliedCap.maxSpent.toFixed(2)} spent`
-                  : ""
-              }`}
-            </Typography>
+          {calculationPerformed && calculationResult && (
+            <Paper
+              elevation={3}
+              sx={{
+                p: 2,
+                mt: 2,
+                width: "100%",
+                bgcolor:
+                  calculationResult.points > 0 ||
+                  calculationResult.cashback > 0 ||
+                  calculationResult.miles > 0
+                    ? "success.light"
+                    : "error.light",
+                borderRadius: 2,
+              }}
+            >
+              <Typography
+                variant="h6"
+                align="center"
+                color="textPrimary"
+                fontWeight="bold"
+                sx={{
+                  fontSize: { xs: "1rem", sm: "1.25rem" },
+                  whiteSpace: "normal",
+                  wordBreak: "break-word",
+                }}
+              >
+                {calculationResult.points > 0 ||
+                calculationResult.cashback > 0 ||
+                calculationResult.miles > 0 ? (
+                  <>
+                    🎉 {calculationResult.rewardText} 🎉
+                    {calculationResult.appliedCap && (
+                      <Typography variant="body2" color="textSecondary">
+                        {`${
+                          calculationResult.appliedCap.category
+                        } cap applied: Max ${
+                          calculationResult.appliedCap.maxPoints ||
+                          calculationResult.appliedCap.maxCashback ||
+                          calculationResult.appliedCap.maxMiles
+                        } ${
+                          calculationResult.points
+                            ? "points"
+                            : calculationResult.cashback
+                            ? "cashback"
+                            : "miles"
+                        }${
+                          calculationResult.appliedCap.maxSpent
+                            ? ` or ₹${calculationResult.appliedCap.maxSpent.toFixed(
+                                2
+                              )} spent`
+                            : ""
+                        }`}
+                      </Typography>
+                    )}
+                    {calculationResult.uncappedPoints > 0 &&
+                      calculationResult.uncappedPoints !==
+                        calculationResult.points && (
+                        <Typography variant="body2" color="textSecondary">
+                          (Uncapped: {calculationResult.uncappedPoints} points)
+                        </Typography>
+                      )}
+                    {calculationResult.uncappedCashback > 0 &&
+                      calculationResult.uncappedCashback !==
+                        calculationResult.cashback && (
+                        <Typography variant="body2" color="textSecondary">
+                          (Uncapped: ₹
+                          {calculationResult.uncappedCashback.toFixed(2)}{" "}
+                          cashback)
+                        </Typography>
+                      )}
+                    {calculationResult.uncappedMiles > 0 &&
+                      calculationResult.uncappedMiles !==
+                        calculationResult.miles && (
+                        <Typography variant="body2" color="textSecondary">
+                          (Uncapped: {calculationResult.uncappedMiles} miles)
+                        </Typography>
+                      )}
+                  </>
+                ) : (
+                  <>😢 No rewards earned 😢</>
+                )}
+              </Typography>
+            </Paper>
           )}
-          {calculationResult.uncappedPoints > 0 && calculationResult.uncappedPoints !== calculationResult.points && (
-            <Typography variant="body2" color="textSecondary">
-              (Uncapped: {calculationResult.uncappedPoints} points)
-            </Typography>
-          )}
-          {calculationResult.uncappedCashback > 0 && calculationResult.uncappedCashback !== calculationResult.cashback && (
-            <Typography variant="body2" color="textSecondary">
-              (Uncapped: ₹{calculationResult.uncappedCashback.toFixed(2)} cashback)
-            </Typography>
-          )}
-          {calculationResult.uncappedMiles > 0 && calculationResult.uncappedMiles !== calculationResult.miles && (
-            <Typography variant="body2" color="textSecondary">
-              (Uncapped: {calculationResult.uncappedMiles} miles)
-            </Typography>
-          )}
-        </>
-      ) : (
-        <>😢 No rewards earned 😢</>
-      )}
-    </Typography>
-  </Paper>
-)}
         </Paper>
       </Container>
       <Snackbar
