@@ -1,5 +1,4 @@
-'use client';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -18,6 +17,7 @@ import {
   Tabs,
   Tab,
   Alert,
+  AlertTitle,
   Snackbar,
   IconButton,
 } from '@mui/material';
@@ -28,6 +28,7 @@ import {
   Fingerprint,
   Brightness4,
   Brightness7,
+  Close as CloseIcon,
 } from "@mui/icons-material";
 import { useRouter } from 'next/navigation';
 import { useTheme, withTheme } from './ThemeRegistry';
@@ -46,6 +47,10 @@ function LoginPage() {
     severity: "info",
   });
 
+  useEffect(() => {
+    // Clear error when tab changes
+    setError('');
+  }, [tab]);
 
   const showSnackbar = (message, severity = "info") => {
     setSnackbar({ open: true, message, severity });
@@ -55,10 +60,14 @@ function LoginPage() {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  const handleErrorClose = () => {
+    setError('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-  
+    setError(''); // Clear any existing error
+
     if (!email) {
       showSnackbar("Please enter an email address", "error");
       return;
@@ -72,8 +81,6 @@ function LoginPage() {
       const hostname = window.location.hostname;
       let rpID = hostname;
   
-      console.log('Using rpID:', rpID); // Log the rpID for debugging
-  
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: {
@@ -81,14 +88,20 @@ function LoginPage() {
         },
         body: JSON.stringify({ email, rpId: rpID }),
       });
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Authentication request failed");
+
+      let responseData;
+      try {
+        responseData = await response.json();
+      } catch (jsonError) {
+        throw new Error('Invalid response from server. Please try again.');
       }
-  
-      const options = await response.json();
-  
+
+      if (!response.ok) {
+        throw new Error(responseData.message || "Authentication request failed");
+      }
+
+      const options = responseData;
+
       let credential;
       if (isSignUp) {
         credential = await navigator.credentials.create({
@@ -132,20 +145,24 @@ function LoginPage() {
       const verifyResponse = await fetch(`${API_BASE_URL}${verifyEndpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        Origin: window.location.origin,
         body: JSON.stringify({
           email,
           credential: preparedCredential,
         }),
       });
 
-      if (!verifyResponse.ok) {
-        const errorData = await verifyResponse.json();
-        throw new Error(errorData.message || "Verification failed");
+      let verifyResponseData;
+      try {
+        verifyResponseData = await verifyResponse.json();
+      } catch (jsonError) {
+        throw new Error('Invalid response from server during verification. Please try again.');
       }
 
-      const result = await verifyResponse.json();
-      if (result.success) {
+      if (!verifyResponse.ok) {
+        throw new Error(verifyResponseData.message || "Verification failed");
+      }
+
+      if (verifyResponseData.success) {
         showSnackbar(`${isSignUp ? "Sign up" : "Login"} successful!`, "success");
         router.push('/my-cards');
       } else {
@@ -157,6 +174,7 @@ function LoginPage() {
       showSnackbar(`${tab === 0 ? "Login" : "Sign up"} failed: ${error.message}`, "error");
     }
   };
+
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -173,58 +191,76 @@ function LoginPage() {
         </Toolbar>
       </AppBar>
 
-        <Container component="main" maxWidth="xs" sx={{ mt: 8, mb: 2 }}>
-          <Paper elevation={3} sx={{ p: 4, bgcolor: 'background.paper' }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <Typography component="h1" variant="h5">
-                {tab === 0 ? 'Sign in to your account' : 'Create an account'}
-              </Typography>
-              <Tabs 
-                value={tab} 
-                onChange={(e, newValue) => setTab(newValue)} 
-                sx={{ 
-                  mb: 3,
-                  '& .MuiTab-root': {
-                    color: 'text.secondary',
-                  },
-                  '& .Mui-selected': {
-                    color: 'primary.main',
-                  },
-                }}
+      <Container component="main" maxWidth="xs" sx={{ mt: 8, mb: 2 }}>
+        <Paper elevation={3} sx={{ p: 4, bgcolor: 'background.paper' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Typography component="h1" variant="h5">
+              {tab === 0 ? 'Sign in to your account' : 'Create an account'}
+            </Typography>
+            <Tabs 
+              value={tab} 
+              onChange={(e, newValue) => setTab(newValue)} 
+              sx={{ 
+                mb: 3,
+                '& .MuiTab-root': {
+                  color: 'text.secondary',
+                },
+                '& .Mui-selected': {
+                  color: 'primary.main',
+                },
+              }}
+            >
+              <Tab label="Sign In" />
+              <Tab label="Sign Up" />
+            </Tabs>
+            <Typography variant="body2" sx={{ mt: 1, mb: 3, color: 'text.secondary' }}>
+              Use your email to {tab === 0 ? 'sign in' : 'sign up'} with a secure passkey
+            </Typography>
+            {error && (
+              <Alert 
+                severity="error" 
+                sx={{ mt: 2, width: '100%' }}
+                action={
+                  <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    size="small"
+                    onClick={handleErrorClose}
+                  >
+                    <CloseIcon fontSize="inherit" />
+                  </IconButton>
+                }
               >
-                <Tab label="Sign In" />
-                <Tab label="Sign Up" />
-              </Tabs>
-              <Typography variant="body2" sx={{ mt: 1, mb: 3, color: 'text.secondary' }}>
-                Use your email to {tab === 0 ? 'sign in' : 'sign up'} with a secure passkey
-              </Typography>
-              <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                  autoFocus
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  sx={{ mt: 3, mb: 2 }}
-                  startIcon={<VpnKey />}
-                >
-                  {tab === 0 ? 'Sign in' : 'Sign up'} with Passkey
-                </Button>
-              </Box>
+                <AlertTitle>Error</AlertTitle>
+                {error}
+              </Alert>
+            )}
+            <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+              <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                autoFocus
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                sx={{ mt: 3, mb: 2 }}
+                startIcon={<VpnKey />}
+              >
+                {tab === 0 ? 'Sign in' : 'Sign up'} with Passkey
+              </Button>
             </Box>
+          </Box>
 
             <Divider sx={{ my: 3 }}>
               <Typography variant="body2" color="text.secondary">
@@ -264,22 +300,8 @@ function LoginPage() {
                 />
               </ListItem>
             </List>
-          </Paper>
-        </Container>
-
-        <Box component="footer" sx={{ py: 3, px: 2, mt: 'auto', backgroundColor: 'background.default' }}>
-          <Container maxWidth="sm">
-            <Typography variant="body2" color="text.secondary" align="center">
-              © 2024 CardCompare. All rights reserved.
-              <Link color="inherit" href="#" sx={{ ml: 2 }}>
-                Terms of Service
-              </Link>
-              <Link color="inherit" href="#" sx={{ ml: 2 }}>
-                Privacy
-              </Link>
-            </Typography>
-          </Container>
-        </Box>
+            </Paper>
+      </Container>
 
       <Snackbar
         open={snackbar.open}
@@ -295,7 +317,7 @@ function LoginPage() {
           {snackbar.message}
         </Alert>
       </Snackbar>
-      </Box>
+    </Box>
   );
 }
 
