@@ -1,7 +1,15 @@
 import dynamic from 'next/dynamic';
+import { AuthProvider } from '../app/providers/AuthContext';
+import { ThemeRegistry } from '../components/ThemeRegistry';
 
-const CreditCardRewardsCalculator = dynamic(() => import('../components/CreditCardRewardsCalculator'), { ssr: false });
+const CalculatorWrapper = dynamic(() => import('../components/Calculator'), { ssr: false });
 
 export default function CalculatorPage() {
-  return <CreditCardRewardsCalculator />;
+  return (
+    <ThemeRegistry>
+      <AuthProvider>
+        <CalculatorWrapper />
+      </AuthProvider>
+    </ThemeRegistry>
+  );
 }

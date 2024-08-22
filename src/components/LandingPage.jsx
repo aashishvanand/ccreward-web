@@ -1,5 +1,5 @@
 'use client';
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -12,6 +12,9 @@ import {
   Box,
   Link,
   IconButton,
+  CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import {
   CreditCard,
@@ -20,12 +23,20 @@ import {
   Bolt,
   Brightness4,
   Brightness7,
+  Google as GoogleIcon,
 } from "@mui/icons-material";
 import NextLink from "next/link";
-import { useTheme } from './ThemeRegistry';
+import { useRouter } from 'next/navigation';
+import { useAppTheme } from '../components/ThemeRegistry';
+import { useAuth } from '../app/providers/AuthContext';
 
 export default function LandingPage() {
- const { mode, toggleTheme } = useTheme();
+  const { mode, toggleTheme, theme } = useAppTheme();
+  const { signInWithGoogle, isAuthenticated, loading } = useAuth();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
 
   const banks = [
     "AMEX",
@@ -38,6 +49,26 @@ export default function LandingPage() {
     "SBI",
     "SC",
   ];
+
+  useEffect(() => {
+    if (!loading && isAuthenticated()) {
+      router.push('/my-cards');
+    }
+  }, [loading, isAuthenticated, router]);
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await signInWithGoogle();
+      router.push('/my-cards');
+    } catch (error) {
+      console.error("Error during Google sign in:", error);
+      setError("Failed to sign in. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -53,37 +84,37 @@ export default function LandingPage() {
         </Toolbar>
       </AppBar>
 
-        <Box
-          sx={{
-            bgcolor: "primary.main",
-            color: "primary.contrastText",
-            py: { xs: 8, md: 12, lg: 16 },
-          }}
-        >
-          <Container maxWidth="md">
-            <Typography variant="h2" align="center" gutterBottom>
-              Maximize Your Rewards with the Right Credit Card
-            </Typography>
-            <Typography variant="h5" align="center" paragraph>
-              Compare cards, calculate rewards, and find the perfect credit card
-              for your spending habits.
-            </Typography>
-            <Box
-              sx={{ mt: 4, display: "flex", justifyContent: "center", gap: 2 }}
+      <Box
+        sx={{
+          bgcolor: "primary.main",
+          color: "primary.contrastText",
+          py: { xs: 8, md: 12, lg: 16 },
+        }}
+      >
+        <Container maxWidth="md">
+          <Typography variant="h2" align="center" gutterBottom>
+            Maximize Your Rewards with the Right Credit Card
+          </Typography>
+          <Typography variant="h5" align="center" paragraph>
+            Compare cards, calculate rewards, and find the perfect credit card
+            for your spending habits.
+          </Typography>
+          <Box
+            sx={{ mt: 4, display: "flex", justifyContent: "center", gap: 2 }}
+          >
+            <Button
+              variant="contained"
+              color="secondary"
+              size="large"
+              startIcon={isLoading ? <CircularProgress size={24} color="inherit" /> : <GoogleIcon />}
+              onClick={handleGoogleSignIn}
+              disabled={isLoading}
             >
-              <NextLink href="/signin" passHref>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  size="large"
-                  component="a"
-                >
-                  Get Started
-                </Button>
-              </NextLink>
-            </Box>
-          </Container>
-        </Box>
+              {isLoading ? 'Signing In...' : 'Sign in with Google'}
+            </Button>
+          </Box>
+        </Container>
+      </Box>
 
         <Container sx={{ py: 8 }} maxWidth="lg">
           <Typography variant="h3" align="center" gutterBottom>

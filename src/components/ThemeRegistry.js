@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useMemo, createContext, useContext, useEffect } from 'react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider, createTheme, useTheme as useMuiTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
@@ -69,20 +69,11 @@ export function ThemeRegistry({ children }) {
   );
 }
 
-export const useTheme = () => {
+export const useAppTheme = () => {
   const context = useContext(ThemeContext);
+  const theme = useMuiTheme();
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeRegistry');
+    throw new Error('useAppTheme must be used within a ThemeRegistry');
   }
-  return context;
-};
-
-export const withTheme = (Component) => {
-  return function WrappedComponent(props) {
-    return (
-      <ThemeRegistry>
-        <Component {...props} />
-      </ThemeRegistry>
-    );
-  };
+  return { ...context, theme };
 };

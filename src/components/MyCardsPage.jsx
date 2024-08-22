@@ -21,6 +21,8 @@ import {
   AppBar,
   Toolbar,
   Link,
+  CircularProgress,
+  Avatar
 } from '@mui/material';
 import {
   CreditCard,
@@ -28,103 +30,108 @@ import {
   Delete as DeleteIcon,
   Brightness4,
   Brightness7,
+  Logout as LogoutIcon
 } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../app/providers/AuthProvider';
-import { useTheme, withTheme } from './ThemeRegistry';
-
-const API_BASE_URL = "https://credit-card-rewards-india-backend.aashishvanand.workers.dev";
+import { useAuth } from '../app/providers/AuthContext';
+import { useAppTheme } from '../components/ThemeRegistry';
+import { bankData } from '../data/bankData';  // Import the bank data
+import { db } from '../../firebase';  // Import the Firestore instance
+import { collection, addDoc, getDocs, deleteDoc, doc, query, where } from 'firebase/firestore';
 
 function MyCardsPage() {
-  const { mode, toggleTheme } = useTheme();
+  const { mode, toggleTheme, theme } = useAppTheme();
   const [cards, setCards] = useState([]);
   const [isAddCardDialogOpen, setIsAddCardDialogOpen] = useState(false);
   const [newCard, setNewCard] = useState({ bank: '', cardName: '' });
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  const auth = useAuth();
-  const isAuthenticated = auth?.isAuthenticated;
-  const token = auth?.token;
+  const { user, isAuthenticated, loading, logout } = useAuth();
 
   useEffect(() => {
-    if (!isAuthenticated || !isAuthenticated()) {
-      router.push('/signin');
-    } else {
-      fetchUserCards();
-    }
-  }, [isAuthenticated, router]);
+    const checkAuth = async () => {
+      console.log('Checking authentication...', { user, isAuthenticated: isAuthenticated(), loading });
+
+      if (loading) {
+        console.log('Auth is still loading...');
+        return;
+      }
+
+      if (!isAuthenticated()) {
+        console.log('User is not authenticated, redirecting to home page');
+        router.push('/');
+      } else {
+        console.log('User is authenticated, fetching cards');
+        await fetchUserCards();
+      }
+      setIsLoading(false);
+    };
+
+    checkAuth();
+  }, [isAuthenticated, router, user, loading]);
+
 
   const fetchUserCards = async () => {
-    if (!token) {
-      console.error('No token available');
+    if (!user) {
+      console.error('No user available');
       showSnackbar('Authentication error', 'error');
       return;
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/cards`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setCards(data.cards);
-      } else {
-        console.error('Failed to fetch cards');
-        showSnackbar('Failed to fetch cards', 'error');
-      }
+      const cardsCollection = collection(db, 'cards');
+      const q = query(cardsCollection, where("userId", "==", user.uid));
+      const querySnapshot = await getDocs(q);
+      const fetchedCards = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setCards(fetchedCards);
     } catch (error) {
       console.error('Error fetching cards:', error);
-      showSnackbar('Error fetching cards', 'error');
+      showSnackbar('Error fetching cards. Please try again later.', 'error');
     }
   };
 
   const handleAddCard = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/cards`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(newCard),
-      });
+      const cardData = {
+        userId: user.uid,
+        bank: newCard.bank,
+        cardName: newCard.cardName,
+        createdAt: new Date()
+      };
 
-      if (response.ok) {
-        const addedCard = await response.json();
-        setCards([...cards, addedCard]);
-        setIsAddCardDialogOpen(false);
-        setNewCard({ bank: '', cardName: '' });
-        showSnackbar('Card added successfully', 'success');
-      } else {
-        showSnackbar('Failed to add card', 'error');
-      }
+      const docRef = await addDoc(collection(db, 'cards'), cardData);
+      const addedCard = { id: docRef.id, ...cardData };
+      setCards([...cards, addedCard]);
+      setIsAddCardDialogOpen(false);
+      setNewCard({ bank: '', cardName: '' });
+      showSnackbar('Card added successfully', 'success');
     } catch (error) {
       console.error('Error adding card:', error);
-      showSnackbar('Error adding card', 'error');
+      if (error.code === 'permission-denied') {
+        showSnackbar('Permission denied. Please check your account status.', 'error');
+      } else {
+        showSnackbar('Error adding card. Please try again later.', 'error');
+      }
     }
   };
 
   const handleDeleteCard = async (cardId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/cards/${cardId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        setCards(cards.filter(card => card.id !== cardId));
-        showSnackbar('Card deleted successfully', 'success');
-      } else {
-        showSnackbar('Failed to delete card', 'error');
-      }
+      await deleteDoc(doc(db, 'cards', cardId));
+      setCards(cards.filter(card => card.id !== cardId));
+      showSnackbar('Card deleted successfully', 'success');
     } catch (error) {
       console.error('Error deleting card:', error);
-      showSnackbar('Error deleting card', 'error');
+      if (error.code === 'permission-denied') {
+        showSnackbar('Permission denied. Please check your account status.', 'error');
+      } else {
+        showSnackbar('Error deleting card. Please try again later.', 'error');
+      }
     }
   };
 
@@ -136,6 +143,24 @@ function MyCardsPage() {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push('/');
+    } catch (error) {
+      console.error('Error logging out:', error);
+      showSnackbar('Error logging out. Please try again.', 'error');
+    }
+  };
+
+  if (isLoading || loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <AppBar position="static" color="default" elevation={0}>
@@ -144,15 +169,27 @@ function MyCardsPage() {
             <CreditCard sx={{ mr: 1 }} />
             CardCompare
           </Typography>
-          <Button color="inherit" component={Link} href="/">Home</Button>
           <IconButton onClick={toggleTheme} color="inherit">
             {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
           </IconButton>
+          <Button 
+            color="inherit" 
+            onClick={handleLogout}
+            startIcon={<LogoutIcon />}
+            sx={{ ml: 2 }}
+          >
+            Logout
+          </Button>
+          <Avatar
+            src={user?.photoURL || ''}
+            alt={user?.displayName || 'User'}
+            sx={{ ml: 2, width: 40, height: 40 }}
+          />
         </Toolbar>
       </AppBar>
 
       <Container sx={{ py: 8 }} maxWidth="md">
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
           <Typography variant="h4" component="h1">
             My Cards
           </Typography>
@@ -235,18 +272,27 @@ function MyCardsPage() {
             fullWidth
             margin="normal"
           >
-            <MenuItem value="HDFC">HDFC</MenuItem>
-            <MenuItem value="ICICI">ICICI</MenuItem>
-            <MenuItem value="SBI">SBI</MenuItem>
-            {/* Add more banks as needed */}
+            {Object.keys(bankData).map((bank) => (
+              <MenuItem key={bank} value={bank}>
+                {bank}
+              </MenuItem>
+            ))}
           </TextField>
           <TextField
+            select
             label="Card Name"
             value={newCard.cardName}
             onChange={(e) => setNewCard({ ...newCard, cardName: e.target.value })}
             fullWidth
             margin="normal"
-          />
+            disabled={!newCard.bank}
+          >
+            {newCard.bank && bankData[newCard.bank].map((card) => (
+              <MenuItem key={card} value={card}>
+                {card}
+              </MenuItem>
+            ))}
+          </TextField>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsAddCardDialogOpen(false)}>Cancel</Button>
@@ -282,4 +328,4 @@ function MyCardsPage() {
   );
 }
 
-export default withTheme(MyCardsPage);
+export default MyCardsPage;

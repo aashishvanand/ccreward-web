@@ -1,10 +1,7 @@
 "use client";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import {
-  ThemeProvider,
-  createTheme,
-  CssBaseline,
   Container,
   Paper,
   Typography,
@@ -15,14 +12,26 @@ import {
   Autocomplete,
   Snackbar,
   Alert,
-  useMediaQuery,
+  AppBar,
+  Toolbar,
+  Link,
 } from "@mui/material";
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
+import {
+  Brightness4 as Brightness4Icon,
+  Brightness7 as Brightness7Icon,
+  CreditCard as CreditCardIcon,
+  Add as AddIcon,
+} from "@mui/icons-material";
+import { useAppTheme } from './ThemeRegistry';
+import { useAuth } from '../app/providers/AuthContext';
+import { db } from '../../firebase';
+import { collection, addDoc } from 'firebase/firestore';
 import { mccList } from "../data/mccData";
 import { bankData } from "../data/bankData";
 import Confetti from "react-confetti";
 import MissingBankCardForm from "./MissingBankCardForm";
+import DynamicCardInputs from "./DynamicCardInputs";
+import IncorrectRewardReportForm from "./IncorrectRewardReportForm";
 import {
   iciciCardRewards,
   calculateICICIRewards,
@@ -73,8 +82,6 @@ import {
   calculateAmexRewards,
   getCardInputs as getAmexCardInputs,
 } from "../utils/amexRewards";
-import DynamicCardInputs from "./DynamicCardInputs";
-import IncorrectRewardReportForm from "./IncorrectRewardReportForm";
 
 const DEBUG_MODE = true;
 
@@ -84,11 +91,11 @@ const debugLog = (...args) => {
   }
 };
 
-const CreditCardRewardsCalculator = () => {
-  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-  const [mode, setMode] = useState(prefersDarkMode ? "dark" : "light");
+function CreditCardRewardsCalculator() {
+  const { mode, toggleTheme, theme } = useAppTheme();
+  const { user, isAuthenticated, signInWithGoogle, loading, logout } = useAuth();
+  const router = useRouter();
   const [selectedBank, setSelectedBank] = useState("");
-  const [selectedCard, setSelectedCard] = useState("");
   const [selectedMcc, setSelectedMcc] = useState(null);
   const [spentAmount, setSpentAmount] = useState("");
   const [rewardPoints, setRewardPoints] = useState(0);
@@ -102,9 +109,13 @@ const CreditCardRewardsCalculator = () => {
   });
   const [bankError, setBankError] = useState(false);
   const [cardError, setCardError] = useState(false);
+  const [missingFormOpen, setMissingFormOpen] = useState(false);
+  const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] =
+    useState(false);
+  const [calculationResult, setCalculationResult] = useState(null);
+  const [selectedCard, setSelectedCard] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-  const [missingFormOpen, setMissingFormOpen] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
@@ -112,7 +123,11 @@ const CreditCardRewardsCalculator = () => {
   const [appliedCapping, setAppliedCapping] = useState(null);
   const [spendType, setSpendType] = useState("local");
   const [showInternationalOption, setShowInternationalOption] = useState(false);
-  const [calculationResult, setCalculationResult] = useState(null);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
   const [additionalInputs, setAdditionalInputs] = useState({
     isIndigoBooking: false,
     isInternational: false,
@@ -139,40 +154,51 @@ const CreditCardRewardsCalculator = () => {
     isScanAndPay: false,
     smartbuyCategory: "",
   });
-  const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] =
-    useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     setAdditionalInputs({}); // Reset additional inputs when bank or card changes
   }, [selectedBank, selectedCard]);
 
-  const theme = React.useMemo(
-    () =>
-      createTheme({
-        palette: {
-          mode,
-          primary: {
-            main: mode === "light" ? "#1976d2" : "#90caf9",
-          },
-          background: {
-            default: mode === "light" ? "#f5f5f5" : "#303030",
-            paper: mode === "light" ? "#ffffff" : "#424242",
-          },
-        },
-        shape: {
-          borderRadius: 12,
-        },
-      }),
-    [mode]
-  );
+  const showSnackbar = (message, severity = "info") => {
+    setSnackbar({ open: true, message, severity });
+  };
 
-  useEffect(() => {
-    setMode(prefersDarkMode ? "dark" : "light");
-  }, [prefersDarkMode]);
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbar({ ...snackbar, open: false });
+  };
 
-  const toggleColorMode = () => {
-    setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+  const handleAddToMyCards = async () => {
+    if (!user) {
+      try {
+        await signInWithGoogle();
+        // After successful sign-in, the user state will be updated
+      } catch (error) {
+        console.error("Error signing in:", error);
+        showSnackbar("Failed to sign in. Please try again.", "error");
+        return;
+      }
+    }
+
+    // At this point, the user should be signed in
+    if (user) {
+      try {
+        const cardData = {
+          userId: user.uid,
+          bank: selectedBank,
+          cardName: selectedCard,
+          createdAt: new Date()
+        };
+
+        await addDoc(collection(db, 'cards'), cardData);
+        showSnackbar("Card added to your collection successfully!", "success");
+      } catch (error) {
+        console.error("Error adding card:", error);
+        showSnackbar("Failed to add card. Please try again.", "error");
+      }
+    }
   };
 
   useEffect(() => {
@@ -561,13 +587,6 @@ const CreditCardRewardsCalculator = () => {
     setMissingFormOpen(false);
   };
 
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
-
   const handleFormSubmitSuccess = (message, severity = "success") => {
     setSnackbarMessage(message);
     setSnackbarSeverity(severity);
@@ -612,8 +631,26 @@ const CreditCardRewardsCalculator = () => {
   );
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <AppBar position="static" color="default" elevation={0}>
+        <Toolbar>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}
+          >
+            <CreditCardIcon sx={{ mr: 1 }} />
+            CardCompare
+          </Typography>
+          <Button color="inherit" component={Link} href="/">
+            Home
+          </Button>
+          <IconButton onClick={toggleTheme} color="inherit">
+            {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+
       {showConfetti && (
         <Confetti
           width={windowDimensions.width}
@@ -621,55 +658,19 @@ const CreditCardRewardsCalculator = () => {
           style={{ position: "fixed", top: 0, left: 0, zIndex: 1000 }}
         />
       )}
-      <Container
-        component="main"
-        maxWidth="sm"
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          py: { xs: 2, sm: 4 },
-        }}
-      >
+      <Container component="main" maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
         <Paper
           elevation={6}
           sx={{
-            p: { xs: 2, sm: 3 },
+            p: 3,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            width: "100%",
-            borderRadius: { xs: 2, sm: 4 },
-            maxWidth: "100%",
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              width: "100%",
-              mb: 1,
-              flexDirection: { xs: "row", sm: "row" },
-            }}
-          >
-            <Typography
-              component="h1"
-              variant="h4"
-              fontWeight="bold"
-              color="primary"
-              sx={{
-                fontSize: { xs: "1.2rem", sm: "1.5rem" },
-                flexGrow: 1,
-                textAlign: { xs: "left", sm: "center" },
-              }}
-            >
-              Credit Cards Rewards Calculator
-            </Typography>
-            <IconButton onClick={toggleColorMode} color="inherit" size="small">
-              {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
-            </IconButton>
-          </Box>
+          <Typography component="h1" variant="h4" gutterBottom>
+            Credit Card Rewards Calculator
+          </Typography>
 
           <Autocomplete
             fullWidth
@@ -678,8 +679,7 @@ const CreditCardRewardsCalculator = () => {
               <TextField
                 {...params}
                 label="Select a bank"
-                margin="dense"
-                variant="outlined"
+                margin="normal"
                 error={bankError}
                 helperText={bankError ? "Bank selection is required" : ""}
               />
@@ -689,13 +689,6 @@ const CreditCardRewardsCalculator = () => {
               setSelectedBank(newValue);
               setSelectedCard("");
               setBankError(false);
-            }}
-            onInputChange={(event, newInputValue) => {
-              const matchedBank = findMatchingBank(newInputValue);
-              if (matchedBank) {
-                setSelectedBank(matchedBank);
-                setBankError(false);
-              }
             }}
             freeSolo
           />
@@ -708,7 +701,6 @@ const CreditCardRewardsCalculator = () => {
                 {...params}
                 label="Select a card"
                 margin="normal"
-                variant="outlined"
                 error={cardError}
                 helperText={cardError ? "Card selection is required" : ""}
               />
@@ -717,13 +709,6 @@ const CreditCardRewardsCalculator = () => {
             onChange={(event, newValue) => {
               setSelectedCard(newValue);
               setCardError(false);
-            }}
-            onInputChange={(event, newInputValue) => {
-              const matchedCard = findMatchingCard(newInputValue);
-              if (matchedCard) {
-                setSelectedCard(matchedCard);
-                setCardError(false);
-              }
             }}
             disabled={!selectedBank}
             freeSolo
@@ -734,12 +719,7 @@ const CreditCardRewardsCalculator = () => {
             options={mccList}
             getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Search MCC"
-                margin="normal"
-                variant="outlined"
-              />
+              <TextField {...params} label="Search MCC" margin="normal" />
             )}
             onChange={(event, newValue) => {
               setSelectedMcc(newValue);
@@ -755,11 +735,10 @@ const CreditCardRewardsCalculator = () => {
             type="number"
             value={spentAmount}
             onChange={(e) => setSpentAmount(e.target.value)}
-            variant="outlined"
           />
 
           {selectedCard && selectedBank && (
-            <MemoizedDynamicCardInputs
+            <DynamicCardInputs
               cardConfig={getCardConfig(selectedBank, selectedCard)}
               onChange={handleAdditionalInputChange}
               currentInputs={additionalInputs}
@@ -770,24 +749,16 @@ const CreditCardRewardsCalculator = () => {
           <Box
             sx={{
               display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
               justifyContent: "space-between",
               width: "100%",
               mt: 2,
-              mb: 1,
             }}
           >
             <Button
               variant="contained"
               color="primary"
               onClick={calculateRewards}
-              sx={{
-                py: 1,
-                fontSize: "1rem",
-                width: "100%",
-                mb: { xs: 1, sm: 0 },
-                mr: { sm: 1 },
-              }}
+              sx={{ width: "48%" }}
             >
               Calculate
             </Button>
@@ -795,13 +766,7 @@ const CreditCardRewardsCalculator = () => {
               variant="outlined"
               color="secondary"
               onClick={clearForm}
-              sx={{
-                py: 1,
-                fontSize: "1rem",
-                width: "100%",
-                mt: { xs: 1, sm: 0 },
-                ml: { sm: 1 },
-              }}
+              sx={{ width: "48%" }}
             >
               Clear
             </Button>
@@ -820,7 +785,7 @@ const CreditCardRewardsCalculator = () => {
             <Button
               variant="text"
               color="primary"
-              onClick={handleMissingFormOpen}
+              onClick={() => setMissingFormOpen(true)}
               sx={{ mt: 2 }}
             >
               Bank or Card Missing?
@@ -912,30 +877,45 @@ const CreditCardRewardsCalculator = () => {
               </Typography>
             </Paper>
           )}
+          {calculationPerformed && calculationResult && (
+          <Button
+              variant="outlined"
+              color="primary"
+              startIcon={<AddIcon />}
+              onClick={handleAddToMyCards}
+              sx={{ mt: 2, width: '100%' }}
+            >
+              {user ? "Add to My Cards" : "Sign In & Add to My Cards"}
+            </Button>
+          )}
         </Paper>
       </Container>
+
       <Snackbar
-        open={snackbarOpen}
+        open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
           onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
+          severity={snackbar.severity}
           sx={{ width: "100%" }}
         >
-          {snackbarMessage}
+          {snackbar.message}
         </Alert>
       </Snackbar>
+
       <MissingBankCardForm
         open={missingFormOpen}
-        onClose={handleMissingFormClose}
-        onSubmitSuccess={handleFormSubmitSuccess}
+        onClose={() => setMissingFormOpen(false)}
+        onSubmitSuccess={(message) => showSnackbar(message, "success")}
       />
+
       <IncorrectRewardReportForm
         open={incorrectRewardReportOpen}
         onClose={() => setIncorrectRewardReportOpen(false)}
-        onSubmitSuccess={handleFormSubmitSuccess}
+        onSubmitSuccess={(message) => showSnackbar(message, "success")}
         formData={{
           bank: selectedBank,
           card: selectedCard,
@@ -947,8 +927,25 @@ const CreditCardRewardsCalculator = () => {
           calculationResult,
         }}
       />
-    </ThemeProvider>
+
+      <Box
+        component="footer"
+        sx={{ py: 3, px: 2, mt: "auto", backgroundColor: "background.paper" }}
+      >
+        <Container maxWidth="sm">
+          <Typography variant="body2" color="text.secondary" align="center">
+            © 2024 CardCompare. All rights reserved.
+            <Link color="inherit" href="#" sx={{ ml: 2 }}>
+              Terms of Service
+            </Link>
+            <Link color="inherit" href="#" sx={{ ml: 2 }}>
+              Privacy
+            </Link>
+          </Typography>
+        </Container>
+      </Box>
+    </Box>
   );
-};
+}
 
 export default CreditCardRewardsCalculator;
