@@ -67,49 +67,34 @@ function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Clear any existing error
-
-    if (!email) {
-      showSnackbar("Please enter an email address", "error");
-      return;
-    }
-
+    setError(''); // Clear any existing error
+  
+    // Email validation regex
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
+    
     if (!email) {
       setError("Please enter an email address");
       return;
     }
-
+  
     if (!emailRegex.test(email)) {
       setError("Please enter a valid email address");
       return;
     }
-
+  
     // Additional check for common disposable email domains
-    const disposableDomains = [
-      "yopmail.com",
-      "tempmail.com",
-      "guerrillamail.com",
-      "10minutemail.com",
-    ];
-    const emailDomain = email.split("@")[1];
+    const disposableDomains = ['yopmail.com', 'tempmail.com', 'guerrillamail.com', '10minutemail.com'];
+    const emailDomain = email.split('@')[1];
     if (disposableDomains.includes(emailDomain)) {
       setError("Please use a valid, non-disposable email address");
       return;
     }
-
+  
     try {
       const isSignUp = tab === 1;
       const endpoint = isSignUp ? "/api/auth/signup" : "/api/auth/login";
-
-      const hostname = window.location.hostname;
-    let rpID;
-
-    // Always use the root domain (last two parts of the hostname) as rpID
-    const parts = hostname.split('.');
-    rpID = parts.slice(-3).join('.');
-
+      const rpID = 'ccrewards.aashishvanand.me';
+  
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: {
@@ -117,22 +102,22 @@ function LoginPage() {
         },
         body: JSON.stringify({ email, rpId: rpID }),
       });
-
+  
       let responseData;
       try {
         responseData = await response.json();
       } catch (jsonError) {
-        throw new Error("Invalid response from server. Please try again.");
+        throw new Error('Invalid response from server. Please try again.');
       }
-
+  
       if (!response.ok) {
-        throw new Error(
-          responseData.message || "Authentication request failed"
-        );
+        throw new Error(responseData.message || "Authentication request failed");
       }
-
+  
       const options = responseData;
-
+      
+      console.log('Received options:', options); // Log the options received from the server
+  
       let credential;
       if (isSignUp) {
         credential = await navigator.credentials.create({
@@ -160,32 +145,21 @@ function LoginPage() {
           mediation: "optional",
         });
       }
-
+  
       const preparedCredential = {
         id: credential.id,
         rawId: base64UrlEncode(credential.rawId),
         type: credential.type,
         response: {
           clientDataJSON: base64UrlEncode(credential.response.clientDataJSON),
-          attestationObject: isSignUp
-            ? base64UrlEncode(credential.response.attestationObject)
-            : undefined,
-          authenticatorData: !isSignUp
-            ? base64UrlEncode(credential.response.authenticatorData)
-            : undefined,
-          signature: !isSignUp
-            ? base64UrlEncode(credential.response.signature)
-            : undefined,
-          userHandle:
-            !isSignUp && credential.response.userHandle
-              ? base64UrlEncode(credential.response.userHandle)
-              : undefined,
+          attestationObject: isSignUp ? base64UrlEncode(credential.response.attestationObject) : undefined,
+          authenticatorData: !isSignUp ? base64UrlEncode(credential.response.authenticatorData) : undefined,
+          signature: !isSignUp ? base64UrlEncode(credential.response.signature) : undefined,
+          userHandle: !isSignUp && credential.response.userHandle ? base64UrlEncode(credential.response.userHandle) : undefined,
         },
       };
-
-      const verifyEndpoint = isSignUp
-        ? "/api/auth/signup/verify"
-        : "/api/auth/login/verify";
+  
+      const verifyEndpoint = isSignUp ? "/api/auth/signup/verify" : "/api/auth/login/verify";
       const verifyResponse = await fetch(`${API_BASE_URL}${verifyEndpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -194,36 +168,27 @@ function LoginPage() {
           credential: preparedCredential,
         }),
       });
-
+  
       let verifyResponseData;
       try {
         verifyResponseData = await verifyResponse.json();
       } catch (jsonError) {
-        throw new Error(
-          "Invalid response from server during verification. Please try again."
-        );
+        throw new Error('Invalid response from server during verification. Please try again.');
       }
-
+  
       if (!verifyResponse.ok) {
         throw new Error(verifyResponseData.message || "Verification failed");
       }
-
+  
       if (verifyResponseData.success) {
-        showSnackbar(
-          `${isSignUp ? "Sign up" : "Login"} successful!`,
-          "success"
-        );
-        router.push("/my-cards");
+        setError(''); // Clear any existing error
+        router.push('/my-cards');
       } else {
         throw new Error("Authentication failed");
       }
     } catch (error) {
       console.error("Authentication error:", error);
       setError(error.message);
-      showSnackbar(
-        `${tab === 0 ? "Login" : "Sign up"} failed: ${error.message}`,
-        "error"
-      );
     }
   };
 
