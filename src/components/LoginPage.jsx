@@ -80,8 +80,16 @@ function LoginPage() {
       const hostname = window.location.hostname;
       let rpID;
 
-      const parts = hostname.split('.');
-      rpID = parts.slice(-2).join('.');
+      if (hostname.includes('credit-card-rewards-india-calculator.pages.dev')) {
+        rpID = 'credit-card-rewards-india-calculator.pages.dev';
+      } else if (hostname === 'ccrewards.aashishvanand.me') {
+        rpID = 'ccrewards.aashishvanand.me';
+      } else {
+        // Fallback to the hostname if none of the above conditions are met
+        rpID = hostname;
+      }
+
+      console.log('Using rpID:', rpID); // Log the rpID for debugging
   
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
