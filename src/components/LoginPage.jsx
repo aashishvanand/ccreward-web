@@ -18,7 +18,6 @@ import {
   Tab,
   Alert,
   AlertTitle,
-  Snackbar,
   IconButton,
 } from "@mui/material";
 import {
@@ -32,6 +31,7 @@ import {
 } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import { useTheme, withTheme } from "./ThemeRegistry";
+import { startRegistration, startAuthentication } from '@simplewebauthn/browser';
 
 const API_BASE_URL =
   "https://credit-card-rewards-india-backend.aashishvanand.workers.dev";
@@ -42,24 +42,10 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "info",
-  });
 
   useEffect(() => {
-    // Clear error when tab changes
     setError("");
   }, [tab]);
-
-  const showSnackbar = (message, severity = "info") => {
-    setSnackbar({ open: true, message, severity });
-  };
-
-  const handleSnackbarClose = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
 
   const handleErrorClose = () => {
     setError("");
@@ -67,9 +53,8 @@ function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Clear any existing error
+    setError("");
 
-    // Email validation regex
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     if (!email) {
@@ -82,7 +67,6 @@ function LoginPage() {
       return;
     }
 
-    // Additional check for common disposable email domains
     const disposableDomains = [
       "yopmail.com",
       "tempmail.com",
@@ -99,91 +83,28 @@ function LoginPage() {
       const isSignUp = tab === 1;
       const endpoint = isSignUp ? "/api/auth/signup" : "/api/auth/login";
 
-      const hostname = window.location.hostname;
-      let rpID;
-      if (hostname.includes("pages.dev")) {
-        rpID = "dev.credit-card-rewards-india-calculator.pages.dev";
-      } else if (hostname === "ccrewards.aashishvanand.me") {
-        rpID = "ccrewards.aashishvanand.me";
-      } else {
-        // Fallback to the current hostname if none of the above conditions are met
-        rpID = hostname;
-      }
-
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, rpId: rpID }),
+        body: JSON.stringify({ email }),
       });
 
-      let responseData;
-      try {
-        responseData = await response.json();
-      } catch (jsonError) {
-        throw new Error("Invalid response from server. Please try again.");
-      }
-
       if (!response.ok) {
-        throw new Error(
-          responseData.message || "Authentication request failed"
-        );
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Authentication request failed");
       }
 
-      const options = responseData;
-
-      console.log("Received options:", options); // Log the options received from the server
+      const options = await response.json();
+      console.log("Received options:", options);
 
       let credential;
       if (isSignUp) {
-        credential = await navigator.credentials.create({
-          publicKey: {
-            ...options,
-            challenge: base64UrlDecode(options.challenge),
-            user: {
-              ...options.user,
-              id: base64UrlDecode(options.user.id),
-            },
-            rpId: rpID,
-          },
-        });
+        credential = await startRegistration(options);
       } else {
-        credential = await navigator.credentials.get({
-          publicKey: {
-            ...options,
-            challenge: base64UrlDecode(options.challenge),
-            allowCredentials: options.allowCredentials.map((cred) => ({
-              ...cred,
-              id: base64UrlDecode(cred.id),
-            })),
-            rpId: rpID,
-          },
-          mediation: "optional",
-        });
+        credential = await startAuthentication(options);
       }
-
-      const preparedCredential = {
-        id: credential.id,
-        rawId: base64UrlEncode(credential.rawId),
-        type: credential.type,
-        response: {
-          clientDataJSON: base64UrlEncode(credential.response.clientDataJSON),
-          attestationObject: isSignUp
-            ? base64UrlEncode(credential.response.attestationObject)
-            : undefined,
-          authenticatorData: !isSignUp
-            ? base64UrlEncode(credential.response.authenticatorData)
-            : undefined,
-          signature: !isSignUp
-            ? base64UrlEncode(credential.response.signature)
-            : undefined,
-          userHandle:
-            !isSignUp && credential.response.userHandle
-              ? base64UrlEncode(credential.response.userHandle)
-              : undefined,
-        },
-      };
 
       const verifyEndpoint = isSignUp
         ? "/api/auth/signup/verify"
@@ -193,25 +114,17 @@ function LoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
-          credential: preparedCredential,
+          credential,
         }),
       });
 
-      let verifyResponseData;
-      try {
-        verifyResponseData = await verifyResponse.json();
-      } catch (jsonError) {
-        throw new Error(
-          "Invalid response from server during verification. Please try again."
-        );
-      }
-
       if (!verifyResponse.ok) {
-        throw new Error(verifyResponseData.message || "Verification failed");
+        const errorData = await verifyResponse.json();
+        throw new Error(errorData.message || "Verification failed");
       }
 
-      if (verifyResponseData.success) {
-        setError(""); // Clear any existing error
+      const verifyResult = await verifyResponse.json();
+      if (verifyResult.success) {
         router.push("/my-cards");
       } else {
         throw new Error("Authentication failed");
@@ -370,21 +283,6 @@ function LoginPage() {
           </List>
         </Paper>
       </Container>
-
-      {/* <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbar.severity}
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar> */}
     </Box>
   );
 }
