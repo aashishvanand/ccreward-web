@@ -614,7 +614,6 @@ const CreditCardRewardsCalculator = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      {/* <Topbar /> */}
       {showConfetti && (
         <Confetti
           width={windowDimensions.width}

@@ -83,9 +83,15 @@ function LoginPage() {
 
       const options = await response.json();
 
-      if (window.location.hostname === "localhost") {
-        options.rpId = "localhost";
-      }
+    const hostname = window.location.hostname;
+    let rpID;
+    if (hostname.includes('credit-card-rewards-india-calculator.pages.dev')) {
+      rpID = 'credit-card-rewards-india-calculator.pages.dev';
+    } else {
+      rpID = 'credit-card-rewards-india-backend.aashishvanand.me';
+    }
+
+    console.log('Using rpID:', rpID); // Log the rpID for debugging
 
       let credential;
       if (isSignUp) {
@@ -130,6 +136,7 @@ function LoginPage() {
       const verifyResponse = await fetch(`${API_BASE_URL}${verifyEndpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        Origin: window.location.origin,
         body: JSON.stringify({
           email,
           credential: preparedCredential,
