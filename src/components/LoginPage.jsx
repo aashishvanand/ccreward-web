@@ -58,41 +58,37 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
+  
     if (!email) {
       showSnackbar("Please enter an email address", "error");
       return;
     }
-
+  
     try {
       const isSignUp = tab === 1;
       const endpoint = isSignUp ? "/api/auth/signup" : "/api/auth/login";
+      
+      // Determine the correct rpID based on the current environment
+      const hostname = window.location.hostname;
+      let rpID = hostname;
+  
+      console.log('Using rpID:', rpID); // Log the rpID for debugging
+  
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Origin: window.location.origin,
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, rpId: rpID }),
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Authentication request failed");
       }
-
+  
       const options = await response.json();
-
-    const hostname = window.location.hostname;
-    let rpID;
-    if (hostname.includes('credit-card-rewards-india-calculator.pages.dev')) {
-      rpID = 'credit-card-rewards-india-calculator.pages.dev';
-    } else {
-      rpID = 'credit-card-rewards-india-backend.aashishvanand.me';
-    }
-
-    console.log('Using rpID:', rpID); // Log the rpID for debugging
-
+  
       let credential;
       if (isSignUp) {
         credential = await navigator.credentials.create({
@@ -115,7 +111,7 @@ function LoginPage() {
               id: base64UrlDecode(cred.id),
             })),
           },
-          mediation: "optional", // This allows the browser to choose the best option
+          mediation: "optional",
         });
       }
 
