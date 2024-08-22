@@ -112,31 +112,36 @@ function LoginPage() {
 
       const options = responseData;
 
+      const serverRpId = options.rpId || rpID;
+      console.log('Using server rpId:', serverRpId);
+
       let credential;
-      if (isSignUp) {
-        credential = await navigator.credentials.create({
-          publicKey: {
-            ...options,
-            challenge: base64UrlDecode(options.challenge),
-            user: {
-              ...options.user,
-              id: base64UrlDecode(options.user.id),
-            },
+    if (isSignUp) {
+      credential = await navigator.credentials.create({
+        publicKey: {
+          ...options,
+          challenge: base64UrlDecode(options.challenge),
+          user: {
+            ...options.user,
+            id: base64UrlDecode(options.user.id),
           },
-        });
-      } else {
-        credential = await navigator.credentials.get({
-          publicKey: {
-            ...options,
-            challenge: base64UrlDecode(options.challenge),
-            allowCredentials: options.allowCredentials.map((cred) => ({
-              ...cred,
-              id: base64UrlDecode(cred.id),
-            })),
-          },
-          mediation: "optional",
-        });
-      }
+          rpId: serverRpId,
+        },
+      });
+    } else {
+      credential = await navigator.credentials.get({
+        publicKey: {
+          ...options,
+          challenge: base64UrlDecode(options.challenge),
+          allowCredentials: options.allowCredentials.map((cred) => ({
+            ...cred,
+            id: base64UrlDecode(cred.id),
+          })),
+          rpId: serverRpId,
+        },
+        mediation: "optional",
+      });
+    }
 
       const preparedCredential = {
         id: credential.id,
