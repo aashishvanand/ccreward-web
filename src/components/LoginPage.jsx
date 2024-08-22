@@ -77,9 +77,11 @@ function LoginPage() {
       const isSignUp = tab === 1;
       const endpoint = isSignUp ? "/api/auth/signup" : "/api/auth/login";
       
-      // Determine the correct rpID based on the current environment
       const hostname = window.location.hostname;
-      let rpID = hostname;
+      let rpID;
+
+      const parts = hostname.split('.');
+      rpID = parts.slice(-2).join('.');
   
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
@@ -303,7 +305,7 @@ function LoginPage() {
             </Paper>
       </Container>
 
-      <Snackbar
+      {/* <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
@@ -316,7 +318,7 @@ function LoginPage() {
         >
           {snackbar.message}
         </Alert>
-      </Snackbar>
+      </Snackbar> */}
     </Box>
   );
 }
