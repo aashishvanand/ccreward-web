@@ -171,7 +171,7 @@ function MyCardsPage() {
             sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}
           >
             <CreditCard sx={{ mr: 1 }} />
-            CardCompare
+            CCReward
           </Typography>
           <IconButton onClick={toggleTheme} color="inherit">
             {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
@@ -361,7 +361,7 @@ function MyCardsPage() {
       >
         <Container maxWidth="sm">
           <Typography variant="body2" color="text.secondary" align="center">
-            © 2024 CardCompare. All rights reserved.
+            © 2024 CCReward. All rights reserved.
             <Link color="inherit" href="#" sx={{ ml: 2 }}>
               Terms of Service
             </Link>

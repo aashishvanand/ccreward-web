@@ -727,7 +727,7 @@ function CreditCardRewardsCalculator() {
             sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}
           >
             <CreditCardIcon sx={{ mr: 1 }} />
-            CardCompare
+            CCRewards
           </Typography>
           <Button color="inherit" component={Link} href="/">
             Home
@@ -1057,7 +1057,7 @@ function CreditCardRewardsCalculator() {
       >
         <Container maxWidth="sm">
           <Typography variant="body2" color="text.secondary" align="center">
-            © 2024 CardCompare. All rights reserved.
+            © 2024 CCReward. All rights reserved.
             <Link color="inherit" href="#" sx={{ ml: 2 }}>
               Terms of Service
             </Link>
