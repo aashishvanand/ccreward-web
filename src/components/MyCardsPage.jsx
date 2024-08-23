@@ -123,9 +123,9 @@ function MyCardsPage() {
   };
 
   const getCardImagePath = (bank, cardName) => {
-    const formattedBank = bank.toLowerCase();
-    const formattedCardName = cardName.replace(/\s+/g, "_").toLowerCase();
-    return `/card-images/${formattedBank}/${formattedBank}_${formattedCardName}.webp`;
+    // Keep the bank name as is, don't modify its case or spacing
+    const formattedCardName = cardName.replace(/\s+/g, '_').toLowerCase();
+    return `/card-images/${bank}/${bank.toLowerCase()}_${formattedCardName}.webp`;
   };
 
   const showSnackbar = (message, severity = "info") => {
