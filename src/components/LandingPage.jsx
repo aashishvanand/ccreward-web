@@ -44,7 +44,7 @@ export default function LandingPage() {
     "HDFC",
     "HSBC",
     "ICICI",
-    "IDFC FIRST",
+    "IDFCFIRST",
     "ONECARD",
     "SBI",
     "SC",

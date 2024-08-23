@@ -379,7 +379,7 @@ function CreditCardRewardsCalculator() {
         case "IDBI":
           cardReward = idbiCardRewards[selectedCard];
           break;
-        case "IDFC First":
+        case "IDFCFirst":
           cardReward = idfcFirstCardRewards[selectedCard];
           break;
         case "IndusInd":
@@ -438,7 +438,7 @@ function CreditCardRewardsCalculator() {
         return hsbcCardRewards[card];
       case "IDBI":
         return idbiCardRewards[card];
-      case "IDFC First":
+      case "IDFCFirst":
         return idfcFirstCardRewards[card];
       case "IndusInd":
         return indusIndCardRewards[card];
@@ -583,7 +583,7 @@ function CreditCardRewardsCalculator() {
           additionalParams
         );
         break;
-      case "IDFC First":
+      case "IDFCFirst":
         result = calculateIDFCFirstRewards(
           selectedCard,
           amount,
