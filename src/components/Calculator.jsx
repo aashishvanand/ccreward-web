@@ -15,6 +15,7 @@ import {
   AppBar,
   Toolbar,
   Link,
+  CircularProgress
 } from "@mui/material";
 import {
   Brightness4 as Brightness4Icon,
@@ -25,7 +26,8 @@ import {
 import { useAppTheme } from './ThemeRegistry';
 import { useAuth } from '../app/providers/AuthContext';
 import { db } from '../../firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { getCardsForUser } from "../utils/firebaseUtils";
+import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
 import { mccList } from "../data/mccData";
 import { bankData } from "../data/bankData";
 import Confetti from "react-confetti";
@@ -103,18 +105,17 @@ function CreditCardRewardsCalculator() {
   const [calculationPerformed, setCalculationPerformed] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [firstSuccessfulSearch, setFirstSuccessfulSearch] = useState(true);
-  const [windowDimensions, setWindowDimensions] = useState({
-    width: 0,
-    height: 0,
-  });
+  const [windowDimensions, setWindowDimensions] = useState({ width: 0, height: 0 });
   const [bankError, setBankError] = useState(false);
   const [cardError, setCardError] = useState(false);
   const [missingFormOpen, setMissingFormOpen] = useState(false);
-  const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] =
-    useState(false);
+  const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] = useState(false);
   const [calculationResult, setCalculationResult] = useState(null);
   const [selectedCard, setSelectedCard] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
+  const [cards, setCards] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [toastMessage, setToastMessage] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -123,11 +124,50 @@ function CreditCardRewardsCalculator() {
   const [appliedCapping, setAppliedCapping] = useState(null);
   const [spendType, setSpendType] = useState("local");
   const [showInternationalOption, setShowInternationalOption] = useState(false);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "info",
-  });
+  const [userCards, setUserCards] = useState([]);
+  const [isCardInCollection, setIsCardInCollection] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
+  
+  // const { user, isAuthenticated, signInWithGoogle, loading, logout } = useAuth();
+  // const router = useRouter();
+  // const [selectedBank, setSelectedBank] = useState("");
+  // const [selectedMcc, setSelectedMcc] = useState(null);
+  // const [spentAmount, setSpentAmount] = useState("");
+  // const [rewardPoints, setRewardPoints] = useState(0);
+  // const [filteredCards, setFilteredCards] = useState([]);
+  // const [calculationPerformed, setCalculationPerformed] = useState(false);
+  // const [showConfetti, setShowConfetti] = useState(false);
+  // const [firstSuccessfulSearch, setFirstSuccessfulSearch] = useState(true);
+  // const [windowDimensions, setWindowDimensions] = useState({
+  //   width: 0,
+  //   height: 0,
+  // });
+  // const [bankError, setBankError] = useState(false);
+  // const [cardError, setCardError] = useState(false);
+  // const [missingFormOpen, setMissingFormOpen] = useState(false);
+  // const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] =
+  //   useState(false);
+  // const [calculationResult, setCalculationResult] = useState(null);
+  // const [selectedCard, setSelectedCard] = useState("");
+  // const [toastOpen, setToastOpen] = useState(false);
+  // const [cards, setCards] = useState([]);
+  // const [isLoading, setIsLoading] = useState(true);
+  // const [error, setError] = useState(null);
+  // const [toastMessage, setToastMessage] = useState("");
+  // const [snackbarOpen, setSnackbarOpen] = useState(false);
+  // const [snackbarMessage, setSnackbarMessage] = useState("");
+  // const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  // const [cappedRewardPoints, setCappedRewardPoints] = useState(0);
+  // const [appliedCapping, setAppliedCapping] = useState(null);
+  // const [spendType, setSpendType] = useState("local");
+  // const [showInternationalOption, setShowInternationalOption] = useState(false);
+  // const [userCards, setUserCards] = useState([]);
+  // const [isCardInCollection, setIsCardInCollection] = useState(false);
+  // const [snackbar, setSnackbar] = useState({
+  //   open: false,
+  //   message: "",
+  //   severity: "info",
+  // });
   const [additionalInputs, setAdditionalInputs] = useState({
     isIndigoBooking: false,
     isInternational: false,
@@ -154,6 +194,74 @@ function CreditCardRewardsCalculator() {
     isScanAndPay: false,
     smartbuyCategory: "",
   });
+
+  const handleAdditionalInputChange = useCallback((key, value) => {
+    setAdditionalInputs((prev) => {
+      const newInputs = { ...prev };
+
+      // Convert 'true' and 'false' strings to boolean
+      if (value === "true") value = true;
+      if (value === "false") value = false;
+
+      // Handle special cases
+      switch (key) {
+        case "isShoppersStopTransaction":
+          newInputs[key] = value;
+          if (!value) newInputs.isWeekendTransaction = false;
+          if (value) newInputs.isInternational = false;
+          break;
+        case "selectedPacks":
+          // Ensure selectedPacks is always an array and limit to 2 selections
+          newInputs[key] = Array.isArray(value) ? value.slice(0, 2) : [value];
+          break;
+        case "smartbuyCategory":
+          // Handle smartbuy category selection
+          newInputs[key] = value;
+          newInputs.isSmartBuy = !!value;
+          break;
+        default:
+          newInputs[key] = value;
+      }
+
+      return newInputs;
+    });
+  }, []);
+
+  const MemoizedDynamicCardInputs = useMemo(
+    () => React.memo(DynamicCardInputs),
+    []
+  );
+
+  useEffect(() => {
+    const fetchCards = async () => {
+      if (user) {
+        try {
+          setIsLoading(true);
+          const fetchedCards = await getCardsForUser(user.uid);
+          setUserCards(fetchedCards);
+          setError(null);
+        } catch (err) {
+          console.error('Error fetching cards:', err);
+          setError('Failed to fetch cards. Please try again later.');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchCards();
+  }, [user]);
+
+  useEffect(() => {
+    if (selectedBank && selectedCard) {
+      const cardExists = userCards.some(
+        card => card.bank === selectedBank && card.cardName === selectedCard
+      );
+      setIsCardInCollection(cardExists);
+    } else {
+      setIsCardInCollection(false);
+    }
+  }, [selectedBank, selectedCard, userCards]);
 
   useEffect(() => {
     setAdditionalInputs({}); // Reset additional inputs when bank or card changes
@@ -338,7 +446,6 @@ function CreditCardRewardsCalculator() {
     if (isAuthenticated) {
       // Logic to add the card to the user's account
       // This could involve making an API call to your backend
-      console.log("Adding card to user's account");
     } else {
       router.push("/signin");
     }
@@ -593,43 +700,6 @@ function CreditCardRewardsCalculator() {
     setSnackbarOpen(true);
   };
 
-  const handleAdditionalInputChange = useCallback((key, value) => {
-    setAdditionalInputs((prev) => {
-      const newInputs = { ...prev };
-
-      // Convert 'true' and 'false' strings to boolean
-      if (value === "true") value = true;
-      if (value === "false") value = false;
-
-      // Handle special cases
-      switch (key) {
-        case "isShoppersStopTransaction":
-          newInputs[key] = value;
-          if (!value) newInputs.isWeekendTransaction = false;
-          if (value) newInputs.isInternational = false;
-          break;
-        case "selectedPacks":
-          // Ensure selectedPacks is always an array and limit to 2 selections
-          newInputs[key] = Array.isArray(value) ? value.slice(0, 2) : [value];
-          break;
-        case "smartbuyCategory":
-          // Handle smartbuy category selection
-          newInputs[key] = value;
-          newInputs.isSmartBuy = !!value;
-          break;
-        default:
-          newInputs[key] = value;
-      }
-
-      return newInputs;
-    });
-  }, []);
-
-  const MemoizedDynamicCardInputs = useMemo(
-    () => React.memo(DynamicCardInputs),
-    []
-  );
-
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <AppBar position="static" color="default" elevation={0}>
@@ -650,7 +720,7 @@ function CreditCardRewardsCalculator() {
           </IconButton>
         </Toolbar>
       </AppBar>
-
+  
       {showConfetti && (
         <Confetti
           width={windowDimensions.width}
@@ -658,6 +728,7 @@ function CreditCardRewardsCalculator() {
           style={{ position: "fixed", top: 0, left: 0, zIndex: 1000 }}
         />
       )}
+  
       <Container component="main" maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
         <Paper
           elevation={6}
@@ -668,229 +739,250 @@ function CreditCardRewardsCalculator() {
             alignItems: "center",
           }}
         >
-          <Typography component="h1" variant="h4" gutterBottom>
-            Credit Card Rewards Calculator
-          </Typography>
-
-          <Autocomplete
-            fullWidth
-            options={Object.keys(bankData)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Select a bank"
-                margin="normal"
-                error={bankError}
-                helperText={bankError ? "Bank selection is required" : ""}
-              />
-            )}
-            value={selectedBank}
-            onChange={(event, newValue) => {
-              setSelectedBank(newValue);
-              setSelectedCard("");
-              setBankError(false);
-            }}
-            freeSolo
-          />
-
-          <Autocomplete
-            fullWidth
-            options={filteredCards}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Select a card"
-                margin="normal"
-                error={cardError}
-                helperText={cardError ? "Card selection is required" : ""}
-              />
-            )}
-            value={selectedCard}
-            onChange={(event, newValue) => {
-              setSelectedCard(newValue);
-              setCardError(false);
-            }}
-            disabled={!selectedBank}
-            freeSolo
-          />
-
-          <Autocomplete
-            fullWidth
-            options={mccList}
-            getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
-            renderInput={(params) => (
-              <TextField {...params} label="Search MCC" margin="normal" />
-            )}
-            onChange={(event, newValue) => {
-              setSelectedMcc(newValue);
-            }}
-            isOptionEqualToValue={(option, value) => option.mcc === value.mcc}
-            value={selectedMcc}
-          />
-
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Enter spent amount (INR)"
-            type="number"
-            value={spentAmount}
-            onChange={(e) => setSpentAmount(e.target.value)}
-          />
-
-          {selectedCard && selectedBank && (
-            <DynamicCardInputs
-              cardConfig={getCardConfig(selectedBank, selectedCard)}
-              onChange={handleAdditionalInputChange}
-              currentInputs={additionalInputs}
-              selectedMcc={selectedMcc}
-            />
-          )}
-
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-              mt: 2,
-            }}
-          >
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={calculateRewards}
-              sx={{ width: "48%" }}
-            >
-              Calculate
-            </Button>
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={clearForm}
-              sx={{ width: "48%" }}
-            >
-              Clear
-            </Button>
-          </Box>
-
-          {calculationPerformed ? (
-            <Button
-              variant="text"
-              color="primary"
-              onClick={() => setIncorrectRewardReportOpen(true)}
-              sx={{ mt: 2 }}
-            >
-              Report Incorrect Reward
-            </Button>
+          {isLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+              <CircularProgress />
+            </Box>
+          ) : error ? (
+            <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+              {error}
+            </Alert>
           ) : (
-            <Button
-              variant="text"
-              color="primary"
-              onClick={() => setMissingFormOpen(true)}
-              sx={{ mt: 2 }}
-            >
-              Bank or Card Missing?
-            </Button>
-          )}
-
-          {calculationPerformed && calculationResult && (
-            <Paper
-              elevation={3}
-              sx={{
-                p: 2,
-                mt: 2,
-                width: "100%",
-                bgcolor:
-                  calculationResult.points > 0 ||
-                  calculationResult.cashback > 0 ||
-                  calculationResult.miles > 0
-                    ? "success.light"
-                    : "error.light",
-                borderRadius: 2,
-              }}
-            >
-              <Typography
-                variant="h6"
-                align="center"
-                color="textPrimary"
-                fontWeight="bold"
+            <>
+              <Autocomplete
+                fullWidth
+                options={Object.keys(bankData)}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Select a bank"
+                    margin="normal"
+                    error={bankError}
+                    helperText={bankError ? "Bank selection is required" : ""}
+                  />
+                )}
+                value={selectedBank}
+                onChange={(event, newValue) => {
+                  setSelectedBank(newValue);
+                  setSelectedCard("");
+                  setBankError(false);
+                }}
+                freeSolo
+              />
+  
+              <Autocomplete
+                fullWidth
+                options={filteredCards}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Select a card"
+                    margin="normal"
+                    error={cardError}
+                    helperText={cardError ? "Card selection is required" : ""}
+                  />
+                )}
+                value={selectedCard}
+                onChange={(event, newValue) => {
+                  setSelectedCard(newValue);
+                  setCardError(false);
+                }}
+                disabled={!selectedBank}
+                freeSolo
+              />
+  
+              <Autocomplete
+                fullWidth
+                options={mccList}
+                getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
+                renderInput={(params) => (
+                  <TextField {...params} label="Search MCC" margin="normal" />
+                )}
+                onChange={(event, newValue) => {
+                  setSelectedMcc(newValue);
+                }}
+                isOptionEqualToValue={(option, value) => option.mcc === value.mcc}
+                value={selectedMcc}
+              />
+  
+              <TextField
+                fullWidth
+                margin="normal"
+                label="Enter spent amount (INR)"
+                type="number"
+                value={spentAmount}
+                onChange={(e) => setSpentAmount(e.target.value)}
+              />
+  
+              {selectedCard && selectedBank && (
+                <MemoizedDynamicCardInputs
+                  cardConfig={getCardConfig(selectedBank, selectedCard)}
+                  onChange={handleAdditionalInputChange}
+                  currentInputs={additionalInputs}
+                  selectedMcc={selectedMcc}
+                />
+              )}
+  
+              <Box
                 sx={{
-                  fontSize: { xs: "1rem", sm: "1.25rem" },
-                  whiteSpace: "normal",
-                  wordBreak: "break-word",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  mt: 2,
                 }}
               >
-                {calculationResult.points > 0 ||
-                calculationResult.cashback > 0 ||
-                calculationResult.miles > 0 ? (
-                  <>
-                    🎉 {calculationResult.rewardText} 🎉
-                    {calculationResult.appliedCap && (
-                      <Typography variant="body2" color="textSecondary">
-                        {`${
-                          calculationResult.appliedCap.category
-                        } cap applied: Max ${
-                          calculationResult.appliedCap.maxPoints ||
-                          calculationResult.appliedCap.maxCashback ||
-                          calculationResult.appliedCap.maxMiles
-                        } ${
-                          calculationResult.points
-                            ? "points"
-                            : calculationResult.cashback
-                            ? "cashback"
-                            : "miles"
-                        }${
-                          calculationResult.appliedCap.maxSpent
-                            ? ` or ₹${calculationResult.appliedCap.maxSpent.toFixed(
-                                2
-                              )} spent`
-                            : ""
-                        }`}
-                      </Typography>
-                    )}
-                    {calculationResult.uncappedPoints > 0 &&
-                      calculationResult.uncappedPoints !==
-                        calculationResult.points && (
-                        <Typography variant="body2" color="textSecondary">
-                          (Uncapped: {calculationResult.uncappedPoints} points)
-                        </Typography>
-                      )}
-                    {calculationResult.uncappedCashback > 0 &&
-                      calculationResult.uncappedCashback !==
-                        calculationResult.cashback && (
-                        <Typography variant="body2" color="textSecondary">
-                          (Uncapped: ₹
-                          {calculationResult.uncappedCashback.toFixed(2)}{" "}
-                          cashback)
-                        </Typography>
-                      )}
-                    {calculationResult.uncappedMiles > 0 &&
-                      calculationResult.uncappedMiles !==
-                        calculationResult.miles && (
-                        <Typography variant="body2" color="textSecondary">
-                          (Uncapped: {calculationResult.uncappedMiles} miles)
-                        </Typography>
-                      )}
-                  </>
-                ) : (
-                  <>😢 No rewards earned 😢</>
-                )}
-              </Typography>
-            </Paper>
-          )}
-          {calculationPerformed && calculationResult && (
-          <Button
-              variant="outlined"
-              color="primary"
-              startIcon={<AddIcon />}
-              onClick={handleAddToMyCards}
-              sx={{ mt: 2, width: '100%' }}
-            >
-              {user ? "Add to My Cards" : "Sign In & Add to My Cards"}
-            </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={calculateRewards}
+                  sx={{ width: "48%" }}
+                >
+                  Calculate
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={clearForm}
+                  sx={{ width: "48%" }}
+                >
+                  Clear
+                </Button>
+              </Box>
+  
+              {calculationPerformed ? (
+                <Button
+                  variant="text"
+                  color="primary"
+                  onClick={() => setIncorrectRewardReportOpen(true)}
+                  sx={{ mt: 2 }}
+                >
+                  Report Incorrect Reward
+                </Button>
+              ) : (
+                <Button
+                  variant="text"
+                  color="primary"
+                  onClick={() => setMissingFormOpen(true)}
+                  sx={{ mt: 2 }}
+                >
+                  Bank or Card Missing?
+                </Button>
+              )}
+  
+              {calculationPerformed && calculationResult && (
+                <Paper
+                  elevation={3}
+                  sx={{
+                    p: 2,
+                    mt: 2,
+                    width: "100%",
+                    bgcolor:
+                      calculationResult.points > 0 ||
+                      calculationResult.cashback > 0 ||
+                      calculationResult.miles > 0
+                        ? "success.light"
+                        : "error.light",
+                    borderRadius: 2,
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    align="center"
+                    color="textPrimary"
+                    fontWeight="bold"
+                    sx={{
+                      fontSize: { xs: "1rem", sm: "1.25rem" },
+                      whiteSpace: "normal",
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    <Typography
+  variant="h6"
+  align="center"
+  color="textPrimary"
+  fontWeight="bold"
+  sx={{
+    fontSize: { xs: "1rem", sm: "1.25rem" },
+    whiteSpace: "normal",
+    wordBreak: "break-word",
+  }}
+>
+  {calculationResult.points > 0 ||
+  calculationResult.cashback > 0 ||
+  calculationResult.miles > 0 ? (
+    <>
+      🎉 {calculationResult.rewardText} 🎉
+      {calculationResult.appliedCap && (
+        <Typography variant="body2" color="textSecondary">
+          {`${
+            calculationResult.appliedCap.category
+          } cap applied: Max ${
+            calculationResult.appliedCap.maxPoints ||
+            calculationResult.appliedCap.maxCashback ||
+            calculationResult.appliedCap.maxMiles
+          } ${
+            calculationResult.points
+              ? "points"
+              : calculationResult.cashback
+              ? "cashback"
+              : "miles"
+          }${
+            calculationResult.appliedCap.maxSpent
+              ? ` or ₹${calculationResult.appliedCap.maxSpent.toFixed(
+                  2
+                )} spent`
+              : ""
+          }`}
+        </Typography>
+      )}
+      {calculationResult.uncappedPoints > 0 &&
+        calculationResult.uncappedPoints !==
+          calculationResult.points && (
+          <Typography variant="body2" color="textSecondary">
+            (Uncapped: {calculationResult.uncappedPoints} points)
+          </Typography>
+        )}
+      {calculationResult.uncappedCashback > 0 &&
+        calculationResult.uncappedCashback !==
+          calculationResult.cashback && (
+          <Typography variant="body2" color="textSecondary">
+            (Uncapped: ₹
+            {calculationResult.uncappedCashback.toFixed(2)}{" "}
+            cashback)
+          </Typography>
+        )}
+      {calculationResult.uncappedMiles > 0 &&
+        calculationResult.uncappedMiles !==
+          calculationResult.miles && (
+          <Typography variant="body2" color="textSecondary">
+            (Uncapped: {calculationResult.uncappedMiles} miles)
+          </Typography>
+        )}
+    </>
+  ) : (
+    <>😢 No rewards earned 😢</>
+  )}
+</Typography>
+                  </Typography>
+                </Paper>
+              )}
+  
+              {calculationPerformed && calculationResult && user && !isCardInCollection && (
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  startIcon={<AddIcon />}
+                  onClick={handleAddToMyCards}
+                  sx={{ mt: 2, width: '100%' }}
+                >
+                  {user ? "Add to My Cards" : "Sign In & Add to My Cards"}
+                </Button>
+              )}
+            </>
           )}
         </Paper>
       </Container>
-
+  
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
@@ -905,13 +997,13 @@ function CreditCardRewardsCalculator() {
           {snackbar.message}
         </Alert>
       </Snackbar>
-
+  
       <MissingBankCardForm
         open={missingFormOpen}
         onClose={() => setMissingFormOpen(false)}
         onSubmitSuccess={(message) => showSnackbar(message, "success")}
       />
-
+  
       <IncorrectRewardReportForm
         open={incorrectRewardReportOpen}
         onClose={() => setIncorrectRewardReportOpen(false)}
@@ -927,7 +1019,7 @@ function CreditCardRewardsCalculator() {
           calculationResult,
         }}
       />
-
+  
       <Box
         component="footer"
         sx={{ py: 3, px: 2, mt: "auto", backgroundColor: "background.paper" }}
@@ -946,6 +1038,7 @@ function CreditCardRewardsCalculator() {
       </Box>
     </Box>
   );
+  
 }
 
 export default CreditCardRewardsCalculator;

@@ -36,8 +36,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../app/providers/AuthContext';
 import { useAppTheme } from '../components/ThemeRegistry';
 import { bankData } from '../data/bankData';  // Import the bank data
-import { db } from '../../firebase';  // Import the Firestore instance
-import { collection, addDoc, getDocs, deleteDoc, doc, query, where } from 'firebase/firestore';
+import { addCardForUser, getCardsForUser, deleteCardForUser } from '../utils/firebaseUtils';
 
 function MyCardsPage() {
   const { mode, toggleTheme, theme } = useAppTheme();
@@ -45,6 +44,7 @@ function MyCardsPage() {
   const [isAddCardDialogOpen, setIsAddCardDialogOpen] = useState(false);
   const [newCard, setNewCard] = useState({ bank: '', cardName: '' });
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
@@ -52,86 +52,71 @@ function MyCardsPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      console.log('Checking authentication...', { user, isAuthenticated: isAuthenticated(), loading });
-
       if (loading) {
-        console.log('Auth is still loading...');
         return;
       }
 
       if (!isAuthenticated()) {
-        console.log('User is not authenticated, redirecting to home page');
         router.push('/');
       } else {
-        console.log('User is authenticated, fetching cards');
         await fetchUserCards();
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     checkAuth();
   }, [isAuthenticated, router, user, loading]);
 
-
   const fetchUserCards = async () => {
     if (!user) {
       console.error('No user available');
-      showSnackbar('Authentication error', 'error');
+      showSnackbar('Authentication error. Please try logging in again.', 'error');
+      setIsLoading(false);
       return;
     }
-
+  
     try {
-      const cardsCollection = collection(db, 'cards');
-      const q = query(cardsCollection, where("userId", "==", user.uid));
-      const querySnapshot = await getDocs(q);
-      const fetchedCards = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      const fetchedCards = await getCardsForUser(user.uid);
       setCards(fetchedCards);
+      setHasAttemptedFetch(true);
     } catch (error) {
       console.error('Error fetching cards:', error);
-      showSnackbar('Error fetching cards. Please try again later.', 'error');
+      if (error.message.includes('Permission denied')) {
+        showSnackbar('You do not have permission to access these cards. Please try logging out and in again.', 'error');
+      } else {
+        showSnackbar('Error fetching cards. Please try again later.', 'error');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleAddCard = async () => {
     try {
       const cardData = {
-        userId: user.uid,
         bank: newCard.bank,
-        cardName: newCard.cardName,
-        createdAt: new Date()
+        cardName: newCard.cardName
       };
 
-      const docRef = await addDoc(collection(db, 'cards'), cardData);
-      const addedCard = { id: docRef.id, ...cardData };
-      setCards([...cards, addedCard]);
+      await addCardForUser(user.uid, cardData);
+      await fetchUserCards(); // Refresh the cards list
       setIsAddCardDialogOpen(false);
       setNewCard({ bank: '', cardName: '' });
       showSnackbar('Card added successfully', 'success');
     } catch (error) {
       console.error('Error adding card:', error);
-      if (error.code === 'permission-denied') {
-        showSnackbar('Permission denied. Please check your account status.', 'error');
-      } else {
-        showSnackbar('Error adding card. Please try again later.', 'error');
-      }
+      showSnackbar('Error adding card. Please try again later.', 'error');
     }
   };
 
   const handleDeleteCard = async (cardId) => {
     try {
-      await deleteDoc(doc(db, 'cards', cardId));
-      setCards(cards.filter(card => card.id !== cardId));
+      await deleteCardForUser(user.uid, cardId);
+      await fetchUserCards(); // Refresh the cards list
       showSnackbar('Card deleted successfully', 'success');
     } catch (error) {
       console.error('Error deleting card:', error);
-      if (error.code === 'permission-denied') {
-        showSnackbar('Permission denied. Please check your account status.', 'error');
-      } else {
-        showSnackbar('Error deleting card. Please try again later.', 'error');
-      }
+      showSnackbar('Error deleting card. Please try again later.', 'error');
     }
   };
 
@@ -261,7 +246,12 @@ function MyCardsPage() {
         )}
       </Container>
 
-      <Dialog open={isAddCardDialogOpen} onClose={() => setIsAddCardDialogOpen(false)}>
+      <Dialog 
+        open={isAddCardDialogOpen} 
+        onClose={() => setIsAddCardDialogOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
         <DialogTitle>Add New Card</DialogTitle>
         <DialogContent>
           <TextField
@@ -296,7 +286,7 @@ function MyCardsPage() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsAddCardDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleAddCard} color="primary">Add Card</Button>
+          <Button onClick={handleAddCard} color="primary" variant="contained">Add Card</Button>
         </DialogActions>
       </Dialog>
 
