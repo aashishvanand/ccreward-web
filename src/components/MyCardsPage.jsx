@@ -1,4 +1,3 @@
-'use client';
 import React, { useState, useEffect } from 'react';
 import {
   Typography,
@@ -37,6 +36,7 @@ import { useAuth } from '../app/providers/AuthContext';
 import { useAppTheme } from '../components/ThemeRegistry';
 import { bankData } from '../data/bankData';
 import { addCardForUser, getCardsForUser, deleteCardForUser } from '../utils/firebaseUtils';
+import Image from 'next/image';
 
 function MyCardsPage() {
   const { mode, toggleTheme, theme } = useAppTheme();
@@ -109,6 +109,12 @@ function MyCardsPage() {
       console.error('Error deleting card:', error);
       showSnackbar('Error deleting card. Please try again later.', 'error');
     }
+  };
+
+  const getCardImagePath = (bank, cardName) => {
+    const formattedBank = bank.toLowerCase();
+    const formattedCardName = cardName.replace(/\s+/g, '_').toLowerCase();
+    return `/card-images/${formattedBank}/${formattedBank}_${formattedCardName}.webp`;
   };
 
   const showSnackbar = (message, severity = 'info') => {
@@ -202,9 +208,21 @@ function MyCardsPage() {
                     component="div"
                     sx={{
                       pt: '56.25%',
+                      position: 'relative',
                       background: `linear-gradient(45deg, ${mode === 'dark' ? '#1a237e' : '#2196f3'}, #f50057)`,
                     }}
-                  />
+                  >
+                    <Image
+                      src={getCardImagePath(card.bank, card.cardName)}
+                      alt={`${card.bank} ${card.cardName}`}
+                      layout="fill"
+                      objectFit="cover"
+                      onError={(e) => {
+                        console.log(`Image not found: ${e.target.src}`);
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                  </CardMedia>
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Typography gutterBottom variant="h5" component="h2">
                       {card.bank}

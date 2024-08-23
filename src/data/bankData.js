@@ -1,3 +1,4 @@
+//idfc - power plus, ashva, mayura missing
 export const bankData = {
     "AMEX": ["Gold", "Platinum", "Platinum Reserve", "Platinum Travel", "SmartEarn"],
     // "AU": ["Altura", "Altura Plus", "LIT", "Vetta", "Zenith"],
@@ -6,9 +7,9 @@ export const bankData = {
     // "Federal": ["Celesta", "Imperio", "Scapia", "Signet", "Wave"],
     "HDFC": ["6E Rewards – IndiGo", "6E Rewards XL – IndiGo", "Diners Club Black Metal", "Diners Club Privilege", "Freedom", "H.O.G Diners", "Harley Davidson", "IndianOil", "Infinia Metal", "IRCTC", "Marriott Bonvoy", "Millennia", "MoneyBack Plus", "Paytm", "Paytm Select", "Paytm Mobile", "Paytm Digital", "Pixel Go", "Pixel Play", "Regalia", "Regalia Gold", "Shoppers Stop", "Shoppers Stop Black", "Swiggy", "Tata Neu Infinity", "Tata Neu Plus", "Times", "Times Platinum", "UPI RuPay"],
     "HSBC": ["Live+", "Platinum", "Premier"],
-    "ICICI": ["AmazonPay", "Coral", "Emeralde", "Emeralde Private", "HPCL Coral", "HPCL Super Saver", "MakeMyTrip Signature", "Mine", "MMT", "MMT Black", "Rubyx", "Sapphiro"],
+    "ICICI": ["AmazonPay", "Coral", "Emeralde", "Emeralde Private", "HPCL Coral", "HPCL Super Saver", "MMT Signature", "Mine", "MMT", "Rubyx", "Sapphiro"],
     // "IDBI": ["Aspire Platinum", "Euphoria World", "Imperium Platinum", "Royale Signature", "Winnings"],
-    "IDFC First": ["Classic", "Club Vistara", "Millennia", "Power", "Select", "SYWP", "Wealth", "WOW"],
+    "IDFC First": ["Classic", "Club Vistara", "Millennia", "Power", "Select", "SYWP", "Wealth", "WOW"], 
     // "IndusInd": ["Avios", "Celesta", "Club Vistara Explorer", "Crest", "Duo", "EazyDiner Platinum", "EazyDiner Signature", "IndusInd Platinum", "Indulge", "InterMiles Odyssey", "InterMiles Voyage", "Legend", "Nexxt", "Pinnacle", "Pioneer Heritage", "Pioneer Legacy", "Pioneer Private", "Platinum Aura Edge", "Platinum Select", "Samman", "Solitare"],
     // "Kotak": ["811", "Biz", "Indian Oil", "IndiGo 6E Rewards", "IndiGo 6E Rewards XL", "Kotak Infinite", "League", "Metro", "MOJO", "Myntra", "Privy League Signature", "PVR INOX", "PVR INOX Gold", "PVR INOX Platinum", "Royale Signature", "Urbane", "Urbane Gold", "White", "White Reserve", "Zen"],
     "OneCard": ["One Card"],
