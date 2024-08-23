@@ -15,7 +15,7 @@ import {
   AppBar,
   Toolbar,
   Link,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import {
   Brightness4 as Brightness4Icon,
@@ -23,11 +23,13 @@ import {
   CreditCard as CreditCardIcon,
   Add as AddIcon,
 } from "@mui/icons-material";
-import { useAppTheme } from './ThemeRegistry';
-import { useAuth } from '../app/providers/AuthContext';
-import { db } from '../../firebase';
-import { getCardsForUser } from "../utils/firebaseUtils";
-import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
+import { useAppTheme } from "./ThemeRegistry";
+import { useAuth } from "../app/providers/AuthContext";
+import {
+  addCardForUser,
+  getCardsForUser,
+  deleteCardForUser,
+} from "../utils/firebaseUtils";
 import { mccList } from "../data/mccData";
 import { bankData } from "../data/bankData";
 import Confetti from "react-confetti";
@@ -95,7 +97,8 @@ const debugLog = (...args) => {
 
 function CreditCardRewardsCalculator() {
   const { mode, toggleTheme, theme } = useAppTheme();
-  const { user, isAuthenticated, signInWithGoogle, loading, logout } = useAuth();
+  const { user, isAuthenticated, signInWithGoogle, loading, logout } =
+    useAuth();
   const router = useRouter();
   const [selectedBank, setSelectedBank] = useState("");
   const [selectedMcc, setSelectedMcc] = useState(null);
@@ -105,11 +108,15 @@ function CreditCardRewardsCalculator() {
   const [calculationPerformed, setCalculationPerformed] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [firstSuccessfulSearch, setFirstSuccessfulSearch] = useState(true);
-  const [windowDimensions, setWindowDimensions] = useState({ width: 0, height: 0 });
+  const [windowDimensions, setWindowDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
   const [bankError, setBankError] = useState(false);
   const [cardError, setCardError] = useState(false);
   const [missingFormOpen, setMissingFormOpen] = useState(false);
-  const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] = useState(false);
+  const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] =
+    useState(false);
   const [calculationResult, setCalculationResult] = useState(null);
   const [selectedCard, setSelectedCard] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
@@ -126,8 +133,12 @@ function CreditCardRewardsCalculator() {
   const [showInternationalOption, setShowInternationalOption] = useState(false);
   const [userCards, setUserCards] = useState([]);
   const [isCardInCollection, setIsCardInCollection] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
-  
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
+
   // const { user, isAuthenticated, signInWithGoogle, loading, logout } = useAuth();
   // const router = useRouter();
   // const [selectedBank, setSelectedBank] = useState("");
@@ -241,8 +252,8 @@ function CreditCardRewardsCalculator() {
           setUserCards(fetchedCards);
           setError(null);
         } catch (err) {
-          console.error('Error fetching cards:', err);
-          setError('Failed to fetch cards. Please try again later.');
+          console.error("Error fetching cards:", err);
+          setError(err.message);
         } finally {
           setIsLoading(false);
         }
@@ -255,7 +266,7 @@ function CreditCardRewardsCalculator() {
   useEffect(() => {
     if (selectedBank && selectedCard) {
       const cardExists = userCards.some(
-        card => card.bank === selectedBank && card.cardName === selectedCard
+        (card) => card.bank === selectedBank && card.cardName === selectedCard
       );
       setIsCardInCollection(cardExists);
     } else {
@@ -282,7 +293,6 @@ function CreditCardRewardsCalculator() {
     if (!user) {
       try {
         await signInWithGoogle();
-        // After successful sign-in, the user state will be updated
       } catch (error) {
         console.error("Error signing in:", error);
         showSnackbar("Failed to sign in. Please try again.", "error");
@@ -290,22 +300,29 @@ function CreditCardRewardsCalculator() {
       }
     }
 
-    // At this point, the user should be signed in
     if (user) {
       try {
         const cardData = {
-          userId: user.uid,
           bank: selectedBank,
           cardName: selectedCard,
-          createdAt: new Date()
         };
-
-        await addDoc(collection(db, 'cards'), cardData);
+        const newCardId = await addCardForUser(user.uid, cardData);
         showSnackbar("Card added to your collection successfully!", "success");
+        // Update local state
+        setUserCards((prevCards) => [
+          ...prevCards,
+          { ...cardData, id: newCardId },
+        ]);
+        setIsCardInCollection(true);
       } catch (error) {
         console.error("Error adding card:", error);
-        showSnackbar("Failed to add card. Please try again.", "error");
+        showSnackbar(
+          error.message || "Failed to add card. Please try again.",
+          "error"
+        );
       }
+    } else {
+      showSnackbar("Please sign in to add cards to your collection.", "error");
     }
   };
 
@@ -720,7 +737,7 @@ function CreditCardRewardsCalculator() {
           </IconButton>
         </Toolbar>
       </AppBar>
-  
+
       {showConfetti && (
         <Confetti
           width={windowDimensions.width}
@@ -728,7 +745,7 @@ function CreditCardRewardsCalculator() {
           style={{ position: "fixed", top: 0, left: 0, zIndex: 1000 }}
         />
       )}
-  
+
       <Container component="main" maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
         <Paper
           elevation={6}
@@ -740,11 +757,18 @@ function CreditCardRewardsCalculator() {
           }}
         >
           {isLoading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "200px",
+              }}
+            >
               <CircularProgress />
             </Box>
           ) : error ? (
-            <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+            <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
               {error}
             </Alert>
           ) : (
@@ -769,7 +793,7 @@ function CreditCardRewardsCalculator() {
                 }}
                 freeSolo
               />
-  
+
               <Autocomplete
                 fullWidth
                 options={filteredCards}
@@ -790,7 +814,7 @@ function CreditCardRewardsCalculator() {
                 disabled={!selectedBank}
                 freeSolo
               />
-  
+
               <Autocomplete
                 fullWidth
                 options={mccList}
@@ -801,10 +825,12 @@ function CreditCardRewardsCalculator() {
                 onChange={(event, newValue) => {
                   setSelectedMcc(newValue);
                 }}
-                isOptionEqualToValue={(option, value) => option.mcc === value.mcc}
+                isOptionEqualToValue={(option, value) =>
+                  option.mcc === value.mcc
+                }
                 value={selectedMcc}
               />
-  
+
               <TextField
                 fullWidth
                 margin="normal"
@@ -813,7 +839,7 @@ function CreditCardRewardsCalculator() {
                 value={spentAmount}
                 onChange={(e) => setSpentAmount(e.target.value)}
               />
-  
+
               {selectedCard && selectedBank && (
                 <MemoizedDynamicCardInputs
                   cardConfig={getCardConfig(selectedBank, selectedCard)}
@@ -822,7 +848,7 @@ function CreditCardRewardsCalculator() {
                   selectedMcc={selectedMcc}
                 />
               )}
-  
+
               <Box
                 sx={{
                   display: "flex",
@@ -848,7 +874,7 @@ function CreditCardRewardsCalculator() {
                   Clear
                 </Button>
               </Box>
-  
+
               {calculationPerformed ? (
                 <Button
                   variant="text"
@@ -868,7 +894,7 @@ function CreditCardRewardsCalculator() {
                   Bank or Card Missing?
                 </Button>
               )}
-  
+
               {calculationPerformed && calculationResult && (
                 <Paper
                   elevation={3}
@@ -897,92 +923,97 @@ function CreditCardRewardsCalculator() {
                     }}
                   >
                     <Typography
-  variant="h6"
-  align="center"
-  color="textPrimary"
-  fontWeight="bold"
-  sx={{
-    fontSize: { xs: "1rem", sm: "1.25rem" },
-    whiteSpace: "normal",
-    wordBreak: "break-word",
-  }}
->
-  {calculationResult.points > 0 ||
-  calculationResult.cashback > 0 ||
-  calculationResult.miles > 0 ? (
-    <>
-      🎉 {calculationResult.rewardText} 🎉
-      {calculationResult.appliedCap && (
-        <Typography variant="body2" color="textSecondary">
-          {`${
-            calculationResult.appliedCap.category
-          } cap applied: Max ${
-            calculationResult.appliedCap.maxPoints ||
-            calculationResult.appliedCap.maxCashback ||
-            calculationResult.appliedCap.maxMiles
-          } ${
-            calculationResult.points
-              ? "points"
-              : calculationResult.cashback
-              ? "cashback"
-              : "miles"
-          }${
-            calculationResult.appliedCap.maxSpent
-              ? ` or ₹${calculationResult.appliedCap.maxSpent.toFixed(
-                  2
-                )} spent`
-              : ""
-          }`}
-        </Typography>
-      )}
-      {calculationResult.uncappedPoints > 0 &&
-        calculationResult.uncappedPoints !==
-          calculationResult.points && (
-          <Typography variant="body2" color="textSecondary">
-            (Uncapped: {calculationResult.uncappedPoints} points)
-          </Typography>
-        )}
-      {calculationResult.uncappedCashback > 0 &&
-        calculationResult.uncappedCashback !==
-          calculationResult.cashback && (
-          <Typography variant="body2" color="textSecondary">
-            (Uncapped: ₹
-            {calculationResult.uncappedCashback.toFixed(2)}{" "}
-            cashback)
-          </Typography>
-        )}
-      {calculationResult.uncappedMiles > 0 &&
-        calculationResult.uncappedMiles !==
-          calculationResult.miles && (
-          <Typography variant="body2" color="textSecondary">
-            (Uncapped: {calculationResult.uncappedMiles} miles)
-          </Typography>
-        )}
-    </>
-  ) : (
-    <>😢 No rewards earned 😢</>
-  )}
-</Typography>
+                      variant="h6"
+                      align="center"
+                      color="textPrimary"
+                      fontWeight="bold"
+                      sx={{
+                        fontSize: { xs: "1rem", sm: "1.25rem" },
+                        whiteSpace: "normal",
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      {calculationResult.points > 0 ||
+                      calculationResult.cashback > 0 ||
+                      calculationResult.miles > 0 ? (
+                        <>
+                          🎉 {calculationResult.rewardText} 🎉
+                          {calculationResult.appliedCap && (
+                            <Typography variant="body2" color="textSecondary">
+                              {`${
+                                calculationResult.appliedCap.category
+                              } cap applied: Max ${
+                                calculationResult.appliedCap.maxPoints ||
+                                calculationResult.appliedCap.maxCashback ||
+                                calculationResult.appliedCap.maxMiles
+                              } ${
+                                calculationResult.points
+                                  ? "points"
+                                  : calculationResult.cashback
+                                  ? "cashback"
+                                  : "miles"
+                              }${
+                                calculationResult.appliedCap.maxSpent
+                                  ? ` or ₹${calculationResult.appliedCap.maxSpent.toFixed(
+                                      2
+                                    )} spent`
+                                  : ""
+                              }`}
+                            </Typography>
+                          )}
+                          {calculationResult.uncappedPoints > 0 &&
+                            calculationResult.uncappedPoints !==
+                              calculationResult.points && (
+                              <Typography variant="body2" color="textSecondary">
+                                (Uncapped: {calculationResult.uncappedPoints}{" "}
+                                points)
+                              </Typography>
+                            )}
+                          {calculationResult.uncappedCashback > 0 &&
+                            calculationResult.uncappedCashback !==
+                              calculationResult.cashback && (
+                              <Typography variant="body2" color="textSecondary">
+                                (Uncapped: ₹
+                                {calculationResult.uncappedCashback.toFixed(2)}{" "}
+                                cashback)
+                              </Typography>
+                            )}
+                          {calculationResult.uncappedMiles > 0 &&
+                            calculationResult.uncappedMiles !==
+                              calculationResult.miles && (
+                              <Typography variant="body2" color="textSecondary">
+                                (Uncapped: {calculationResult.uncappedMiles}{" "}
+                                miles)
+                              </Typography>
+                            )}
+                        </>
+                      ) : (
+                        <>😢 No rewards earned 😢</>
+                      )}
+                    </Typography>
                   </Typography>
                 </Paper>
               )}
-  
-              {calculationPerformed && calculationResult && user && !isCardInCollection && (
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  startIcon={<AddIcon />}
-                  onClick={handleAddToMyCards}
-                  sx={{ mt: 2, width: '100%' }}
-                >
-                  {user ? "Add to My Cards" : "Sign In & Add to My Cards"}
-                </Button>
-              )}
+
+              {calculationPerformed &&
+                calculationResult &&
+                user &&
+                !isCardInCollection && (
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<AddIcon />}
+                    onClick={handleAddToMyCards}
+                    sx={{ mt: 2, width: "100%" }}
+                  >
+                    {user ? "Add to My Cards" : "Sign In & Add to My Cards"}
+                  </Button>
+                )}
             </>
           )}
         </Paper>
       </Container>
-  
+
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
@@ -997,13 +1028,13 @@ function CreditCardRewardsCalculator() {
           {snackbar.message}
         </Alert>
       </Snackbar>
-  
+
       <MissingBankCardForm
         open={missingFormOpen}
         onClose={() => setMissingFormOpen(false)}
         onSubmitSuccess={(message) => showSnackbar(message, "success")}
       />
-  
+
       <IncorrectRewardReportForm
         open={incorrectRewardReportOpen}
         onClose={() => setIncorrectRewardReportOpen(false)}
@@ -1019,7 +1050,7 @@ function CreditCardRewardsCalculator() {
           calculationResult,
         }}
       />
-  
+
       <Box
         component="footer"
         sx={{ py: 3, px: 2, mt: "auto", backgroundColor: "background.paper" }}
@@ -1038,7 +1069,6 @@ function CreditCardRewardsCalculator() {
       </Box>
     </Box>
   );
-  
 }
 
 export default CreditCardRewardsCalculator;

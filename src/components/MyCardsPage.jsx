@@ -35,7 +35,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../app/providers/AuthContext';
 import { useAppTheme } from '../components/ThemeRegistry';
-import { bankData } from '../data/bankData';  // Import the bank data
+import { bankData } from '../data/bankData';
 import { addCardForUser, getCardsForUser, deleteCardForUser } from '../utils/firebaseUtils';
 
 function MyCardsPage() {
@@ -44,7 +44,6 @@ function MyCardsPage() {
   const [isAddCardDialogOpen, setIsAddCardDialogOpen] = useState(false);
   const [newCard, setNewCard] = useState({ bank: '', cardName: '' });
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
-  const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
@@ -52,15 +51,12 @@ function MyCardsPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      if (loading) {
-        return;
-      }
+      if (loading) return;
 
       if (!isAuthenticated()) {
         router.push('/');
       } else {
         await fetchUserCards();
-        setIsLoading(false);
       }
     };
 
@@ -78,14 +74,9 @@ function MyCardsPage() {
     try {
       const fetchedCards = await getCardsForUser(user.uid);
       setCards(fetchedCards);
-      setHasAttemptedFetch(true);
     } catch (error) {
       console.error('Error fetching cards:', error);
-      if (error.message.includes('Permission denied')) {
-        showSnackbar('You do not have permission to access these cards. Please try logging out and in again.', 'error');
-      } else {
-        showSnackbar('Error fetching cards. Please try again later.', 'error');
-      }
+      showSnackbar('Error fetching cards. Please try again later.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +90,7 @@ function MyCardsPage() {
       };
 
       await addCardForUser(user.uid, cardData);
-      await fetchUserCards(); // Refresh the cards list
+      await fetchUserCards();
       setIsAddCardDialogOpen(false);
       setNewCard({ bank: '', cardName: '' });
       showSnackbar('Card added successfully', 'success');
@@ -112,7 +103,7 @@ function MyCardsPage() {
   const handleDeleteCard = async (cardId) => {
     try {
       await deleteCardForUser(user.uid, cardId);
-      await fetchUserCards(); // Refresh the cards list
+      await fetchUserCards();
       showSnackbar('Card deleted successfully', 'success');
     } catch (error) {
       console.error('Error deleting card:', error);
@@ -286,7 +277,14 @@ function MyCardsPage() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsAddCardDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleAddCard} color="primary" variant="contained">Add Card</Button>
+          <Button 
+            onClick={handleAddCard} 
+            color="primary" 
+            variant="contained"
+            disabled={!newCard.bank || !newCard.cardName}
+          >
+            Add Card
+          </Button>
         </DialogActions>
       </Dialog>
 
