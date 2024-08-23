@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Typography,
   Button,
@@ -21,29 +21,37 @@ import {
   Toolbar,
   Link,
   CircularProgress,
-  Avatar
-} from '@mui/material';
+  Avatar,
+} from "@mui/material";
 import {
   CreditCard,
   Add as AddIcon,
   Delete as DeleteIcon,
   Brightness4,
   Brightness7,
-  Logout as LogoutIcon
-} from '@mui/icons-material';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../app/providers/AuthContext';
-import { useAppTheme } from '../components/ThemeRegistry';
-import { bankData } from '../data/bankData';
-import { addCardForUser, getCardsForUser, deleteCardForUser } from '../utils/firebaseUtils';
-import Image from 'next/image';
+  Logout as LogoutIcon,
+} from "@mui/icons-material";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../app/providers/AuthContext";
+import { useAppTheme } from "../components/ThemeRegistry";
+import { bankData } from "../data/bankData";
+import {
+  addCardForUser,
+  getCardsForUser,
+  deleteCardForUser,
+} from "../utils/firebaseUtils";
+import Image from "next-image-export-optimizer";
 
 function MyCardsPage() {
   const { mode, toggleTheme, theme } = useAppTheme();
   const [cards, setCards] = useState([]);
   const [isAddCardDialogOpen, setIsAddCardDialogOpen] = useState(false);
-  const [newCard, setNewCard] = useState({ bank: '', cardName: '' });
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const [newCard, setNewCard] = useState({ bank: "", cardName: "" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
@@ -54,7 +62,7 @@ function MyCardsPage() {
       if (loading) return;
 
       if (!isAuthenticated()) {
-        router.push('/');
+        router.push("/");
       } else {
         await fetchUserCards();
       }
@@ -65,18 +73,21 @@ function MyCardsPage() {
 
   const fetchUserCards = async () => {
     if (!user) {
-      console.error('No user available');
-      showSnackbar('Authentication error. Please try logging in again.', 'error');
+      console.error("No user available");
+      showSnackbar(
+        "Authentication error. Please try logging in again.",
+        "error"
+      );
       setIsLoading(false);
       return;
     }
-  
+
     try {
       const fetchedCards = await getCardsForUser(user.uid);
       setCards(fetchedCards);
     } catch (error) {
-      console.error('Error fetching cards:', error);
-      showSnackbar('Error fetching cards. Please try again later.', 'error');
+      console.error("Error fetching cards:", error);
+      showSnackbar("Error fetching cards. Please try again later.", "error");
     } finally {
       setIsLoading(false);
     }
@@ -86,17 +97,17 @@ function MyCardsPage() {
     try {
       const cardData = {
         bank: newCard.bank,
-        cardName: newCard.cardName
+        cardName: newCard.cardName,
       };
 
       await addCardForUser(user.uid, cardData);
       await fetchUserCards();
       setIsAddCardDialogOpen(false);
-      setNewCard({ bank: '', cardName: '' });
-      showSnackbar('Card added successfully', 'success');
+      setNewCard({ bank: "", cardName: "" });
+      showSnackbar("Card added successfully", "success");
     } catch (error) {
-      console.error('Error adding card:', error);
-      showSnackbar('Error adding card. Please try again later.', 'error');
+      console.error("Error adding card:", error);
+      showSnackbar("Error adding card. Please try again later.", "error");
     }
   };
 
@@ -104,20 +115,20 @@ function MyCardsPage() {
     try {
       await deleteCardForUser(user.uid, cardId);
       await fetchUserCards();
-      showSnackbar('Card deleted successfully', 'success');
+      showSnackbar("Card deleted successfully", "success");
     } catch (error) {
-      console.error('Error deleting card:', error);
-      showSnackbar('Error deleting card. Please try again later.', 'error');
+      console.error("Error deleting card:", error);
+      showSnackbar("Error deleting card. Please try again later.", "error");
     }
   };
 
   const getCardImagePath = (bank, cardName) => {
     const formattedBank = bank.toLowerCase();
-    const formattedCardName = cardName.replace(/\s+/g, '_').toLowerCase();
+    const formattedCardName = cardName.replace(/\s+/g, "_").toLowerCase();
     return `/card-images/${formattedBank}/${formattedBank}_${formattedCardName}.webp`;
   };
 
-  const showSnackbar = (message, severity = 'info') => {
+  const showSnackbar = (message, severity = "info") => {
     setSnackbar({ open: true, message, severity });
   };
 
@@ -128,34 +139,45 @@ function MyCardsPage() {
   const handleLogout = async () => {
     try {
       await logout();
-      router.push('/');
+      router.push("/");
     } catch (error) {
-      console.error('Error logging out:', error);
-      showSnackbar('Error logging out. Please try again.', 'error');
+      console.error("Error logging out:", error);
+      showSnackbar("Error logging out. Please try again.", "error");
     }
   };
 
   if (isLoading || loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
         <CircularProgress />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <AppBar position="static" color="default" elevation={0}>
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}
+          >
             <CreditCard sx={{ mr: 1 }} />
             CardCompare
           </Typography>
           <IconButton onClick={toggleTheme} color="inherit">
-            {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
+            {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
           </IconButton>
-          <Button 
-            color="inherit" 
+          <Button
+            color="inherit"
             onClick={handleLogout}
             startIcon={<LogoutIcon />}
             sx={{ ml: 2 }}
@@ -163,15 +185,22 @@ function MyCardsPage() {
             Logout
           </Button>
           <Avatar
-            src={user?.photoURL || ''}
-            alt={user?.displayName || 'User'}
+            src={user?.photoURL || ""}
+            alt={user?.displayName || "User"}
             sx={{ ml: 2, width: 40, height: 40 }}
           />
         </Toolbar>
       </AppBar>
 
       <Container sx={{ py: 8 }} maxWidth="md">
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 4,
+          }}
+        >
           <Typography variant="h4" component="h1">
             My Cards
           </Typography>
@@ -187,19 +216,20 @@ function MyCardsPage() {
 
         {cards.length === 0 ? (
           <Typography variant="h6" align="center" sx={{ mt: 4 }}>
-            You haven&apos;t added any cards yet. Click &quot;Add New Card&quot; to get started!
+            You haven&apos;t added any cards yet. Click &quot;Add New Card&quot;
+            to get started!
           </Typography>
         ) : (
           <Grid container spacing={4}>
             {cards.map((card) => (
               <Grid item key={card.id} xs={12} sm={6} md={4}>
-                <Card 
-                  sx={{ 
-                    height: '100%', 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    position: 'relative',
-                    '&:hover .deleteIcon': {
+                <Card
+                  sx={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    position: "relative",
+                    "&:hover .deleteIcon": {
                       opacity: 1,
                     },
                   }}
@@ -207,19 +237,23 @@ function MyCardsPage() {
                   <CardMedia
                     component="div"
                     sx={{
-                      pt: '56.25%',
-                      position: 'relative',
-                      background: `linear-gradient(45deg, ${mode === 'dark' ? '#1a237e' : '#2196f3'}, #f50057)`,
+                      pt: "56.25%",
+                      position: "relative",
+                      background: `linear-gradient(45deg, ${
+                        mode === "dark" ? "#1a237e" : "#2196f3"
+                      }, #f50057)`,
                     }}
                   >
                     <Image
                       src={getCardImagePath(card.bank, card.cardName)}
                       alt={`${card.bank} ${card.cardName}`}
-                      layout="fill"
-                      objectFit="cover"
+                      fill
+                      style={{ objectFit: "cover" }}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      placeholder="empty"
                       onError={(e) => {
-                        console.log(`Image not found: ${e.target.src}`);
-                        e.target.style.display = 'none';
+                        console.log(`Image not found: ${e.currentTarget.src}`);
+                        e.currentTarget.style.display = "none";
                       }}
                     />
                   </CardMedia>
@@ -227,26 +261,24 @@ function MyCardsPage() {
                     <Typography gutterBottom variant="h5" component="h2">
                       {card.bank}
                     </Typography>
-                    <Typography>
-                      {card.cardName}
-                    </Typography>
+                    <Typography>{card.cardName}</Typography>
                   </CardContent>
-                  <IconButton 
+                  <IconButton
                     className="deleteIcon"
-                    sx={{ 
-                      position: 'absolute', 
-                      top: 8, 
-                      right: 8, 
+                    sx={{
+                      position: "absolute",
+                      top: 8,
+                      right: 8,
                       opacity: 0,
-                      transition: 'opacity 0.3s',
-                      backgroundColor: 'rgba(0,0,0,0.5)',
-                      '&:hover': {
-                        backgroundColor: 'rgba(0,0,0,0.7)',
+                      transition: "opacity 0.3s",
+                      backgroundColor: "rgba(0,0,0,0.5)",
+                      "&:hover": {
+                        backgroundColor: "rgba(0,0,0,0.7)",
                       },
                     }}
                     onClick={() => handleDeleteCard(card.id)}
                   >
-                    <DeleteIcon sx={{ color: 'white' }} />
+                    <DeleteIcon sx={{ color: "white" }} />
                   </IconButton>
                 </Card>
               </Grid>
@@ -255,8 +287,8 @@ function MyCardsPage() {
         )}
       </Container>
 
-      <Dialog 
-        open={isAddCardDialogOpen} 
+      <Dialog
+        open={isAddCardDialogOpen}
         onClose={() => setIsAddCardDialogOpen(false)}
         fullWidth
         maxWidth="sm"
@@ -281,23 +313,26 @@ function MyCardsPage() {
             select
             label="Card Name"
             value={newCard.cardName}
-            onChange={(e) => setNewCard({ ...newCard, cardName: e.target.value })}
+            onChange={(e) =>
+              setNewCard({ ...newCard, cardName: e.target.value })
+            }
             fullWidth
             margin="normal"
             disabled={!newCard.bank}
           >
-            {newCard.bank && bankData[newCard.bank].map((card) => (
-              <MenuItem key={card} value={card}>
-                {card}
-              </MenuItem>
-            ))}
+            {newCard.bank &&
+              bankData[newCard.bank].map((card) => (
+                <MenuItem key={card} value={card}>
+                  {card}
+                </MenuItem>
+              ))}
           </TextField>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsAddCardDialogOpen(false)}>Cancel</Button>
-          <Button 
-            onClick={handleAddCard} 
-            color="primary" 
+          <Button
+            onClick={handleAddCard}
+            color="primary"
             variant="contained"
             disabled={!newCard.bank || !newCard.cardName}
           >
@@ -310,14 +345,21 @@ function MyCardsPage() {
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
 
-      <Box component="footer" sx={{ py: 3, px: 2, mt: 'auto', backgroundColor: 'background.paper' }}>
+      <Box
+        component="footer"
+        sx={{ py: 3, px: 2, mt: "auto", backgroundColor: "background.paper" }}
+      >
         <Container maxWidth="sm">
           <Typography variant="body2" color="text.secondary" align="center">
             © 2024 CardCompare. All rights reserved.
