@@ -40,7 +40,7 @@ import {
   getCardsForUser,
   deleteCardForUser,
 } from "../utils/firebaseUtils";
-import Image from "next-image-export-optimizer";
+import ExportedImage from "next-image-export-optimizer";
 
 function MyCardsPage() {
   const { mode, toggleTheme, theme } = useAppTheme();
@@ -244,13 +244,12 @@ function MyCardsPage() {
                       }, #f50057)`,
                     }}
                   >
-                    <Image
+                    <ExportedImage
                       src={getCardImagePath(card.bank, card.cardName)}
                       alt={`${card.bank} ${card.cardName}`}
                       fill
                       style={{ objectFit: "cover" }}
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      placeholder="empty"
                       onError={(e) => {
                         console.log(`Image not found: ${e.currentTarget.src}`);
                         e.currentTarget.style.display = "none";
