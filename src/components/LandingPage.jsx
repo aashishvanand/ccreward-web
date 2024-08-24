@@ -1,8 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import {
-  AppBar,
-  Toolbar,
   Typography,
   Button,
   Container,
@@ -10,23 +8,20 @@ import {
   Card,
   CardContent,
   Box,
-  Link,
-  IconButton,
   CircularProgress,
 } from "@mui/material";
 import {
-  CreditCard,
   Calculate,
   Search,
   Bolt,
-  Brightness4,
-  Brightness7,
   Google as GoogleIcon,
 } from "@mui/icons-material";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useAppTheme } from "../components/ThemeRegistry";
 import { useAuth } from "../app/providers/AuthContext";
+import Header from "./Header";
+import Footer from "./Footer";
 
 export default function LandingPage() {
   const { mode, toggleTheme, theme } = useAppTheme();
@@ -34,6 +29,7 @@ export default function LandingPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isInitialSignIn, setIsInitialSignIn] = useState(true);
 
   const banks = [
     "AMEX",
@@ -47,17 +43,19 @@ export default function LandingPage() {
     "SC",
   ];
 
-  useEffect(() => {
-    if (!loading && isAuthenticated()) {
-      router.push("/my-cards");
-    }
-  }, [loading, isAuthenticated, router]);
+  // useEffect(() => {
+  //   if (!loading && isAuthenticated() && isInitialSignIn) {
+  //     router.push("/my-cards");
+  //     setIsInitialSignIn(false);
+  //   }
+  // }, [loading, isAuthenticated, router, isInitialSignIn]);
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     setError(null);
     try {
       await signInWithGoogle();
+      setIsInitialSignIn(true);
       router.push("/my-cards");
     } catch (error) {
       console.error("Error during Google sign in:", error);
@@ -69,21 +67,7 @@ export default function LandingPage() {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <AppBar position="static" color="default" elevation={0}>
-        <Toolbar>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}
-          >
-            <CreditCard sx={{ mr: 1 }} />
-            CCReward
-          </Typography>
-          <IconButton onClick={toggleTheme} color="inherit">
-            {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
-          </IconButton>
-        </Toolbar>
-      </AppBar>
+      <Header />
 
       <Box
         sx={{
@@ -236,22 +220,7 @@ export default function LandingPage() {
         </Container>
       </Box>
 
-      <Box
-        component="footer"
-        sx={{ py: 3, px: 2, mt: "auto", backgroundColor: "background.paper" }}
-      >
-        <Container maxWidth="lg">
-          <Typography variant="body2" color="text.secondary" align="center">
-            © 2024 CCReward. All rights reserved.
-            <Link color="inherit" href="#" sx={{ ml: 2 }}>
-              Terms of Service
-            </Link>
-            <Link color="inherit" href="#" sx={{ ml: 2 }}>
-              Privacy
-            </Link>
-          </Typography>
-        </Container>
-      </Box>
+      <Footer />
     </Box>
   );
 }

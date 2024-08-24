@@ -86,6 +86,8 @@ import {
   calculateAmexRewards,
   getCardInputs as getAmexCardInputs,
 } from "../utils/amexRewards";
+import Header from "./Header";
+import Footer from "./Footer";
 
 const DEBUG_MODE = true;
 
@@ -139,46 +141,6 @@ function CreditCardRewardsCalculator() {
     severity: "info",
   });
 
-  // const { user, isAuthenticated, signInWithGoogle, loading, logout } = useAuth();
-  // const router = useRouter();
-  // const [selectedBank, setSelectedBank] = useState("");
-  // const [selectedMcc, setSelectedMcc] = useState(null);
-  // const [spentAmount, setSpentAmount] = useState("");
-  // const [rewardPoints, setRewardPoints] = useState(0);
-  // const [filteredCards, setFilteredCards] = useState([]);
-  // const [calculationPerformed, setCalculationPerformed] = useState(false);
-  // const [showConfetti, setShowConfetti] = useState(false);
-  // const [firstSuccessfulSearch, setFirstSuccessfulSearch] = useState(true);
-  // const [windowDimensions, setWindowDimensions] = useState({
-  //   width: 0,
-  //   height: 0,
-  // });
-  // const [bankError, setBankError] = useState(false);
-  // const [cardError, setCardError] = useState(false);
-  // const [missingFormOpen, setMissingFormOpen] = useState(false);
-  // const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] =
-  //   useState(false);
-  // const [calculationResult, setCalculationResult] = useState(null);
-  // const [selectedCard, setSelectedCard] = useState("");
-  // const [toastOpen, setToastOpen] = useState(false);
-  // const [cards, setCards] = useState([]);
-  // const [isLoading, setIsLoading] = useState(true);
-  // const [error, setError] = useState(null);
-  // const [toastMessage, setToastMessage] = useState("");
-  // const [snackbarOpen, setSnackbarOpen] = useState(false);
-  // const [snackbarMessage, setSnackbarMessage] = useState("");
-  // const [snackbarSeverity, setSnackbarSeverity] = useState("success");
-  // const [cappedRewardPoints, setCappedRewardPoints] = useState(0);
-  // const [appliedCapping, setAppliedCapping] = useState(null);
-  // const [spendType, setSpendType] = useState("local");
-  // const [showInternationalOption, setShowInternationalOption] = useState(false);
-  // const [userCards, setUserCards] = useState([]);
-  // const [isCardInCollection, setIsCardInCollection] = useState(false);
-  // const [snackbar, setSnackbar] = useState({
-  //   open: false,
-  //   message: "",
-  //   severity: "info",
-  // });
   const [additionalInputs, setAdditionalInputs] = useState({
     isIndigoBooking: false,
     isInternational: false,
@@ -242,6 +204,31 @@ function CreditCardRewardsCalculator() {
     () => React.memo(DynamicCardInputs),
     []
   );
+
+  useEffect(() => {
+    const fetchUserCards = async () => {
+      if (user) {
+        setIsLoading(true);
+        try {
+          const fetchedCards = await getCardsForUser(user.uid);
+          setUserCards(fetchedCards);
+        } catch (err) {
+          console.error("Error fetching cards:", err);
+          setError("Failed to fetch user cards. Please try again later.");
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    if (!loading) {
+      if (isAuthenticated()) {
+        fetchUserCards();
+      } else {
+        setIsLoading(false);
+      }
+    }
+  }, [user, isAuthenticated, loading]);
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -719,24 +706,7 @@ function CreditCardRewardsCalculator() {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <AppBar position="static" color="default" elevation={0}>
-        <Toolbar>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}
-          >
-            <CreditCardIcon sx={{ mr: 1 }} />
-            CCRewards
-          </Typography>
-          <Button color="inherit" component={Link} href="/">
-            Home
-          </Button>
-          <IconButton onClick={toggleTheme} color="inherit">
-            {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
-          </IconButton>
-        </Toolbar>
-      </AppBar>
+      <Header />
 
       {showConfetti && (
         <Confetti
@@ -756,15 +726,12 @@ function CreditCardRewardsCalculator() {
             alignItems: "center",
           }}
         >
-          {isLoading ? (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "200px",
-              }}
-            >
+          {loading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
+              <CircularProgress />
+            </Box>
+          ) : isLoading ? (
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
               <CircularProgress />
             </Box>
           ) : error ? (
@@ -928,9 +895,10 @@ function CreditCardRewardsCalculator() {
                       color="textPrimary"
                       fontWeight="bold"
                       sx={{
-                        fontSize: { xs: "1rem", sm: "1.25rem" },
-                        whiteSpace: "normal",
-                        wordBreak: "break-word",
+                        fontSize: { xs: "0.875rem", sm: "1rem" },
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
                       }}
                     >
                       {calculationResult.points > 0 ||
@@ -1050,23 +1018,7 @@ function CreditCardRewardsCalculator() {
           calculationResult,
         }}
       />
-
-      <Box
-        component="footer"
-        sx={{ py: 3, px: 2, mt: "auto", backgroundColor: "background.paper" }}
-      >
-        <Container maxWidth="sm">
-          <Typography variant="body2" color="text.secondary" align="center">
-            © 2024 CCReward. All rights reserved.
-            <Link color="inherit" href="#" sx={{ ml: 2 }}>
-              Terms of Service
-            </Link>
-            <Link color="inherit" href="#" sx={{ ml: 2 }}>
-              Privacy
-            </Link>
-          </Typography>
-        </Container>
-      </Box>
+      <Footer />
     </Box>
   );
 }
