@@ -326,7 +326,7 @@ export const iciciCardRewards = {
     dynamicInputs: () => []
   },
 
-  "MakeMyTrip Signature": {
+  "MMT Signature": {
     cardType: "points",
     defaultRate: 1.25 / 200,
     mccRates: {
@@ -334,12 +334,12 @@ export const iciciCardRewards = {
       "4511": 2 / 200
     },
     calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = iciciCardRewards["MakeMyTrip Signature"].defaultRate;
+      let rate = iciciCardRewards["MMT Signature"].defaultRate;
       let category = "Other Spends";
       let rateType = "default";
 
-      if (mcc && iciciCardRewards["MakeMyTrip Signature"].mccRates[mcc]) {
-        rate = iciciCardRewards["MakeMyTrip Signature"].mccRates[mcc];
+      if (mcc && iciciCardRewards["MMT Signature"].mccRates[mcc]) {
+        rate = iciciCardRewards["MMT Signature"].mccRates[mcc];
         rateType = "mcc-specific";
         category = "Travel Spend";
       }
@@ -405,22 +405,6 @@ export const iciciCardRewards = {
     mccRates: {},
     calculateRewards: (amount, mcc, additionalParams) => {
       const rate = iciciCardRewards.MMT.defaultRate;
-      const category = "Other Spends";
-      const rateType = "default";
-
-      const points = Math.floor(amount * rate);
-
-      return { points, rate, rateType, category };
-    },
-    dynamicInputs: () => []
-  },
-
-  "MMT Black": {
-    cardType: "points",
-    defaultRate: 1 / 100,
-    mccRates: {},
-    calculateRewards: (amount, mcc, additionalParams) => {
-      const rate = iciciCardRewards["MMT Black"].defaultRate;
       const category = "Other Spends";
       const rateType = "default";
 

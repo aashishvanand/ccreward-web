@@ -2,7 +2,8 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import Script from "next/script";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
-import ThemeRegistry from '../components/ThemeRegistry';
+import { ThemeRegistry } from '../components/ThemeRegistry';
+import { AuthProvider } from './providers/AuthContext';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -12,7 +13,7 @@ export default function RootLayout({ children }) {
       <head>
         <meta property="og:title" content="Credit Card Rewards Calculator - Maximize Your Benefits" />
         <meta property="og:description" content="Optimize your rewards across multiple banks and credit cards with our comprehensive Credit Card Rewards Calculator. Compare rewards based on specific Merchant Category Codes (MCCs) and find the best card for your spending patterns." />
-        <meta property="og:url" content="https://credit-card-rewards-calculator.aashishvanand.me/" />
+        <meta property="og:url" content="https://ccrewards.aashishvanand.me/" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Multi-Bank Credit Card Rewards Calculator - Maximize Your Benefits" />
@@ -30,9 +31,11 @@ export default function RootLayout({ children }) {
         </Script>
       </head>
       <body className={inter.className}>
-        <AppRouterCacheProvider>
+      <AppRouterCacheProvider>
           <ThemeRegistry>
-            {children}
+            <AuthProvider>
+              {children}
+            </AuthProvider>
           </ThemeRegistry>
         </AppRouterCacheProvider>
       </body>

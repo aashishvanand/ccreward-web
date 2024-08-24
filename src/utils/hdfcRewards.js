@@ -169,7 +169,7 @@ export const hdfcCardRewards = {
       }
     ]
   },
-  "6E Rewards – IndiGo": {
+  "6E Rewards": {
     cardType: "points",
     defaultRate: 1 / 100,
     indigoRate: 2.5 / 100,
@@ -192,16 +192,16 @@ export const hdfcCardRewards = {
       }
     },
     calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = hdfcCardRewards["6E Rewards – IndiGo"].defaultRate;
+      let rate = hdfcCardRewards["6E Rewards"].defaultRate;
       let category = "Other Spends";
       let rateType = "default";
 
       if (additionalParams.isIndigoBooking) {
-        rate = hdfcCardRewards["6E Rewards – IndiGo"].indigoRate;
+        rate = hdfcCardRewards["6E Rewards"].indigoRate;
         category = "IndiGo Booking";
         rateType = "indigo";
-      } else if (mcc && hdfcCardRewards["6E Rewards – IndiGo"].mccRates[mcc]) {
-        rate = hdfcCardRewards["6E Rewards – IndiGo"].mccRates[mcc];
+      } else if (mcc && hdfcCardRewards["6E Rewards"].mccRates[mcc]) {
+        rate = hdfcCardRewards["6E Rewards"].mccRates[mcc];
         rateType = "mcc-specific";
         if (["5411"].includes(mcc)) {
           category = "Grocery";
@@ -215,7 +215,7 @@ export const hdfcCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const pointsValue = points * hdfcCardRewards["6E Rewards – IndiGo"].redemptionRate;
+      const pointsValue = points * hdfcCardRewards["6E Rewards"].redemptionRate;
 
       return { points, rate, rateType, category, pointsValue };
     },
@@ -233,7 +233,7 @@ export const hdfcCardRewards = {
       }
     ]
   },
-  "6E Rewards XL – IndiGo": {
+  "6E Rewards XL": {
     cardType: "points",
     defaultRate: 2 / 100,
     indigoRate: 5 / 100,
@@ -252,16 +252,16 @@ export const hdfcCardRewards = {
       }
     },
     calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = hdfcCardRewards["6E Rewards XL – IndiGo"].defaultRate;
+      let rate = hdfcCardRewards["6E Rewards XL"].defaultRate;
       let category = "Other Spends";
       let rateType = "default";
 
       if (additionalParams.isIndigoBooking) {
-        rate = hdfcCardRewards["6E Rewards XL – IndiGo"].indigoRate;
+        rate = hdfcCardRewards["6E Rewards XL"].indigoRate;
         category = "IndiGo Booking";
         rateType = "indigo";
-      } else if (mcc && hdfcCardRewards["6E Rewards XL – IndiGo"].mccRates[mcc]) {
-        rate = hdfcCardRewards["6E Rewards XL – IndiGo"].mccRates[mcc];
+      } else if (mcc && hdfcCardRewards["6E Rewards XL"].mccRates[mcc]) {
+        rate = hdfcCardRewards["6E Rewards XL"].mccRates[mcc];
         rateType = "mcc-specific";
         if (["5411"].includes(mcc)) {
           category = "Grocery";
@@ -273,7 +273,7 @@ export const hdfcCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const pointsValue = points * hdfcCardRewards["6E Rewards XL – IndiGo"].redemptionRate;
+      const pointsValue = points * hdfcCardRewards["6E Rewards XL"].redemptionRate;
 
       return { points, rate, rateType, category, pointsValue };
     },

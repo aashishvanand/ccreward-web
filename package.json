@@ -15,7 +15,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && next-image-export-optimizer",
     "start": "next start",
     "lint": "next lint"
   },
@@ -26,7 +26,10 @@
     "@mui/icons-material": "^5.16.6",
     "@mui/material": "^5.16.6",
     "@mui/material-nextjs": "^5.16.6",
+    "@simplewebauthn/browser": "^10.0.0",
+    "firebase": "^10.13.0",
     "next": "14.2.5",
+    "next-image-export-optimizer": "^1.14.1",
     "react": "^18",
     "react-confetti": "^6.1.0",
     "react-dom": "^18"
