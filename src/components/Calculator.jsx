@@ -400,7 +400,7 @@ function CreditCardRewardsCalculator() {
         case "SC":
           cardReward = scCardRewards[selectedCard];
           break;
-        case "Yes Bank":
+        case "YesBank":
           cardReward = yesCardRewards[selectedCard];
           break;
         default:
@@ -452,7 +452,7 @@ function CreditCardRewardsCalculator() {
         return sbiCardRewards[card];
       case "SC":
         return scCardRewards[card];
-      case "Yes Bank":
+      case "YesBank":
         return yesCardRewards[card];
       default:
         return null;
@@ -639,7 +639,7 @@ function CreditCardRewardsCalculator() {
           additionalParams
         );
         break;
-      case "Yes Bank":
+      case "YesBank":
         result = calculateYesRewards(
           selectedCard,
           amount,
