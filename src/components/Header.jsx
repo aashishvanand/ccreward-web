@@ -7,6 +7,10 @@ import {
   Button,
   Avatar,
   Box,
+  Menu,
+  MenuItem,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   CreditCard,
@@ -15,6 +19,7 @@ import {
   Logout as LogoutIcon,
   Home as HomeIcon,
   Calculate as CalculateIcon,
+  Menu as MenuIcon,
 } from "@mui/icons-material";
 import { useAppTheme } from "../components/ThemeRegistry";
 import { useAuth } from "../app/providers/AuthContext";
@@ -26,6 +31,9 @@ function Header() {
   const { user, logout, isAuthenticated } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleLogout = async () => {
     try {
@@ -36,9 +44,39 @@ function Header() {
     }
   };
 
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const menuItems = [
+    { label: 'Home', icon: <HomeIcon />, href: '/' },
+    { label: 'Calculator', icon: <CalculateIcon />, href: '/calculator' },
+    ...(isAuthenticated() ? [{ label: 'My Cards', icon: <CreditCard />, href: '/my-cards' }] : []),
+  ];
+
+  const renderMenuItems = () => {
+    return menuItems.map((item) => (
+      pathname !== item.href && (
+        <MenuItem
+          key={item.label}
+          onClick={handleMenuClose}
+          component={Link}
+          href={item.href}
+        >
+          {item.icon}
+          <Typography sx={{ ml: 1 }}>{item.label}</Typography>
+        </MenuItem>
+      )
+    ));
+  };
+
   return (
     <AppBar position="static" color="default" elevation={0}>
-      <Toolbar>
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Typography
           variant="h6"
           component="div"
@@ -48,54 +86,71 @@ function Header() {
           CCReward
         </Typography>
         
-        <Box sx={{ flexGrow: 1 }} />
-        
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <IconButton onClick={toggleTheme} color="inherit">
             {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
           </IconButton>
           
-          {pathname !== '/' && (
-            <Button color="inherit" startIcon={<HomeIcon />} component={Link} href="/" sx={{ ml: 2 }}>
-              Home
-            </Button>
-          )}
-          
-          {pathname !== '/calculator' && (
-            <Button color="inherit" startIcon={<CalculateIcon />} component={Link} href="/calculator" sx={{ ml: 2 }}>
-              Calculator
-            </Button>
+          {isMobile ? (
+            <>
+              <IconButton
+                edge="end"
+                color="inherit"
+                aria-label="menu"
+                onClick={handleMenuOpen}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                {renderMenuItems()}
+                {isAuthenticated() && (
+                  <MenuItem onClick={handleLogout}>
+                    <LogoutIcon />
+                    <Typography sx={{ ml: 1 }}>Logout</Typography>
+                  </MenuItem>
+                )}
+              </Menu>
+            </>
+          ) : (
+            <>
+              {menuItems.map((item) => (
+                pathname !== item.href && (
+                  <Button
+                    key={item.label}
+                    color="inherit"
+                    startIcon={item.icon}
+                    component={Link}
+                    href={item.href}
+                    sx={{ ml: 2 }}
+                  >
+                    {item.label}
+                  </Button>
+                )
+              ))}
+              
+              {isAuthenticated() && (
+                <Button
+                  color="inherit"
+                  onClick={handleLogout}
+                  startIcon={<LogoutIcon />}
+                  sx={{ ml: 2 }}
+                >
+                  Logout
+                </Button>
+              )}
+            </>
           )}
           
           {isAuthenticated() && (
-            <>
-              {pathname !== '/my-cards' && (
-                <Button
-                  color="inherit"
-                  component={Link}
-                  href="/my-cards"
-                  startIcon={<CreditCard />}
-                  sx={{ ml: 2 }}
-                >
-                  My Cards
-                </Button>
-              )}
-              
-              <Button
-                color="inherit"
-                onClick={handleLogout}
-                startIcon={<LogoutIcon />}
-                sx={{ ml: 2 }}
-              >
-                Logout
-              </Button>
-              
-              <Avatar
-                src={user?.photoURL || ""}
-                alt={user?.displayName || "User"}
-                sx={{ ml: 2, width: 40, height: 40 }}
-              />
-            </>
+            <Avatar
+              src={user?.photoURL || ""}
+              alt={user?.displayName || "User"}
+              sx={{ ml: 2, width: 40, height: 40 }}
+            />
           )}
         </Box>
       </Toolbar>
