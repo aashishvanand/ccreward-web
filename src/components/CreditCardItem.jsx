@@ -68,7 +68,7 @@ function CreditCardItem({ card, onDelete, onImageLoad, isHorizontal }) {
       <CardMedia
         component="div"
         sx={{
-          paddingTop: isHorizontal ? "65%" : "160%", // Reduced height for vertical cards
+          paddingTop: isHorizontal ? "63%" : "158%", // Reduced height for vertical cards
           position: "relative",
           background: `linear-gradient(45deg, ${startColor}, ${endColor})`,
         }}

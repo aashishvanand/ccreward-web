@@ -43,13 +43,6 @@ export default function LandingPage() {
     "SC",
   ];
 
-  // useEffect(() => {
-  //   if (!loading && isAuthenticated() && isInitialSignIn) {
-  //     router.push("/my-cards");
-  //     setIsInitialSignIn(false);
-  //   }
-  // }, [loading, isAuthenticated, router, isInitialSignIn]);
-
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     setError(null);
@@ -87,22 +80,24 @@ export default function LandingPage() {
           <Box
             sx={{ mt: 4, display: "flex", justifyContent: "center", gap: 2 }}
           >
-            <Button
-              variant="contained"
-              color="secondary"
-              size="large"
-              startIcon={
-                isLoading ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  <GoogleIcon />
-                )
-              }
-              onClick={handleGoogleSignIn}
-              disabled={isLoading}
-            >
-              {isLoading ? "Signing In..." : "Sign in with Google"}
-            </Button>
+            {!loading && !isAuthenticated() && (
+              <Button
+                variant="contained"
+                color="secondary"
+                size="large"
+                startIcon={
+                  isLoading ? (
+                    <CircularProgress size={24} color="inherit" />
+                  ) : (
+                    <GoogleIcon />
+                  )
+                }
+                onClick={handleGoogleSignIn}
+                disabled={isLoading}
+              >
+                {isLoading ? "Signing In..." : "Sign in with Google"}
+              </Button>
+            )}
           </Box>
         </Container>
       </Box>

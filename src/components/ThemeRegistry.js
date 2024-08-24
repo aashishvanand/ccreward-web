@@ -3,6 +3,7 @@ import React, { useState, useMemo, createContext, useContext, useEffect } from '
 import { ThemeProvider, createTheme, useTheme as useMuiTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import colorPalette from './colorPalette';
 
 const ThemeContext = createContext();
 
@@ -30,27 +31,46 @@ export function ThemeRegistry({ children }) {
       createTheme({
         palette: {
           mode,
-          primary: {
-            main: mode === 'dark' ? '#90caf9' : '#1976d2',
-          },
-          secondary: {
-            main: '#f50057',
-          },
-          background: {
-            default: mode === 'dark' ? '#121212' : '#ffffff',
-            paper: mode === 'dark' ? '#1e1e1e' : '#ffffff',
-          },
-          text: {
-            primary: mode === 'dark' ? '#ffffff' : '#000000',
-            secondary: mode === 'dark' ? '#b0bec5' : '#757575',
-          },
+          ...colorPalette[mode],
+        },
+        typography: {
+          fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+        },
+        shape: {
+          borderRadius: 8,
         },
         components: {
+          MuiButton: {
+            styleOverrides: {
+              root: {
+                textTransform: 'none',
+              },
+            },
+          },
           MuiCssBaseline: {
             styleOverrides: {
               body: {
-                margin: 0,
-                padding: 0,
+                scrollbarColor: mode === 'dark' ? '#6b6b6b #2b2b2b' : '#959595 #f1f1f1',
+                '&::-webkit-scrollbar, & *::-webkit-scrollbar': {
+                  width: '8px',
+                },
+                '&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb': {
+                  borderRadius: 8,
+                  backgroundColor: mode === 'dark' ? '#6b6b6b' : '#959595',
+                  minHeight: 24,
+                },
+                '&::-webkit-scrollbar-thumb:focus, & *::-webkit-scrollbar-thumb:focus': {
+                  backgroundColor: mode === 'dark' ? '#959595' : '#6b6b6b',
+                },
+                '&::-webkit-scrollbar-thumb:active, & *::-webkit-scrollbar-thumb:active': {
+                  backgroundColor: mode === 'dark' ? '#959595' : '#6b6b6b',
+                },
+                '&::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover': {
+                  backgroundColor: mode === 'dark' ? '#959595' : '#6b6b6b',
+                },
+                '&::-webkit-scrollbar-track, & *::-webkit-scrollbar-track': {
+                  backgroundColor: mode === 'dark' ? '#2b2b2b' : '#f1f1f1',
+                },
               },
             },
           },

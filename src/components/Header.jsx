@@ -36,68 +36,68 @@ function Header() {
     }
   };
 
-  const renderNavLinks = () => {
-    if (pathname === '/') {
-      return null; // No additional links on the home page
-    }
-
-    return (
-      <Box sx={{ flexGrow: 1, display: 'flex', gap: 2 }}>
-        {pathname !== '/' && (
-          <Button color="inherit" startIcon={<HomeIcon />} component={Link} href="/">
-            Home
-          </Button>
-        )}
-        {pathname !== '/calculator' && (
-          <Button color="inherit" startIcon={<CalculateIcon />} component={Link} href="/calculator">
-            Calculator
-          </Button>
-        )}
-      </Box>
-    );
-  };
-
   return (
     <AppBar position="static" color="default" elevation={0}>
       <Toolbar>
         <Typography
           variant="h6"
           component="div"
-          sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}
+          sx={{ display: "flex", alignItems: "center" }}
         >
           <CreditCard sx={{ mr: 1 }} />
           CCReward
         </Typography>
-        {renderNavLinks()}
-        <IconButton onClick={toggleTheme} color="inherit">
-          {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
-        </IconButton>
-        {isAuthenticated() && (
-          <>
-            <Button
-              color="inherit"
-              component={Link}
-              href="/my-cards"
-              startIcon={<CreditCard />}
-              sx={{ ml: 2 }}
-            >
-              My Cards
+        
+        <Box sx={{ flexGrow: 1 }} />
+        
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <IconButton onClick={toggleTheme} color="inherit">
+            {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
+          </IconButton>
+          
+          {pathname !== '/' && (
+            <Button color="inherit" startIcon={<HomeIcon />} component={Link} href="/" sx={{ ml: 2 }}>
+              Home
             </Button>
-            <Button
-              color="inherit"
-              onClick={handleLogout}
-              startIcon={<LogoutIcon />}
-              sx={{ ml: 2 }}
-            >
-              Logout
+          )}
+          
+          {pathname !== '/calculator' && (
+            <Button color="inherit" startIcon={<CalculateIcon />} component={Link} href="/calculator" sx={{ ml: 2 }}>
+              Calculator
             </Button>
-            <Avatar
-              src={user?.photoURL || ""}
-              alt={user?.displayName || "User"}
-              sx={{ ml: 2, width: 40, height: 40 }}
-            />
-          </>
-        )}
+          )}
+          
+          {isAuthenticated() && (
+            <>
+              {pathname !== '/my-cards' && (
+                <Button
+                  color="inherit"
+                  component={Link}
+                  href="/my-cards"
+                  startIcon={<CreditCard />}
+                  sx={{ ml: 2 }}
+                >
+                  My Cards
+                </Button>
+              )}
+              
+              <Button
+                color="inherit"
+                onClick={handleLogout}
+                startIcon={<LogoutIcon />}
+                sx={{ ml: 2 }}
+              >
+                Logout
+              </Button>
+              
+              <Avatar
+                src={user?.photoURL || ""}
+                alt={user?.displayName || "User"}
+                sx={{ ml: 2, width: 40, height: 40 }}
+              />
+            </>
+          )}
+        </Box>
       </Toolbar>
     </AppBar>
   );
