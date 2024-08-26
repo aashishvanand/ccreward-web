@@ -244,7 +244,7 @@ export const idfcFirstCardRewards = {
     },
     dynamicInputs: () => []
   },
-  "SYWP": {
+  "SWYP": {
     cardType: "points",
     defaultRate: 0,
     mccRates: {
@@ -281,12 +281,12 @@ export const idfcFirstCardRewards = {
       let category = "Other Spends";
       let rateType = "default";
 
-      if (mcc && idfcFirstCardRewards.SYWP.mccRates[mcc] !== undefined) {
-        rate = idfcFirstCardRewards.SYWP.mccRates[mcc];
+      if (mcc && idfcFirstCardRewards.SWYP.mccRates[mcc] !== undefined) {
+        rate = idfcFirstCardRewards.SWYP.mccRates[mcc];
         rateType = "mcc-specific";
         category = "Excluded Category";
       } else {
-        const tiers = Object.values(idfcFirstCardRewards.SYWP.acceleratedRewards).sort((a, b) => b.threshold - a.threshold);
+        const tiers = Object.values(idfcFirstCardRewards.SWYP.acceleratedRewards).sort((a, b) => b.threshold - a.threshold);
         for (const tier of tiers) {
           if (amount >= tier.threshold) {
             points = Math.min(tier.maxPoints, Math.floor(amount * tier.rate));

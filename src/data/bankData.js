@@ -9,7 +9,7 @@ export const bankData = {
     "HSBC": ["Live+", "Platinum", "Premier"],
     "ICICI": ["AmazonPay", "Coral", "Emeralde", "Emeralde Private", "HPCL Coral", "HPCL Super Saver", "MMT Signature", "Mine", "MMT", "Rubyx", "Sapphiro"],
     // "IDBI": ["Aspire Platinum", "Euphoria World", "Imperium Platinum", "Royale Signature", "Winnings"],
-    "IDFCFirst": ["Classic", "Club Vistara", "Millennia", "Power", "Select", "SYWP", "Wealth", "WOW"], 
+    "IDFCFirst": ["Classic", "Club Vistara", "Millennia", "Power", "Select", "SWYP", "Wealth", "WOW"], 
     // "IndusInd": ["Avios", "Celesta", "Club Vistara Explorer", "Crest", "Duo", "EazyDiner Platinum", "EazyDiner Signature", "IndusInd Platinum", "Indulge", "InterMiles Odyssey", "InterMiles Voyage", "Legend", "Nexxt", "Pinnacle", "Pioneer Heritage", "Pioneer Legacy", "Pioneer Private", "Platinum Aura Edge", "Platinum Select", "Samman", "Solitare"],
     // "Kotak": ["811", "Biz", "Indian Oil", "6E Rewards", "6E Rewards XL", "Kotak Infinite", "League", "Metro", "MOJO", "Myntra", "Privy League Signature", "PVR INOX", "PVR INOX Gold", "PVR INOX Platinum", "Royale Signature", "Urbane", "Urbane Gold", "White", "White Reserve", "Zen"],
     "OneCard": ["One Card"],
