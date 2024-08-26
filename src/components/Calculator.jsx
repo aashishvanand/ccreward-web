@@ -14,9 +14,12 @@ import {
   Alert,
   AppBar,
   Toolbar,
+  Tooltip,
   Link,
   CircularProgress,
 } from "@mui/material";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import {
   Brightness4 as Brightness4Icon,
   Brightness7 as Brightness7Icon,
@@ -99,6 +102,7 @@ const debugLog = (...args) => {
 
 function CreditCardRewardsCalculator() {
   const { mode, toggleTheme, theme } = useAppTheme();
+  const [expanded, setExpanded] = useState(false);
   const { user, isAuthenticated, signInWithGoogle, loading, logout } =
     useAuth();
   const router = useRouter();
@@ -878,88 +882,89 @@ function CreditCardRewardsCalculator() {
                     borderRadius: 2,
                   }}
                 >
-                  <Typography
-                    variant="h6"
-                    align="center"
-                    color="textPrimary"
-                    fontWeight="bold"
-                    sx={{
-                      fontSize: { xs: "1rem", sm: "1.25rem" },
-                      whiteSpace: "normal",
-                      wordBreak: "break-word",
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center'
                     }}
                   >
-                    <Typography
-                      variant="h6"
-                      align="center"
-                      color="textPrimary"
-                      fontWeight="bold"
-                      sx={{
-                        fontSize: { xs: "0.875rem", sm: "1rem" },
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
+                    <Tooltip title={expanded ? "Collapse" : "Expand"}>
+                      <Typography
+                        variant="h6"
+                        align="center"
+                        color="textPrimary"
+                        fontWeight="bold"
+                        onClick={() => setExpanded(!expanded)}
+                        sx={{
+                          fontSize: { xs: "1rem", sm: "1.25rem" },
+                          cursor: "pointer",
+                          maxWidth: "calc(100% - 40px)", // Make room for the icon
+                          ...(expanded ? {} : {
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }),
+                        }}
+                      >
+                        {calculationResult.points > 0 ||
+                        calculationResult.cashback > 0 ||
+                        calculationResult.miles > 0 ? (
+                          <>🎉 {calculationResult.rewardText} 🎉</>
+                        ) : (
+                          <>😢 No rewards earned 😢</>
+                        )}
+                      </Typography>
+                    </Tooltip>
+                    <IconButton 
+                      size="small" 
+                      onClick={() => setExpanded(!expanded)}
+                      sx={{ ml: 1 }}
                     >
-                      {calculationResult.points > 0 ||
-                      calculationResult.cashback > 0 ||
-                      calculationResult.miles > 0 ? (
-                        <>
-                          🎉 {calculationResult.rewardText} 🎉
-                          {calculationResult.appliedCap && (
-                            <Typography variant="body2" color="textSecondary">
-                              {`${
-                                calculationResult.appliedCap.category
-                              } cap applied: Max ${
-                                calculationResult.appliedCap.maxPoints ||
-                                calculationResult.appliedCap.maxCashback ||
-                                calculationResult.appliedCap.maxMiles
-                              } ${
-                                calculationResult.points
-                                  ? "points"
-                                  : calculationResult.cashback
-                                  ? "cashback"
-                                  : "miles"
-                              }${
-                                calculationResult.appliedCap.maxSpent
-                                  ? ` or ₹${calculationResult.appliedCap.maxSpent.toFixed(
-                                      2
-                                    )} spent`
-                                  : ""
-                              }`}
-                            </Typography>
-                          )}
-                          {calculationResult.uncappedPoints > 0 &&
-                            calculationResult.uncappedPoints !==
-                              calculationResult.points && (
-                              <Typography variant="body2" color="textSecondary">
-                                (Uncapped: {calculationResult.uncappedPoints}{" "}
-                                points)
-                              </Typography>
-                            )}
-                          {calculationResult.uncappedCashback > 0 &&
-                            calculationResult.uncappedCashback !==
-                              calculationResult.cashback && (
-                              <Typography variant="body2" color="textSecondary">
-                                (Uncapped: ₹
-                                {calculationResult.uncappedCashback.toFixed(2)}{" "}
-                                cashback)
-                              </Typography>
-                            )}
-                          {calculationResult.uncappedMiles > 0 &&
-                            calculationResult.uncappedMiles !==
-                              calculationResult.miles && (
-                              <Typography variant="body2" color="textSecondary">
-                                (Uncapped: {calculationResult.uncappedMiles}{" "}
-                                miles)
-                              </Typography>
-                            )}
-                        </>
-                      ) : (
-                        <>😢 No rewards earned 😢</>
+                      {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    </IconButton>
+                  </Box>
+                  {expanded && (
+                    <>
+                      {calculationResult.appliedCap && (
+                        <Typography variant="body2" color="textSecondary" align="center">
+                          {`${calculationResult.appliedCap.category} cap applied: Max ${
+                            calculationResult.appliedCap.maxPoints ||
+                            calculationResult.appliedCap.maxCashback ||
+                            calculationResult.appliedCap.maxMiles
+                          } ${
+                            calculationResult.points
+                              ? "points"
+                              : calculationResult.cashback
+                              ? "cashback"
+                              : "miles"
+                          }${
+                            calculationResult.appliedCap.maxSpent
+                              ? ` or ₹${calculationResult.appliedCap.maxSpent.toFixed(2)} spent`
+                              : ""
+                          }`}
+                        </Typography>
                       )}
-                    </Typography>
-                  </Typography>
+                      {calculationResult.uncappedPoints > 0 &&
+                        calculationResult.uncappedPoints !== calculationResult.points && (
+                        <Typography variant="body2" color="textSecondary" align="center">
+                          (Uncapped: {calculationResult.uncappedPoints} points)
+                        </Typography>
+                      )}
+                      {calculationResult.uncappedCashback > 0 &&
+                        calculationResult.uncappedCashback !== calculationResult.cashback && (
+                        <Typography variant="body2" color="textSecondary" align="center">
+                          (Uncapped: ₹{calculationResult.uncappedCashback.toFixed(2)} cashback)
+                        </Typography>
+                      )}
+                      {calculationResult.uncappedMiles > 0 &&
+                        calculationResult.uncappedMiles !== calculationResult.miles && (
+                        <Typography variant="body2" color="textSecondary" align="center">
+                          (Uncapped: {calculationResult.uncappedMiles} miles)
+                        </Typography>
+                      )}
+                    </>
+                  )}
                 </Paper>
               )}
 
