@@ -704,32 +704,35 @@ export const hdfcCardRewards = {
 
       return { points, rate, rateType, category };
     },
-    dynamicInputs: (currentInputs, onChange) => [
-      {
-        type: 'radio',
-        label: 'Is this a Smartbuy transaction?',
-        name: 'isSmartbuy',
-        options: [
-          { label: 'Yes', value: true },
-          { label: 'No', value: false }
-        ],
-        value: currentInputs.isSmartbuy || false,
-        onChange: (value) => onChange('isSmartbuy', value === 'true')
-      },
-      {
-        type: 'select',
-        label: 'Smartbuy Category',
-        name: 'smartbuyCategory',
-        options: [
-          { label: 'Hotels', value: 'hotels' },
-          { label: 'Flights', value: 'flights' },
-          { label: 'Vouchers', value: 'vouchers' }
-        ],
-        value: currentInputs.smartbuyCategory || '',
-        onChange: (value) => onChange('smartbuyCategory', value),
-        condition: (inputs) => inputs.isSmartbuy
+    dynamicInputs: (currentInputs, onChange) => {
+      const inputs = [
+        {
+          type: "radio",
+          name: "isSmartBuy",
+          label: "Is this a Smartbuy transaction?",
+          options: [
+            { label: "Yes", value: "true" },
+            { label: "No", value: "false" }
+          ],
+          onChange: (value) => onChange("isSmartBuy", value === "true"),
+        },
+      ];
+      if (currentInputs.isSmartBuy === true) {
+        inputs.push({
+          type: "select",
+          name: "smartbuyCategory",
+          label: "Smartbuy Category",
+          options: [
+            { label: 'Hotels', value: 'hotels' },
+            { label: 'Flights', value: 'flights' },
+            { label: 'Vouchers', value: 'vouchers' }
+          ],
+          onChange: (value) => onChange("smartbuyCategory", value),
+        });
       }
-    ]
+
+      return inputs;
+    }
   },
   "IRCTC": {
     cardType: "points",
