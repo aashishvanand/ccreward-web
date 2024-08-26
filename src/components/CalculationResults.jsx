@@ -1,10 +1,40 @@
-import React, { useState } from 'react';
-import { Paper, Typography, Box, IconButton, Tooltip } from '@mui/material';
+import React, { useState, useRef, useEffect } from 'react';
+import { Paper, Typography, Box, IconButton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 const CalculationResults = ({ result }) => {
   const [expanded, setExpanded] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const textRef = useRef(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (textRef.current) {
+        const isOverflowing = textRef.current.scrollWidth > textRef.current.clientWidth;
+        setIsOverflowing(isOverflowing);
+      }
+    };
+
+    checkOverflow();
+
+    const resizeObserver = new ResizeObserver(checkOverflow);
+    if (textRef.current) {
+      resizeObserver.observe(textRef.current);
+    }
+
+    return () => {
+      if (textRef.current) {
+        resizeObserver.unobserve(textRef.current);
+      }
+    };
+  }, [result]);
+
+  const toggleExpand = () => {
+    setExpanded(!expanded);
+  };
 
   return (
     <Paper
@@ -26,37 +56,40 @@ const CalculationResults = ({ result }) => {
           justifyContent: 'center'
         }}
       >
-        <Tooltip title={expanded ? "Collapse" : "Expand"}>
-          <Typography
-            variant="h6"
-            align="center"
-            color="textPrimary"
-            fontWeight="bold"
-            onClick={() => setExpanded(!expanded)}
-            sx={{
-              fontSize: { xs: "1rem", sm: "1.25rem" },
-              cursor: "pointer",
-              maxWidth: "calc(100% - 40px)",
-              ...(expanded ? {} : {
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }),
-            }}
-          >
-            {result.points > 0 || result.cashback > 0 || result.miles > 0
-              ? <>🎉 {result.rewardText} 🎉</>
-              : <>😢 No rewards earned 😢</>
-            }
-          </Typography>
-        </Tooltip>
-        <IconButton 
-          size="small" 
-          onClick={() => setExpanded(!expanded)}
-          sx={{ ml: 1 }}
+        <Typography
+          ref={textRef}
+          variant="h6"
+          align="center"
+          color="textPrimary"
+          fontWeight="bold"
+          onClick={toggleExpand}
+          sx={{
+            fontSize: { xs: "1rem", sm: "1.25rem" },
+            cursor: "pointer",
+            maxWidth: "calc(100% - 40px)",
+            ...(expanded ? {} : {
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }),
+          }}
         >
-          {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        </IconButton>
+          {result.points > 0 || result.cashback > 0 || result.miles > 0
+            ? <>🎉 {result.rewardText} 🎉</>
+            : <>😢 No rewards earned 😢</>
+          }
+        </Typography>
+        {(isMobile || isOverflowing) && (
+          <Tooltip title={expanded ? "Collapse" : "Expand"}>
+            <IconButton 
+              size="small" 
+              onClick={toggleExpand}
+              sx={{ ml: 1 }}
+            >
+              {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </IconButton>
+          </Tooltip>
+        )}
       </Box>
       {expanded && (
         <>
