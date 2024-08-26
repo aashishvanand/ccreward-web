@@ -955,25 +955,19 @@ export const sbiCardRewards = {
   dynamicInputs: (currentInputs, onChange) => [
     {
       type: 'radio',
-      label: 'Is this a Paytm Mall, Movies or Travel transaction?',
-      name: 'isPaytmMallMoviesTravel',
+      label: 'Transaction Type',
+      name: 'paytmTransactionType',
       options: [
-        { label: 'Yes', value: true },
-        { label: 'No', value: false }
+        { label: 'Paytm Mall, Movies or Travel transaction', value: 'mallMoviesTravel' },
+        { label: 'Paytm App transaction', value: 'app' },
+        { label: 'Other transaction', value: 'other' }
       ],
-      value: currentInputs.isPaytmMallMoviesTravel || false,
-      onChange: (value) => onChange('isPaytmMallMoviesTravel', value === 'true')
-    },
-    {
-      type: 'radio',
-      label: 'Is this a Paytm App transaction?',
-      name: 'isPaytmApp',
-      options: [
-        { label: 'Yes', value: true },
-        { label: 'No', value: false }
-      ],
-      value: currentInputs.isPaytmApp || false,
-      onChange: (value) => onChange('isPaytmApp', value === 'true')
+      value: currentInputs.paytmTransactionType || 'other',
+      onChange: (value) => {
+        onChange('paytmTransactionType', value);
+        onChange('isPaytmMallMoviesTravel', value === 'mallMoviesTravel');
+        onChange('isPaytmApp', value === 'app');
+      }
     }
   ]
   },
@@ -1011,25 +1005,19 @@ export const sbiCardRewards = {
   dynamicInputs: (currentInputs, onChange) => [
     {
       type: 'radio',
-      label: 'Is this a Paytm Mall, Movies or Travel transaction?',
-      name: 'isPaytmMallMoviesTravel',
+      label: 'Transaction Type',
+      name: 'paytmTransactionType',
       options: [
-        { label: 'Yes', value: true },
-        { label: 'No', value: false }
+        { label: 'Paytm Mall, Movies or Travel transaction', value: 'mallMoviesTravel' },
+        { label: 'Paytm App transaction', value: 'app' },
+        { label: 'Other transaction', value: 'other' }
       ],
-      value: currentInputs.isPaytmMallMoviesTravel || false,
-      onChange: (value) => onChange('isPaytmMallMoviesTravel', value === 'true')
-    },
-    {
-      type: 'radio',
-      label: 'Is this a Paytm App transaction?',
-      name: 'isPaytmApp',
-      options: [
-        { label: 'Yes', value: true },
-        { label: 'No', value: false }
-      ],
-      value: currentInputs.isPaytmApp || false,
-      onChange: (value) => onChange('isPaytmApp', value === 'true')
+      value: currentInputs.paytmTransactionType || 'other',
+      onChange: (value) => {
+        onChange('paytmTransactionType', value);
+        onChange('isPaytmMallMoviesTravel', value === 'mallMoviesTravel');
+        onChange('isPaytmApp', value === 'app');
+      }
     }
   ]
   },
@@ -1520,7 +1508,13 @@ export const sbiCardRewards = {
           { label: 'No', value: false }
         ],
         value: currentInputs.isOnline || false,
-        onChange: (value) => onChange('isOnline', value === 'true')
+        onChange: (value) => {
+          const isOnline = value === 'true';
+          onChange('isOnline', isOnline);
+          if (isOnline) {
+            onChange('isExclusivePartner', false);
+          }
+        }
       },
       {
         type: 'radio',
@@ -1531,7 +1525,13 @@ export const sbiCardRewards = {
           { label: 'No', value: false }
         ],
         value: currentInputs.isExclusivePartner || false,
-        onChange: (value) => onChange('isExclusivePartner', value === 'true')
+        onChange: (value) => {
+          const isExclusivePartner = value === 'true';
+          onChange('isExclusivePartner', isExclusivePartner);
+          if (isExclusivePartner) {
+            onChange('isOnline', false);
+          }
+        }
       }
     ]
   },
@@ -1631,7 +1631,13 @@ export const sbiCardRewards = {
           { label: 'No', value: false }
         ],
         value: currentInputs.isCroma || false,
-        onChange: (value) => onChange('isCroma', value === 'true')
+        onChange: (value) => {
+          const isCroma = value === 'true';
+          onChange('isCroma', isCroma);
+          if (isCroma) {
+            onChange('isTataOutlet', false);
+          }
+        }
       },
       {
         type: 'radio',
@@ -1642,7 +1648,13 @@ export const sbiCardRewards = {
           { label: 'No', value: false }
         ],
         value: currentInputs.isTataOutlet || false,
-        onChange: (value) => onChange('isTataOutlet', value === 'true')
+        onChange: (value) => {
+          const isTataOutlet = value === 'true';
+          onChange('isTataOutlet', isTataOutlet);
+          if (isTataOutlet) {
+            onChange('isCroma', false);
+          }
+        }
       }
     ]
   },
