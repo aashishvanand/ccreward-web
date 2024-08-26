@@ -372,7 +372,7 @@ export const axisCardRewards = {
               { label: 'No', value: false }
             ],
             value: currentInputs.isFlipkartPlusMember || false,
-            onChange: (value) => onChange('isFlipkartPlusMember', value === true)
+            onChange: (value) => onChange('isFlipkartPlusMember', value === 'true')
           }
         ];
       }
@@ -1067,8 +1067,9 @@ export const axisCardRewards = {
         ],
         value: currentInputs.isSamsungTransaction || false,
         onChange: (value) => {
-          onChange('isSamsungTransaction', value === 'true');
-          if (value === 'true') {
+          const isSamsungTransaction = value === 'true';
+          onChange('isSamsungTransaction', isSamsungTransaction);
+          if (isSamsungTransaction) {
             onChange('isInternational', false);
           }
         }
@@ -1082,7 +1083,13 @@ export const axisCardRewards = {
           { label: 'No', value: false }
         ],
         value: currentInputs.isInternational || false,
-        onChange: (value) => onChange('isInternational', value === 'true'),
+        onChange: (value) => {
+          const isInternational = value === 'true';
+          onChange('isInternational', isInternational);
+          if (isInternational) {
+            onChange('isSamsungTransaction', false);
+          }
+        },
         condition: (inputs) => !inputs.isSamsungTransaction
       }
     ]
@@ -1409,8 +1416,9 @@ export const axisCardRewards = {
         ],
         value: currentInputs.isLICPremium || false,
         onChange: (value) => {
-          onChange('isLICPremium', value === 'true');
-          if (value === 'true') {
+          const isLICPremium = value === 'true';
+          onChange('isLICPremium', isLICPremium);
+          if (isLICPremium) {
             onChange('isInternational', false);
           }
         }
@@ -1424,7 +1432,13 @@ export const axisCardRewards = {
           { label: 'No', value: false }
         ],
         value: currentInputs.isInternational || false,
-        onChange: (value) => onChange('isInternational', value === 'true'),
+        onChange: (value) => {
+          const isInternational = value === 'true';
+          onChange('isInternational', isInternational);
+          if (isInternational) {
+            onChange('isLICPremium', false);
+          }
+        },
         condition: (inputs) => !inputs.isLICPremium
       }
     ]
