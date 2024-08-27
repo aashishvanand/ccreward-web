@@ -1,0 +1,11 @@
+# Allow access to OG image from any origin
+/og.png
+  Access-Control-Allow-Origin: *
+
+# Security headers for all pages
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Content-Security-Policy: default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' https:;
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
