@@ -12,13 +12,20 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <meta property="og:title" content="Credit Card Rewards Calculator - Maximize Your Benefits" />
-        <meta property="og:description" content="Optimize your rewards across multiple banks and credit cards with our comprehensive Credit Card Rewards Calculator. Compare rewards based on specific Merchant Category Codes (MCCs) and find the best card for your spending patterns." />
-        <meta property="og:url" content="https://ccrewards.aashishvanand.me/" />
+        <meta name="description" content="Compare, calculate, and choose the best credit card rewards with CCReward."/>
+        <meta property="og:description" content="Compare, calculate, and choose the best credit card rewards with CCReward." />
+        <meta property="og:url" content="https://ccrewards.aashishvanand.me" />
         <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://ccrewards.aashishvanand.me/og.png" />
+        <meta property="og:image:secure_url" content="https://ccrewards.aashishvanand.me/og.png" />
+        <meta property="og:image:type" content="image/png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Multi-Bank Credit Card Rewards Calculator - Maximize Your Benefits" />
-        <meta name="twitter:description" content="Optimize your rewards across multiple banks and credit cards with our comprehensive Credit Card Rewards Calculator. Compare rewards based on specific Merchant Category Codes (MCCs) and find the best card for your spending patterns." />
-        <meta name="keywords" content="Credit Card Rewards, Reward Calculator, AMEX, Axis Bank, BOB, HDFC, HSBC, ICICI, IDFC First, IndusInd, Kotak, OneCard, RBL, SBI, Scapia, Standard Chartered, Yes Bank, Kiwi, AU Bank, Platinum, Atlas, Diners Club, Infinia, Regalia, Swiggy, AmazonPay, Emeralde, Sapphiro, Vistara, BPCL, Cashback, Forex Card, RuPay, MCC, Merchant Category Code" />
+        <meta name="twitter:title" content="CCReward - Maximize Your Credit Card Rewards" />
+        <meta property="twitter:domain" content="https://ccrewards.aashishvanand.me"/>
+        <meta property="twitter:url" content="https://ccrewards.aashishvanand.me"/>
+        <meta name="twitter:description" content="Compare, calculate, and choose the best credit card rewards with CCReward." />
+        <meta name="twitter:image" content="https://ccrewards.aashishvanand.me/og.png" />
+        <meta name="keywords" content="Credit Card Rewards, ccgeeks, Reward Calculator, Credit Card Points Calculator, AMEX, Axis Bank, BOB, HDFC, HSBC, ICICI, IDFC First, IndusInd, Kotak, OneCard, RBL, SBI, Scapia, Standard Chartered, Yes Bank, Kiwi, AU Bank, Platinum, Atlas, Diners Club, Infinia, Regalia, Swiggy, AmazonPay, Emeralde, Sapphiro, Vistara, BPCL, Cashback, Forex Card, RuPay, MCC, Merchant Category Code" />
 
         <Script id="microsoft-clarity" strategy="afterInteractive">
           {`
