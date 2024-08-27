@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -20,11 +20,13 @@ import {
   Home as HomeIcon,
   Calculate as CalculateIcon,
   Menu as MenuIcon,
+  Stars as StarsIcon,
 } from "@mui/icons-material";
 import { useAppTheme } from "../components/ThemeRegistry";
 import { useAuth } from "../app/providers/AuthContext";
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { getCardsForUser } from "../utils/firebaseUtils";
 
 function Header() {
   const { mode, toggleTheme } = useAppTheme();
@@ -34,6 +36,22 @@ function Header() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [userCardCount, setUserCardCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUserCardCount = async () => {
+      if (user) {
+        try {
+          const userCards = await getCardsForUser(user.uid);
+          setUserCardCount(userCards.length);
+        } catch (error) {
+          console.error("Error fetching user cards:", error);
+        }
+      }
+    };
+
+    fetchUserCardCount();
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -55,7 +73,10 @@ function Header() {
   const menuItems = [
     { label: 'Home', icon: <HomeIcon />, href: '/' },
     { label: 'Calculator', icon: <CalculateIcon />, href: '/calculator' },
-    ...(isAuthenticated() ? [{ label: 'My Cards', icon: <CreditCard />, href: '/my-cards' }] : []),
+    ...(isAuthenticated() ? [
+      { label: 'My Cards', icon: <CreditCard />, href: '/my-cards' },
+      ...(userCardCount > 1 ? [{ label: 'Best Card', icon: <StarsIcon />, href: '/best-card' }] : [])
+    ] : []),
   ];
 
   const renderMenuItems = () => {

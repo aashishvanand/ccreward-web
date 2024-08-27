@@ -29,6 +29,14 @@ export const useCardSelection = () => {
     setAdditionalInputs(prev => ({ ...prev, [key]: value }));
   }, []);
 
+  const resetAllFields = useCallback(() => {
+    setSelectedBank('');
+    setSelectedCard('');
+    setSelectedMcc(null);
+    setSpentAmount('');
+    setAdditionalInputs({});
+  }, []);
+
   return {
     selectedBank,
     selectedCard,
@@ -40,9 +48,9 @@ export const useCardSelection = () => {
     handleMccChange,
     handleSpentAmountChange,
     handleAdditionalInputChange,
+    resetAllFields,
   };
 };
-
 export const useRewardCalculation = (selectedBank, selectedCard, selectedMcc, spentAmount, additionalInputs) => {
   const [calculationResult, setCalculationResult] = useState(null);
   const [calculationPerformed, setCalculationPerformed] = useState(false);

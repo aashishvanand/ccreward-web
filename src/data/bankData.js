@@ -1,6 +1,6 @@
 //idfc - power plus, ashva, mayura missing
 export const bankData = {
-    "AMEX": ["Gold", "Platinum", "Platinum Reserve", "Platinum Travel", "SmartEarn"],
+    "AMEX": ["Gold","Membership Rewards", "Platinum", "Platinum Reserve", "Platinum Travel", "SmartEarn"],
     // "AU": ["Altura", "Altura Plus", "LIT", "Vetta", "Zenith"],
     "Axis": ["ACE", "Airtel", "Atlas", "Aura", "Flipkart", "Flipkart Super Elite", "Freecharge", "Freecharge Plus", "Horizon", "Indian Oil", "Indian Oil Premium", "LIC", "Magnus", "Miles & More World", "Miles & More World Select", "MyZone", "Neo", "Privilege", "Reserve", "Rewards", "Samsung Infinite", "Samsung Signature", "Select", "Shoppers Stop", "Vistara", "Vistara Infinite", "Vistara Signature", "Voyage", "Voyage Black"],
     // "BOB": ["Easy", "Eterna", "HPCL Energie", "IRCTC BOBCard", "BOB Premier", "BOB Prime", "Select BOBCard", "Snapdeal"],
