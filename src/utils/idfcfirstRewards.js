@@ -399,6 +399,261 @@ export const idfcFirstCardRewards = {
     },
     dynamicInputs: () => []
   },
+  "Mayura": {
+    cardType: "points",
+    defaultRate: 5 / 150, // 5X reward points on spends till ₹20,000
+    acceleratedRate: 10 / 150, // 10X reward points for incremental spends above ₹20,000
+    specialCategoryRate: 3 / 150, // 3X reward points on special categories
+    utilitiesInsuranceRate: 1 / 150, // 1X reward points on utilities and insurance
+    redemptionRate: 0.25, // 1 reward point = ₹0.25
+    mccRates: {
+      "6513": 3 / 150, // Education, Rent, Property Management/Purchase
+      "6540": 3 / 150, // Wallet Load
+      "9399": 3 / 150, // Government
+      "9311": 3 / 150, // Government
+      "4814": 1 / 150, // Utilities
+      "4900": 1 / 150, // Utilities
+      "5960": 1 / 150, // Insurance
+      "6300": 1 / 150, // Insurance
+      "6381": 1 / 150, // Insurance
+      "5172": 0, // Fuel
+      "5541": 0, // Fuel
+      "5542": 0, // Fuel
+      "5983": 0  // Fuel
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = idfcFirstCardRewards.Mayura.defaultRate;
+      let category = "Regular Spend";
+      let rateType = "default";
+
+      if (additionalParams.isBirthday) {
+        rate = idfcFirstCardRewards.Mayura.acceleratedRate;
+        category = "Birthday Spend";
+        rateType = "birthday";
+      } else if (additionalParams.monthlySpend > 20000) {
+        rate = idfcFirstCardRewards.Mayura.acceleratedRate;
+        category = "Accelerated Spend";
+        rateType = "accelerated";
+      } else if (mcc && idfcFirstCardRewards.Mayura.mccRates[mcc] !== undefined) {
+        rate = idfcFirstCardRewards.Mayura.mccRates[mcc];
+        if (rate === idfcFirstCardRewards.Mayura.specialCategoryRate) {
+          category = "Special Category";
+          rateType = "special";
+        } else if (rate === idfcFirstCardRewards.Mayura.utilitiesInsuranceRate) {
+          category = "Utilities & Insurance";
+          rateType = "utilities-insurance";
+        } else if (rate === 0) {
+          category = "Excluded Category";
+          rateType = "excluded";
+        }
+      }
+
+      const points = Math.floor(amount * rate);
+      const cashbackValue = points * idfcFirstCardRewards.Mayura.redemptionRate;
+
+      return { points, rate, rateType, category, cashbackValue };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a birthday transaction?',
+        name: 'isBirthday',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isBirthday || false,
+        onChange: (value) => onChange('isBirthday', value === 'true')
+      },
+      {
+        type: 'number',
+        label: 'Total monthly spend so far',
+        name: 'monthlySpend',
+        value: currentInputs.monthlySpend || 0,
+        onChange: (value) => onChange('monthlySpend', parseFloat(value))
+      }
+    ]
+  },
+
+  "Ashva": {
+    cardType: "points",
+    defaultRate: 5 / 150, // 5X reward points on spends up to ₹20,000
+    acceleratedRate: 10 / 150, // 10X reward points for incremental spends above ₹20,000
+    specialCategoryRate: 3 / 150, // 3X reward points on special categories
+    utilitiesInsuranceRate: 1 / 150, // 1X reward points on utilities and insurance
+    redemptionRate: 0.25, // 1 reward point = ₹0.25
+    mccRates: {
+      "6513": 3 / 150, // Education, Rent, Property Management/Purchase
+      "6540": 3 / 150, // Wallet Load
+      "9399": 3 / 150, // Government
+      "9311": 3 / 150, // Government
+      "4814": 1 / 150, // Utilities
+      "4900": 1 / 150, // Utilities
+      "5960": 1 / 150, // Insurance
+      "6300": 1 / 150, // Insurance
+      "6381": 1 / 150, // Insurance
+      "5172": 0, // Fuel
+      "5541": 0, // Fuel
+      "5542": 0, // Fuel
+      "5983": 0  // Fuel
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = idfcFirstCardRewards.Ashva.defaultRate;
+      let category = "Regular Spend";
+      let rateType = "default";
+
+      if (additionalParams.isBirthday) {
+        rate = idfcFirstCardRewards.Ashva.acceleratedRate;
+        category = "Birthday Spend";
+        rateType = "birthday";
+      } else if (additionalParams.monthlySpend > 20000) {
+        rate = idfcFirstCardRewards.Ashva.acceleratedRate;
+        category = "Accelerated Spend";
+        rateType = "accelerated";
+      } else if (mcc && idfcFirstCardRewards.Ashva.mccRates[mcc] !== undefined) {
+        rate = idfcFirstCardRewards.Ashva.mccRates[mcc];
+        if (rate === idfcFirstCardRewards.Ashva.specialCategoryRate) {
+          category = "Special Category";
+          rateType = "special";
+        } else if (rate === idfcFirstCardRewards.Ashva.utilitiesInsuranceRate) {
+          category = "Utilities & Insurance";
+          rateType = "utilities-insurance";
+        } else if (rate === 0) {
+          category = "Excluded Category";
+          rateType = "excluded";
+        }
+      }
+
+      const points = Math.floor(amount * rate);
+      const cashbackValue = points * idfcFirstCardRewards.Ashva.redemptionRate;
+
+      return { points, rate, rateType, category, cashbackValue };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a birthday transaction?',
+        name: 'isBirthday',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isBirthday || false,
+        onChange: (value) => onChange('isBirthday', value === 'true')
+      },
+      {
+        type: 'number',
+        label: 'Total monthly spend so far',
+        name: 'monthlySpend',
+        value: currentInputs.monthlySpend || 0,
+        onChange: (value) => onChange('monthlySpend', parseFloat(value))
+      }
+    ]
+  },
+
+  "Power+": {
+    cardType: "hybrid",
+    defaultRate: 3 / 150, // 3X Rewards on other retail spends
+    mccRates: {
+      "5541": 30 / 150, // 30X Rewards on HPCL fuel spends
+      "5542": 30 / 150, // 30X Rewards on HPCL fuel spends
+      "5411": 30 / 150, // 30X Rewards on grocery
+      "4900": 30 / 150, // 30X Rewards on utility
+      "5960": 0, // Insurance
+      "6300": 0, // Insurance
+      "6381": 0, // Insurance
+      "5172": 0, // Non-HPCL Fuel
+      "5983": 0, // Non-HPCL Fuel
+    },
+    happyCoinsRate: 6 / 100, // 6 Happy Coins per ₹100 fuel spends through HP Pay App
+    redemptionRate: 0.25, // 1 Reward point = ₹0.25
+    capping: {
+      categories: {
+        "HPCL Fuel": { points: 2400, maxSpent: 12000, period: "statement cycle" },
+        "Grocery and Utility": { points: 400, maxSpent: 2000, period: "statement cycle" },
+        "IDFC FIRST FASTag": { points: 200, maxSpent: 1000, period: "statement cycle" }
+      }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = idfcFirstCardRewards["Power+"].defaultRate;
+      let category = "Other Retail Spends";
+      let rateType = "default";
+      let happyCoins = 0;
+
+      if (mcc && idfcFirstCardRewards["Power+"].mccRates[mcc] !== undefined) {
+        rate = idfcFirstCardRewards["Power+"].mccRates[mcc];
+        if ((mcc === "5541" || mcc === "5542") && additionalParams.isHPCL) {
+          category = "HPCL Fuel";
+          rateType = "hpcl-fuel";
+          if (additionalParams.isHPPayApp) {
+            happyCoins = Math.floor(amount * idfcFirstCardRewards["Power+"].happyCoinsRate);
+          }
+        } else if (mcc === "5411" || mcc === "4900") {
+          category = "Grocery and Utility";
+          rateType = "grocery-utility";
+        } else if (rate === 0) {
+          category = "Excluded Category";
+          rateType = "excluded";
+        }
+      }
+
+      if (additionalParams.isIDFCFASTag) {
+        rate = idfcFirstCardRewards["Power+"].mccRates["5411"]; // Using the same rate as grocery
+        category = "IDFC FIRST FASTag";
+        rateType = "fastag";
+      }
+
+      const points = Math.floor(amount * rate);
+      const cashbackValue = points * idfcFirstCardRewards["Power+"].redemptionRate;
+
+      return { points, happyCoins, rate, rateType, category, cashbackValue };
+    },
+    dynamicInputs: (currentInputs, onChange, selectedMcc) => {
+      const inputs = [];
+
+      if (selectedMcc === "5541" || selectedMcc === "5542") {
+        inputs.push({
+          type: 'radio',
+          label: 'Is this an HPCL fuel transaction?',
+          name: 'isHPCL',
+          options: [
+            { label: 'Yes', value: true },
+            { label: 'No', value: false }
+          ],
+          value: currentInputs.isHPCL || false,
+          onChange: (value) => onChange('isHPCL', value === 'true')
+        });
+
+        if (currentInputs.isHPCL) {
+          inputs.push({
+            type: 'radio',
+            label: 'Is this transaction through HP Pay App?',
+            name: 'isHPPayApp',
+            options: [
+              { label: 'Yes', value: true },
+              { label: 'No', value: false }
+            ],
+            value: currentInputs.isHPPayApp || false,
+            onChange: (value) => onChange('isHPPayApp', value === 'true')
+          });
+        }
+      }
+
+      inputs.push({
+        type: 'radio',
+        label: 'Is this an IDFC FIRST FASTag recharge?',
+        name: 'isIDFCFASTag',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isIDFCFASTag || false,
+        onChange: (value) => onChange('isIDFCFASTag', value === 'true')
+      });
+
+      return inputs;
+    }
+  }
 };
 
 export const calculateIDFCFirstRewards = (cardName, amount, mcc, additionalParams = {}) => {

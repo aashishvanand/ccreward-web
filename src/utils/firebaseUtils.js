@@ -9,7 +9,7 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 const getCachedData = (userId) => {
   const cachedData = localStorage.getItem(`${CACHE_KEY}_${userId}`);
   const cacheTimestamp = localStorage.getItem(`${CACHE_TIMESTAMP_KEY}_${userId}`);
-  
+
   if (cachedData && cacheTimestamp) {
     const now = new Date().getTime();
     if (now - parseInt(cacheTimestamp) < CACHE_DURATION) {

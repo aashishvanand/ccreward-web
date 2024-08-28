@@ -20,6 +20,7 @@ export default function RootLayout({ children }) {
         <meta property="og:image:secure_url" content="https://ccrewards.aashishvanand.me/og.png" />
         <meta property="og:image:type" content="image/png" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta property="og:logo" content="your value" />
         <meta name="twitter:title" content="CCReward - Maximize Your Credit Card Rewards" />
         <meta property="twitter:domain" content="https://ccrewards.aashishvanand.me"/>
         <meta property="twitter:url" content="https://ccrewards.aashishvanand.me"/>
