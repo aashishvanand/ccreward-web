@@ -3,6 +3,7 @@ export const axisCardRewards = {
   "ACE": {
     cardType: "cashback",
     defaultRate: 1.5 / 100,
+    googlePayRate: 5 / 100,
     mccRates: {
       // Google Pay bill payments, DTH, and mobile recharges
       "4814": 5 / 100, "4816": 5 / 100, "4899": 5 / 100, "4900": 5 / 100,
@@ -16,7 +17,9 @@ export const axisCardRewards = {
       "6513": 0, // Rental payments
       "6540": 0, // Wallet load
       "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0, // Educational services
-      "9399": 0, "9311": 0, "9222": 0, "9402": 0 // Government services
+      "9399": 0, "9311": 0, "9222": 0, "9402": 0, // Government services
+      "5399": 3 / 100,
+      "5735": 2 / 100
     },
     capping: {
       categories: {
@@ -29,18 +32,18 @@ export const axisCardRewards = {
       let rateType = "default";
 
       if (additionalParams.isGooglePay && ["4814", "4816", "4899", "4900"].includes(mcc)) {
-        rate = 5 / 100;
+        rate = axisCardRewards.ACE.googlePayRate;
         category = "Google Pay Bill Payments";
         rateType = "google-pay";
-      } else if (["5812", "5814", "4121"].includes(mcc)) {
-        rate = 4 / 100;
-        category = "Food Delivery and Ola";
-        rateType = "food-and-ola";
-      } else if (axisCardRewards.ACE.mccRates[mcc] !== undefined) {
+      } else if (["4814", "4816", "4899", "4900"].includes(mcc)) {
+        rate = 0;
+        category = "Utility (No Cashback)";
+        rateType = "excluded";
+      }else if (axisCardRewards.ACE.mccRates[mcc]) {
         rate = axisCardRewards.ACE.mccRates[mcc];
         rateType = "mcc-specific";
-        category = rate === 0 ? "Excluded Category" : "Category Spend";
-      }
+        category = "Category Spend";
+      } 
 
       const cashback = amount * rate;
 
@@ -68,6 +71,9 @@ export const axisCardRewards = {
   "Atlas": {
     cardType: "points",
     defaultRate: 2 / 100,
+    travelRate: 5 / 100,
+    travelCapThreshold: 200000,
+    travelRateAboveCap: 2 / 100,
     mccRates: {
       // Airlines and Hotels (5X rewards)
       "3000": 5 / 100, "3001": 5 / 100, "3002": 5 / 100, "3003": 5 / 100, "3004": 5 / 100, "3005": 5 / 100,
@@ -168,19 +174,23 @@ export const axisCardRewards = {
       let category = "Other Spends";
       let rateType = "default";
 
-      if (mcc && axisCardRewards.Atlas.mccRates[mcc] !== undefined) {
-        rate = axisCardRewards.Atlas.mccRates[mcc];
-        rateType = "mcc-specific";
-        if (["3000", "3001", "3501", "3502", "7011"].includes(mcc)) {
-          category = "Travel";
-        } else if (rate === 0) {
-          category = "Excluded Category";
+      if (axisCardRewards.Atlas.mccRates[mcc]) {
+        if (amount <= axisCardRewards.Atlas.travelCapThreshold) {
+          rate = axisCardRewards.Atlas.travelRate;
         } else {
-          category = "Category Spend";
+          const belowCapAmount = axisCardRewards.Atlas.travelCapThreshold;
+          const aboveCapAmount = amount - axisCardRewards.Atlas.travelCapThreshold;
+          const belowCapPoints = belowCapAmount * axisCardRewards.Atlas.travelRate;
+          const aboveCapPoints = aboveCapAmount * axisCardRewards.Atlas.travelRateAboveCap;
+          const totalPoints = belowCapPoints + aboveCapPoints;
+          rate = totalPoints / amount; // Effective rate
         }
+        category = "Travel";
+        rateType = "travel";
       }
 
       const points = Math.floor(amount * rate);
+
       return { points, rate, rateType, category };
     },
     dynamicInputs: () => []
@@ -306,7 +316,7 @@ export const axisCardRewards = {
       "4722": 5 / 100, // 5% cashback for travel agencies (Cleartrip)
 
       // Preferred Merchants (examples, adjust as needed)
-      "5812": 4 / 100, // 4% cashback for restaurants (e.g., Swiggy)
+      "5812": 4 / 100, "5814": 4 / 100, // 4% cashback for restaurants (e.g., Swiggy)
       "7832": 4 / 100, // 4% cashback for movie theaters (e.g., PVR)
       "4121": 4 / 100, // 4% cashback for taxicabs/limousines (e.g., Uber)
       "7997": 4 / 100, // 4% cashback for gyms/fitness centers (e.g., Cultfit)
@@ -316,13 +326,14 @@ export const axisCardRewards = {
       let category = "Other Spends";
       let rateType = "default";
 
-      if (mcc && axisCardRewards.Flipkart.mccRates[mcc]) {
+      if (axisCardRewards.Flipkart.mccRates[mcc]) {
         rate = axisCardRewards.Flipkart.mccRates[mcc];
         rateType = "mcc-specific";
-        category = "Preferred Merchant";
+        category = "Fast Food Restaurants";
       }
 
       const cashback = amount * rate;
+
       return { cashback, rate, rateType, category };
     },
     dynamicInputs: () => []
@@ -667,6 +678,7 @@ export const axisCardRewards = {
   "Select": {
     cardType: "points",
     defaultRate: 10 / 200, // 10 Axis EDGE points on every Rs. 200 spends
+    retailRate: 20 / 200, // 2x points for retail spends
     acceleratedRewards: {
       tier1: {
         rate: 20 / 200, // 2X EDGE REWARD Points
@@ -714,7 +726,15 @@ export const axisCardRewards = {
       const points = Math.floor(amount * rate);
       return { points, rate, rateType, category };
     },
-    dynamicInputs: () => []
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'number',
+        label: 'Total monthly spend so far',
+        name: 'monthlySpend',
+        value: currentInputs.monthlySpend || 0,
+        onChange: (value) => onChange('monthlySpend', parseFloat(value))
+      }
+    ]
   },
   "Voyage": {
     cardType: "points",
@@ -1161,9 +1181,10 @@ export const axisCardRewards = {
     cardType: "cashback",
     defaultRate: 1 / 100, // 1% cashback on all other merchants/spends
     airtelRate: 25 / 100, // 25% cashback on Airtel Thanks App transactions
+    airtelAppNonTelecomRate: 10 / 100,
     mccRates: {
       // Airtel Thanks App transactions
-      "4814": 25 / 100, // Telecommunication Services
+      "4814": 10 / 100, // Telecommunication Services
       "4816": 10 / 100, // Computer Network Services
       "4899": 10 / 100, // Cable, Satellite, and Other Pay Television and Radio Services
       "4900": 10 / 100, // Utilities - Electric, Gas, Water, and Sanitary
@@ -1192,61 +1213,57 @@ export const axisCardRewards = {
       "5814": 500, // Preferred merchant cap per month (combined)
       "5411": 500, // Preferred merchant cap per month (combined)
     },
-    calculateRewards: (amount, mcc, additionalParams) => {
+    calculateRewards: (amount, mcc, additionalInputs) => {
       let rate = axisCardRewards.Airtel.defaultRate;
       let category = "Other Spends";
       let rateType = "default";
 
-      const relevantMCCs = ["4814", "4816", "4899", "4900"];
-      if (relevantMCCs.includes(mcc)) {
-        if (additionalParams.isAirtelApp === true) {
-          rate = axisCardRewards.Airtel.airtelRate;
-          rateType = "airtel-app";
-          category = "Airtel Thanks App";
+      if (additionalInputs.isAirtelApp) {
+        if (["4814", "4816", "4899", "4900"].includes(mcc)) {
+          rate = axisCardRewards.Airtel.airtelAppRate;
+          category = "Airtel Thanks App (Telecom)";
         } else {
-          rate = axisCardRewards.Airtel.mccRates[mcc];
-          rateType = "mcc-specific";
-          category = "Category Spend";
+          rate = axisCardRewards.Airtel.airtelAppNonTelecomRate;
+          category = "Airtel Thanks App (Non-Telecom)";
         }
-      } else if (axisCardRewards.Airtel.mccRates[mcc] !== undefined) {
+        rateType = "airtel-app";
+      } else if (axisCardRewards.Airtel.mccRates[mcc]) {
         rate = axisCardRewards.Airtel.mccRates[mcc];
         rateType = "mcc-specific";
-        category = "Category Spend";
+        if (["4814", "4816", "4899", "4900"].includes(mcc)) {
+          category = "Telecom/Utility Services";
+        } else {
+          category = "Preferred Merchant";
+        }
       }
 
       let cashback = amount * rate;
-      const cap = axisCardRewards.Airtel.cashbackCaps[mcc];
+      let appliedCap = null;
 
-      if (cap) {
-        cashback = Math.min(cashback, cap);
+      // Apply cashback cap
+      if (axisCardRewards.Airtel.cashbackCaps[mcc]) {
+        const cap = axisCardRewards.Airtel.cashbackCaps[mcc];
+        if (cashback > cap) {
+          cashback = cap;
+          appliedCap = { category, maxCashback: cap };
+        }
       }
 
-      cashback = Math.round(cashback * 100) / 100; // Round to 2 decimal places
-
-      return { cashback, rate, rateType, category };
+      return { cashback, rate, rateType, category, appliedCap };
     },
-    dynamicInputs: (currentInputs, onChange, selectedMcc) => {
-      const relevantMCCs = ["4814", "4816", "4899", "4900"];
-
-      if (relevantMCCs.includes(selectedMcc)) {
-        return [
-          {
-            type: 'radio',
-            label: 'Is this an Airtel Thanks App transaction?',
-            name: 'isAirtelApp',
-            options: [
-              { label: 'Yes', value: 'true' },
-              { label: 'No', value: 'false' }
-            ],
-            value: currentInputs.isAirtelApp ? 'true' : 'false',
-            onChange: (value) => {
-              onChange('isAirtelApp', value === 'true');
-            }
-          }
-        ];
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this an Airtel Thanks App transaction?',
+        name: 'isAirtelApp',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isAirtelApp || false,
+        onChange: (value) => onChange('isAirtelApp', value === 'true')
       }
-      return [];
-    }
+    ]
   },
   "Miles & More World Select": {
     cardType: "points",

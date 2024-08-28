@@ -105,9 +105,3 @@ export const validateInputs = (selectedBank, selectedCard, spentAmount) => {
 
   return Object.keys(errors).length === 0 ? null : errors;
 };
-
-export const debugLog = (...args) => {
-  if (process.env.NODE_ENV === 'development') {
-    console.log(...args);
-  }
-};

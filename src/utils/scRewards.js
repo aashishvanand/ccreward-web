@@ -32,7 +32,15 @@ export const scCardRewards = {
     cardType: "hybrid",
     defaultRate: 5 / 150, // 5 reward points per INR 150 spent
     mccRates: {
-      "5309": 0.05 // 5% cashback on duty-free spends
+      "5309": 0.05, // 5% cashback on duty-free spends
+      "4900": 3 / 150, // Utilities
+      "5411": 3 / 150, // Supermarkets
+      "5960": 3 / 150, // Insurance
+      "6300": 3 / 150, // Insurance
+      "7349": 3 / 150, // Property Management
+      "6513": 3 / 150, // Property Management / Rent Pay
+      "8299": 3 / 150, // Schools
+      "9399": 3 / 150, // Government
     },
     pointValue: 1, // 1 Reward point equals to INR 1
     calculateRewards: (amount, mcc, additionalParams) => {
@@ -44,7 +52,12 @@ export const scCardRewards = {
         rate = scCardRewards.Ultimate.mccRates["5309"];
         rateType = "cashback";
         category = "Duty-Free";
+      } else if (scCardRewards.Ultimate.mccRates[mcc]) {
+        rate = scCardRewards.Ultimate.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = getMccCategory(mcc);
       }
+
 
       const points = Math.floor(amount * rate);
       const cashback = mcc === "5309" ? amount * rate : 0;
