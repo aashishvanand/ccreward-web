@@ -33,7 +33,7 @@ const PrivacyPolicyPage = () => {
           <h2>4. Data Retention and Deletion</h2>
           <p>4.1. We retain your personal information only for as long as necessary to provide you with our Service and as described in this Privacy Policy.</p>
           <p>4.2. You can delete all the cards you&apos;ve added to your account directly through the Service.</p>
-          <p>4.3. To request the deletion of your account, please email ccrewards@aashishvanand.me. Upon request, we will disable your account for 30 days and then delete it after this period.</p>
+          <p>4.3. To request the deletion of your account, please email support@ccreward.app. Upon request, we will disable your account for 30 days and then delete it after this period.</p>
 
           <h2>5. Third-Party Services</h2>
           <p>Our Service uses Google Firebase for authentication and data storage. Please refer to Google&apos;s Privacy Policy for information on how they handle your data.</p>
@@ -45,7 +45,7 @@ const PrivacyPolicyPage = () => {
           <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the &quot;effective date&quot; at the top of this Privacy Policy.</p>
 
           <h2>8. Contact Us</h2>
-          <p>If you have any questions about this Privacy Policy, please contact us at ccrewards@aashishvanand.me</p>
+          <p>If you have any questions about this Privacy Policy, please contact us at support@ccreward.app</p>
         </Typography>
       </Container>
       <Footer />

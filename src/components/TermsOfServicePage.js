@@ -41,7 +41,7 @@ const TermsOfServicePage = () => {
           <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. By continuing to access or use our Service after any revisions become effective, you agree to be bound by the revised terms.</p>
 
           <h2>9. Contact Us</h2>
-          <p>If you have any questions about these Terms, please contact us at ccrewards@aashishvanand.me</p>
+          <p>If you have any questions about these Terms, please contact us at support@ccreward.app</p>
         </Typography>
       </Container>
       <Footer />
