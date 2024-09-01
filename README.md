@@ -102,6 +102,6 @@ This project is based on the Credit Card Rewards India Calculator (https://githu
 
 ---
 
-Visit the live calculator: [Credit Card Rewards Calculator](https://ccrewards.aashishvanand.me/)
+Visit the live calculator: [Credit Card Rewards Calculator](https://ccreward.app)
 
 Optimize your rewards and make the most of your credit card benefits with our comprehensive Credit Card Rewards Calculator!
