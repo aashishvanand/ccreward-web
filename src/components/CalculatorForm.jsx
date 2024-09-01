@@ -31,6 +31,8 @@ const CalculatorForm = ({
     }
   }, [selectedBank, selectedCard, getCardConfig]);
 
+  const isCalculateDisabled = !selectedBank || !selectedCard || !spentAmount || parseFloat(spentAmount) <= 0;
+
   return (
     <>
       <Autocomplete
@@ -41,13 +43,14 @@ const CalculatorForm = ({
             {...params}
             label="Select a bank"
             margin="normal"
+            required
           />
         )}
         value={selectedBank}
         onChange={(event, newValue) => onBankChange(newValue)}
       />
 
-      <Autocomplete
+<Autocomplete
         fullWidth
         options={selectedBank ? bankData[selectedBank] : []}
         renderInput={(params) => (
@@ -55,6 +58,7 @@ const CalculatorForm = ({
             {...params}
             label="Select a card"
             margin="normal"
+            required
           />
         )}
         value={selectedCard}
@@ -62,24 +66,25 @@ const CalculatorForm = ({
         disabled={!selectedBank}
       />
 
-      <Autocomplete
+<Autocomplete
         fullWidth
         options={mccList}
         getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
         renderInput={(params) => (
-          <TextField {...params} label="Search MCC" margin="normal" />
+          <TextField {...params} label="Search MCC (Optional)" margin="normal" />
         )}
         onChange={(event, newValue) => onMccChange(newValue)}
         value={selectedMcc}
       />
 
-      <TextField
+<TextField
         fullWidth
         margin="normal"
         label="Enter spent amount (INR)"
         type="number"
         value={spentAmount}
         onChange={(e) => onSpentAmountChange(e.target.value)}
+        required
       />
 
       {cardConfig && (
@@ -104,6 +109,7 @@ const CalculatorForm = ({
           color="primary"
           onClick={onCalculate}
           sx={{ width: "48%" }}
+          disabled={isCalculateDisabled}
         >
           Calculate
         </Button>

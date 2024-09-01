@@ -4,27 +4,21 @@ import {
   Typography,
   TextField,
   Button,
-  Card,
-  CardContent,
   CircularProgress,
   Container,
   Autocomplete,
   List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Skeleton,
+  Snackbar,
+  Alert,
 } from '@mui/material';
-import { CreditCard as CreditCardIcon } from '@mui/icons-material';
-import { calculateRewards, formatRewardText } from './CalculatorHelpers';
+import { calculateRewards } from './CalculatorHelpers';
 import Header from './Header';
 import Footer from './Footer';
 import { useAuth } from "../app/providers/AuthContext";
 import { getCardsForUser } from "../utils/firebaseUtils";
 import { mccList } from "../data/mccData";
 import ReactConfetti from 'react-confetti';
-import ExportedImage from "next-image-export-optimizer";
-import { getBankColor } from './colorPalette';
+import { renderCardList } from './CardListRenderer';
 
 const BestCardCalculator = () => {
   const [userCards, setUserCards] = useState([]);
@@ -36,8 +30,8 @@ const BestCardCalculator = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [isCardListLoading, setIsCardListLoading] = useState(true);
   const [hasCalculated, setHasCalculated] = useState(false);
-  const [imageLoadStatus, setImageLoadStatus] = useState({});
   const [failedImages, setFailedImages] = useState({});
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
   const { user } = useAuth();
 
   useEffect(() => {
@@ -49,6 +43,11 @@ const BestCardCalculator = () => {
           setUserCards(fetchedCards);
         } catch (error) {
           console.error("Error fetching user cards:", error);
+          setSnackbar({
+            open: true,
+            message: "Error fetching user cards. Please try again.",
+            severity: "error",
+          });
         } finally {
           setIsCardListLoading(false);
         }
@@ -60,6 +59,15 @@ const BestCardCalculator = () => {
   }, [user]);
 
   const handleCalculate = async () => {
+    if (!spentAmount || parseFloat(spentAmount) <= 0) {
+      setSnackbar({
+        open: true,
+        message: "Please enter a valid spent amount",
+        severity: "error",
+      });
+      return;
+    }
+
     setIsLoading(true);
     const rewards = await Promise.all(
       userCards.map(async (card) => {
@@ -86,14 +94,16 @@ const BestCardCalculator = () => {
     
     if (!hasCalculated) {
       setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 5000); // Hide confetti after 5 seconds
+      setTimeout(() => setShowConfetti(false), 5000);
       setHasCalculated(true);
     }
   };
 
-  const getCardImagePath = (bank, cardName) => {
-    const formattedCardName = cardName.replace(/\s+/g, '_').toLowerCase();
-    return `/card-images/${bank}/${bank.toLowerCase()}_${formattedCardName}.webp`;
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbar({ ...snackbar, open: false });
   };
 
   const handleImageError = (cardId) => {
@@ -101,82 +111,6 @@ const BestCardCalculator = () => {
       ...prevFailedImages,
       [cardId]: true
     }));
-  };
-
-  const renderCardImage = (card) => {
-    const bankColor = getBankColor(card.bank);
-
-    if (failedImages[card.id]) {
-      return <CreditCardIcon sx={{ fontSize: 40, color: bankColor }} />;
-    }
-
-    return (
-      <ExportedImage
-        src={getCardImagePath(card.bank, card.cardName)}
-        alt={`${card.bank} ${card.cardName}`}
-        fill
-        style={{ objectFit: "contain" }}
-        onError={() => handleImageError(card.id)}
-      />
-    );
-  };
-
-
-  const renderCardList = () => {
-    if (isCardListLoading) {
-      return Array(3).fill(0).map((_, index) => (
-        <ListItem key={index} sx={{ mb: 2 }}>
-          <Card sx={{ width: '100%' }}>
-            <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
-              <Skeleton variant="rectangular" width={60} height={40} sx={{ mr: 2 }} />
-              <Box sx={{ width: '100%' }}>
-                <Skeleton width="60%" />
-                <Skeleton width="40%" />
-              </Box>
-            </CardContent>
-          </Card>
-        </ListItem>
-      ));
-    }
-
-    return (isCalculated ? cardRewards : userCards).map((card, index) => (
-      <ListItem 
-        key={card.id}
-        sx={{ 
-          mb: 2,
-          borderRadius: 1,
-        }}
-      >
-        <Card 
-          sx={{ 
-            width: '100%',
-            bgcolor: isCalculated && index === 0 ? 'success.light' : 'background.paper',
-          }}
-        >
-          <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
-            <ListItemIcon>
-              <Box sx={{ width: 60, height: 40, position: 'relative', mr: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                {renderCardImage(card)}
-              </Box>
-            </ListItemIcon>
-            <ListItemText
-              primary={
-                <Typography variant="h6" component="div" sx={{ color: isCalculated && index === 0 ? 'success.contrastText' : 'text.primary' }}>
-                  {isCalculated ? `${index + 1}. ${card.bank} - ${card.cardName}` : `${card.bank} - ${card.cardName}`}
-                </Typography>
-              }
-              secondary={
-                isCalculated ? 
-                  <Typography variant="body1" sx={{ color: index === 0 ? 'success.contrastText' : 'text.secondary' }}>
-                    {formatRewardText(card)}
-                  </Typography>
-                : null
-              }
-            />
-          </CardContent>
-        </Card>
-      </ListItem>
-    ));
   };
 
   return (
@@ -203,21 +137,45 @@ const BestCardCalculator = () => {
           type="number"
           value={spentAmount}
           onChange={(e) => setSpentAmount(e.target.value)}
+          required
         />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleCalculate}
-          disabled={!spentAmount || isLoading}
-          sx={{ mt: 2, mb: 4 }}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            width: "100%",
+            mt: 2,
+            mb: 4,
+          }}
         >
-          Calculate Best Card
-        </Button>
-        {isLoading && <CircularProgress sx={{ mt: 2 }} />}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleCalculate}
+            disabled={!spentAmount || parseFloat(spentAmount) <= 0 || isLoading}
+            sx={{ width: "100%" }}
+          >
+            {isLoading ? <CircularProgress size={24} color="inherit" /> : "Calculate Best Card"}
+          </Button>
+        </Box>
         <List sx={{ width: '100%' }}>
-          {renderCardList()}
+          {renderCardList(isCardListLoading, isCalculated, cardRewards, userCards, failedImages, handleImageError)}
         </List>
       </Container>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
       <Footer />
     </Box>
   );
