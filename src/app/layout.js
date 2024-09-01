@@ -14,18 +14,18 @@ export default function RootLayout({ children }) {
         <meta property="og:title" content="Credit Card Rewards Calculator - Maximize Your Benefits" />
         <meta name="description" content="Compare, calculate, and choose the best credit card rewards with CCReward."/>
         <meta property="og:description" content="Compare, calculate, and choose the best credit card rewards with CCReward." />
-        <meta property="og:url" content="https://ccrewards.aashishvanand.me" />
+        <meta property="og:url" content="https://ccreward.app" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://ccrewards.aashishvanand.me/og.png" />
-        <meta property="og:image:secure_url" content="https://ccrewards.aashishvanand.me/og.png" />
+        <meta property="og:image" content="https://ccreward.app/og.png" />
+        <meta property="og:image:secure_url" content="https://ccreward.app/og.png" />
         <meta property="og:image:type" content="image/png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta property="og:logo" content="your value" />
         <meta name="twitter:title" content="CCReward - Maximize Your Credit Card Rewards" />
-        <meta property="twitter:domain" content="https://ccrewards.aashishvanand.me"/>
-        <meta property="twitter:url" content="https://ccrewards.aashishvanand.me"/>
+        <meta property="twitter:domain" content="https://ccreward.app"/>
+        <meta property="twitter:url" content="https://ccreward.app"/>
         <meta name="twitter:description" content="Compare, calculate, and choose the best credit card rewards with CCReward." />
-        <meta name="twitter:image" content="https://ccrewards.aashishvanand.me/og.png" />
+        <meta name="twitter:image" content="https://ccreward.app/og.png" />
         <meta name="keywords" content="Credit Card Rewards, ccgeeks, Reward Calculator, Credit Card Points Calculator, AMEX, Axis Bank, BOB, HDFC, HSBC, ICICI, IDFC First, IndusInd, Kotak, OneCard, RBL, SBI, Scapia, Standard Chartered, Yes Bank, Kiwi, AU Bank, Platinum, Atlas, Diners Club, Infinia, Regalia, Swiggy, AmazonPay, Emeralde, Sapphiro, Vistara, BPCL, Cashback, Forex Card, RuPay, MCC, Merchant Category Code" />
 
         <Script id="microsoft-clarity" strategy="afterInteractive">
