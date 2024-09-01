@@ -29,8 +29,7 @@ export const sbiCardRewards = {
 
       return { points, airMiles, rate, rateType, category };
     },
-    dynamicInputs: (currentInputs, onChange, selectedMcc) => 
-      {
+    dynamicInputs: (currentInputs, onChange, selectedMcc) => {
       if (["3020", "3193"].includes(selectedMcc)) {
         return [
           {
@@ -156,16 +155,18 @@ export const sbiCardRewards = {
     cardType: "points",
     defaultRate: 4 / 100, // 4 reward points on every Rs. 100 spent
     redemptionRate: 0.25, // 1 Reward Point = Rs. 0.25
-    excludedMCCs: ["6540", "6541"], // Wallet loads
+    mccRates: {
+      "6540": 0, "6541": 0 // Wallet loads
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = sbiCardRewards["Aurum"].defaultRate;
       let category = "All Spends";
       let rateType = "default";
 
-      if (sbiCardRewards["Aurum"].excludedMCCs.includes(mcc)) {
-        rate = 0;
-        category = "Excluded Category";
-        rateType = "excluded";
+      if (mcc && sbiCardRewards["Aurum"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["Aurum"].mccRates[mcc];
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+        rateType = "mcc-specific";
       }
 
       const points = Math.floor(amount * rate);
@@ -204,7 +205,7 @@ export const sbiCardRewards = {
       let category = "Other Non-Fuel Retail";
       let rateType = "default";
       let surchargeWaiver = 0;
-  
+
       if (["5541", "5542"].includes(mcc) && additionalParams.isBPCL) {
         rate = sbiCardRewards["BPCL"].mccRates["5541"];
         category = "BPCL Fuel";
@@ -217,10 +218,10 @@ export const sbiCardRewards = {
         category = "Accelerated Rewards";
         rateType = "accelerated";
       }
-  
+
       const points = Math.floor(amount * rate);
       const cashbackValue = points * sbiCardRewards["BPCL"].redemptionRate;
-  
+
       return { points, rate, rateType, category, cashbackValue, surchargeWaiver };
     },
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
@@ -257,7 +258,7 @@ export const sbiCardRewards = {
       "5411": 10 / 100, // Grocery Stores
       "7832": 10 / 100, // Movies
     },
-    
+
     capping: {
       categories: {
         "BPCL Fuel": { points: 2500, period: "billing cycle" },
@@ -274,7 +275,7 @@ export const sbiCardRewards = {
       let category = "Other Retail";
       let rateType = "default";
       let surchargeWaiver = 0;
-  
+
       if (["5541", "5542"].includes(mcc) && additionalParams.isBPCL) {
         rate = sbiCardRewards["BPCL Octane"].mccRates["5541"];
         category = "BPCL Fuel";
@@ -291,10 +292,10 @@ export const sbiCardRewards = {
         category = "Dining & Others";
         rateType = "accelerated";
       }
-  
+
       const points = Math.floor(amount * rate);
       const cashbackValue = points * sbiCardRewards["BPCL Octane"].redemptionRate;
-  
+
       return { points, rate, rateType, category, cashbackValue, surchargeWaiver };
     },
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
@@ -331,17 +332,17 @@ export const sbiCardRewards = {
     defaultRate: 0.01, // 1% cashback on offline spends
     onlineRate: 0.05, // 5% cashback on online spends
     mccRates: {
-        "5051": 0,"5094": 0,"5944": 0,"7631": 0,"5111": 0,"5192": 0,"5942": 0,"5943": 0,
-        "8211": 0,"8220": 0,"8241": 0,"8244": 0,"8249": 0,"8299": 0,"8351": 0,
-        "4814": 0,"4900": 0,
-        "9399": 0,"4816": 0,"4899": 0,
-        "5960": 0,
-        "6300": 0,"6381": 0,"5947": 0,
-        "6011": 0,"6012": 0,"6051": 0,
-        "4011": 0,"4112": 0,
-        "5172": 0,"5541": 0,"5542": 0,"5983": 0,
-        "6540": 0,"6541": 0,"6513": 0,
-        "7349": 0
+      "5051": 0, "5094": 0, "5944": 0, "7631": 0, "5111": 0, "5192": 0, "5942": 0, "5943": 0,
+      "8211": 0, "8220": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0, "8351": 0,
+      "4814": 0, "4900": 0,
+      "9399": 0, "4816": 0, "4899": 0,
+      "5960": 0,
+      "6300": 0, "6381": 0, "5947": 0,
+      "6011": 0, "6012": 0, "6051": 0,
+      "4011": 0, "4112": 0,
+      "5172": 0, "5541": 0, "5542": 0, "5983": 0,
+      "6540": 0, "6541": 0, "6513": 0,
+      "7349": 0
     },
     maxCashback: 5000, // Maximum cashback per statement cycle
     calculateRewards: (amount, mcc, additionalParams) => {
@@ -390,10 +391,10 @@ export const sbiCardRewards = {
       "5814": 10 / 100, // Fast Food Restaurants
       "5311": 10 / 100, // Departmental Stores
       "5411": 10 / 100, // Grocery Stores & Supermarkets
-      
+
       // Fuel transactions
       "5172": 0, "5541": 0, "5542": 0, "5983": 0,
-      
+
       // Rent transactions (effective April 1, 2024)
       "6513": 0
     },
@@ -403,7 +404,7 @@ export const sbiCardRewards = {
     },
     capping: {
       categories: {
-        "Accelerated Rewards": { points: 7500, maxSpent: 7500 / (10/100), period: "monthly" },
+        "Accelerated Rewards": { points: 7500, maxSpent: 7500 / (10 / 100), period: "monthly" },
         "Fuel": { surchargeWaiver: 250, period: "monthly" }
       }
     },
@@ -491,7 +492,7 @@ export const sbiCardRewards = {
       let rate = sbiCardRewards["Etihad Guest"].defaultRate;
       let category = "Other Spends";
       let rateType = "default";
-  
+
       if (mcc === "3034") {
         rate = sbiCardRewards["Etihad Guest"].mccRates["3034"];
         category = "Etihad.com";
@@ -505,9 +506,9 @@ export const sbiCardRewards = {
         category = rate === 0 ? "Excluded Category" : "Category Spend";
         rateType = "mcc-specific";
       }
-  
+
       const miles = Math.floor(amount * rate);
-  
+
       return { miles, rate, rateType, category };
     },
     dynamicInputs: (currentInputs, onChange) => [
@@ -533,7 +534,10 @@ export const sbiCardRewards = {
     internationalRate: 4 / 100, // 4 Etihad Guest Miles on every Rs. 100 spent on International Spends
     tierMileRate: 1 / 50, // 1 Etihad Guest Tier Mile for every Rs. 50 spent
     tierMileCap: 40000, // Maximum 40,000 Etihad Guest Tier Miles can be earned in a year
-    excludedMCCs: ["5172", "5541", "5983", "5542", "6513"], // Excluded categories
+    mccRates: {
+      "3034": 6 / 100,
+      "5172": 0, "5541": 0, "5983": 0, "5542": 0, "6513": 0,
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = sbiCardRewards["Etihad Guest Premier"].defaultRate;
       let category = "Other Spends";
@@ -547,7 +551,7 @@ export const sbiCardRewards = {
         rate = sbiCardRewards["Etihad Guest Premier"].internationalRate;
         category = "International Spends";
         rateType = "international";
-      } else if (sbiCardRewards["Etihad Guest Premier"].excludedMCCs.includes(mcc)) {
+      } else if (sbiCardRewards["Etihad Guest Premier"].mccRates[mcc] !== undefined) {
         rate = 0;
         category = "Excluded Category";
         rateType = "excluded";
@@ -582,8 +586,8 @@ export const sbiCardRewards = {
       "5813": 5 / 100, // Bars
       "5814": 5 / 100, // Fast Food
       "7832": 5 / 100, // Movies
+      "5712": 0, "5541": 0, "5983": 0, "5542": 0, "6513": 0 // Excluded categories
     },
-    excludedMCCs: ["5712", "5541", "5983", "5542", "6513"], // Fuel and Rent transactions
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = sbiCardRewards["Lifestyle"].defaultRate;
       let category = "Other Retail";
@@ -593,14 +597,10 @@ export const sbiCardRewards = {
         rate = sbiCardRewards["Lifestyle"].acceleratedRate;
         category = "Landmark Stores";
         rateType = "landmark";
-      } else if (sbiCardRewards["Lifestyle"].mccRates[mcc]) {
+      } else if (mcc && sbiCardRewards["Lifestyle"].mccRates[mcc] !== undefined) {
         rate = sbiCardRewards["Lifestyle"].mccRates[mcc];
-        category = "Dining & Movies";
-        rateType = "dining-movies";
-      } else if (sbiCardRewards["Lifestyle"].excludedMCCs.includes(mcc)) {
-        rate = 0;
-        category = "Excluded Category";
-        rateType = "excluded";
+        category = rate === 0 ? "Excluded Category" : "Dining & Movies";
+        rateType = rate === 0 ? "excluded" : "dining-movies";
       }
 
       const points = Math.floor(amount * rate);
@@ -631,29 +631,25 @@ export const sbiCardRewards = {
       "5813": 10 / 100, // Bars
       "5814": 10 / 100, // Fast Food
       "7832": 10 / 100, // Movies
+      "5712": 0, "5541": 0, "5983": 0, "5542": 0, "6513": 0 // Excluded categories
     },
-    excludedMCCs: ["5712", "5541", "5983", "5542", "6513"],
     calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = sbiCardRewards["Lifestyle Prime"].defaultRate;
+      let rate = sbiCardRewards["Lifestyle"].defaultRate;
       let category = "Other Retail";
       let rateType = "default";
 
       if (additionalParams.isLandmarkStore) {
-        rate = 15 / 100;
+        rate = sbiCardRewards["Lifestyle"].acceleratedRate;
         category = "Landmark Stores";
         rateType = "landmark";
-      } else if (sbiCardRewards["Lifestyle Prime"].mccRates[mcc]) {
-        rate = sbiCardRewards["Lifestyle Prime"].mccRates[mcc];
-        category = "Dining & Movies";
-        rateType = "dining-movies";
-      } else if (sbiCardRewards["Lifestyle Prime"].excludedMCCs.includes(mcc)) {
-        rate = 0;
-        category = "Excluded Category";
-        rateType = "excluded";
+      } else if (mcc && sbiCardRewards["Lifestyle"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["Lifestyle"].mccRates[mcc];
+        category = rate === 0 ? "Excluded Category" : "Dining & Movies";
+        rateType = rate === 0 ? "excluded" : "dining-movies";
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Lifestyle Prime"].redemptionRate;
+      const cashbackValue = points * sbiCardRewards["Lifestyle"].redemptionRate;
 
       return { points, rate, rateType, category, cashbackValue };
     },
@@ -680,29 +676,25 @@ export const sbiCardRewards = {
       "5813": 10 / 100, // Bars
       "5814": 10 / 100, // Fast Food
       "7832": 10 / 100, // Movies
+      "5712": 0, "5541": 0, "5983": 0, "5542": 0, "6513": 0 // Excluded categories
     },
-    excludedMCCs: ["5712", "5541", "5983", "5542", "6513"],
     calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = sbiCardRewards["Lifestyle Select"].defaultRate;
+      let rate = sbiCardRewards["Reliance"].defaultRate;
       let category = "Other Retail";
       let rateType = "default";
 
-      if (additionalParams.isLandmarkStore) {
-        rate = 10 / 100;
-        category = "Landmark Stores";
-        rateType = "landmark";
-      } else if (sbiCardRewards["Lifestyle Select"].mccRates[mcc]) {
-        rate = sbiCardRewards["Lifestyle Select"].mccRates[mcc];
-        category = "Dining & Movies";
-        rateType = "dining-movies";
-      } else if (sbiCardRewards["Lifestyle Select"].excludedMCCs.includes(mcc)) {
-        rate = 0;
-        category = "Excluded Category";
-        rateType = "excluded";
+      if (additionalParams.isRelianceRetail) {
+        rate = 5 / 100;
+        category = "Reliance Retail";
+        rateType = "reliance-retail";
+      } else if (mcc && sbiCardRewards["Reliance"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["Reliance"].mccRates[mcc];
+        category = rate === 0 ? "Excluded Category" : "Dining & Movies";
+        rateType = rate === 0 ? "excluded" : "dining-movies";
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Lifestyle Select"].redemptionRate;
+      const cashbackValue = points * sbiCardRewards["Reliance"].redemptionRate;
 
       return { points, rate, rateType, category, cashbackValue };
     },
@@ -731,10 +723,10 @@ export const sbiCardRewards = {
     },
     mccRates: {
       // Travel transactions (2 Travel Credits for every Rs. 200)
-      "4511": 2 / 200, "3020": 2 / 200, "3026": 2 / 200, "3034": 2 / 200, "3005": 2 / 200, 
-      "3008": 2 / 200, "3075": 2 / 200, "3136": 2 / 200, "3007": 2 / 200, "3010": 2 / 200, 
-      "3047": 2 / 200, "4722": 2 / 200, "4784": 2 / 200, "4131": 2 / 200, "4111": 2 / 200, 
-      "4121": 2 / 200, "7512": 2 / 200, "4789": 2 / 200, "4214": 2 / 200, "7011": 2 / 200, 
+      "4511": 2 / 200, "3020": 2 / 200, "3026": 2 / 200, "3034": 2 / 200, "3005": 2 / 200,
+      "3008": 2 / 200, "3075": 2 / 200, "3136": 2 / 200, "3007": 2 / 200, "3010": 2 / 200,
+      "3047": 2 / 200, "4722": 2 / 200, "4784": 2 / 200, "4131": 2 / 200, "4111": 2 / 200,
+      "4121": 2 / 200, "7512": 2 / 200, "4789": 2 / 200, "4214": 2 / 200, "7011": 2 / 200,
       "3640": 2 / 200, "3509": 2 / 200, "3649": 2 / 200, "3501": 2 / 200,
 
       // Excluded categories (same as MILES PRIME and MILES Elite)
@@ -779,10 +771,10 @@ export const sbiCardRewards = {
     },
     mccRates: {
       // Travel transactions (6 Travel Credits for every Rs. 200)
-      "4511": 6 / 200, "3020": 6 / 200, "3026": 6 / 200, "3034": 6 / 200, "3005": 6 / 200, 
-      "3008": 6 / 200, "3075": 6 / 200, "3136": 6 / 200, "3007": 6 / 200, "3010": 6 / 200, 
-      "3047": 6 / 200, "4722": 6 / 200, "4784": 6 / 200, "4131": 6 / 200, "4111": 6 / 200, 
-      "4121": 6 / 200, "7512": 6 / 200, "4789": 6 / 200, "4214": 6 / 200, "7011": 6 / 200, 
+      "4511": 6 / 200, "3020": 6 / 200, "3026": 6 / 200, "3034": 6 / 200, "3005": 6 / 200,
+      "3008": 6 / 200, "3075": 6 / 200, "3136": 6 / 200, "3007": 6 / 200, "3010": 6 / 200,
+      "3047": 6 / 200, "4722": 6 / 200, "4784": 6 / 200, "4131": 6 / 200, "4111": 6 / 200,
+      "4121": 6 / 200, "7512": 6 / 200, "4789": 6 / 200, "4214": 6 / 200, "7011": 6 / 200,
       "3640": 6 / 200, "3509": 6 / 200, "3649": 6 / 200, "3501": 6 / 200,
 
       // Excluded categories (same as MILES PRIME)
@@ -827,10 +819,10 @@ export const sbiCardRewards = {
     },
     mccRates: {
       // Travel transactions
-      "4511": 4 / 200, "3020": 4 / 200, "3026": 4 / 200, "3034": 4 / 200, "3005": 4 / 200, 
-      "3008": 4 / 200, "3075": 4 / 200, "3136": 4 / 200, "3007": 4 / 200, "3010": 4 / 200, 
-      "3047": 4 / 200, "4722": 4 / 200, "4784": 4 / 200, "4131": 4 / 200, "4111": 4 / 200, 
-      "4121": 4 / 200, "7512": 4 / 200, "4789": 4 / 200, "4214": 4 / 200, "7011": 4 / 200, 
+      "4511": 4 / 200, "3020": 4 / 200, "3026": 4 / 200, "3034": 4 / 200, "3005": 4 / 200,
+      "3008": 4 / 200, "3075": 4 / 200, "3136": 4 / 200, "3007": 4 / 200, "3010": 4 / 200,
+      "3047": 4 / 200, "4722": 4 / 200, "4784": 4 / 200, "4131": 4 / 200, "4111": 4 / 200,
+      "4121": 4 / 200, "7512": 4 / 200, "4789": 4 / 200, "4214": 4 / 200, "7011": 4 / 200,
       "3640": 4 / 200, "3509": 4 / 200, "3649": 4 / 200, "3501": 4 / 200,
 
       // Excluded categories
@@ -871,11 +863,11 @@ export const sbiCardRewards = {
     mccRates: {
       "4121": 7 / 100, // 7% Reward Points on all Ola rides
       // Excluded MCCs
-    "5172": 0, // Petroleum and Petroleum Products
-    "5541": 0, // Service Stations (with or without ancillary services)
-    "5983": 0, // Fuel Dealers – Fuel Oil, Wood, Coal, Liquefied Petroleum
-    "5542": 0, // Automated Fuel Dispensers
-    "6513": 0  // Real Estate Agents and Managers - Rentals
+      "5172": 0, // Petroleum and Petroleum Products
+      "5541": 0, // Service Stations (with or without ancillary services)
+      "5983": 0, // Fuel Dealers – Fuel Oil, Wood, Coal, Liquefied Petroleum
+      "5542": 0, // Automated Fuel Dispensers
+      "6513": 0  // Real Estate Agents and Managers - Rentals
     },
     capping: {
       categories: {
@@ -886,7 +878,7 @@ export const sbiCardRewards = {
       let rate = sbiCardRewards["Ola Money"].defaultRate;
       let category = "Other Spends";
       let rateType = "default";
-  
+
       if (mcc === "4121" && additionalParams.isOlaRide) {
         rate = sbiCardRewards["Ola Money"].mccRates["4121"];
         category = "OLA Rides";
@@ -896,10 +888,10 @@ export const sbiCardRewards = {
         rateType = "mcc-specific";
         category = rate === 0 ? "Excluded Category" : "Category Spend";
       }
-  
+
       const points = Math.floor(amount * rate);
       const cashbackValue = points * sbiCardRewards["Ola Money"].redemptionRate;
-  
+
       return { points, rate, rateType, category, cashbackValue };
     },
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
@@ -923,103 +915,103 @@ export const sbiCardRewards = {
   },
   "PayTM": {
     cardType: "cashback",
-  defaultRate: 0.01, // 1% cashback on any other spends
-  mccRates: {
-    "5541": 0, "5542": 0, // Fuel spends
-    "6513": 0, // Rent payments
-    "9399": 0, "9311": 0, // Government transactions
-  },
-  calculateRewards: (amount, mcc, additionalParams) => {
-    let rate = sbiCardRewards["PayTM"].defaultRate;
-    let category = "Other Spends";
-    let rateType = "default";
+    defaultRate: 0.01, // 1% cashback on any other spends
+    mccRates: {
+      "5541": 0, "5542": 0, // Fuel spends
+      "6513": 0, // Rent payments
+      "9399": 0, "9311": 0, // Government transactions
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = sbiCardRewards["PayTM"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
 
-    if (additionalParams.isPaytmMallMoviesTravel) {
-      rate = 0.03; // 3% cashback
-      category = "Paytm Mall, Movies and Travel";
-      rateType = "paytm-special";
-    } else if (additionalParams.isPaytmApp) {
-      rate = 0.02; // 2% cashback
-      category = "Paytm App";
-      rateType = "paytm-app";
-    } else if (mcc && sbiCardRewards["PayTM"].mccRates[mcc] !== undefined) {
-      rate = sbiCardRewards["PayTM"].mccRates[mcc];
-      rateType = "mcc-specific";
-      category = "Excluded Category";
-    }
-
-    const cashback = amount * rate;
-
-    return { cashback, rate, rateType, category };
-  },
-  dynamicInputs: (currentInputs, onChange) => [
-    {
-      type: 'radio',
-      label: 'Transaction Type',
-      name: 'paytmTransactionType',
-      options: [
-        { label: 'Paytm Mall, Movies or Travel transaction', value: 'mallMoviesTravel' },
-        { label: 'Paytm App transaction', value: 'app' },
-        { label: 'Other transaction', value: 'other' }
-      ],
-      value: currentInputs.paytmTransactionType || 'other',
-      onChange: (value) => {
-        onChange('paytmTransactionType', value);
-        onChange('isPaytmMallMoviesTravel', value === 'mallMoviesTravel');
-        onChange('isPaytmApp', value === 'app');
+      if (additionalParams.isPaytmMallMoviesTravel) {
+        rate = 0.03; // 3% cashback
+        category = "Paytm Mall, Movies and Travel";
+        rateType = "paytm-special";
+      } else if (additionalParams.isPaytmApp) {
+        rate = 0.02; // 2% cashback
+        category = "Paytm App";
+        rateType = "paytm-app";
+      } else if (mcc && sbiCardRewards["PayTM"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["PayTM"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = "Excluded Category";
       }
-    }
-  ]
+
+      const cashback = amount * rate;
+
+      return { cashback, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Transaction Type',
+        name: 'paytmTransactionType',
+        options: [
+          { label: 'Paytm Mall, Movies or Travel transaction', value: 'mallMoviesTravel' },
+          { label: 'Paytm App transaction', value: 'app' },
+          { label: 'Other transaction', value: 'other' }
+        ],
+        value: currentInputs.paytmTransactionType || 'other',
+        onChange: (value) => {
+          onChange('paytmTransactionType', value);
+          onChange('isPaytmMallMoviesTravel', value === 'mallMoviesTravel');
+          onChange('isPaytmApp', value === 'app');
+        }
+      }
+    ]
   },
   "PayTM Select": {
     cardType: "cashback",
-  defaultRate: 0.01, // 1% cashback on any other spends
-  mccRates: {
-    "5541": 0, "5542": 0, // Fuel spends
-    "6513": 0, // Rent payments
-    "9399": 0, "9311": 0, // Government transactions
-  },
-  calculateRewards: (amount, mcc, additionalParams) => {
-    let rate = sbiCardRewards["PayTM Select"].defaultRate;
-    let category = "Other Spends";
-    let rateType = "default";
+    defaultRate: 0.01, // 1% cashback on any other spends
+    mccRates: {
+      "5541": 0, "5542": 0, // Fuel spends
+      "6513": 0, // Rent payments
+      "9399": 0, "9311": 0, // Government transactions
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = sbiCardRewards["PayTM Select"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
 
-    if (additionalParams.isPaytmMallMoviesTravel) {
-      rate = 0.05; // 5% cashback
-      category = "Paytm Mall, Movies and Travel";
-      rateType = "paytm-special";
-    } else if (additionalParams.isPaytmApp) {
-      rate = 0.02; // 2% cashback
-      category = "Paytm App";
-      rateType = "paytm-app";
-    } else if (mcc && sbiCardRewards["PayTM Select"].mccRates[mcc] !== undefined) {
-      rate = sbiCardRewards["PayTM Select"].mccRates[mcc];
-      rateType = "mcc-specific";
-      category = "Excluded Category";
-    }
-
-    const cashback = amount * rate;
-
-    return { cashback, rate, rateType, category };
-  },
-  dynamicInputs: (currentInputs, onChange) => [
-    {
-      type: 'radio',
-      label: 'Transaction Type',
-      name: 'paytmTransactionType',
-      options: [
-        { label: 'Paytm Mall, Movies or Travel transaction', value: 'mallMoviesTravel' },
-        { label: 'Paytm App transaction', value: 'app' },
-        { label: 'Other transaction', value: 'other' }
-      ],
-      value: currentInputs.paytmTransactionType || 'other',
-      onChange: (value) => {
-        onChange('paytmTransactionType', value);
-        onChange('isPaytmMallMoviesTravel', value === 'mallMoviesTravel');
-        onChange('isPaytmApp', value === 'app');
+      if (additionalParams.isPaytmMallMoviesTravel) {
+        rate = 0.05; // 5% cashback
+        category = "Paytm Mall, Movies and Travel";
+        rateType = "paytm-special";
+      } else if (additionalParams.isPaytmApp) {
+        rate = 0.02; // 2% cashback
+        category = "Paytm App";
+        rateType = "paytm-app";
+      } else if (mcc && sbiCardRewards["PayTM Select"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["PayTM Select"].mccRates[mcc];
+        rateType = "mcc-specific";
+        category = "Excluded Category";
       }
-    }
-  ]
+
+      const cashback = amount * rate;
+
+      return { cashback, rate, rateType, category };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Transaction Type',
+        name: 'paytmTransactionType',
+        options: [
+          { label: 'Paytm Mall, Movies or Travel transaction', value: 'mallMoviesTravel' },
+          { label: 'Paytm App transaction', value: 'app' },
+          { label: 'Other transaction', value: 'other' }
+        ],
+        value: currentInputs.paytmTransactionType || 'other',
+        onChange: (value) => {
+          onChange('paytmTransactionType', value);
+          onChange('isPaytmMallMoviesTravel', value === 'mallMoviesTravel');
+          onChange('isPaytmApp', value === 'app');
+        }
+      }
+    ]
   },
   "Prime": {
     cardType: "points",
@@ -1033,7 +1025,7 @@ export const sbiCardRewards = {
       "5411": 10 / 100, // Grocery Stores & Supermarkets
       "5311": 10 / 100, // Departmental Stores
       "7832": 10 / 100, // Motion Picture Theaters
-      
+
       // Fuel transactions
       "5172": 0, "5541": 0, "5542": 0, "5983": 0
     },
@@ -1054,62 +1046,62 @@ export const sbiCardRewards = {
       }
     },
     acceleratedCap: 7500, // Monthly cap on accelerated reward points
-  calculateRewards: (amount, mcc, additionalParams) => {
-    let rate = sbiCardRewards["Prime"].defaultRate;
-    let category = "Other Retail Spends";
-    let rateType = "default";
-    let surchargeWaiver = 0;
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = sbiCardRewards["Prime"].defaultRate;
+      let category = "Other Retail Spends";
+      let rateType = "default";
+      let surchargeWaiver = 0;
 
-    if (additionalParams.isBirthday) {
-      rate = sbiCardRewards["Prime"].birthdayRate;
-      category = "Birthday Spend";
-      rateType = "birthday";
-    } else if (additionalParams.isUtilityBill) {
-      rate = sbiCardRewards["Prime"].utilityBillRate;
-      category = "Utility Bill";
-      rateType = "utility";
-    } else if (mcc && sbiCardRewards["Prime"].mccRates[mcc] !== undefined) {
-      rate = sbiCardRewards["Prime"].mccRates[mcc];
-      rateType = "mcc-specific";
-      if (["5812", "5813", "5814", "5411", "5311", "7832"].includes(mcc)) {
-        category = "Accelerated Rewards";
-      } else if (["5172", "5541", "5542", "5983"].includes(mcc)) {
-        category = "Fuel";
-        if (amount >= 500 && amount <= 4000) {
-          surchargeWaiver = Math.min(amount * sbiCardRewards["Prime"].fuelSurchargeWaiver.rate, sbiCardRewards["Prime"].fuelSurchargeWaiver.maxWaiver);
+      if (additionalParams.isBirthday) {
+        rate = sbiCardRewards["Prime"].birthdayRate;
+        category = "Birthday Spend";
+        rateType = "birthday";
+      } else if (additionalParams.isUtilityBill) {
+        rate = sbiCardRewards["Prime"].utilityBillRate;
+        category = "Utility Bill";
+        rateType = "utility";
+      } else if (mcc && sbiCardRewards["Prime"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["Prime"].mccRates[mcc];
+        rateType = "mcc-specific";
+        if (["5812", "5813", "5814", "5411", "5311", "7832"].includes(mcc)) {
+          category = "Accelerated Rewards";
+        } else if (["5172", "5541", "5542", "5983"].includes(mcc)) {
+          category = "Fuel";
+          if (amount >= 500 && amount <= 4000) {
+            surchargeWaiver = Math.min(amount * sbiCardRewards["Prime"].fuelSurchargeWaiver.rate, sbiCardRewards["Prime"].fuelSurchargeWaiver.maxWaiver);
+          }
         }
       }
-    }
 
-    const points = Math.floor(amount * rate);
-    const cashbackValue = points * sbiCardRewards["Prime"].redemptionRate;
+      const points = Math.floor(amount * rate);
+      const cashbackValue = points * sbiCardRewards["Prime"].redemptionRate;
 
-    return { points, rate, rateType, category, cashbackValue, surchargeWaiver };
-  },
-  dynamicInputs: (currentInputs, onChange) => [
-    {
-      type: 'radio',
-      label: 'Is this a birthday transaction?',
-      name: 'isBirthday',
-      options: [
-        { label: 'Yes', value: true },
-        { label: 'No', value: false }
-      ],
-      value: currentInputs.isBirthday || false,
-      onChange: (value) => onChange('isBirthday', value === 'true')
+      return { points, rate, rateType, category, cashbackValue, surchargeWaiver };
     },
-    {
-      type: 'radio',
-      label: 'Is this a utility bill transaction?',
-      name: 'isUtilityBill',
-      options: [
-        { label: 'Yes', value: true },
-        { label: 'No', value: false }
-      ],
-      value: currentInputs.isUtilityBill || false,
-      onChange: (value) => onChange('isUtilityBill', value === 'true')
-    }
-  ]
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a birthday transaction?',
+        name: 'isBirthday',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isBirthday || false,
+        onChange: (value) => onChange('isBirthday', value === 'true')
+      },
+      {
+        type: 'radio',
+        label: 'Is this a utility bill transaction?',
+        name: 'isUtilityBill',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isUtilityBill || false,
+        onChange: (value) => onChange('isUtilityBill', value === 'true')
+      }
+    ]
   },
   "Prime Advantage": {
     cardType: "points",
@@ -1128,7 +1120,7 @@ export const sbiCardRewards = {
       "4900": 20 / 100, // Utilities - Electric, Gas, Sanitary, Water
       "4814": 20 / 100, // Telecommunication Services
       "4899": 20 / 100, // Cable, Satellite, and Other Pay Television and Radio Services
-      
+
       // Fuel transactions
       "5172": 0, "5541": 0, "5542": 0, "5983": 0
     },
@@ -1151,7 +1143,7 @@ export const sbiCardRewards = {
       let category = "Other Retail Spends";
       let rateType = "default";
       let surchargeWaiver = 0;
-  
+
       if (["4900", "4814", "4899"].includes(mcc)) {
         rate = sbiCardRewards["Prime Advantage"].mccRates[mcc];
         category = "Utility Bill";
@@ -1167,10 +1159,10 @@ export const sbiCardRewards = {
           surchargeWaiver = Math.min(amount * sbiCardRewards["Prime Advantage"].fuelSurchargeWaiver.rate, sbiCardRewards["Prime Advantage"].fuelSurchargeWaiver.maxWaiver);
         }
       }
-  
+
       const points = Math.floor(amount * rate);
       const cashbackValue = points * sbiCardRewards["Prime Advantage"].redemptionRate;
-  
+
       return { points, rate, rateType, category, cashbackValue, surchargeWaiver };
     },
     dynamicInputs: () => []
@@ -1230,8 +1222,8 @@ export const sbiCardRewards = {
       "5813": 5 / 100, // Bars
       "5814": 5 / 100, // Fast Food
       "7832": 5 / 100, // Movies
+      "5172": 0, "5541": 0, "5983": 0, "5542": 0, "6540": 0, "6541": 0, "6513": 0, "9399": 0, "9311": 0 // Excluded categories
     },
-    excludedMCCs: ["5172", "5541", "5983", "5542", "6540", "6541", "6513", "9399", "9311"],
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = sbiCardRewards["Reliance"].defaultRate;
       let category = "Other Retail";
@@ -1241,14 +1233,10 @@ export const sbiCardRewards = {
         rate = 5 / 100;
         category = "Reliance Retail";
         rateType = "reliance-retail";
-      } else if (sbiCardRewards["Reliance"].mccRates[mcc]) {
+      } else if (mcc && sbiCardRewards["Reliance"].mccRates[mcc] !== undefined) {
         rate = sbiCardRewards["Reliance"].mccRates[mcc];
-        category = "Dining & Movies";
-        rateType = "dining-movies";
-      } else if (sbiCardRewards["Reliance"].excludedMCCs.includes(mcc)) {
-        rate = 0;
-        category = "Excluded Category";
-        rateType = "excluded";
+        category = rate === 0 ? "Excluded Category" : "Dining & Movies";
+        rateType = rate === 0 ? "excluded" : "dining-movies";
       }
 
       const points = Math.floor(amount * rate);
@@ -1281,33 +1269,30 @@ export const sbiCardRewards = {
       "7832": 5 / 100, // Movies
       "7922": 5 / 100, // Entertainment
       "3000": 5 / 100, // Airlines (generic)
+      "5172": 0, "5541": 0, "5983": 0, "5542": 0, "6540": 0, "6541": 0, "6513": 0, "9399": 0, "9311": 0 // Excluded categories
     },
-    excludedMCCs: ["5172", "5541", "5983", "5542", "6540", "6541", "6513", "9399", "9311"],
     calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = sbiCardRewards["Reliance Prime"].defaultRate;
-      let category = "Other Retail";
+      let rate = sbiCardRewards["Yatra"].defaultRate;
+      let category = "Other Categories";
       let rateType = "default";
 
-      if (additionalParams.isRelianceRetail) {
-        rate = 10 / 100;
-        category = "Reliance Retail";
-        rateType = "reliance-retail";
-      } else if (sbiCardRewards["Reliance Prime"].mccRates[mcc]) {
-        rate = sbiCardRewards["Reliance Prime"].mccRates[mcc];
-        category = "Accelerated Category";
-        rateType = "accelerated";
+      if (mcc && sbiCardRewards["Yatra"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["Yatra"].mccRates[mcc];
+        if (rate === 0) {
+          category = "Excluded Category";
+          rateType = "excluded";
+        } else {
+          category = "Accelerated Domestic";
+          rateType = "accelerated";
+        }
       } else if (additionalParams.isInternational) {
-        rate = 5 / 100;
-        category = "International Spends";
+        rate = 6 / 100;
+        category = "International";
         rateType = "international";
-      } else if (sbiCardRewards["Reliance Prime"].excludedMCCs.includes(mcc)) {
-        rate = 0;
-        category = "Excluded Category";
-        rateType = "excluded";
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Reliance Prime"].redemptionRate;
+      const cashbackValue = points * sbiCardRewards["Yatra"].redemptionRate;
 
       return { points, rate, rateType, category, cashbackValue };
     },
@@ -1365,16 +1350,18 @@ export const sbiCardRewards = {
   "IRCTC Platinum": {
     cardType: "points",
     defaultRate: 1 / 125, // 1 Reward point for every Rs. 125 spent on non-fuel retail purchases
-    excludedMCCs: ["5172", "5541", "5983", "5542"], // Fuel purchases
+    mccRates: {
+      "5172": 0, "5541": 0, "5983": 0, "5542": 0 // Fuel purchases
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = sbiCardRewards["IRCTC Platinum"].defaultRate;
       let category = "Non-Fuel Retail";
       let rateType = "default";
 
-      if (sbiCardRewards["IRCTC Platinum"].excludedMCCs.includes(mcc)) {
-        rate = 0;
-        category = "Excluded Category";
-        rateType = "excluded";
+      if (mcc && sbiCardRewards["IRCTC Platinum"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["IRCTC Platinum"].mccRates[mcc];
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+        rateType = "mcc-specific";
       }
 
       const points = Math.floor(amount * rate);
@@ -1428,16 +1415,18 @@ export const sbiCardRewards = {
   "Vistara": {
     cardType: "points",
     defaultRate: 3 / 200, // 3 CV Points per Rs. 200 spent on all spends
-    excludedMCCs: ["6540", "6541", "6513"], // E-wallet loading and Rent Payment
+    mccRates: {
+      "6540": 0, "6541": 0, "6513": 0 // E-wallet loading and Rent Payment
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = sbiCardRewards["Vistara"].defaultRate;
       let category = "All Spends";
       let rateType = "default";
 
-      if (sbiCardRewards["Vistara"].excludedMCCs.includes(mcc)) {
-        rate = 0;
-        category = "Excluded Category";
-        rateType = "excluded";
+      if (mcc && sbiCardRewards["Vistara"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["Vistara"].mccRates[mcc];
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+        rateType = "mcc-specific";
       }
 
       const points = Math.floor(amount * rate);
@@ -1449,16 +1438,18 @@ export const sbiCardRewards = {
   "Vistara Prime": {
     cardType: "points",
     defaultRate: 4 / 200, // 4 CV Points per Rs. 200 spent on all spends
-    excludedMCCs: ["6540", "6541", "6513"], // E-wallet loading and Rent Payment
+    mccRates: {
+      "6540": 0, "6541": 0, "6513": 0 // E-wallet loading and Rent Payment
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = sbiCardRewards["Vistara Prime"].defaultRate;
+      let rate = sbiCardRewards["Vistara"].defaultRate;
       let category = "All Spends";
       let rateType = "default";
 
-      if (sbiCardRewards["Vistara Prime"].excludedMCCs.includes(mcc)) {
-        rate = 0;
-        category = "Excluded Category";
-        rateType = "excluded";
+      if (mcc && sbiCardRewards["Vistara"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["Vistara"].mccRates[mcc];
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+        rateType = "mcc-specific";
       }
 
       const points = Math.floor(amount * rate);
@@ -1473,7 +1464,9 @@ export const sbiCardRewards = {
     onlineRate: 5 / 100, // 5X Reward Points on all other online spends
     partnerRate: 10 / 100, // 10X Reward Points on online spends with exclusive partners
     redemptionRate: 1, // Assuming 1 point = Rs. 1 for simplicity
-    excludedMCCs: ["6540", "6541", "5172", "5541", "5983", "5542", "6513", "9399", "9311"],
+    mccRates: {
+      "6540": 0, "6541": 0, "5172": 0, "5541": 0, "5983": 0, "5542": 0, "6513": 0, "9399": 0, "9311": 0
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = sbiCardRewards["SimplyClick"].defaultRate;
       let category = "Other Spends";
@@ -1487,10 +1480,10 @@ export const sbiCardRewards = {
         rate = sbiCardRewards["SimplyClick"].onlineRate;
         category = "Online Spends";
         rateType = "online";
-      } else if (sbiCardRewards["SimplyClick"].excludedMCCs.includes(mcc)) {
-        rate = 0;
-        category = "Excluded Category";
-        rateType = "excluded";
+      } else if (mcc && sbiCardRewards["SimplyClick"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["SimplyClick"].mccRates[mcc];
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+        rateType = "mcc-specific";
       }
 
       const points = Math.floor(amount * rate);
@@ -1557,7 +1550,7 @@ export const sbiCardRewards = {
         rate = sbiCardRewards["SimplySave"].acceleratedRate;
         category = "Accelerated Category";
         rateType = "accelerated";
-        
+
         if (["5812", "5813", "5814"].includes(mcc)) {
           category = "Dining";
         } else if (mcc === "7832") {
@@ -1764,111 +1757,114 @@ export const sbiCardRewards = {
   },
   "Titan": {
     cardType: "mixed",
-  defaultRate: 6 / 100, // 6 Reward Points per Rs 100 spent on all other categories
-  redemptionRate: 0.25, // 1 Reward Point = Rs. 0.25
-  titanRates: {
-    "Tanishq": 3 / 100, // 3% Value back on Tanishq
-    "MiaCaratlaneZoya": 5 / 100, // 5% Cashback on Mia, Caratlane & Zoya
-    "OtherTitan": 7.5 / 100, // 7.5% Cashback on other Titan brands
-  },
-  excludedMCCs: ["5541", "5542", "6540", "6541", "6513", "4900"],
-  calculateRewards: (amount, mcc, additionalParams) => {
-    let rate = sbiCardRewards["Titan"].defaultRate;
-    let category = "Other Categories";
-    let rateType = "default";
-    let cashback = 0;
-    let points = 0;
+    defaultRate: 6 / 100, // 6 Reward Points per Rs 100 spent on all other categories
+    redemptionRate: 0.25, // 1 Reward Point = Rs. 0.25
+    titanRates: {
+      "Tanishq": 3 / 100, // 3% Value back on Tanishq
+      "MiaCaratlaneZoya": 5 / 100, // 5% Cashback on Mia, Caratlane & Zoya
+      "OtherTitan": 7.5 / 100, // 7.5% Cashback on other Titan brands
+    },
+    mccRates: {
+      "5541": 0, "5542": 0, "6540": 0, "6541": 0, "6513": 0, "4900": 0
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = sbiCardRewards["Titan"].defaultRate;
+      let category = "Other Categories";
+      let rateType = "default";
+      let cashback = 0;
+      let points = 0;
 
-    if (additionalParams.titanBrand) {
-      rate = sbiCardRewards["Titan"].titanRates[additionalParams.titanBrand];
-      category = additionalParams.titanBrand;
-      rateType = "titan-brand";
-      cashback = amount * rate;
-    } else if (sbiCardRewards["Titan"].excludedMCCs.includes(mcc)) {
-      rate = 0;
-      category = "Excluded Category";
-      rateType = "excluded";
-    } else {
-      points = Math.floor(amount * rate);
-    }
+      if (additionalParams.titanBrand) {
+        rate = sbiCardRewards["Titan"].titanRates[additionalParams.titanBrand];
+        category = additionalParams.titanBrand;
+        rateType = "titan-brand";
+        cashback = amount * rate;
+      } else if (mcc && sbiCardRewards["Titan"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["Titan"].mccRates[mcc];
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+        rateType = "mcc-specific";
+      } else {
+        points = Math.floor(amount * rate);
+      }
 
-    const cashbackValue = points * sbiCardRewards["Titan"].redemptionRate;
+      const cashbackValue = points * sbiCardRewards["Titan"].redemptionRate;
 
-    return { points, cashback, rate, rateType, category, cashbackValue };
-  },
-  dynamicInputs: (currentInputs, onChange) => [
-    {
-      type: 'select',
-      label: 'Titan Brand',
-      name: 'titanBrand',
-      options: [
-        { label: 'Not Titan', value: '' },
-        { label: 'Tanishq', value: 'Tanishq' },
-        { label: 'Mia/Caratlane/Zoya', value: 'MiaCaratlaneZoya' },
-        { label: 'Other Titan Brands', value: 'OtherTitan' },
-      ],
-      value: currentInputs.titanBrand || '',
-      onChange: (value) => onChange('titanBrand', value)
-    }
-  ]
+      return { points, cashback, rate, rateType, category, cashbackValue };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'select',
+        label: 'Titan Brand',
+        name: 'titanBrand',
+        options: [
+          { label: 'Not Titan', value: '' },
+          { label: 'Tanishq', value: 'Tanishq' },
+          { label: 'Mia/Caratlane/Zoya', value: 'MiaCaratlaneZoya' },
+          { label: 'Other Titan Brands', value: 'OtherTitan' },
+        ],
+        value: currentInputs.titanBrand || '',
+        onChange: (value) => onChange('titanBrand', value)
+      }
+    ]
   },
   "Yatra": {
     cardType: "points",
-  defaultRate: 1 / 100, // 1 Reward Point on every Rs. 100 spent on all other categories
-  redemptionRate: 0.25, // 1 Reward point = Rs. 0.25
-  mccRates: {
-    "5311": 6 / 100, // Departmental Stores
-    "5411": 6 / 100, // Grocery
-    "5812": 6 / 100, // Dining
-    "5813": 6 / 100, // Bars
-    "5814": 6 / 100, // Fast Food
-    "7832": 6 / 100, // Movies
-    "7922": 6 / 100, // Entertainment
-  },
-  capping: {
-    categories: {
-      "Accelerated Domestic": { points: 5000, period: "monthly" },
-      "International": { points: 5000, period: "monthly" },
-    }
-  },
-  excludedMCCs: ["5172", "5541", "5983", "5542", "6513", "9399", "9311"],
-  calculateRewards: (amount, mcc, additionalParams) => {
-    let rate = sbiCardRewards["Yatra"].defaultRate;
-    let category = "Other Categories";
-    let rateType = "default";
+    defaultRate: 1 / 100, // 1 Reward Point on every Rs. 100 spent on all other categories
+    redemptionRate: 0.25, // 1 Reward point = Rs. 0.25
+    mccRates: {
+      "5311": 6 / 100, // Departmental Stores
+      "5411": 6 / 100, // Grocery
+      "5812": 6 / 100, // Dining
+      "5813": 6 / 100, // Bars
+      "5814": 6 / 100, // Fast Food
+      "7832": 6 / 100, // Movies
+      "7922": 6 / 100, // Entertainment
+      "5172": 0, "5541": 0, "5983": 0, "5542": 0, "6513": 0, "9399": 0, "9311": 0 // Excluded categories
+    },
+    capping: {
+      categories: {
+        "Accelerated Domestic": { points: 5000, period: "monthly" },
+        "International": { points: 5000, period: "monthly" },
+      }
+    },
+    calculateRewards: (amount, mcc, additionalParams) => {
+      let rate = sbiCardRewards["Yatra"].defaultRate;
+      let category = "Other Categories";
+      let rateType = "default";
 
-    if (sbiCardRewards["Yatra"].excludedMCCs.includes(mcc)) {
-      rate = 0;
-      category = "Excluded Category";
-      rateType = "excluded";
-    } else if (Object.keys(sbiCardRewards["Yatra"].mccRates).includes(mcc)) {
-      rate = sbiCardRewards["Yatra"].mccRates[mcc];
-      category = "Accelerated Domestic";
-      rateType = "accelerated";
-    } else if (additionalParams.isInternational) {
-      rate = 6 / 100;
-      category = "International";
-      rateType = "international";
-    }
+      if (mcc && sbiCardRewards["Yatra"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["Yatra"].mccRates[mcc];
+        if (rate === 0) {
+          category = "Excluded Category";
+          rateType = "excluded";
+        } else {
+          category = "Accelerated Domestic";
+          rateType = "accelerated";
+        }
+      } else if (additionalParams.isInternational) {
+        rate = 6 / 100;
+        category = "International";
+        rateType = "international";
+      }
 
-    const points = Math.floor(amount * rate);
-    const cashbackValue = points * sbiCardRewards["Yatra"].redemptionRate;
+      const points = Math.floor(amount * rate);
+      const cashbackValue = points * sbiCardRewards["Yatra"].redemptionRate;
 
-    return { points, rate, rateType, category, cashbackValue };
-  },
-  dynamicInputs: (currentInputs, onChange) => [
-    {
-      type: 'radio',
-      label: 'Is this an international transaction?',
-      name: 'isInternational',
-      options: [
-        { label: 'Yes', value: true },
-        { label: 'No', value: false }
-      ],
-      value: currentInputs.isInternational || false,
-      onChange: (value) => onChange('isInternational', value === 'true')
-    }
-  ]
+      return { points, rate, rateType, category, cashbackValue };
+    },
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this an international transaction?',
+        name: 'isInternational',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isInternational || false,
+        onChange: (value) => onChange('isInternational', value === 'true')
+      }
+    ]
   }
 };
 
@@ -2047,7 +2043,7 @@ const applyPointsCapping = (result, cardReward, cardName) => {
 
 const generateMilesRewardText = (cardName, miles, tierMiles, rate, rateType, category, appliedCap) => {
   let rewardText = `${miles} Etihad Guest Miles`;
-  
+
   if (tierMiles) {
     rewardText += ` + ${tierMiles} Tier Miles`;
   }

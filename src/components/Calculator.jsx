@@ -4,6 +4,8 @@ import {
   Container,
   Typography,
   CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useAppTheme } from "./ThemeRegistry";
@@ -19,7 +21,7 @@ import MissingBankCardForm from "./MissingBankCardForm";
 import IncorrectRewardReportForm from "./IncorrectRewardReportForm";
 import { useCardSelection, useRewardCalculation } from "./CalculatorHooks";
 import { getCardConfig } from "./CalculatorHelpers";
-import ReactConfetti from 'react-confetti';
+import ReactConfetti from "react-confetti";
 
 function Calculator() {
   const { mode, toggleTheme, theme } = useAppTheme();
@@ -29,7 +31,11 @@ function Calculator() {
   const [userCards, setUserCards] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
   const [showConfetti, setShowConfetti] = useState(false);
   const [hasCalculated, setHasCalculated] = useState(false);
 
@@ -52,10 +58,17 @@ function Calculator() {
     calculationPerformed,
     calculateRewards,
     clearForm,
-  } = useRewardCalculation(selectedBank, selectedCard, selectedMcc, spentAmount, additionalInputs);
+  } = useRewardCalculation(
+    selectedBank,
+    selectedCard,
+    selectedMcc,
+    spentAmount,
+    additionalInputs
+  );
 
   const [missingFormOpen, setMissingFormOpen] = useState(false);
-  const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] = useState(false);
+  const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] =
+    useState(false);
 
   useEffect(() => {
     const fetchUserCards = async () => {
@@ -94,7 +107,10 @@ function Calculator() {
           cardName: selectedCard,
         };
         const newCardId = await addCardForUser(user.uid, cardData);
-        setUserCards((prevCards) => [...prevCards, { ...cardData, id: newCardId }]);
+        setUserCards((prevCards) => [
+          ...prevCards,
+          { ...cardData, id: newCardId },
+        ]);
         setSnackbar({
           open: true,
           message: "Card added to your collection successfully!",
@@ -125,11 +141,19 @@ function Calculator() {
   };
 
   const handleCalculate = () => {
-    calculateRewards();
-    if (!hasCalculated) {
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 5000); // Hide confetti after 5 seconds
-      setHasCalculated(true);
+    if (spentAmount && parseFloat(spentAmount) > 0) {
+      calculateRewards();
+      if (!hasCalculated) {
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 5000);
+        setHasCalculated(true);
+      }
+    } else {
+      setSnackbar({
+        open: true,
+        message: "Please enter a valid spent amount",
+        severity: "error",
+      });
     }
   };
 
@@ -202,22 +226,43 @@ function Calculator() {
       <MissingBankCardForm
         open={missingFormOpen}
         onClose={() => setMissingFormOpen(false)}
-        onSubmitSuccess={(message) => setSnackbar({ open: true, message, severity: "success" })}
+        onSubmitSuccess={(message) =>
+          setSnackbar({ open: true, message, severity: "success" })
+        }
       />
 
       <IncorrectRewardReportForm
         open={incorrectRewardReportOpen}
         onClose={() => setIncorrectRewardReportOpen(false)}
-        onSubmitSuccess={(message) => setSnackbar({ open: true, message, severity: "success" })}
+        onSubmitSuccess={(message) =>
+          setSnackbar({ open: true, message, severity: "success" })
+        }
         formData={{
           bank: selectedBank,
           card: selectedCard,
-          mcc: selectedMcc ? `${selectedMcc.mcc} - ${selectedMcc.name}` : "Not selected",
+          mcc: selectedMcc
+            ? `${selectedMcc.mcc} - ${selectedMcc.name}`
+            : "Not selected",
           spentAmount,
           additionalInputs,
           calculationResult,
         }}
       />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
 
       <Footer />
     </Box>

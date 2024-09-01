@@ -7,8 +7,17 @@ import { calculateIDFCFirstRewards } from "../utils/idfcfirstRewards";
 import { calculateOneCardRewards } from "../utils/onecardRewards";
 import { calculateSCRewards } from "../utils/scRewards";
 import { calculateSBIRewards } from "../utils/sbiRewards";
+import { calculateYESRewards } from "../utils/yesRewards";
+import { calculateKotakRewards } from "../utils/kotakRewards";
+import { calculateIndusIndRewards } from "../utils/indusindRewards";
 
-export const calculateRewards = (selectedBank, selectedCard, selectedMcc, spentAmount, additionalInputs) => {
+export const calculateRewards = (
+  selectedBank,
+  selectedCard,
+  selectedMcc,
+  spentAmount,
+  additionalInputs
+) => {
   const amount = parseFloat(spentAmount);
   const mcc = selectedMcc ? selectedMcc.mcc : null;
 
@@ -16,31 +25,85 @@ export const calculateRewards = (selectedBank, selectedCard, selectedMcc, spentA
 
   switch (selectedBank) {
     case "AMEX":
-      result = calculateAmexRewards(selectedCard, amount, mcc, additionalInputs);
+      result = calculateAmexRewards(
+        selectedCard,
+        amount,
+        mcc,
+        additionalInputs
+      );
       break;
     case "ICICI":
-      result = calculateICICIRewards(selectedCard, amount, mcc, additionalInputs);
+      result = calculateICICIRewards(
+        selectedCard,
+        amount,
+        mcc,
+        additionalInputs
+      );
       break;
     case "HDFC":
-      result = calculateHDFCRewards(selectedCard, amount, mcc, additionalInputs);
+      result = calculateHDFCRewards(
+        selectedCard,
+        amount,
+        mcc,
+        additionalInputs
+      );
       break;
     case "HSBC":
-      result = calculateHSBCRewards(selectedCard, amount, mcc, additionalInputs);
+      result = calculateHSBCRewards(
+        selectedCard,
+        amount,
+        mcc,
+        additionalInputs
+      );
       break;
     case "Axis":
-      result = calculateAxisRewards(selectedCard, amount, mcc, additionalInputs);
+      result = calculateAxisRewards(
+        selectedCard,
+        amount,
+        mcc,
+        additionalInputs
+      );
       break;
     case "IDFCFirst":
-      result = calculateIDFCFirstRewards(selectedCard, amount, mcc, additionalInputs);
+      result = calculateIDFCFirstRewards(
+        selectedCard,
+        amount,
+        mcc,
+        additionalInputs
+      );
       break;
     case "OneCard":
-      result = calculateOneCardRewards(selectedCard, amount, mcc, additionalInputs);
+      result = calculateOneCardRewards(
+        selectedCard,
+        amount,
+        mcc,
+        additionalInputs
+      );
       break;
     case "SBI":
       result = calculateSBIRewards(selectedCard, amount, mcc, additionalInputs);
       break;
     case "SC":
       result = calculateSCRewards(selectedCard, amount, mcc, additionalInputs);
+      break;
+    case "YesBank":
+      result = calculateYESRewards(selectedCard, amount, mcc, additionalInputs);
+      break;
+    case "Kotak":
+      result = calculateKotakRewards(
+        selectedCard,
+        amount,
+        mcc,
+        additionalInputs
+      );
+      break;
+    case "IndusInd":
+      result = calculateIndusIndRewards(
+        selectedCard,
+        amount,
+        mcc,
+        additionalInputs
+      );
       break;
     default:
       console.error("Unknown bank selected:", selectedBank);
@@ -65,23 +128,53 @@ export const formatRewardText = (result) => {
 export const getCardConfig = (bank, card) => {
   switch (bank) {
     case "AMEX":
-      return import("../utils/amexRewards").then(module => module.amexCardRewards[card]);
+      return import("../utils/amexRewards").then(
+        (module) => module.amexCardRewards[card]
+      );
     case "ICICI":
-      return import("../utils/iciciRewards").then(module => module.iciciCardRewards[card]);
+      return import("../utils/iciciRewards").then(
+        (module) => module.iciciCardRewards[card]
+      );
     case "HDFC":
-      return import("../utils/hdfcRewards").then(module => module.hdfcCardRewards[card]);
+      return import("../utils/hdfcRewards").then(
+        (module) => module.hdfcCardRewards[card]
+      );
     case "HSBC":
-      return import("../utils/hsbcRewards").then(module => module.hsbcCardRewards[card]);
+      return import("../utils/hsbcRewards").then(
+        (module) => module.hsbcCardRewards[card]
+      );
     case "Axis":
-      return import("../utils/axisRewards").then(module => module.axisCardRewards[card]);
+      return import("../utils/axisRewards").then(
+        (module) => module.axisCardRewards[card]
+      );
     case "IDFCFirst":
-      return import("../utils/idfcfirstRewards").then(module => module.idfcFirstCardRewards[card]);
+      return import("../utils/idfcfirstRewards").then(
+        (module) => module.idfcFirstCardRewards[card]
+      );
     case "OneCard":
-      return import("../utils/onecardRewards").then(module => module.oneCardRewards[card]);
+      return import("../utils/onecardRewards").then(
+        (module) => module.oneCardRewards[card]
+      );
     case "SBI":
-      return import("../utils/sbiRewards").then(module => module.sbiCardRewards[card]);
+      return import("../utils/sbiRewards").then(
+        (module) => module.sbiCardRewards[card]
+      );
     case "SC":
-      return import("../utils/scRewards").then(module => module.scCardRewards[card]);
+      return import("../utils/scRewards").then(
+        (module) => module.scCardRewards[card]
+      );
+    case "YesBank":
+      return import("../utils/yesRewards").then(
+        (module) => module.yesCardRewards[card]
+      );
+    case "Kotak":
+      return import("../utils/kotakRewards").then(
+        (module) => module.kotakCardRewards[card]
+      );
+    case "IndusInd":
+      return import("../utils/indusindRewards").then(
+        (module) => module.indusIndCardRewards[card]
+      );
     default:
       console.error("Unknown bank selected:", bank);
       return Promise.resolve(null);
@@ -99,7 +192,11 @@ export const validateInputs = (selectedBank, selectedCard, spentAmount) => {
     errors.card = "Please select a card";
   }
 
-  if (!spentAmount || isNaN(parseFloat(spentAmount)) || parseFloat(spentAmount) <= 0) {
+  if (
+    !spentAmount ||
+    isNaN(parseFloat(spentAmount)) ||
+    parseFloat(spentAmount) <= 0
+  ) {
     errors.spentAmount = "Please enter a valid spent amount";
   }
 

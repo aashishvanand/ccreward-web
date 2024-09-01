@@ -6,7 +6,7 @@ The Credit Card Rewards India Calculator is a comprehensive tool designed to hel
 
 ## Features
 
-- Multi-bank support: Calculate rewards for cards from AMEX, Axis Bank, BOB, HDFC, HSBC, ICICI, IDFC First, IndusInd, Kotak, OneCard, RBL, SBI, Scapia, Standard Chartered, Yes Bank, Kiwi, and AU Bank.
+- Multi-bank support: Calculate rewards for cards from AMEX, Axis Bank, BOB, HDFC, HSBC, ICICI, IDFC First, IndusInd, Kotak, OneCard, RBL, SBI, Scapia, Standard Chartered, Yes Bank and AU Bank.
 - MCC-based calculations: Accurately calculate rewards based on specific Merchant Category Codes.
 - User-friendly interface: Easy-to-use calculator with intuitive design.
 - Dark mode support: Toggle between light and dark themes for comfortable viewing.
@@ -28,6 +28,7 @@ The Credit Card Rewards India Calculator is a comprehensive tool designed to hel
 - React.js
 - Material-UI (MUI)
 - Next.js (inferred from the use of 'use client')
+- Firebase (for authentication and data storage)
 
 ## Installation and Setup
 
@@ -44,6 +45,30 @@ npm install
 # Run the development server
 npm run dev
 ```
+
+## Firebase Setup
+To run this project locally, you need to set up a Firebase project and add the configuration to your local environment. Follow these steps:
+
+1. Go to the Firebase Console.
+2. Click on "Add project" and follow the setup wizard to create a new project.
+3. Once your project is created, click on the web icon (</>) to add a web app to your project.
+4. Register your app with a nickname (e.g., "credit-card-rewards-calculator").
+5. Copy the Firebase configuration object.
+6. In your project root, create a file named .env.local.
+7. Add the following environment variables to .env.local, replacing the xxx with your actual Firebase configuration values:
+
+```bash
+NEXT_PUBLIC_FIREBASE_API_KEY=xxx
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=xxx
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=xxx
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=xxx
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=xxx
+NEXT_PUBLIC_FIREBASE_APP_ID=xxx
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=xxx
+```
+
+8. Save the .env.local file.
+Make sure to add .env.local to your .gitignore file to prevent sensitive information from being committed to your repository.
 
 ## Contributing
 
@@ -77,6 +102,6 @@ This project is based on the Credit Card Rewards India Calculator (https://githu
 
 ---
 
-Visit the live calculator: [Credit Card Rewards Calculator](https://ccrewards.aashishvanand.me/)
+Visit the live calculator: [Credit Card Rewards Calculator](https://ccreward.app)
 
 Optimize your rewards and make the most of your credit card benefits with our comprehensive Credit Card Rewards Calculator!

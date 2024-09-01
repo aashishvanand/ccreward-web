@@ -15,7 +15,7 @@ export const amexCardRewards = {
 
             // Excluded categories
             "5541": 0, "5542": 0, // Fuel
-            "6300": 0, // Insurance
+            "6300": 0, "6381": 0, "6399": 0, // Insurance
             "4900": 0, // Utilities
         },
         capping: {
@@ -56,7 +56,7 @@ export const amexCardRewards = {
         defaultRate: 1 / 50,
         mccRates: {
             "5541": 0, "5542": 0, // Fuel
-            "6300": 0, // Insurance
+            "6300": 0, "6381": 0, "6399": 0, // Insurance
             "4900": 0, // Utilities
         },
         calculateRewards: (amount, mcc, additionalParams) => {
@@ -82,7 +82,7 @@ export const amexCardRewards = {
         defaultRate: 1 / 50,
         mccRates: {
             "5541": 0, "5542": 0, // Fuel
-            "6300": 0, // Insurance
+            "6300": 0, "6381": 0, "6399": 0, // Insurance
             "4900": 0, // Utilities
         },
         calculateRewards: (amount, mcc, additionalParams) => {
@@ -108,7 +108,7 @@ export const amexCardRewards = {
         defaultRate: 1 / 50,
         mccRates: {
             "5541": 0, "5542": 0, // Fuel
-            "6300": 0, // Insurance
+            "6300": 0, "6381": 0, "6399": 0, // Insurance
             "4900": 0, // Utilities
         },
         calculateRewards: (amount, mcc, additionalParams) => {
@@ -136,7 +136,7 @@ export const amexCardRewards = {
         rewardMultiplierRate: 5 / 40, // 5X points through Reward Multiplier
         mccRates: {
             "5541": 5 / 100, "5542": 5 / 100, // Fuel
-            "6300": 0, // Insurance
+            "6300": 0, "6381": 0, "6399": 0, // Insurance
             "4900": 0, // Utilities
         },
         capping: {
@@ -193,7 +193,7 @@ export const amexCardRewards = {
         mccRates: {
             "5541": 1 / 50, "5542": 1 / 50, // Fuel
             "4900": 1 / 50, // Utilities
-            "6300": 0, // Insurance
+            "6300": 0, "6381": 0, "6399": 0, // Insurance
         },
         capping: {
             categories: {

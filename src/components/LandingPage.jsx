@@ -41,6 +41,9 @@ export default function LandingPage() {
     "ONECARD",
     "SBI",
     "SC",
+    "KOTAK",
+    "INDUSIND",
+    "YESBANK"
   ];
 
   const handleGoogleSignIn = async () => {
