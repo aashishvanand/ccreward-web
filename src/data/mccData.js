@@ -5709,7 +5709,7 @@ export const mccList = [
         "mcc": "9399",
         "industryname": "Government Services",
         "merchantCategory": "General",
-        "name": "United Airlines, Utilities, Government Services"
+        "name": "Utilities, Government Services"
     },
     {
         "mcc": "9401",
