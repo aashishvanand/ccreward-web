@@ -173,8 +173,16 @@ export const axisCardRewards = {
       let rate = axisCardRewards.Atlas.defaultRate;
       let category = "Other Spends";
       let rateType = "default";
-
-      if (axisCardRewards.Atlas.mccRates[mcc]) {
+  
+      const mccNum = parseInt(mcc, 10);
+      const isAirlineMCC = mccNum >= 3000 && mccNum <= 3350;
+      const isHotelMCC = mccNum >= 3501 && mccNum <= 3999;
+  
+      if (axisCardRewards.Atlas.mccRates[mcc] !== undefined) {
+        rate = axisCardRewards.Atlas.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = rate === 0 ? "Excluded Category" : "Travel";
+      } else if (isAirlineMCC || isHotelMCC || mcc === "4511" || mcc === "7011") {
         if (amount <= axisCardRewards.Atlas.travelCapThreshold) {
           rate = axisCardRewards.Atlas.travelRate;
         } else {
@@ -188,9 +196,9 @@ export const axisCardRewards = {
         category = "Travel";
         rateType = "travel";
       }
-
+  
       const points = Math.floor(amount * rate);
-
+  
       return { points, rate, rateType, category };
     },
     dynamicInputs: () => []
