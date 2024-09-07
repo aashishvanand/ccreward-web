@@ -89,7 +89,9 @@ export const iciciCardRewards = {
     defaultRate: 6 / 200,
     mccRates: {
       "6513": 0,
-      "5541": 0
+      "5541": 0,
+      "6540": 0,
+      "9311": 0
     },
     capping: {
       categories: {
@@ -104,16 +106,16 @@ export const iciciCardRewards = {
       let rate = iciciCardRewards["Emeralde Private"].defaultRate;
       let category = "Other Spends";
       let rateType = "default";
-
-      if (mcc && iciciCardRewards["Emeralde Private"].mccRates[mcc] !== undefined) {
+  
+      if (mcc in iciciCardRewards["Emeralde Private"].mccRates) {
         rate = iciciCardRewards["Emeralde Private"].mccRates[mcc];
         rateType = "mcc-specific";
         category = rate === 0 ? "Excluded Category" : "Category Spend";
       }
-
+  
       const points = Math.floor(amount * rate);
       const cashbackValue = points * iciciCardRewards["Emeralde Private"].pointValue;
-
+  
       return { points, rate, rateType, category, cashbackValue };
     },
     dynamicInputs: () => []

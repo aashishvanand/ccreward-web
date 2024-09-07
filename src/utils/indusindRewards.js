@@ -58,6 +58,8 @@ export const indusIndCardRewards = {
   },
   "Celesta": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 1 / 100, // 1 Reward Point for every ₹100 spent on Domestic transactions
     internationalRate: 3 / 100, // 3 Reward Points for every ₹100 spent on International transactions
     redemptionRate: {
@@ -97,6 +99,8 @@ export const indusIndCardRewards = {
   },
   "Club Vistara Explorer": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 2 / 200, // 2 CV Points per INR 200 spent on all other spends
     rates: {
       "vistara": 8 / 200, // 8 CV Points per INR 200 spent on Vistara website/app
@@ -148,6 +152,8 @@ export const indusIndCardRewards = {
   },
   "Crest": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 1 / 100, // 1 Reward point on every ₹ 100 spent on domestic transactions
     internationalRate: 2.5 / 100, // 2.5 Reward Points on every ₹ 100 spent on international transactions
     redemptionRate: {
@@ -187,6 +193,8 @@ export const indusIndCardRewards = {
   },
   "Duo": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 1 / 150, // 1 Reward Point for every ₹ 150 spent
     calculateRewards: (amount, mcc, additionalParams) => {
       const rate = indusIndCardRewards["Duo"].defaultRate;
@@ -306,6 +314,8 @@ export const indusIndCardRewards = {
   },
   "Indulge": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 1.5 / 100, // 1.5 Reward Points for every ₹100 spent
     redemptionRate: {
       cashCredit: 1, // 1 Reward Point = ₹1 Cash Credit
@@ -326,6 +336,8 @@ export const indusIndCardRewards = {
   },
   "InterMiles Odyssey": {
     cardType: "miles",
+    mccRates: {
+    },
     defaultRates: {
       amex: {
         weekday: 4 / 100, // 4 InterMiles for every ₹100 spent on weekdays
@@ -404,6 +416,8 @@ export const indusIndCardRewards = {
   },
   "InterMiles Voyage": {
     cardType: "miles",
+    mccRates: {
+    },
     defaultRates: {
       amex: {
         weekday: 3 / 100, // 3 InterMiles for every ₹100 spent on weekdays
@@ -649,6 +663,8 @@ export const indusIndCardRewards = {
   },
   "Pioneer Heritage": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 1 / 100, // 1 Reward point on every ₹ 100 spent on domestic transactions
     internationalRate: 2.5 / 100, // 2.5 Reward Points on every ₹ 100 spent on international transactions
     specialRate: 0.7 / 100, // Assuming 0.7 Reward Points for special categories
@@ -745,6 +761,8 @@ export const indusIndCardRewards = {
   },
   "Pioneer Private": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 3 / 100, // 3 Reward Points on all other spends
     specialRate: 0.7 / 100, // 0.7 Reward Points on certain spends
     specialCategories: ["Utility", "Government", "Education"],
@@ -988,6 +1006,8 @@ export const indusIndCardRewards = {
   },
   "Samman": {
     cardType: "cashback",
+    mccRates: {
+    },
     defaultRate: 0.01, // 1% cashback on all spends
     maxCashback: 200, // Maximum cashback of ₹200 per statement cycle
     maxSpend: 20000, // Maximum spend of ₹20,000 per statement cycle for cashback

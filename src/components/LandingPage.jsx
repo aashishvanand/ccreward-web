@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Typography,
   Button,
@@ -18,14 +18,13 @@ import {
 } from "@mui/icons-material";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import { useAppTheme } from "../components/ThemeRegistry";
 import { useAuth } from "../app/providers/AuthContext";
 import Header from "./Header";
 import Footer from "./Footer";
 
 export default function LandingPage() {
-  const { mode, toggleTheme, theme } = useAppTheme();
-  const { signInWithGoogle, isAuthenticated, loading } = useAuth();
+  const { signInWithGoogle, signInAnonymously, isAuthenticated, loading } =
+    useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -43,7 +42,7 @@ export default function LandingPage() {
     "SC",
     "KOTAK",
     "INDUSIND",
-    "YESBANK"
+    "YESBANK",
   ];
 
   const handleGoogleSignIn = async () => {
@@ -56,6 +55,20 @@ export default function LandingPage() {
     } catch (error) {
       console.error("Error during Google sign in:", error);
       setError("Failed to sign in. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAnonymousSignIn = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await signInAnonymously();
+      router.push("/my-cards");
+    } catch (error) {
+      console.error("Error during anonymous sign in:", error);
+      setError("Failed to sign in anonymously. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -81,25 +94,49 @@ export default function LandingPage() {
             for your spending habits.
           </Typography>
           <Box
-            sx={{ mt: 4, display: "flex", justifyContent: "center", gap: 2 }}
+            sx={{
+              mt: 4,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 1,
+            }}
           >
             {!loading && !isAuthenticated() && (
-              <Button
-                variant="contained"
-                color="secondary"
-                size="large"
-                startIcon={
-                  isLoading ? (
-                    <CircularProgress size={24} color="inherit" />
-                  ) : (
-                    <GoogleIcon />
-                  )
-                }
-                onClick={handleGoogleSignIn}
-                disabled={isLoading}
-              >
-                {isLoading ? "Signing In..." : "Sign in with Google"}
-              </Button>
+              <>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  size="large"
+                  fullWidth
+                  sx={{ maxWidth: 300 }}
+                  startIcon={
+                    isLoading ? (
+                      <CircularProgress size={24} color="inherit" />
+                    ) : (
+                      <GoogleIcon />
+                    )
+                  }
+                  onClick={handleGoogleSignIn}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Signing In..." : "Sign in with Google"}
+                </Button>
+                <Typography
+                  variant="body2"
+                  color="text"
+                  sx={{
+                    mt: 1,
+                    cursor: "pointer",
+                    "&:hover": {
+                      textDecoration: "underline",
+                    },
+                  }}
+                  onClick={handleAnonymousSignIn}
+                >
+                  or continue anonymously without signing in
+                </Typography>
+              </>
             )}
           </Box>
         </Container>

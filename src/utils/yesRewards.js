@@ -65,6 +65,8 @@ export const yesCardRewards = {
   },
   "BYOC": {
     cardType: "cashback",
+    mccRates: {
+    },
     defaultRate: 0, // No default cashback
     cashbackRate: 0.10, // 10% cashback on selected merchants
     maxCashbackPerMerchant: 100, // Maximum of ₹100 per merchant per statement cycle
@@ -112,8 +114,10 @@ export const yesCardRewards = {
       }
     ]
   },
-  "Yes First": {
+  "First": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 6 / 100, // 6 Reward Points per INR 100 spent
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = yesCardRewards["Yes First"].defaultRate;
@@ -127,8 +131,10 @@ export const yesCardRewards = {
     dynamicInputs: () => []
   },
 
-  "Yes First Exclusive": {
+  "First Exclusive": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 12 / 100, // 12 Reward Points per INR 100 spent
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = yesCardRewards["Yes First Exclusive"].defaultRate;
@@ -269,6 +275,8 @@ export const yesCardRewards = {
   },
   "Prosperity": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 1 / 100, // 1 Reward Point per INR 100 spent
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = yesCardRewards["Prosperity"].defaultRate;

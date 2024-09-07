@@ -1,6 +1,8 @@
 export const kotakCardRewards = {
   "811": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 1 / 100,
     onlineRate: 2 / 100,
     redemptionRate: 0.25, // Assuming 1 point = Rs. 0.25
@@ -125,6 +127,8 @@ export const kotakCardRewards = {
     fuelRate: 24 / 150,
     groceryDiningRate: 12 / 150,
     redemptionRate: 0.25,
+    mccRates: {
+    },
     fuelMCCs: ["5541", "5542"],
     groceryDiningMCCs: ["5812", "5814", "5813", "5411", "5311", "5399", "5422", "5451", "5499", "5441"],
     capping: {
@@ -247,6 +251,8 @@ export const kotakCardRewards = {
   },
   "League": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 4 / 150,
     specialRate: 8 / 150,
     specialCategories: ["4722", "4723", "4511", "5732", "5722", "5311"],
@@ -285,6 +291,8 @@ export const kotakCardRewards = {
   },
   "Metro": {
     cardType: "cashback",
+    mccRates: {
+    },
     defaultRate: 0,
     metroRates: [
       { minSpend: 10001, maxSpend: 30000, rate: 0.0025 },
@@ -473,6 +481,8 @@ export const kotakCardRewards = {
   },
   "Privy League Signature": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 2 / 100,
     specialRate: 5 / 100,
     redemptionRate: 0.25,
@@ -531,6 +541,8 @@ export const kotakCardRewards = {
   },
   "PVR INOX": {
     cardType: "points",
+    mccRates: {
+    },
     ticketRate: 1 / 10000, // 1 ticket per Rs. 10,000 spent
     ticketValue: 300,
     discountRate: 0.05, // 5% discount on movie tickets
@@ -545,6 +557,8 @@ export const kotakCardRewards = {
   },
   "PVR INOX Gold": {
     cardType: "cashback",
+    mccRates: {
+    },
     ticketThreshold1: 10000,
     ticketThreshold2: 15000,
     freeTickets1: 1,
@@ -589,6 +603,8 @@ export const kotakCardRewards = {
   },
   "PVR Platinum": {
     cardType: "cashback",
+    mccRates: {
+    },
     ticketThreshold: 10000,
     freeTickets: 2,
     foodCashbackRate: 0.15,
@@ -631,6 +647,8 @@ export const kotakCardRewards = {
   },
   "Royale Signature": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 2 / 150,
     specialRate: 4 / 150,
     specialCategories: ["7011", "5812", "4722", "4723", "4511"], // MCCs for Hotels, Restaurants, Travel Agencies, Airlines
@@ -692,6 +710,8 @@ export const kotakCardRewards = {
   },
   "UPI RuPay": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 3 / 100,
     redemptionRate: 0.1, // 1000 points = Rs. 100
     calculateRewards: (amount, mcc, additionalParams) => {
@@ -707,6 +727,8 @@ export const kotakCardRewards = {
   },
   "White": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 0, // No regular points
     milestones: [
       { spend: 200000, value: 2000 },
@@ -755,6 +777,8 @@ export const kotakCardRewards = {
   },
   "White Reserve": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 0, // No regular points
     milestones: [
       { spend: 300000, value: 5000 },

@@ -183,7 +183,7 @@ export const mccList = [
         "mcc": "3015",
         "industryname": "Airlines",
         "merchantCategory": "Travel & Entertainment",
-        "name": "Swiss International Airlines - Air"
+        "name": "Swiss International Airlines"
     },
     {
         "mcc": "3016",
@@ -243,7 +243,7 @@ export const mccList = [
         "mcc": "3025",
         "industryname": "Airlines",
         "merchantCategory": "Travel & Entertainment",
-        "name": "Air New Zeal&"
+        "name": "Air New Zealand"
     },
     {
         "mcc": "3026",
@@ -297,7 +297,7 @@ export const mccList = [
         "mcc": "3034",
         "industryname": "Airlines",
         "merchantCategory": "Travel & Entertainment",
-        "name": "Austrainlian Airlines"
+        "name": "Etihad Airways"
     },
     {
         "mcc": "3035",
@@ -405,7 +405,7 @@ export const mccList = [
         "mcc": "3052",
         "industryname": "Airlines",
         "merchantCategory": "Travel & Entertainment",
-        "name": "Lan Airlines-Lanair"
+        "name": "Lanchile"
     },
     {
         "mcc": "3053",
@@ -1479,13 +1479,13 @@ export const mccList = [
         "mcc": "3300",
         "industryname": "Car Rental",
         "merchantCategory": "Travel & Entertainment",
-        "name": "Wizz Airlines—Wizz Air"
+        "name": "Wizz Airlines\u2014Wizz Air"
     },
     {
         "mcc": "3301",
         "industryname": "Car Rental",
         "merchantCategory": "Travel & Entertainment",
-        "name": "Flybe Ltd—Flybeair"
+        "name": "Flybe Ltd\u2014Flybeair"
     },
     {
         "mcc": "3302",
@@ -2013,7 +2013,8 @@ export const mccList = [
         "mcc": "3530",
         "industryname": "Lodging",
         "merchantCategory": "Travel & Entertainment",
-        "name": "Renaissance Hotels"
+        "name": "Renaissance Hotels",
+        "knownMerchants": "Renaissance Hotels, Stouffer Hotels"
     },
     {
         "mcc": "3531",
@@ -3867,19 +3868,22 @@ export const mccList = [
         "mcc": "4011",
         "industryname": "Transportation Services",
         "merchantCategory": "General",
-        "name": "Railroads, IRCTC, Railways"
+        "name": "Railroads, Railways",
+        "knownMerchants": "IRCTC, UTS, Indian Railways"
     },
     {
         "mcc": "4111",
         "industryname": "Transportation Services",
         "merchantCategory": "General",
-        "name": "Local/Sub Commuter Psgr Trnp, Incl Ferries, Ola, Uber, Zoom, ANI Technologies, Local Cabs"
+        "name": "Local/Sub Commuter Psgr Trnp, Incl Ferries, Local Cabs",
+        "knownMerchants": "Ola, Uber, Zoom, ANI Technologies, Meru Cabs"
     },
     {
         "mcc": "4112",
         "industryname": "Transportation Services",
         "merchantCategory": "General",
-        "name": "Passenger Railways, IRCTC, Railways"
+        "name": "Passenger Railways, Railways",
+        "knownMerchants": "IRCTC, UTS, Indian Railways"
     },
     {
         "mcc": "4119",
@@ -3891,13 +3895,15 @@ export const mccList = [
         "mcc": "4121",
         "industryname": "Transportation Services",
         "merchantCategory": "General",
-        "name": "Taxicabs Or Limousines, Ola, Uber, Zoom, ANI Technologies, Local Cabs"
+        "name": "Taxicabs Or Limousines, Local Cabs",
+        "knownMerchants": "Ola, Uber, Zoom, ANI Technologies, Meru Cabs"
     },
     {
         "mcc": "4131",
         "industryname": "Transportation Services",
         "merchantCategory": "General",
-        "name": "Bus Lines, Including Charters, Tour Buses"
+        "name": "Bus Lines, Including Charters, Tour Buses",
+        "knownMerchants": "Redbus"
     },
     {
         "mcc": "4214",
@@ -3921,7 +3927,8 @@ export const mccList = [
         "mcc": "4411",
         "industryname": "Transportation Services",
         "merchantCategory": "General",
-        "name": "Cruise Or Steamship Lines, Entertainment"
+        "name": "Cruise Or Steamship Lines, Entertainment",
+        "knownMerchants": "Carnival Cruise Line, Royal Caribbean International, Norwegian Cruise Line, Celebrity Cruises, Direct Line Cruises, Holland America Line, Princess Cruises, Resorts World Cruises, Royal Albatross, Star Cruises, Virgin Voyages"
     },
     {
         "mcc": "4457",
@@ -3939,7 +3946,8 @@ export const mccList = [
         "mcc": "4511",
         "industryname": "Transportation Services",
         "merchantCategory": "General",
-        "name": "Airlines, Air Carriers (Not Listed Below)"
+        "name": "Airlines, Air Carriers (Not Listed Below)",
+        "knownMerchants": "Firefly Airlines, Hong Kong Airlines, Juneyao, Tailwind Air, Vietnam Airlines, Zipair,"
     },
     {
         "mcc": "4582",
@@ -3951,7 +3959,8 @@ export const mccList = [
         "mcc": "4722",
         "industryname": "Transportation Services",
         "merchantCategory": "General",
-        "name": "Travel Agencies"
+        "name": "Travel Agencies",
+        "knownMerchants": "MakeMyTrip, Expedia, Hotels.com, Kiwi.com, Cleartrip, Yatra, Booking.com, Agoda, Trip.com, Trivago, Skyscanner, Goibibo, Airbnb, Tripadvisor, CheapOair, Hotwire, CheapTickets"
     },
     {
         "mcc": "4723",
@@ -3975,7 +3984,8 @@ export const mccList = [
         "mcc": "4784",
         "industryname": "Transportation Services",
         "merchantCategory": "General",
-        "name": "Tolls, Road & Bridge Fees, FASTag"
+        "name": "Tolls, Road & Bridge Fees",
+        "knownMerchants": "Fastag"
     },
     {
         "mcc": "4789",
@@ -3987,7 +3997,8 @@ export const mccList = [
         "mcc": "4812",
         "industryname": "Utility Services",
         "merchantCategory": "General",
-        "name": "Telecommuncations Equipment Including Telephone Sales"
+        "name": "Telecommuncations Equipment Including Telephone Sales",
+        "knownMerchants": "Airtel, Vodafone, Jio, BSNL, MTNL, Idea, Tata Docomo"
     },
     {
         "mcc": "4813",
@@ -3999,7 +4010,8 @@ export const mccList = [
         "mcc": "4814",
         "industryname": "Utility Services",
         "merchantCategory": "General",
-        "name": "Telecommuncations Serv Incl Loca/Long Dist Credit & Fax, Utilities"
+        "name": "Telecommuncations Serv Incl Loca/Long Dist Credit & Fax, Utilities",
+        "knownMerchants": "Skype, Zoom, Airtel, Vodafone, Jio, BSNL, MTNL, Idea, Tata Docomo"
     },
     {
         "mcc": "4815",
@@ -4029,13 +4041,15 @@ export const mccList = [
         "mcc": "4899",
         "industryname": "Utility Services",
         "merchantCategory": "General",
-        "name": "Cable & Other Pay Television Services, Utilities, Entertainment"
+        "name": "Cable & Other Pay Television Services, Utilities, Entertainment",
+        "knownMerchants": "Netflix, Amazon Prime, Hotstar, Zee5, Sony Liv, Voot, Alt Balaji, Eros Now, Jio TV, Airtel TV, Tata Sky, Dish TV, Sun Direct, Videocon D2H, Hathway, Siti Cable, Den Networks, GTPL, Fastway, Asianet Digital, Kerala Vision, InDigital, NXT Digital, Ortel, Siti Networks, UCN, Siti Cable, Den Networks, GTPL, Fastway, Asianet Digital, Kerala Vision, InDigital, NXT Digital, Ortel, Siti Networks, UCN"
     },
     {
         "mcc": "4900",
         "industryname": "Utility Services",
         "merchantCategory": "General",
-        "name": "Electric Utilities, Gas Utilities, Sanitary Utilities, Telephone Utilities, Water Utilities, Utilities"
+        "name": "Electric Utilities, Gas Utilities, Sanitary Utilities, Telephone Utilities, Water Utilities, Utilities",
+        "knownMerchants": "BESCOM, TNEB, KSEB, MSEDCL, UPPCL, DHBVN, CESC, WBSEDCL, PSPCL, APSPDCL, BSES Rajdhani, BSES Yamuna, Tata Power, Torrent Power, Adani Electricity, MGL, IGL, GAIL, Indraprastha Gas, Mahanagar Gas, HP Gas, Bharat Gas, Indane Gas"
     },
     {
         "mcc": "5013",
@@ -4065,7 +4079,8 @@ export const mccList = [
         "mcc": "5045",
         "industryname": "Retail Outlet Services",
         "merchantCategory": "General",
-        "name": "Computers & Computer Peripheral Equipment, Electronics"
+        "name": "Computers & Computer Peripheral Equipment, Electronics",
+        "knownMerchants": "ASUS, Acer, Apple, Dell, HP, Lenovo, Microsoft, Samsung, Sony, Toshiba, LG, Nokia, OnePlus, Oppo, Realme, Vivo, Xiaomi, Croma, Reliance Digital, Sangeetha Mobiles, Poorvika Mobiles"
     },
     {
         "mcc": "5046",
@@ -4245,7 +4260,8 @@ export const mccList = [
         "mcc": "5309",
         "industryname": "Retail Outlet Services",
         "merchantCategory": "General",
-        "name": "Duty Free Stores"
+        "name": "Duty Free Stores",
+        "knownMerchants": "Delhi Duty-Free, Lotte Duty Free, Shilla Duty Free"
     },
     {
         "mcc": "5310",
@@ -4257,7 +4273,8 @@ export const mccList = [
         "mcc": "5311",
         "industryname": "Retail Outlet Services",
         "merchantCategory": "General",
-        "name": "Department Stores, Shoppers Stop"
+        "name": "Department Stores",
+        "knownMerchants": "Shoppers Stop, Lifestyle, Pantaloons, Central, Westside, Reliance Trends, Max Fashion, Brand Factory, Big Bazaar, HyperCity, Spencer's Retail, More, Star Bazaar, D-Mart, Reliance Fresh"
     },
     {
         "mcc": "5331",
@@ -4269,13 +4286,15 @@ export const mccList = [
         "mcc": "5399",
         "industryname": "Retail Outlet Services",
         "merchantCategory": "General",
-        "name": "General Merch&ise Or Convenience Food, Flipkart, Meesho, Amazon, Ajio, Discount Stores"
+        "name": "General Merch&ise Or Convenience Food Discount Stores",
+        "knownMerchants": "Flipkart, Meesho, Amazon, Ajio"
     },
     {
         "mcc": "5411",
         "industryname": "Retail Outlet Services",
         "merchantCategory": "General",
-        "name": "Grocery Stores Or Supermarkets"
+        "name": "Grocery Stores Or Supermarkets",
+        "knownMerchants": "Big Bazaar,Big Basket, Grofers, Nature's Basket, Spencer's Retail, More, Star Bazaar, D-Mart, Reliance Fresh"
     },
     {
         "mcc": "5422",
@@ -4299,7 +4318,8 @@ export const mccList = [
         "mcc": "5462",
         "industryname": "Retail Outlet Services",
         "merchantCategory": "General",
-        "name": "Bakeries"
+        "name": "Bakeries",
+        "knownMerchants": "BreadTalk, Baskin Robbins, Dunkin' Donuts, Krispy Kreme, Mad Over Donuts, Theobroma, Monginis, Karachi Bakery, Iyengar Bakery, Hot Chips, Adyar Ananda Bhavan, Sri Krishna Sweets, Haldiram's, Bikanervala, Bikaji"
     },
     {
         "mcc": "5499",
@@ -4311,13 +4331,15 @@ export const mccList = [
         "mcc": "5511",
         "industryname": "Retail Outlet Services",
         "merchantCategory": "General",
-        "name": "Auto/Truck Dealers New/Used Sale Repair Parts & Lease, Ola, Uber, Zoom, ANI Technologies, Local Cabs"
+        "name": "Auto/Truck Dealers New/Used Sale Repair Parts & Lease, Local Cabs",
+        "knownMerchants": "Ola, Uber, Zoom, ANI Technologies, Meru Cabs"
     },
     {
         "mcc": "5521",
         "industryname": "Retail Outlet Services",
         "merchantCategory": "General",
-        "name": "Automobile & Truck Dealers (Used Only), Ola, Uber, Zoom, ANI Technologies, Local Cabs"
+        "name": "Automobile & Truck Dealers (Used Only), Local Cabs",
+        "knownMerchants": "Ola, Uber, Zoom, ANI Technologies, Meru Cabs"
     },
     {
         "mcc": "5531",
@@ -4359,7 +4381,7 @@ export const mccList = [
         "mcc": "5552",
         "industryname": "Retail Outlet Services",
         "merchantCategory": "General",
-        "name": "Quasi Cash — Member Financial Institution"
+        "name": "Quasi Cash \u2014 Member Financial Institution"
     },
     {
         "mcc": "5561",
@@ -4395,13 +4417,15 @@ export const mccList = [
         "mcc": "5611",
         "industryname": "Clothing Stores",
         "merchantCategory": "General",
-        "name": "Men'S &/Or Boys' Clothing & Accessories"
+        "name": "Men'S &/Or Boys' Clothing & Accessories",
+        "knownMerchants": "Jockey, Allen Solly, Arrow, Blackberrys, Celio, ColorPlus, Flying Machine, Jack & Jones, John Players, Louis Philippe, Mufti, Park Avenue, Peter England, Raymond, Van Heusen, Wills Lifestyle, Levi's, Wrangler, Lee, Pepe Jeans, Spykar, US Polo Assn, Tommy Hilfiger, Calvin Klein, Zara, H&M, Forever 21, GAP, Uniqlo, Marks & Spencer, H&M, Forever 21, GAP, Uniqlo, Marks & Spencer"
     },
     {
         "mcc": "5621",
         "industryname": "Clothing Stores",
         "merchantCategory": "General",
-        "name": "Women'S Ready-To-Wear Stores"
+        "name": "Women'S Ready-To-Wear Stores",
+        "knownMerchants": "Biba, W, Pantaloons, Shoppers Stop, Lifestyle, Westside, Reliance Trends, Max Fashion, Brand Factory, Big Bazaar, Jockey, Naidu Hall, Nalli, Pothys, RmKV, The Chennai Silks, Victoria's Secret, Zara, H&M, Forever 21, GAP, Uniqlo, Marks & Spencer"
     },
     {
         "mcc": "5631",
@@ -4413,25 +4437,29 @@ export const mccList = [
         "mcc": "5641",
         "industryname": "Clothing Stores",
         "merchantCategory": "General",
-        "name": "Children'S & Infants' Wear Stores"
+        "name": "Children'S & Infants' Wear Stores",
+        "knownMerchants": "Mothercare, FirstCry, BabyOye, Hopscotch, The Children's Place, Gini & Jony, Lilliput, Catmoss"
     },
     {
         "mcc": "5651",
         "industryname": "Clothing Stores",
         "merchantCategory": "General",
-        "name": "Family Clothing Stores"
+        "name": "Family Clothing Stores",
+        "knownMerchants": "Pantaloons, Shoppers Stop, Lifestyle, Westside, Reliance Trends, Max Fashion, Brand Factory, Big Bazaar, Jockey, Naidu Hall, Nalli, Pothys, RmKV, The Chennai Silks, Victoria's Secret, Zara, H&M, Forever 21, GAP, Uniqlo, Marks & Spencer"
     },
     {
         "mcc": "5655",
         "industryname": "Clothing Stores",
         "merchantCategory": "General",
-        "name": "Riding Or Sports Apparel Stores"
+        "name": "Riding Or Sports Apparel Stores",
+        "knownMerchants": "Decathlon, Puma, Adidas, Nike, Reebok, Under Armour, Skechers, ASICS, New Balance, Fila, Yonex, Wilson, MRF"
     },
     {
         "mcc": "5661",
         "industryname": "Clothing Stores",
         "merchantCategory": "General",
-        "name": "Shoe Stores"
+        "name": "Shoe Stores",
+        "knownMerchants": "Bata, Metro, Mochi, Clarks, Crocs, Hush Puppies, Lee Cooper, Red Tape, Woodl&"
     },
     {
         "mcc": "5681",
@@ -4443,7 +4471,8 @@ export const mccList = [
         "mcc": "5691",
         "industryname": "Clothing Stores",
         "merchantCategory": "General",
-        "name": "Men'S & Women'S Clothing Stores"
+        "name": "Men'S & Women'S Clothing Stores",
+        "knownMerchants": "Pantaloons, Shoppers Stop, Lifestyle, Westside, Reliance Trends, Max Fashion, Brand Factory, Big Bazaar, Jockey, Naidu Hall, Nalli, Pothys, RmKV, The Chennai Silks, Victoria's Secret, Zara, H&M, Forever 21, GAP, Uniqlo, Marks & Spencer"
     },
     {
         "mcc": "5697",
@@ -4461,13 +4490,14 @@ export const mccList = [
         "mcc": "5699",
         "industryname": "Clothing Stores",
         "merchantCategory": "General",
-        "name": "Apparel & Accessory Shops -- Miscellaneous"
+        "name": "Apparel & Accessory Shops - Miscellaneous"
     },
     {
         "mcc": "5712",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Furniture, Home Furnishings & Equip Stores Excl Appliances, Home Decor"
+        "name": "Furniture, Home Furnishings & Equip Stores Excl Appliances, Home Decor",
+        "knownMerchants": "HomeCentre, Pepperfry, Urban Ladder, Godrej Interio, Nilkamal, Durian, Evok, IKEA, Hometown, FabIndia, Welspun, Spaces, Portico, Bombay Dyeing, D'Decor, Swayam, Maspar, Raymond Home, Trident, Spread, Kurlon, Sleepwell, Duroflex, Peps, Springwel, Nilkamal, Cello, Supreme, Wipro Furniture, Zuari Furniture"
     },
     {
         "mcc": "5713",
@@ -4509,7 +4539,8 @@ export const mccList = [
         "mcc": "5732",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Electronic Sales, Electronics"
+        "name": "Electronic Sales, Electronics",
+        "knownMerchants": "ASUS, Acer, Apple, Dell, HP, Lenovo, Microsoft, Samsung, Sony, Toshiba, LG, Nokia, OnePlus, Oppo, Realme, Vivo, Xiaomi, Croma, Reliance Digital, Sangeetha Mobiles, Poorvika Mobiles, Viveks, Vasanth & Co, Girias, Ezone, Vijay Sales, Sargam Electronics, Adishwar, Bajaj Electronics, Reliance Digital, Croma"
     },
     {
         "mcc": "5733",
@@ -4521,13 +4552,15 @@ export const mccList = [
         "mcc": "5734",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Computer Software Stores, Electronics"
+        "name": "Computer Software Stores, Electronics",
+        "knownMerchants": "Microsoft, Adobe, Autodesk, Corel, McAfee, Norton, Kaspersky, Quick Heal, Avast, AVG, Bitdefender, ESET, F-Secure, Trend Micro, Webroot, Malwarebytes, Sophos, Symantec, Panda, ZoneAlarm, Comodo, Acronis, Parallels, VMware, Citrix, Oracle, IBM, SAP, Salesforce, Google, Apple, Amazon Web Services, IBM Cloud, Oracle Cloud, Google Cloud, Microsoft Azure, Adobe Creative Cloud, Autodesk, CorelDRAW, McAfee, Norton, Kaspersky, Quick Heal, Avast, AVG, Bitdefender, ESET, F-Secure, Trend Micro, Webroot, Malwarebytes, Sophos, Symantec, Panda, ZoneAlarm, Comodo, Acronis, Parallels, VMware, Citrix, Oracle, IBM, SAP, Salesforce, Google, Apple, Amazon Web Services, IBM Cloud, Oracle Cloud, Google Cloud, Microsoft Azure, Adobe Creative Cloud, Autodesk, CorelDRAW"
     },
     {
         "mcc": "5735",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Record Shops, Online Pet Stores"
+        "name": "Record Shops, Online Pet Stores",
+        "knownMerchants": "iTunes, Spotify, Apple Music, Amazon Music, YouTube Music, Gaana, JioSaavn, Wynk Music, Hungama, Spotify"
     },
     {
         "mcc": "5811",
@@ -4539,7 +4572,8 @@ export const mccList = [
         "mcc": "5812",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Restaurants Or Eating Places"
+        "name": "Restaurants Or Eating Places",
+        "knownMerchants": "Domino's Pizza, Pizza Hut, McDonald's, KFC, Subway, Burger King, Starbucks, Cafe Coffee Day, Barista, Dunkin' Donuts, Faasos, FreshMenu, Box8, Behrouz Biryani, Biryani Blues"
     },
     {
         "mcc": "5813",
@@ -4551,43 +4585,49 @@ export const mccList = [
         "mcc": "5814",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Fast Food Restaurants, Swiggy"
+        "name": "Fast Food Restaurants",
+        "knownMerchants": "Swiggy, Zomato, Domino's Pizza, Pizza Hut, McDonald's, KFC, Subway, Burger King, Starbucks, Cafe Coffee Day, Barista, Dunkin' Donuts, Faasos, FreshMenu, Box8, Behrouz Biryani, Biryani Blues"
     },
     {
         "mcc": "5815",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Digital Goods Media: Books, Movies, Music"
+        "name": "Digital Goods Media: Books, Movies, Music",
+        "knownMerchants": "iTunes, Spotify, Apple Music, Amazon Music, YouTube Music, Gaana, JioSaavn, Wynk Music, Hungama, Spotify, Kindle"
     },
     {
         "mcc": "5816",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Digital Goods: Games"
+        "name": "Digital Goods: Games",
+        "knownMerchants": "PlayStation Store, Xbox Store, Nintendo eShop, Steam, Epic Games Store, Origin, Uplay, GOG, Humble Bundle"
     },
     {
         "mcc": "5817",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Digital Goods: Applications (Excludes Games)"
+        "name": "Digital Goods: Applications (Excludes Games)",
+        "knownMerchants": "Google Play Store, Apple App Store, Microsoft Store, Amazon Appstore, Samsung Galaxy Store, Huawei AppGallery, Xiaomi GetApps, Oppo App Market, Vivo App Store, OnePlus App Store, Realme Store, LG SmartWorld, Sony Entertainment Network, Adobe Creative Cloud, Autodesk, CorelDRAW"
     },
     {
         "mcc": "5818",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Large Digital Goods Merchant"
+        "name": "Large Digital Goods Merchant",
+        "knownMerchants": "Google Play Store, Apple App Store, Microsoft Store, Amazon Appstore, Samsung Galaxy Store, Huawei AppGallery, Xiaomi GetApps, Oppo App Market, Vivo App Store, OnePlus App Store, Realme Store, LG SmartWorld, Sony Entertainment Network, Adobe Creative Cloud, Autodesk, CorelDRAW"
     },
     {
         "mcc": "5832",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Antique Shops – Sales, Repairs, & Restoration Services"
+        "name": "Antique Shops \u2013 Sales, Repairs, & Restoration Services"
     },
     {
         "mcc": "5912",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Pharmcies Or Drug Stores, Pharmacies"
+        "name": "Pharmcies Or Drug Stores, Pharmacies",
+        "knownMerchants": "Apollo Pharmacy, MedPlus, Netmeds, 1mg, PharmEasy, Practo, Medlife, PharmEasy, Practo, Medlife"
     },
     {
         "mcc": "5921",
@@ -4629,13 +4669,15 @@ export const mccList = [
         "mcc": "5940",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Bicycle Shops -- Sales & Service"
+        "name": "Bicycle Shops -- Sales & Service",
+        "knwonMerchants": "Decathlon, Firefox, Hero Cycles, Atlas Cycles, BSA Cycles, Hercules Cycles, Montra Cycles, Mach City Cycles, Btwin Cycles, Trek Cycles, Giant Cycles, Scott Cycles, Merida Cycles, Cannondale Cycles, Bianchi Cycles, Specialized Cycles, Kross Cycles, Roadeo Cycles, Avon Cycles, Raleigh Cycles, Schwinn Cycles, Mongoose Cycles, Fuji Cycles, Polygon Cycles, Lapierre Cycles, Ghost Cycles, Cube Cycles, Orbea Cycles, Wilier Cycles, Pinarello Cycles, Colnago Cycles, Cervelo Cycles, BMC Cycles, Felt Cycles, Look Cycles, De Rosa Cycles, Ridley Cycles, Bianchi Cycles, Specialized Cycles, Kross Cycles, Roadeo Cycles, Avon Cycles, Raleigh Cycles, Schwinn Cycles, Mongoose Cycles, Fuji Cycles, Polygon Cycles, Lapierre Cycles, Ghost Cycles, Cube Cycles, Orbea Cycles, Wilier Cycles, Pinarello Cycles, Colnago Cycles, Cervelo Cycles, BMC Cycles, Felt Cycles, Look Cycles, De Rosa Cycles, Ridley Cycles"
     },
     {
         "mcc": "5941",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Sporting Goods Stores, Online Pet Stores"
+        "name": "Sporting Goods Stores, Online Pet Stores",
+        "knownMerchants": "Decathlon, Puma, Adidas, Nike, Reebok, Under Armour, Skechers, ASICS, New Balance, Fila, Yonex, Wilson, MRF"
     },
     {
         "mcc": "5942",
@@ -4653,7 +4695,8 @@ export const mccList = [
         "mcc": "5944",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Clock, Jewelry, Silverware Or Watch Stores, Gold"
+        "name": "Clock, Jewelry, Silverware Or Watch Stores, Gold",
+        "knownMerchants": "Tanishq, Kalyan Jewellers, Malabar Gold & Diamonds, Joyalukkas, PC Jeweller, Senco Gold & Diamonds, TBZ - The Original, GRT Jewellers, Jos Alukkas, Bhima Jewellers, GRT Jewellers"
     },
     {
         "mcc": "5945",
@@ -4665,19 +4708,22 @@ export const mccList = [
         "mcc": "5946",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Camera &/Or Photographic Supply Stores, Electronics"
+        "name": "Camera &/Or Photographic Supply Stores, Electronics",
+        "knwonMerchants": "Canon, Nikon, Sony, Panasonic, Fujifilm, GoPro, DJI"
     },
     {
         "mcc": "5947",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Card, Gift, Novelty Or Souvenir Shops, Amazon Gift Card"
+        "name": "Card, Gift, Novelty Or Souvenir Shops",
+        "knownMerchants": "Amazon Gift Card"
     },
     {
         "mcc": "5948",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Luggage Or Leather Goods Stores"
+        "name": "Luggage Or Leather Goods Stores",
+        "knownMerchants": "VIP, Skybags, American Tourister, Samsonite, Safari, Aristocrat, Delsey, Victorinox, Wildcraft, Fastrack, Baggit, Caprese, Lavie, Hidesign, Da Milano, Holii, Fossil, Michael Kors, Coach, Kate Spade, Longchamp, Tumi, Louis Vuitton, Gucci, Prada, Chanel, Hermes, Burberry, Balenciaga, Givenchy, Saint Laurent, Bottega Veneta, Celine, Chloe, Dolce & Gabbana, Valentino, Versace, Salvatore Ferragamo, Jimmy Choo, Alexander McQueen, MCM, Rimowa, Bric's, Tumi, Louis Vuitton, Gucci, Prada, Chanel, Hermes, Burberry, Balenciaga, Givenchy, Saint Laurent, Bottega Veneta, Celine, Chloe, Dolce & Gabbana, Valentino, Versace, Salvatore Ferragamo, Jimmy Choo, Alexander McQueen, MCM, Rimowa, Bric's"
     },
     {
         "mcc": "5949",
@@ -4797,7 +4843,8 @@ export const mccList = [
         "mcc": "5977",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Cosmetic Stores, Personal Care"
+        "name": "Cosmetic Stores, Personal Care",
+        "knownMerchants": "Nykaa, Purplle, Myntra, Amazon, Flipkart, Nykaa, Purplle, Myntra, Amazon, Flipkart, Health & Glow, NewU, The Body Shop, Sephora, MAC, Bobbi Brown, Clinique, Estee Lauder, L'Oreal, Maybelline, Lakme, Revlon, Colorbar, Nykaa Cosmetics, Sugar Cosmetics, Faces Canada, Lotus Herbals, Biotique, Kama Ayurveda, Forest Essentials, Himalaya Herbals, Mamaearth, Plum, WOW Skin Science, The Face Shop"
     },
     {
         "mcc": "5978",
@@ -4815,7 +4862,8 @@ export const mccList = [
         "mcc": "5992",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Florists, Entertainment"
+        "name": "Florists, Entertainment",
+        "knownMerchants": "Ferns N Petals, FlowerAura, Flaberry, BloomsVilla, Arena Flowers, BookMyFlowers, Winni"
     },
     {
         "mcc": "5993",
@@ -4875,7 +4923,8 @@ export const mccList = [
         "mcc": "6012",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Financial Institutions – Merch&ise & Services, Quasi Cash"
+        "name": "Financial Institutions \u2013 Merch&ise & Services, Quasi Cash",
+        "knownMerchants": "Paytm, PhonePe, Google Pay, Amazon Pay, Freecharge, Mobikwik, Airtel Payments Bank, Jio Payments Bank, PayZapp, BHIM, CRED, MobiKwik, PayZapp, BHIM, CRED"
     },
     {
         "mcc": "6050",
@@ -4887,7 +4936,7 @@ export const mccList = [
         "mcc": "6051",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Non-Financial Institutions – Foreign Currency, Money Orders (Not Wire Transfer) & Travelers Cheques, Quasi Cash"
+        "name": "Non-Financial Institutions \u2013 Foreign Currency, Money Orders (Not Wire Transfer) & Travelers Cheques, Quasi Cash"
     },
     {
         "mcc": "6211",
@@ -4899,7 +4948,8 @@ export const mccList = [
         "mcc": "6300",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Insurance Sales, Underwriting, & Premiums, Insurance Services"
+        "name": "Insurance Sales, Underwriting, & Premiums, Insurance Services",
+        "knownMerchants": "Policybazaar, Coverfox, Acko, Digit, ICICI Lombard, HDFC ERGO, Bajaj Allianz, Reliance General Insurance, Tata AIG, Bharti AXA, SBI General Insurance, United India Insurance, New India Assurance, Oriental Insurance, National Insurance, Max Life Insurance, HDFC Life, ICICI Prudential, SBI Life, Bajaj Allianz Life, Reliance Nippon Life, Tata AIA, Kotak Life, PNB MetLife, Aditya Birla Sun Life, Canara HSBC OBC Life, Exide Life, IndiaFirst Life, IDBI Federal Life, Star Health, Apollo Munich, Max Bupa, Religare Health, ICICI Lombard, HDFC ERGO, Bajaj Allianz, Reliance General Insurance, Tata AIG, Bharti AXA, SBI General Insurance, United India Insurance, New India Assurance, Oriental Insurance, National Insurance, Max Life Insurance, HDFC Life, ICICI Prudential, SBI Life, Bajaj Allianz Life, Reliance Nippon Life, Tata AIA, Kotak Life, PNB MetLife, Aditya Birla Sun Life, Canara HSBC OBC Life, Exide Life, IndiaFirst Life, IDBI Federal Life, Star Health, Apollo Munich, Max Bupa, Religare Health"
     },
     {
         "mcc": "6381",
@@ -4917,7 +4967,7 @@ export const mccList = [
         "mcc": "6513",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Payment Transaction — Member, Rent"
+        "name": "Payment Transaction \u2014 Member, Rent"
     },
     {
         "mcc": "6529",
@@ -4941,7 +4991,7 @@ export const mccList = [
         "mcc": "6532",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Payment Transaction — Merchant"
+        "name": "Payment Transaction \u2014 Merchant"
     },
     {
         "mcc": "6533",
@@ -4977,7 +5027,7 @@ export const mccList = [
         "mcc": "6538",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Non-Financial Institutions – Stored Value Card Purchase/Load; Poi Funding Transactions"
+        "name": "Non-Financial Institutions \u2013 Stored Value Card Purchase/Load; Poi Funding Transactions"
     },
     {
         "mcc": "6540",
@@ -5007,7 +5057,8 @@ export const mccList = [
         "mcc": "7011",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Lodging – Hotels, Motels, Resorts, Central Reservation Services "
+        "name": "Lodging \u2013 Hotels, Motels, Resorts, Central Reservation Services",
+        "knownMerchants": "OYO Rooms, MakeMyTrip, Goibibo, Yatra, Cleartrip, Booking.com, Agoda, Expedia, Trivago, Airbnb, Treebo Hotels, FabHotels, Ginger Hotels, Lemon Tree Hotels, Taj Hotels, Oberoi Hotels, ITC Hotels, Marriott Hotels, Hyatt Hotels, Hilton Hotels, Radisson Hotels, Accor Hotels, InterContinental Hotels, Best Western Hotels, Choice Hotels, Wyndham Hotels, Four Seasons Hotels, Shangri-La Hotels, Ritz-Carlton Hotels, JW Marriott Hotels, Westin Hotels, Sheraton Hotels, Le Meridien Hotels, Aloft Hotels, St. Regis Hotels, W Hotels, Andaz Hotels, Park Hyatt Hotels, Grand Hyatt Hotels, Hyatt Regency Hotels, Hyatt Place Hotels, Hyatt House Hotels, Hyatt Centric Hotels, Hyatt Ziva Hotels, Hyatt Zilara"
     },
     {
         "mcc": "7012",
@@ -5037,7 +5088,7 @@ export const mccList = [
         "mcc": "7211",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Laundry – Family & Commercial"
+        "name": "Laundry \u2013 Family & Commercial"
     },
     {
         "mcc": "7216",
@@ -5061,7 +5112,8 @@ export const mccList = [
         "mcc": "7230",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Barber & Beauty Shops, Personal Care"
+        "name": "Barber & Beauty Shops, Personal Care",
+        "knownMerchants": "Lakme Salon, Naturals, Green Trends, VLCC, Enrich Salon, Jawed Habib, Toni & Guy, Kaya Skin Clinic, YLG, Juice Salon, BBlunt, Jean-Claude Biguine, Warren Tricomi, Looks Salon, Affinity Salon, Geetanjali Salon, JCB, T&G, Kaya Skin Clinic, YLG, Juice Salon, BBlunt, Jean-Claude Biguine, Warren Tricomi, Looks Salon, Affinity Salon, Geetanjali Salon, JCB"
     },
     {
         "mcc": "7251",
@@ -5115,25 +5167,27 @@ export const mccList = [
         "mcc": "7295",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Intra – Government Transactions"
+        "name": "Intra \u2013 Government Transactions"
     },
     {
         "mcc": "7296",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Clothing Rental – Costumes, Formal Wear, Uniforms"
+        "name": "Clothing Rental \u2013 Costumes, Formal Wear, Uniforms"
     },
     {
         "mcc": "7297",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Massage Parlors, Personal Care"
+        "name": "Massage Parlors, Personal Care",
+        "knownMerchants": "O2 Spa, Four Fountains De-Stress Spa, MyGlamm, UrbanClap, Housejoy, Zimmber, QuikrEasy, Urban Company, BBlunt, Jean-Claude Biguine, Warren Tricomi, Looks Salon, Affinity Salon, Geetanjali Salon, JCB, O2 Spa, Four Fountains De-Stress Spa, MyGlamm, UrbanClap, Housejoy, Zimmber, QuikrEasy, Urban Company, BBlunt, Jean-Claude Biguine, Warren Tricomi, Looks Salon, Affinity Salon, Geetanjali Salon, JCB"
     },
     {
         "mcc": "7298",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Beauty Or Health Spas, Personal Care"
+        "name": "Beauty Or Health Spas, Personal Care",
+        "knownMerchants": "O2 Spa, Four Fountains De-Stress Spa, MyGlamm, UrbanClap, Housejoy, Zimmber, QuikrEasy, Urban Company, BBlunt, Jean-Claude Biguine, Warren Tricomi, Looks Salon, Affinity Salon, Geetanjali Salon, JCB, O2 Spa, Four Fountains De-Stress Spa, MyGlamm, UrbanClap, Housejoy, Zimmber, QuikrEasy, Urban Company, BBlunt, Jean-Claude Biguine, Warren Tricomi, Looks Salon, Affinity Salon, Geetanjali Salon, JCB"
     },
     {
         "mcc": "7299",
@@ -5235,7 +5289,7 @@ export const mccList = [
         "mcc": "7393",
         "industryname": "Business Services",
         "merchantCategory": "General",
-        "name": "Protective & Security Services – Including Armored Cars& Guard Dogs"
+        "name": "Protective & Security Services \u2013 Including Armored Cars& Guard Dogs"
     },
     {
         "mcc": "7394",
@@ -5253,7 +5307,8 @@ export const mccList = [
         "mcc": "7399",
         "industryname": "Business Services",
         "merchantCategory": "General",
-        "name": "Business Services, "
+        "name": "Business Services",
+        "knownMerchants": "Air France KLM Miles Purchase, Alaska Air Miles Purchase, Amazon Web Services, American Club, August Bespoke, Avianca Miles Purchase, Cabcharge Asia, Etihad Guest Miles Purchase, Google Ads Purchases, Hilton Honors Points Purchase, IHG Miles Purchase, JetBlue TrueBlue Miles Purchase, Lufthansa Miles & More Points Purchase, Marriott Bonvoy Points Purchase, Points.com, SouthWest Miles Purchase, Spirit Points Purchase, United Mileage Plus Miles Purchase, World Of Hyatt Points Purchase,"
     },
     {
         "mcc": "7511",
@@ -5265,13 +5320,15 @@ export const mccList = [
         "mcc": "7512",
         "industryname": "Business Services",
         "merchantCategory": "General",
-        "name": "Car Rental Companies (Not Listed Below), Ola, Uber, Zoom, ANI Technologies, Local Cabs"
+        "name": "Car Rental Companies (Not Listed Below), Local Cabs",
+        "knownMerchants": "Ola, Uber, Zoom, ANI Technologies, Meru Cabs, ZoomCar, Drivezy, Revv, Myles, Avis, Hertz, Europcar, Sixt, Enterprise, Alamo, National, Dollar, Thrifty, Budget, Payless, Advantage, E-Z Rent-A-Car, Fox Rent A Car, Silvercar, Turo, Getaround, Zipcar, Ola, Uber, Zoom, ANI Technologies, Meru Cabs, ZoomCar, Drivezy, Revv, Myles, Avis, Hertz, Europcar, Sixt, Enterprise, Alamo, National, Dollar, Thrifty, Budget, Payless, Advantage, E-Z Rent-A-Car, Fox Rent A Car, Silvercar, Turo, Getaround, Zipcar"
     },
     {
         "mcc": "7513",
         "industryname": "Business Services",
         "merchantCategory": "General",
-        "name": "Truck & Utility Trailer Rentals"
+        "name": "Truck & Utility Trailer Rentals",
+        "knwonMerchants": "Rapido, Porter, Lynk"
     },
     {
         "mcc": "7519",
@@ -5307,7 +5364,7 @@ export const mccList = [
         "mcc": "7535",
         "industryname": "Business Services",
         "merchantCategory": "General",
-        "name": "Paint Shops – Automotive"
+        "name": "Paint Shops \u2013 Automotive"
     },
     {
         "mcc": "7538",
@@ -5367,7 +5424,7 @@ export const mccList = [
         "mcc": "7699",
         "industryname": "Business Services",
         "merchantCategory": "General",
-        "name": "Repair Shops & Related Services –Miscellaneous"
+        "name": "Repair Shops & Related Services \u2013Miscellaneous"
     },
     {
         "mcc": "7800",
@@ -5397,7 +5454,8 @@ export const mccList = [
         "mcc": "7832",
         "industryname": "Business Services",
         "merchantCategory": "General",
-        "name": "Motion Picture Theaters, Entertainment"
+        "name": "Motion Picture Theaters, Entertainment",
+        "knownMerchants": "BookMyShow, PVR Cinemas, INOX, Cinepolis, Carnival Cinemas, Sathyam Cinemas, SPI Cinemas, Mukta A2 Cinemas, City Pride, CineMAX, Fun Cinemas, Big Cinemas, Miraj Cinemas, PVR Cinemas, INOX, Cinepolis, Carnival Cinemas, Sathyam Cinemas, SPI Cinemas, Mukta A2 Cinemas, City Pride, CineMAX, Fun Cinemas, Big Cinemas, Miraj Cinemas"
     },
     {
         "mcc": "7833",
@@ -5451,13 +5509,15 @@ export const mccList = [
         "mcc": "7991",
         "industryname": "Business Services",
         "merchantCategory": "General",
-        "name": "Tourist Attractions & Exhibits, Entertainment"
+        "name": "Tourist Attractions & Exhibits, Entertainment",
+        "knownMerchants": "Wonderla, Essel World, Imagica, Adlabs Aquamagica, Snow World, KidZania, KidZania, Wonderla, Essel World, Imagica, Adlabs Aquamagica, KidZania, KidZania"
     },
     {
         "mcc": "7992",
         "industryname": "Business Services",
         "merchantCategory": "General",
-        "name": "Golf Courses – Public"
+        "name": "Golf Courses \u2013 Public",
+        "knownMerchants": "GolfLan, GolfGreedy, Golftripz, Golftripz, GolfLan, GolfGreedy"
     },
     {
         "mcc": "7993",
@@ -5481,13 +5541,15 @@ export const mccList = [
         "mcc": "7996",
         "industryname": "Business Services",
         "merchantCategory": "General",
-        "name": "Amusement Parks, Carnivals, Circuses, Fortune Tellers, Entertainment"
+        "name": "Amusement Parks, Carnivals, Circuses, Fortune Tellers, Entertainment",
+        "knownMerchants": "Wonderla, Essel World, Imagica, Adlabs Aquamagica, Snow World, KidZania, KidZania, Wonderla, Essel World, Imagica, Adlabs Aquamagica, KidZania"
     },
     {
         "mcc": "7997",
         "industryname": "Business Services",
         "merchantCategory": "General",
-        "name": "Membership Clubs (Sports, Recreation, Athletic), Country Clubs, & Private Golf Courses, Entertainment"
+        "name": "Membership Clubs (Sports, Recreation, Athletic), Country Clubs, & Private Golf Courses, Entertainment",
+        "knownMerchant": "Club Mahindra"
     },
     {
         "mcc": "7998",
@@ -5559,7 +5621,8 @@ export const mccList = [
         "mcc": "8062",
         "industryname": "Professional Services & Membership Organizations",
         "merchantCategory": "General",
-        "name": "Hospitals"
+        "name": "Hospitals",
+        "knownMerchants": "Apollo Hospitals, Fortis Hospitals, Max Hospitals, Manipal Hospitals, Narayana Health, Columbia Asia Hospitals, Aster Hospitals, Medanta Hospitals, Wockhardt Hospitals, HCG Hospitals, Ruby Hall Clinic, KIMS Hospitals, Yashoda Hospitals, Care Hospitals, Global Hospitals, Gleneagles Global Hospitals, Sakra World Hospital, Rainbow Children's Hospital, Motherhood Hospitals, Cloudnine Hospitals, Apollo Hospitals, Fortis Hospitals, Max Hospitals, Manipal Hospitals, Narayana Health, Columbia Asia Hospitals, Aster Hospitals, Medanta Hospitals, Wockhardt Hospitals, HCG Hospitals, Ruby Hall Clinic, KIMS Hospitals, Yashoda Hospitals, Care Hospitals, Global Hospitals, Gleneagles Global Hospitals, Sakra World Hospital, Rainbow Children's Hospital, Motherhood Hospitals, Cloudnine Hospitals"
     },
     {
         "mcc": "8071",
@@ -5613,7 +5676,8 @@ export const mccList = [
         "mcc": "8299",
         "industryname": "Professional Services & Membership Organizations",
         "merchantCategory": "General",
-        "name": "Schools & Educational Services"
+        "name": "Schools & Educational Services",
+        "knownMerchants": "Byju's, Unacademy, Vedantu, Toppr, Meritnation, Gradeup, GradeStack, Gradeup, GradeStack"
     },
     {
         "mcc": "8351",
@@ -5667,7 +5731,7 @@ export const mccList = [
         "mcc": "8911",
         "industryname": "Professional Services & Membership Organizations",
         "merchantCategory": "General",
-        "name": "Architectural – Engineering & Surveying Services"
+        "name": "Architectural \u2013 Engineering & Surveying Services"
     },
     {
         "mcc": "8931",
@@ -5679,7 +5743,8 @@ export const mccList = [
         "mcc": "8999",
         "industryname": "Professional Services & Membership Organizations",
         "merchantCategory": "General",
-        "name": "Professional Services (Not Elsewhere Defined)"
+        "name": "Professional Services (Not Elsewhere Defined)",
+        "knwonMerchants": "Brazzers, Pornhub, Xvideos, Xnxx, Redtube, Youporn, Spankbang, Xhamster, Beeg, Tnaflix, XNXX, Xvideos, Pornhub, Redtube, Youporn, Spankbang, Xhamster, Beeg, Tnaflix"
     },
     {
         "mcc": "9211",
@@ -5709,7 +5774,8 @@ export const mccList = [
         "mcc": "9399",
         "industryname": "Government Services",
         "merchantCategory": "General",
-        "name": "Utilities, Government Services"
+        "name": "Utilities, Government Services",
+        "knownMerchants": "BESCOM, BSES, CESC, DHBVN, DGVCL, GESCOM, HESCOM, JVVNL, KSEB, MSEDCL, NPCL, PSPCL, TNEB, UGVCL, WBSEDCL"
     },
     {
         "mcc": "9401",
@@ -5721,13 +5787,13 @@ export const mccList = [
         "mcc": "9402",
         "industryname": "Government Services",
         "merchantCategory": "General",
-        "name": "Postal Services – Government Only, Government Services"
+        "name": "Postal Services \u2013 Government Only, Government Services"
     },
     {
         "mcc": "9405",
         "industryname": "Government Services",
         "merchantCategory": "General",
-        "name": "Intra – Government Transactions"
+        "name": "Intra \u2013 Government Transactions"
     },
     {
         "mcc": "9406",
@@ -5781,7 +5847,7 @@ export const mccList = [
         "mcc": "9950",
         "industryname": "Government Services",
         "merchantCategory": "General",
-        "name": "Intra – Company Purchases (For Visa Only)"
+        "name": "Intra \u2013 Company Purchases (For Visa Only)"
     },
     {
         "mcc": "9999",
@@ -5789,4 +5855,7 @@ export const mccList = [
         "merchantCategory": "General",
         "name": "Client Defined Mcc"
     }
-]
+].map(item => ({
+    ...item,
+    knownMerchants: item.knownMerchants ? item.knownMerchants.split(', ') : []
+  }));

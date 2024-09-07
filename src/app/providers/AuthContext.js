@@ -1,7 +1,7 @@
 'use client';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { auth, googleProvider } from '../../../firebase';
-import { onAuthStateChanged, signInWithPopup, getIdToken, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signInWithPopup, signInAnonymously as firebaseSignInAnonymously, getIdToken, signOut } from 'firebase/auth';
 
 const AuthContext = createContext();
 
@@ -35,6 +35,16 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const signInAnonymously = async () => {
+    try {
+      const result = await firebaseSignInAnonymously(auth);
+      return result.user;
+    } catch (error) {
+      console.error("Error signing in anonymously", error);
+      throw error;
+    }
+  };
+
   const logout = async () => {
     try {
       await signOut(auth);
@@ -52,6 +62,7 @@ export function AuthProvider({ children }) {
     user,
     token,
     signInWithGoogle,
+    signInAnonymously,
     logout,
     isAuthenticated,
     loading,

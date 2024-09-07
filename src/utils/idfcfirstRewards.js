@@ -602,7 +602,6 @@ export const idfcFirstCardRewards = {
         category = "IDFC FIRST FASTag";
         rateType = "fastag";
       }
-
       const points = Math.floor(amount * rate);
       const cashbackValue = points * idfcFirstCardRewards["Power+"].redemptionRate;
 
