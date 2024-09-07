@@ -23,7 +23,8 @@ export const axisCardRewards = {
     },
     capping: {
       categories: {
-        "Google Pay and Food Delivery": { cashback: 500, maxSpent: 10000 } // Combined cap for 5% and 4% categories
+        "Google Pay and Food Delivery": { cashback: 500, maxSpent: 10000 }, // Combined cap for 5% and 4% categories
+        "Google Pay Bill Payments": { cashback: 500, maxSpent: 10000 }
       }
     },
     calculateRewards: (amount, mcc, additionalParams) => {
@@ -33,13 +34,13 @@ export const axisCardRewards = {
   
       if (additionalParams.isGooglePay && ["4814", "4816", "4899", "4900"].includes(mcc)) {
         rate = axisCardRewards.ACE.googlePayRate;
-        category = "Google Pay Bill Payments";
+        category = "Google Pay and Food Delivery";
         rateType = "google-pay";
       } else if (axisCardRewards.ACE.mccRates[mcc] !== undefined) {
         rate = axisCardRewards.ACE.mccRates[mcc];
         rateType = "mcc-specific";
         if (["5812", "5814", "4121"].includes(mcc)) {
-          category = "Food Delivery";
+          category = "Google Pay and Food Delivery";
         } else if (rate === 0) {
           category = "Excluded Category";
         } else {
@@ -47,7 +48,13 @@ export const axisCardRewards = {
         }
       }
   
-      const cashback = Number((amount * rate).toFixed(2));
+      let cashback = Number((amount * rate).toFixed(2));
+  
+      // Apply capping
+      if (axisCardRewards.ACE.capping.categories[category]) {
+        const cap = axisCardRewards.ACE.capping.categories[category];
+        cashback = Math.min(cashback, cap.cashback);
+      }
   
       return { cashback, rate, rateType, category };
     },
@@ -331,19 +338,30 @@ export const axisCardRewards = {
       "4121": 4 / 100, // 4% cashback for taxicabs/limousines (e.g., Uber)
       "7997": 4 / 100, // 4% cashback for gyms/fitness centers (e.g., Cultfit)
     },
+    capping:{
+      categories: {
+        "Travel": { cashback: 5000, maxSpent: 100000 }
+      }
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = axisCardRewards.Flipkart.defaultRate;
       let category = "Other Spends";
       let rateType = "default";
-
+  
       if (axisCardRewards.Flipkart.mccRates[mcc]) {
         rate = axisCardRewards.Flipkart.mccRates[mcc];
         rateType = "mcc-specific";
-        category = "Fast Food Restaurants";
+        category = mcc === "4722" ? "Travel" : "Fast Food Restaurants";
       }
-
-      const cashback = amount * rate;
-
+  
+      let cashback = amount * rate;
+  
+      // Apply capping for travel category
+      if (category === "Travel" && axisCardRewards.Flipkart.capping.categories.Travel) {
+        const cap = axisCardRewards.Flipkart.capping.categories.Travel;
+        cashback = Math.min(cashback, cap.cashback);
+      }
+  
       return { cashback, rate, rateType, category };
     },
     dynamicInputs: () => []
@@ -542,8 +560,10 @@ export const axisCardRewards = {
         rateType = "mcc-specific";
         category = mcc === "6513" ? "Rent" : (rate === 0 ? "Excluded Category" : "Category Spend");
       }
+      
 
       const points = Math.floor(amount * rate);
+      
       const roundedRate = Number((rate * 100).toFixed(2));
       return { points, rate: roundedRate, rateType, category };
     },
@@ -1216,14 +1236,13 @@ export const axisCardRewards = {
       "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0, // Education services
       "9222": 0, "9311": 0, "9399": 0, "9402": 0, // Government services
     },
-    cashbackCaps: {
-      "4814": 250, // Airtel bill payments cap per month
-      "4816": 250, // Utility bill payments cap per month
-      "4899": 250, // Utility bill payments cap per month
-      "4900": 250, // Utility bill payments cap per month
-      "5812": 500, // Preferred merchant cap per month (combined)
-      "5814": 500, // Preferred merchant cap per month (combined)
-      "5411": 500, // Preferred merchant cap per month (combined)
+    capping: {
+      categories: {
+        "Airtel Thanks App (Non-Telecom)": { cashback: 500, maxSpent: 5000 },
+        "Airtel Thanks App (Telecom)": { cashback: 250, maxSpent: 2500 },
+        "Preferred Merchant": { cashback: 500, maxSpent: 5000 },
+        "Telecom/Utility Services": { cashback: 250, maxSpent: 2500 }
+      }
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = axisCardRewards.Airtel.defaultRate;
@@ -1232,7 +1251,7 @@ export const axisCardRewards = {
   
       if (additionalParams.isAirtelApp) {
         if (["4814", "4816", "4899", "4900"].includes(mcc)) {
-          rate = axisCardRewards.Airtel.airtelAppRate;
+          rate = axisCardRewards.Airtel.airtelRate;
           category = "Airtel Thanks App (Telecom)";
         } else {
           rate = axisCardRewards.Airtel.airtelAppNonTelecomRate;
@@ -1251,7 +1270,13 @@ export const axisCardRewards = {
         }
       }
   
-      const cashback = Number((amount * rate).toFixed(2));
+      let cashback = Number((amount * rate).toFixed(2));
+  
+      // Apply capping
+      if (axisCardRewards.Airtel.capping.categories[category]) {
+        const cap = axisCardRewards.Airtel.capping.categories[category];
+        cashback = Math.min(cashback, cap.cashback);
+      }
   
       return { cashback, rate: Number(rate.toFixed(4)), rateType, category };
     },
