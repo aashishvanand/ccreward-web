@@ -1,6 +1,5 @@
 "use client";
-import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Box from '@mui/material/Box';
 import { ThemeRegistry } from '../components/ThemeRegistry';
@@ -12,7 +11,6 @@ const Calculator = dynamic(() => import('../components/Calculator'), { ssr: fals
 
 function Home() {
   const pathname = usePathname();
-  const router = useRouter();
 
   const getComponent = () => {
     switch (pathname) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -18,6 +18,7 @@ import { useAuth } from "../app/providers/AuthContext";
 import { getCardsForUser } from "../utils/firebaseUtils";
 import { mccList } from "../data/mccData";
 import ReactConfetti from 'react-confetti';
+import { searchMcc } from "../utils/searchUtils";
 import { renderCardList } from './CardListRenderer';
 
 const BestCardCalculator = () => {
@@ -32,6 +33,7 @@ const BestCardCalculator = () => {
   const [hasCalculated, setHasCalculated] = useState(false);
   const [failedImages, setFailedImages] = useState({});
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
+  const [mccOptions, setMccOptions] = useState(mccList);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -57,6 +59,15 @@ const BestCardCalculator = () => {
     fetchUserCards();
     setHasCalculated(false);
   }, [user]);
+
+  const handleMccSearch = (event, value) => {
+    if (!value) {
+      setMccOptions(mccList);
+    } else {
+      const filteredOptions = searchMcc(value, mccList);
+      setMccOptions(filteredOptions);
+    }
+  };
 
   const handleCalculate = async () => {
     if (!spentAmount || parseFloat(spentAmount) <= 0) {
@@ -122,10 +133,20 @@ const BestCardCalculator = () => {
           Know Your Best Card
         </Typography>
         <Autocomplete
-          options={mccList}
+          options={mccOptions}
           getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
+          renderOption={(props, option) => (
+            <li {...props}>
+              {option.mcc} - {option.name}
+              {option.knownMerchants.length > 0 && (
+                <span style={{ fontSize: '0.8em', color: 'gray' }}>
+                  {' '}(e.g., {option.knownMerchants.join(', ')})
+                </span>
+              )}
+            </li>
+          )}
           renderInput={(params) => (
-            <TextField {...params} label="Select MCC (Optional)" margin="normal" fullWidth />
+            <TextField {...params} label="Search Merchant or MCC" margin="normal" fullWidth />
           )}
           onChange={(event, newValue) => setSelectedMcc(newValue)}
           value={selectedMcc}

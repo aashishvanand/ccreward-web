@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Autocomplete, TextField, Button, Box } from '@mui/material';
 import { mccList } from "../data/mccData";
 import { bankData } from "../data/bankData";
+import { searchMcc } from "../utils/searchUtils";
 import DynamicCardInputs from './DynamicCardInputs';
 
 const CalculatorForm = ({
@@ -20,6 +21,7 @@ const CalculatorForm = ({
   getCardConfig
 }) => {
   const [cardConfig, setCardConfig] = useState(null);
+  const [mccOptions, setMccOptions] = useState(mccList);
 
   useEffect(() => {
     if (selectedBank && selectedCard) {
@@ -30,6 +32,15 @@ const CalculatorForm = ({
       setCardConfig(null);
     }
   }, [selectedBank, selectedCard, getCardConfig]);
+
+  const handleMccSearch = (event, value) => {
+    if (!value) {
+      setMccOptions(mccList);
+    } else {
+      const filteredOptions = searchMcc(value, mccList);
+      setMccOptions(filteredOptions);
+    }
+  };
 
   const isCalculateDisabled = !selectedBank || !selectedCard || !spentAmount || parseFloat(spentAmount) <= 0;
 
@@ -68,13 +79,25 @@ const CalculatorForm = ({
 
 <Autocomplete
         fullWidth
-        options={mccList}
+        options={mccOptions}
         getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
-        renderInput={(params) => (
-          <TextField {...params} label="Search MCC (Optional)" margin="normal" />
+        renderOption={(props, option) => (
+          <li {...props}>
+            {option.mcc} - {option.name}
+            {option.knownMerchants.length > 0 && (
+              <span style={{ fontSize: '0.8em', color: 'gray' }}>
+                {' '}(e.g., {option.knownMerchants.join(', ')})
+              </span>
+            )}
+          </li>
         )}
+        renderInput={(params) => (
+          <TextField {...params} label="Search Merchant or MCC (Optional)" margin="normal" />
+        )}
+        onInputChange={handleMccSearch}
         onChange={(event, newValue) => onMccChange(newValue)}
         value={selectedMcc}
+        filterOptions={(x) => x}
       />
 
 <TextField

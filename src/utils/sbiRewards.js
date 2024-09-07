@@ -492,7 +492,7 @@ export const sbiCardRewards = {
       let rate = sbiCardRewards["Etihad Guest"].defaultRate;
       let category = "Other Spends";
       let rateType = "default";
-
+    
       if (mcc === "3034") {
         rate = sbiCardRewards["Etihad Guest"].mccRates["3034"];
         category = "Etihad.com";
@@ -506,9 +506,9 @@ export const sbiCardRewards = {
         category = rate === 0 ? "Excluded Category" : "Category Spend";
         rateType = "mcc-specific";
       }
-
+    
       const miles = Math.floor(amount * rate);
-
+    
       return { miles, rate, rateType, category };
     },
     dynamicInputs: (currentInputs, onChange) => [
@@ -528,14 +528,11 @@ export const sbiCardRewards = {
   "Etihad Guest Premier": {
     cardType: "miles",
     defaultRate: 2 / 100, // 2 Etihad Guest Miles on every Rs. 100 spent on other spends
-    mccRates: {
-      "3034": 6 / 100, // 6 Etihad Guest Miles on every Rs. 100 spent on Etihad.com
-    },
     internationalRate: 4 / 100, // 4 Etihad Guest Miles on every Rs. 100 spent on International Spends
     tierMileRate: 1 / 50, // 1 Etihad Guest Tier Mile for every Rs. 50 spent
     tierMileCap: 40000, // Maximum 40,000 Etihad Guest Tier Miles can be earned in a year
     mccRates: {
-      "3034": 6 / 100,
+      "3034": 6 / 100, // 6 Etihad Guest Miles on every Rs. 100 spent on Etihad.com
       "5172": 0, "5541": 0, "5983": 0, "5542": 0, "6513": 0,
     },
     calculateRewards: (amount, mcc, additionalParams) => {
@@ -679,22 +676,22 @@ export const sbiCardRewards = {
       "5712": 0, "5541": 0, "5983": 0, "5542": 0, "6513": 0 // Excluded categories
     },
     calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = sbiCardRewards["Reliance"].defaultRate;
+      let rate = sbiCardRewards["Lifestyle Select"].defaultRate;
       let category = "Other Retail";
       let rateType = "default";
 
-      if (additionalParams.isRelianceRetail) {
+      if (additionalParams.isLandmarkStore) {
         rate = 5 / 100;
-        category = "Reliance Retail";
-        rateType = "reliance-retail";
-      } else if (mcc && sbiCardRewards["Reliance"].mccRates[mcc] !== undefined) {
-        rate = sbiCardRewards["Reliance"].mccRates[mcc];
+        category = "Landmark Store";
+        rateType = "landmark-store";
+      } else if (mcc && sbiCardRewards["Lifestyle Select"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["Lifestyle Select"].mccRates[mcc];
         category = rate === 0 ? "Excluded Category" : "Dining & Movies";
         rateType = rate === 0 ? "excluded" : "dining-movies";
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Reliance"].redemptionRate;
+      const cashbackValue = points * sbiCardRewards["Lifestyle Select"].redemptionRate;
 
       return { points, rate, rateType, category, cashbackValue };
     },
@@ -1144,19 +1141,20 @@ export const sbiCardRewards = {
       let rateType = "default";
       let surchargeWaiver = 0;
 
-      if (["4900", "4814", "4899"].includes(mcc)) {
+      if (mcc && sbiCardRewards["Prime Advantage"].mccRates[mcc] !== undefined) {
         rate = sbiCardRewards["Prime Advantage"].mccRates[mcc];
-        category = "Utility Bill";
-        rateType = "utility";
-      } else if (["5812", "5813", "5814", "5411", "5311", "7832"].includes(mcc)) {
-        rate = sbiCardRewards["Prime Advantage"].mccRates[mcc];
-        category = "Accelerated Rewards";
-        rateType = "accelerated";
-      } else if (["5172", "5541", "5542", "5983"].includes(mcc)) {
-        category = "Fuel";
-        rateType = "fuel";
-        if (amount >= 500 && amount <= 4000) {
-          surchargeWaiver = Math.min(amount * sbiCardRewards["Prime Advantage"].fuelSurchargeWaiver.rate, sbiCardRewards["Prime Advantage"].fuelSurchargeWaiver.maxWaiver);
+        rateType = "mcc-specific";
+        if (["4900", "4814", "4899"].includes(mcc)) {
+          category = "Utility Bill";
+        } else if (["5812", "5813", "5814", "5411", "5311", "7832"].includes(mcc)) {
+          category = "Accelerated Rewards";
+        } else if (["5172", "5541", "5542", "5983"].includes(mcc)) {
+          category = "Fuel";
+          if (amount >= 500 && amount <= 4000) {
+            surchargeWaiver = Math.min(amount * 0.01, 250);
+          }
+        } else {
+          category = "Excluded Category";
         }
       }
 
@@ -1272,12 +1270,16 @@ export const sbiCardRewards = {
       "5172": 0, "5541": 0, "5983": 0, "5542": 0, "6540": 0, "6541": 0, "6513": 0, "9399": 0, "9311": 0 // Excluded categories
     },
     calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = sbiCardRewards["Yatra"].defaultRate;
+      let rate = sbiCardRewards["Reliance Prime"].defaultRate;
       let category = "Other Categories";
       let rateType = "default";
 
-      if (mcc && sbiCardRewards["Yatra"].mccRates[mcc] !== undefined) {
-        rate = sbiCardRewards["Yatra"].mccRates[mcc];
+      if (additionalParams.isRelianceRetail) {
+        rate = 10 / 100;
+        category = "Reliance Retail";
+        rateType = "reliance-retail";
+      } else if (mcc && sbiCardRewards["Reliance Prime"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["Reliance Prime"].mccRates[mcc];
         if (rate === 0) {
           category = "Excluded Category";
           rateType = "excluded";
@@ -1292,7 +1294,7 @@ export const sbiCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Yatra"].redemptionRate;
+      const cashbackValue = points * sbiCardRewards["Reliance Prime"].redemptionRate;
 
       return { points, rate, rateType, category, cashbackValue };
     },
@@ -1317,6 +1319,8 @@ export const sbiCardRewards = {
   },
   "IRCTC": {
     cardType: "points",
+    mccRates: {
+    },
     defaultRate: 1 / 125, // 1 Reward point for every Rs. 125 spent on non-fuel retail purchases
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = sbiCardRewards["IRCTC"].defaultRate;

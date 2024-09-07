@@ -55,9 +55,18 @@ export const scCardRewards = {
       } else if (scCardRewards.Ultimate.mccRates[mcc]) {
         rate = scCardRewards.Ultimate.mccRates[mcc];
         rateType = "mcc-specific";
-        category = getMccCategory(mcc);
+        // Inline category mapping
+        category = {
+          "4900": "Utilities",
+          "5411": "Supermarkets",
+          "5960": "Insurance",
+          "6300": "Insurance",
+          "7349": "Property Management",
+          "6513": "Property Management / Rent Pay",
+          "8299": "Schools",
+          "9399": "Government",
+        }[mcc] || "Other Spends";
       }
-
 
       const points = Math.floor(amount * rate);
       const cashback = mcc === "5309" ? amount * rate : 0;

@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-module.exports = {
+const nextConfig = {
   output: "export",
   images: {
     loader: "custom",
@@ -15,4 +15,9 @@ module.exports = {
     nextImageExportOptimizer_exportFolderName: "nextImageExportOptimizer",
     nextImageExportOptimizer_generateAndUseBlurImages: "true",
   },
+  experimental: {
+    forceSwcTransforms: true,
+  },
 };
+
+module.exports = nextConfig;

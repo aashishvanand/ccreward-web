@@ -16,5 +16,5 @@ export const bankData = {
     // "RBL": ["BankBazaar SaveMax", "BankBazaar SaveMax Pro", "Blockbuster", "Cookies", "Fun+", "iGlobe", "Icon", "Insigna", "LazyPay", "MoCash", "MoneyTap", "MoneyTap Black", "Monthly Treats", "Movies and More", "Paisabazaar Duet", "Paisabazaar Duet Plus", "Play", "Platinum Delight", "Platinum Maxima", "Platinum Maxima Plus", "Popcorn", "Shoprite", "Titanium Delight", "vCard", "World Safari"],
     "SBI": ["Air India Platinum", "Air India Signature", "Apollo", "Aurum", "BPCL", "BPCL Octane", "Cashback", "Elite", "Elite Advantage", "Etihad Guest", "Etihad Guest Premier", "Lifestyle", "Lifestyle Prime", "Lifestyle Select", "Miles", "Miles Elite", "Miles Prime", "Ola Money", "PayTM", "PayTM Select", "Prime", "Prime Advantage", "Pulse", "Reliance", "Reliance Prime", "IRCTC", "IRCTC Platinum", "IRCTC Premier", "Vistara", "Vistara Prime", "SimplyClick", "SimplySave", "Tata", "Tata Select", "Titan", "Yatra"],
     "SC": ["EaseMyTrip", "Platinum Rewards", "Rewards", "Smart", "Ultimate"],
-    "YesBank": ["ACE", "BYOC", "Elite+", "Marquee", "Prosperity", "Reserv", "Select", "Wellness Plus"]
+    "YesBank": ["ACE", "BYOC", "Elite+","First", "First Exclusive", "Marquee", "Prosperity", "Reserv", "Select", "Wellness Plus"]
 };
