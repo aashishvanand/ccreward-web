@@ -291,99 +291,130 @@ export const hdfcCardRewards = {
       }
     ]
   },
-  "Diners Club Black Metal": {
-    cardType: "points",
-    defaultRate: 5 / 150,
-    weekendDiningRate: 10 / 150,
-    smartBuyRate: 10 / 150,
-    redemptionRate: {
-      airmiles: 1, // 1 Reward Point = up to 1 Airmile
-      productVouchers: 0.50 // 1 Reward Point = up to ₹0.50 for products and vouchers
-    },
-    mccRates: {
-      "5812": 10 / 150, // Restaurants (for weekend dining)
-      "5813": 10 / 150, // Bars (for weekend dining)
-      "5814": 10 / 150, // Fast Food (for weekend dining)
-
-      // Excluded categories
-      "9311": 0, // Tax Payments
-      "9399": 0, // Government Services
-      "5541": 0, // Fuel
-      "5542": 0, // Fuel
-      "6540": 0, // E-wallet loading
-      "6513": 0, // Rent payments
-    },
-    capping: {
-      categories: {
-        "Grocery": { points: 2000, maxSpent: 60000 }, // 2000 points cap on grocery transactions per month
-        "Utility": { points: 2000, maxSpent: 60000 }, // 2000 points cap on utility transactions per month
-        "Insurance": { points: 5000, maxSpent: 150000 }, // 5000 points cap on insurance transactions per day
-        "Total": { points: 75000, maxSpent: 2250000 }, // 75000 points cap per statement cycle
-        "SmartbuyTravel": { points: 75000, maxSpent: 2250000 }, // 75000 points cap for Smartbuy travel redemptions per month
-        "CashbackRedemption": { points: 50000, maxSpent: 1500000 } // 50000 points cap for cashback redemptions per month
-      }
-    },
-    calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = hdfcCardRewards["Diners Club Black Metal"].defaultRate;
-      let category = "Other Retail Spends";
-      let rateType = "default";
-
-      const isDiningMCC = ["5812", "5813", "5814"].includes(mcc);
-
-      if (isDiningMCC && additionalParams.isWeekend) {
-        rate = hdfcCardRewards["Diners Club Black Metal"].weekendDiningRate;
-        category = "Weekend Dining";
-        rateType = "weekend-dining";
-      } else if (additionalParams.isSmartBuy) {
-        rate = hdfcCardRewards["Diners Club Black Metal"].smartBuyRate;
-        category = "SmartBuy Purchase";
-        rateType = "smartbuy";
-      } else if (mcc && hdfcCardRewards["Diners Club Black Metal"].mccRates[mcc] !== undefined) {
-        rate = hdfcCardRewards["Diners Club Black Metal"].mccRates[mcc];
-        rateType = "mcc-specific";
-        category = rate === 0 ? "Excluded Category" : "Category Spend";
-      } else if (mcc === "5411") {
-        category = "Grocery";
-      } else if (mcc === "6300") {
-        category = "Insurance";
-      }
-
-      const points = Math.floor(amount * rate);
-
-      return { points, rate, rateType, category };
-    },
-    dynamicInputs: (currentInputs, onChange, selectedMcc) => {
-      const inputs = [];
-
-      if (["5812", "5813", "5814"].includes(selectedMcc)) {
-        inputs.push({
-          type: 'radio',
-          label: 'Is this a weekend transaction?',
-          name: 'isWeekend',
-          options: [
-            { label: 'Yes', value: true },
-            { label: 'No', value: false }
-          ],
-          value: currentInputs.isWeekend || false,
-          onChange: (value) => onChange('isWeekend', value === 'true')
-        });
-      } else {
-        inputs.push({
-          type: 'radio',
-          label: 'Is this a SmartBuy purchase?',
-          name: 'isSmartBuy',
-          options: [
-            { label: 'Yes', value: true },
-            { label: 'No', value: false }
-          ],
-          value: currentInputs.isSmartBuy || false,
-          onChange: (value) => onChange('isSmartBuy', value === 'true')
-        });
-      }
-
-      return inputs;
+"Diners Club Black Metal": {
+  cardType: "points",
+  defaultRate: 5 / 150,
+  weekendDiningRate: 10 / 150,
+  smartBuyRate: 10 / 150,
+  redemptionRate: {
+    airmiles: 1, // 1 Reward Point = up to 1 Airmile
+    productVouchers: 0.50 // 1 Reward Point = up to ₹0.50 for products and vouchers
+  },
+  mccRates: {
+    "5812": 10 / 150, // Restaurants (for weekend dining)
+    "5813": 10 / 150, // Bars (for weekend dining)
+    "5814": 10 / 150, // Fast Food (for weekend dining)
+    // Excluded categories
+    "9311": 0, // Tax Payments
+    "9399": 0, // Government Services
+    "5541": 0, // Fuel
+    "5542": 0, // Fuel
+    "6540": 0, // E-wallet loading
+    "6513": 0, // Rent payments
+  },
+  smartbuyRates: {
+    hotels: 40 / 150,
+    flights: 25 / 150,
+    vouchers: 25 / 150
+  },
+  capping: {
+    categories: {
+      "Grocery": { points: 2000, maxSpent: 60000 }, // 2000 points cap on grocery transactions per month
+      "Utility": { points: 2000, maxSpent: 60000 }, // 2000 points cap on utility transactions per month
+      "Insurance": { points: 5000, maxSpent: 150000 }, // 5000 points cap on insurance transactions per day
+      "Total": { points: 75000, maxSpent: 2250000 }, // 75000 points cap per statement cycle
+      "SmartbuyTravel": { points: 75000, maxSpent: 2250000 }, // 75000 points cap for Smartbuy travel redemptions per month
+      "CashbackRedemption": { points: 50000, maxSpent: 1500000 } // 50000 points cap for cashback redemptions per month
     }
   },
+  calculateRewards: (amount, mcc, additionalParams) => {
+    let rate = hdfcCardRewards["Diners Club Black Metal"].defaultRate;
+    let category = "Other Retail Spends";
+    let rateType = "default";
+
+    const isDiningMCC = ["5812", "5813", "5814"].includes(mcc);
+
+    if (isDiningMCC && additionalParams.isWeekend) {
+      rate = hdfcCardRewards["Diners Club Black Metal"].weekendDiningRate;
+      category = "Weekend Dining";
+      rateType = "weekend-dining";
+    } else if (additionalParams.isSmartBuy) {
+      if (additionalParams.smartbuyCategory === "hotels") {
+        rate = hdfcCardRewards["Diners Club Black Metal"].smartbuyRates.hotels;
+        category = "SmartBuy Hotels";
+      } else if (additionalParams.smartbuyCategory === "flights") {
+        rate = hdfcCardRewards["Diners Club Black Metal"].smartbuyRates.flights;
+        category = "SmartBuy Flights";
+      } else if (additionalParams.smartbuyCategory === "vouchers") {
+        rate = hdfcCardRewards["Diners Club Black Metal"].smartbuyRates.vouchers;
+        category = "SmartBuy Vouchers";
+      } else {
+        rate = hdfcCardRewards["Diners Club Black Metal"].smartBuyRate;
+        category = "SmartBuy Purchase";
+      }
+      rateType = "smartbuy";
+    } else if (mcc && hdfcCardRewards["Diners Club Black Metal"].mccRates[mcc] !== undefined) {
+      rate = hdfcCardRewards["Diners Club Black Metal"].mccRates[mcc];
+      rateType = "mcc-specific";
+      category = rate === 0 ? "Excluded Category" : "Category Spend";
+    } else if (mcc === "5411") {
+      category = "Grocery";
+    } else if (mcc === "6300") {
+      category = "Insurance";
+    }
+
+    const points = Math.floor(amount * rate);
+
+    return { points, rate, rateType, category };
+  },
+  dynamicInputs: (currentInputs, onChange, selectedMcc) => {
+    const inputs = [];
+
+    if (["5812", "5813", "5814"].includes(selectedMcc)) {
+      inputs.push({
+        type: 'radio',
+        label: 'Is this a weekend transaction?',
+        name: 'isWeekend',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isWeekend || false,
+        onChange: (value) => onChange('isWeekend', value === 'true')
+      });
+    } else {
+      inputs.push({
+        type: 'radio',
+        label: 'Is this a SmartBuy purchase?',
+        name: 'isSmartBuy',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isSmartBuy || false,
+        onChange: (value) => onChange('isSmartBuy', value === 'true')
+      });
+
+      if (currentInputs.isSmartBuy) {
+        inputs.push({
+          type: 'select',
+          label: 'SmartBuy Category',
+          name: 'smartbuyCategory',
+          options: [
+            { label: 'Hotels', value: 'hotels' },
+            { label: 'Flights', value: 'flights' },
+            { label: 'Vouchers', value: 'vouchers' },
+            { label: 'Other', value: 'other' }
+          ],
+          value: currentInputs.smartbuyCategory || 'other',
+          onChange: (value) => onChange('smartbuyCategory', value)
+        });
+      }
+    }
+
+    return inputs;
+  }
+},
   //TODO: Add Exclusions to this card
   "Diners Club Privilege": {
     cardType: "points",
@@ -700,6 +731,7 @@ export const hdfcCardRewards = {
         "Telecom & Cable": { points: 2000, maxSpent: 60000, period: "monthly" },
       }
     },
+    pointValue: 1,
     calculateRewards: (amount, mcc, additionalParams) => {
       console.log("Additional Params:", additionalParams); // Debug log
 
@@ -708,14 +740,11 @@ export const hdfcCardRewards = {
       let rateType = "default";
 
       if (additionalParams.isSmartbuy) {
-        console.log("Smartbuy detected"); // Debug log
         if (additionalParams.smartbuyCategory === "hotels") {
-          console.log("Hotels category selected"); // Debug log
           rate = hdfcCardRewards["Infinia Metal"].smartbuyRates.hotels;
           category = "Hotels (Via Smartbuy)";
         } else if (additionalParams.smartbuyCategory === "flights" || additionalParams.smartbuyCategory === "vouchers") {
-          console.log("Flights or Vouchers category selected"); // Debug log
-          rate = hdfcCardRewards["Infinia Metal"].smartbuyRates.flights;
+          rate = hdfcCardRewards["Infinia Metal"].smartbuyRates.flights; // This applies to both flights and vouchers
           category = "Flights / eVouchers (Via Smartbuy)";
         }
         rateType = "smartbuy";
@@ -1885,6 +1914,8 @@ export const hdfcCardRewards = {
       "5411": 5 / 100, "5422": 5 / 100, "5441": 5 / 100, "5451": 5 / 100, "5462": 5 / 100, "5499": 5 / 100, // Grocery
       "6513": 0, // Rental transactions
       "9211": 0, "9222": 0, "9223": 0, "9311": 0, "9399": 0, "9402": 0, // Government transactions
+      "5541": 0, // Fuel
+      "5542": 0, // Fuel
     },
     capping: {
       categories: {
@@ -1903,6 +1934,9 @@ export const hdfcCardRewards = {
         rate = hdfcCardRewards["Tata Neu Infinity"].tataRate;
         rateType = "tata";
         category = "Tata Brand Spend";
+        if (mcc === "5094") {
+          return { points: Math.floor(amount * rate), rate, rateType, category };
+        }
       } else if (additionalParams.isUPI) {
         rate = hdfcCardRewards["Tata Neu Infinity"].upiRate;
         rateType = "upi";

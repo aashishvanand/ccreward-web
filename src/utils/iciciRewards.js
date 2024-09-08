@@ -66,6 +66,7 @@ export const iciciCardRewards = {
       "4900": 1 / 100,
       "6300": 1 / 100
     },
+    pointValue: 0.25,
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = iciciCardRewards.Coral.defaultRate;
       let category = "Other Spends";
@@ -101,7 +102,7 @@ export const iciciCardRewards = {
         "Education": { points: 1000, maxSpent: 33333.33 }
       }
     },
-    pointValue: 1, // 1 Reward point equals to INR 1
+    pointValue: 1,
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = iciciCardRewards["Emeralde Private"].defaultRate;
       let category = "Other Spends";
@@ -128,6 +129,7 @@ export const iciciCardRewards = {
       "5541": 1 / 100,
       "4900": 1 / 100
     },
+    pointValue: 0.25,
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = iciciCardRewards.Emeralde.defaultRate;
       let category = "Other Spends";
@@ -154,6 +156,7 @@ export const iciciCardRewards = {
       "6300": 1 / 100
     },
     internationalRate: 4 / 100,
+    pointValue: 0.25,
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = iciciCardRewards.Rubyx.defaultRate;
       let category = "Other Spends";
@@ -196,6 +199,7 @@ export const iciciCardRewards = {
       "6300": 1 / 100
     },
     internationalRate: 4 / 100,
+    pointValue: 0.25,
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = iciciCardRewards.Sapphiro.defaultRate;
       let category = "Other Spends";
