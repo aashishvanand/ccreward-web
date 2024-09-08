@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -146,10 +146,12 @@ const BestCardCalculator = () => {
             </li>
           )}
           renderInput={(params) => (
-            <TextField {...params} label="Search Merchant or MCC" margin="normal" fullWidth />
+            <TextField {...params} label="Search MCC or Merchant" margin="normal" fullWidth />
           )}
+          onInputChange={handleMccSearch}
           onChange={(event, newValue) => setSelectedMcc(newValue)}
           value={selectedMcc}
+          filterOptions={(x) => x}
         />
         <TextField
           fullWidth

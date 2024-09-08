@@ -731,6 +731,7 @@ export const hdfcCardRewards = {
         "Telecom & Cable": { points: 2000, maxSpent: 60000, period: "monthly" },
       }
     },
+    pointValue: 1,
     calculateRewards: (amount, mcc, additionalParams) => {
       console.log("Additional Params:", additionalParams); // Debug log
 
