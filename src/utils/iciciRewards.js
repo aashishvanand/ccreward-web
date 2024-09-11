@@ -18,24 +18,26 @@ export const iciciCardRewards = {
       const isAmazonTransaction = mcc ? mccList.find(item => item.mcc === mcc)?.name.toLowerCase().includes('amazon') : false;
 
       if (isAmazonTransaction) {
-        if (additionalParams.isPrimeMember && iciciCardRewards.AmazonPay.amazonPrimeRate) {
-          rate = iciciCardRewards.AmazonPay.amazonPrimeRate[mcc] || iciciCardRewards.AmazonPay.amazonPrimeRate["default"] || iciciCardRewards.AmazonPay.defaultRate;
+        if (additionalParams.isPrimeMember && iciciCardRewards.AmazonPay.amazonPrimeRate[mcc]) {
+          rate = iciciCardRewards.AmazonPay.amazonPrimeRate[mcc];
           category = "Amazon Prime Purchase";
           rateType = "amazon-prime";
-        } else if (iciciCardRewards.AmazonPay.mccRates) {
-          rate = iciciCardRewards.AmazonPay.mccRates[mcc] || iciciCardRewards.AmazonPay.mccRates["default"] || iciciCardRewards.AmazonPay.defaultRate;
+        } else if (iciciCardRewards.AmazonPay.mccRates[mcc]) {
+          rate = iciciCardRewards.AmazonPay.mccRates[mcc];
           category = "Amazon Purchase";
           rateType = "amazon";
         }
-      } else if (iciciCardRewards.AmazonPay.mccRates && iciciCardRewards.AmazonPay.mccRates[mcc]) {
+      } else if (iciciCardRewards.AmazonPay.mccRates[mcc]) {
         rate = iciciCardRewards.AmazonPay.mccRates[mcc];
         rateType = "mcc-specific";
         category = "Category Spend";
       }
 
       const cashback = amount * rate;
+      const rewardText = `₹${cashback.toFixed(2)} Cashback (${category})`;
 
-      return { cashback, rate, rateType, category };
+      return { cashback, rate, rateType, category, rewardText, cardType: iciciCardRewards.AmazonPay.cardType };
+
     },
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
       const isAmazonMcc = selectedMcc && mccList.find(item => item.mcc === selectedMcc)?.name.toLowerCase().includes('amazon');
@@ -66,7 +68,9 @@ export const iciciCardRewards = {
       "4900": 1 / 100,
       "6300": 1 / 100
     },
-    pointValue: 0.25,
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = iciciCardRewards.Coral.defaultRate;
       let category = "Other Spends";
@@ -79,8 +83,13 @@ export const iciciCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
+      const cashbackValue = {
+        cashValue: points * iciciCardRewards.Coral.redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category };
+      const rewardText = `${points} ICICI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: iciciCardRewards.Coral.cardType };
     },
     dynamicInputs: () => []
   },
@@ -102,25 +111,39 @@ export const iciciCardRewards = {
         "Education": { points: 1000, maxSpent: 33333.33 }
       }
     },
-    pointValue: 1,
+    redemptionRate: {
+      cashValue: 1  // 1 point = ₹1
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = iciciCardRewards["Emeralde Private"].defaultRate;
       let category = "Other Spends";
       let rateType = "default";
-  
+
       if (mcc in iciciCardRewards["Emeralde Private"].mccRates) {
         rate = iciciCardRewards["Emeralde Private"].mccRates[mcc];
         rateType = "mcc-specific";
         category = rate === 0 ? "Excluded Category" : "Category Spend";
       }
-  
-      const points = Math.floor(amount * rate);
-      const cashbackValue = points * iciciCardRewards["Emeralde Private"].pointValue;
-  
-      return { points, rate, rateType, category, cashbackValue };
+
+      let points = Math.floor(amount * rate);
+
+      // Apply capping
+      if (iciciCardRewards["Emeralde Private"].capping.categories[category]) {
+        const cap = iciciCardRewards["Emeralde Private"].capping.categories[category];
+        points = Math.min(points, cap.points, Math.floor(cap.maxSpent * rate));
+      }
+
+      const cashbackValue = {
+        cashValue: points * iciciCardRewards["Emeralde Private"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} ICICI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: iciciCardRewards["Emeralde Private"].cardType };
     },
     dynamicInputs: () => []
   },
+
 
   "Emeralde": {
     cardType: "points",
@@ -129,7 +152,9 @@ export const iciciCardRewards = {
       "5541": 1 / 100,
       "4900": 1 / 100
     },
-    pointValue: 0.25,
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = iciciCardRewards.Emeralde.defaultRate;
       let category = "Other Spends";
@@ -142,8 +167,13 @@ export const iciciCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
+      const cashbackValue = {
+        cashValue: points * iciciCardRewards.Emeralde.redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category };
+      const rewardText = `${points} ICICI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: iciciCardRewards.Emeralde.cardType };
     },
     dynamicInputs: () => []
   },
@@ -156,7 +186,9 @@ export const iciciCardRewards = {
       "6300": 1 / 100
     },
     internationalRate: 4 / 100,
-    pointValue: 0.25,
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = iciciCardRewards.Rubyx.defaultRate;
       let category = "Other Spends";
@@ -173,8 +205,13 @@ export const iciciCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
+      const cashbackValue = {
+        cashValue: points * iciciCardRewards.Rubyx.redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category };
+      const rewardText = `${points} ICICI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: iciciCardRewards.Rubyx.cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -199,7 +236,9 @@ export const iciciCardRewards = {
       "6300": 1 / 100
     },
     internationalRate: 4 / 100,
-    pointValue: 0.25,
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = iciciCardRewards.Sapphiro.defaultRate;
       let category = "Other Spends";
@@ -216,8 +255,13 @@ export const iciciCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
+      const cashbackValue = {
+        cashValue: points * iciciCardRewards.Sapphiro.redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category };
+      const rewardText = `${points} ICICI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: iciciCardRewards.Sapphiro.cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -249,6 +293,9 @@ export const iciciCardRewards = {
         "HP Pay Fuel Spends": { points: 1.5 / 100 }
       }
     },
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = iciciCardRewards["HPCL Super Saver"].defaultRate;
       let category = "Other Spends";
@@ -266,9 +313,22 @@ export const iciciCardRewards = {
         rateType = "hp-pay";
       }
 
-      const points = Math.floor(amount * rate);
+      let points = Math.floor(amount * rate);
 
-      return { points, rate, rateType, category };
+      // Apply capping
+      if (iciciCardRewards["HPCL Super Saver"].capping.categories[category]) {
+        const cap = iciciCardRewards["HPCL Super Saver"].capping.categories[category];
+        points = Math.min(points, cap.points, Math.floor(cap.maxSpent * rate));
+      }
+
+      const cashbackValue = {
+        cashValue: points * iciciCardRewards["HPCL Super Saver"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} ICICI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: iciciCardRewards["HPCL Super Saver"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
       const isFuelMcc = selectedMcc ? mccList.find(item => item.mcc === selectedMcc)?.name.toLowerCase().includes('fuel') : false;
@@ -298,6 +358,9 @@ export const iciciCardRewards = {
     mccRates: {
       "5541": 0
     },
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = iciciCardRewards["HPCL Coral"].defaultRate;
       let category = "Other Spends";
@@ -310,8 +373,14 @@ export const iciciCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
+      const cashbackValue = {
+        cashValue: points * iciciCardRewards["HPCL Coral"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category };
+      const rewardText = `${points} ICICI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: iciciCardRewards["HPCL Coral"].cardType };
+
     },
     dynamicInputs: () => []
   },
@@ -320,105 +389,279 @@ export const iciciCardRewards = {
     cardType: "points",
     defaultRate: 1 / 100,
     mccRates: {},
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       const rate = iciciCardRewards.Mine.defaultRate;
       const category = "Other Spends";
       const rateType = "default";
 
       const points = Math.floor(amount * rate);
+      const cashbackValue = {
+        cashValue: points * iciciCardRewards.Mine.redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category };
+      const rewardText = `${points} ICICI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: iciciCardRewards.Mine.cardType };
     },
     dynamicInputs: () => []
   },
 
+
   "MMT Signature": {
     cardType: "points",
     defaultRate: 1.25 / 200,
+    internationalRate: 1.5 / 200,
     mccRates: {
       "7011": 4 / 200,
       "4511": 2 / 200
+    },
+    redemptionRate: {
+      cashValue: 1  // 1 point = ₹1
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = iciciCardRewards["MMT Signature"].defaultRate;
       let category = "Other Spends";
       let rateType = "default";
 
-      if (mcc && iciciCardRewards["MMT Signature"].mccRates[mcc]) {
+      if (additionalParams.isInternational) {
+        rate = iciciCardRewards["MMT Signature"].internationalRate;
+        category = "International Spend";
+        rateType = "international";
+      } else if (mcc && iciciCardRewards["MMT Signature"].mccRates[mcc]) {
         rate = iciciCardRewards["MMT Signature"].mccRates[mcc];
         rateType = "mcc-specific";
         category = "Travel Spend";
       }
 
       const points = Math.floor(amount * rate);
+      const cashbackValue = {
+        cashValue: points * iciciCardRewards["MMT Signature"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category };
+      const rewardText = `${points} ICICI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: iciciCardRewards["MMT Signature"].cardType };
+
     },
-    dynamicInputs: () => []
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this an international transaction?',
+        name: 'isInternational',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isInternational || false,
+        onChange: (value) => onChange('isInternational', value === 'true')
+      }
+    ]
   },
 
   "Manchester United Platinum": {
     cardType: "points",
-    defaultRate: 3 / 100,
-    mccRates: {},
+    defaultRate: 2 / 100,
+    matchDayRate: 3 / 100,
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
-      const rate = iciciCardRewards["Manchester United Platinum"].defaultRate;
-      const category = "Other Spends";
-      const rateType = "default";
+      let rate = iciciCardRewards["Manchester United Platinum"].defaultRate;
+      let category = "Other Spends";
+      let rateType = "default";
+
+      if (additionalParams.isMatchDay) {
+        rate = iciciCardRewards["Manchester United Platinum"].matchDayRate;
+        category = "Manchester United Match Day";
+        rateType = "match-day";
+      }
 
       const points = Math.floor(amount * rate);
+      const cashbackValue = {
+        cashValue: points * iciciCardRewards["Manchester United Platinum"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category };
+      const rewardText = `${points} ICICI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: iciciCardRewards["Manchester United Platinum"].cardType };
+
     },
-    dynamicInputs: () => []
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a Manchester United match day?',
+        name: 'isMatchDay',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isMatchDay || false,
+        onChange: (value) => onChange('isMatchDay', value === 'true')
+      }
+    ]
   },
 
   "Manchester United Signature": {
     cardType: "points",
-    defaultRate: 5 / 100,
-    mccRates: {},
+    defaultRate: 3 / 150,
+    internationalRate: 4 / 150,
+    matchDayRate: 5 / 150,
+    mccRates: {
+      "5541": 0, // Fuel transactions excluded
+      "5542": 0  // Fuel transactions excluded
+    },
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
-      const rate = iciciCardRewards["Manchester United Signature"].defaultRate;
-      const category = "Other Spends";
-      const rateType = "default";
+      let rate = iciciCardRewards["Manchester United Signature"].defaultRate;
+      let category = "Domestic Spend";
+      let rateType = "default";
+
+      if (mcc && iciciCardRewards["Manchester United Signature"].mccRates[mcc] === 0) {
+        rate = 0;
+        category = "Excluded Category";
+        rateType = "excluded";
+      } else if (additionalParams.isMatchDay) {
+        rate = iciciCardRewards["Manchester United Signature"].matchDayRate;
+        category = "Manchester United Match Day";
+        rateType = "match-day";
+      } else if (additionalParams.isInternational) {
+        rate = iciciCardRewards["Manchester United Signature"].internationalRate;
+        category = "International Spend";
+        rateType = "international";
+      }
 
       const points = Math.floor(amount * rate);
+      const cashbackValue = {
+        cashValue: points * iciciCardRewards["Manchester United Signature"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category };
+      const rewardText = `${points} ICICI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: iciciCardRewards["Manchester United Signature"].cardType };
+
     },
-    dynamicInputs: () => []
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this an international transaction?',
+        name: 'isInternational',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isInternational || false,
+        onChange: (value) => onChange('isInternational', value === 'true')
+      },
+      {
+        type: 'radio',
+        label: 'Is this a Manchester United match day?',
+        name: 'isMatchDay',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isMatchDay || false,
+        onChange: (value) => onChange('isMatchDay', value === 'true')
+      }
+    ]
   },
 
   "Platinum": {
     cardType: "points",
     defaultRate: 2 / 100,
     mccRates: {},
+    redemptionRate: {
+      cashValue: 0.25  // 1 My Cash = ₹0.25
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       const rate = iciciCardRewards.Platinum.defaultRate;
       const category = "Other Spends";
       const rateType = "default";
 
       const points = Math.floor(amount * rate);
+      const cashbackValue = {
+        cashValue: points * iciciCardRewards.Platinum.redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category };
+      const rewardText = `${points} ICICI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: iciciCardRewards.Platinum.cardType };
+
     },
     dynamicInputs: () => []
   },
 
   "MMT": {
     cardType: "points",
-    defaultRate: 1 / 100,
-    mccRates: {},
+    defaultRate: 1 / 200,
+    internationalRate: 1.25 / 200,
+    mccRates: {
+      "7011": 3 / 200,  // Hotel bookings
+      "4511": 2 / 200   // Flight bookings
+    },
+    redemptionRate: {
+      cashValue: 1  // 1 My Cash = ₹1
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
-      const rate = iciciCardRewards.MMT.defaultRate;
-      const category = "Other Spends";
-      const rateType = "default";
+      let rate = iciciCardRewards.MMT.defaultRate;
+      let category = "Domestic Spends Outside MMT";
+      let rateType = "default";
+
+      if (additionalParams.isMMTBooking) {
+        if (mcc === "7011") {
+          rate = iciciCardRewards.MMT.mccRates["7011"];
+          category = "Hotel/Holiday Bookings on MMT";
+          rateType = "mmt-hotel";
+        } else if (mcc === "4511") {
+          rate = iciciCardRewards.MMT.mccRates["4511"];
+          category = "Flight Bookings on MMT";
+          rateType = "mmt-flight";
+        }
+      } else if (additionalParams.isInternational) {
+        rate = iciciCardRewards.MMT.internationalRate;
+        category = "International Spends Outside MMT";
+        rateType = "international";
+      }
 
       const points = Math.floor(amount * rate);
+      const cashbackValue = {
+        cashValue: points * iciciCardRewards.MMT.redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category };
+      const rewardText = `${points} ICICI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: iciciCardRewards.MMT.cardType };
     },
-    dynamicInputs: () => []
+    dynamicInputs: (currentInputs, onChange) => [
+      {
+        type: 'radio',
+        label: 'Is this a MakeMyTrip booking?',
+        name: 'isMMTBooking',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isMMTBooking || false,
+        onChange: (value) => onChange('isMMTBooking', value === 'true')
+      },
+      {
+        type: 'radio',
+        label: 'Is this an international transaction?',
+        name: 'isInternational',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isInternational || false,
+        onChange: (value) => onChange('isInternational', value === 'true'),
+        condition: (inputs) => !inputs.isMMTBooking
+      }
+    ]
   }
 };
 
@@ -429,117 +672,16 @@ export const calculateICICIRewards = (cardName, amount, mcc, additionalParams = 
       points: 0,
       cashback: 0,
       rewardText: "Card not found",
-      uncappedPoints: 0,
-      cappedPoints: 0,
-      appliedCap: null
+      category: "Unknown",
+      cashbackValue: 0,
+      cardType: "unknown",
     };
   }
 
-  const result = cardReward.calculateRewards(amount, mcc, additionalParams);
-
-  if (cardReward.cardType === "cashback") {
-    return applyCashbackCapping(result, cardReward, cardName);
-  } else {
-    return applyPointsCapping(result, cardReward, cardName);
-  }
+  return cardReward.calculateRewards(amount, mcc, additionalParams);
 };
 
-const applyCashbackCapping = (result, cardReward, cardName) => {
-  let { cashback, rate, rateType, category } = result;
-  let cappedCashback = cashback;
-  let appliedCap = null;
-
-  if (cardReward.capping && cardReward.capping.categories && category) {
-    const cappingCategory = cardReward.capping.categories[category];
-    if (cappingCategory) {
-      const { maxCashback, maxSpent } = cappingCategory;
-      cappedCashback = Math.min(cashback, maxCashback, maxSpent * rate);
-
-      if (cappedCashback < cashback) {
-        appliedCap = { category, maxCashback, maxSpent };
-      }
-    }
-  }
-
-  const rewardText = generateCashbackRewardText(cardName, cappedCashback, rate, rateType, category, appliedCap);
-
-  return {
-    cashback: cappedCashback,
-    rewardText,
-    uncappedCashback: cashback,
-    cappedCashback,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category
-  };
-};
-
-const applyPointsCapping = (result, cardReward, cardName) => {
-  let { points, rate, rateType, category, cashbackValue } = result;
-  let cappedPoints = points;
-  let appliedCap = null;
-
-  if (cardReward.capping && cardReward.capping.categories && category) {
-    const cappingCategory = cardReward.capping.categories[category];
-    if (cappingCategory) {
-      const { points: maxPoints, maxSpent } = cappingCategory;
-      cappedPoints = Math.min(points, maxPoints, Math.floor(maxSpent * rate));
-
-      if (cappedPoints < points) {
-        appliedCap = { category, maxPoints, maxSpent };
-      }
-    }
-  }
-
-  const rewardText = generatePointsRewardText(cardName, cappedPoints, rate, rateType, category, appliedCap, cashbackValue);
-
-  return {
-    points: cappedPoints,
-    rewardText,
-    uncappedPoints: points,
-    cappedPoints,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category,
-    cashbackValue
-  };
-};
-
-const generateCashbackRewardText = (cardName, cashback, rate, rateType, category, appliedCap) => {
-  let rewardText = rate === 0 ? "No cashback for this transaction" : `₹${cashback.toFixed(2)} Cashback`;
-
-  if (category !== "Other Spends" && !rewardText.includes(category)) {
-    rewardText += ` (${category})`;
-  }
-
-  if (appliedCap) {
-    rewardText += ` (Capped at ₹${appliedCap.maxCashback})`;
-  }
-
-  return rewardText;
-};
-
-const generatePointsRewardText = (cardName, points, rate, rateType, category, appliedCap, cashbackValue) => {
-  let rewardText = rate === 0 ? "No ICICI Reward Points for this transaction" : `${points} ICICI Reward Points`;
-
-  if (category !== "Other Spends" && !rewardText.includes(category)) {
-    rewardText += ` (${category})`;
-  }
-
-  if (appliedCap) {
-    rewardText += ` (Capped at ${appliedCap.maxPoints} points)`;
-  }
-
-  if (cashbackValue !== undefined) {
-    rewardText += ` (Approx. value: ₹${cashbackValue.toFixed(2)})`;
-  }
-
-  return rewardText;
-};
-
-export const getCardInputs = (cardName, currentInputs, onChange) => {
+export const getAxisCardInputs = (cardName, currentInputs, onChange, selectedMcc) => {
   const cardReward = iciciCardRewards[cardName];
-  return cardReward && cardReward.dynamicInputs ? cardReward.dynamicInputs(currentInputs, onChange) : [];
+  return cardReward && cardReward.dynamicInputs ? cardReward.dynamicInputs(currentInputs, onChange, selectedMcc) : [];
 };

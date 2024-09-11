@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -10,21 +10,25 @@ import {
   List,
   Snackbar,
   Alert,
-} from '@mui/material';
-import { calculateRewards } from './CalculatorHelpers';
-import Header from './Header';
-import Footer from './Footer';
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
+  IconButton,
+} from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
+import { calculateRewards } from "./CalculatorHelpers";
+import Header from "./Header";
+import Footer from "./Footer";
 import { useAuth } from "../app/providers/AuthContext";
 import { getCardsForUser } from "../utils/firebaseUtils";
 import { mccList } from "../data/mccData";
-import ReactConfetti from 'react-confetti';
-import { searchMcc } from "../utils/searchUtils";
-import { renderCardList } from './CardListRenderer';
+import ReactConfetti from "react-confetti";
+import { renderCardList } from "./CardListRenderer";
 
 const BestCardCalculator = () => {
   const [userCards, setUserCards] = useState([]);
   const [selectedMcc, setSelectedMcc] = useState(null);
-  const [spentAmount, setSpentAmount] = useState('');
+  const [spentAmount, setSpentAmount] = useState("");
   const [cardRewards, setCardRewards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isCalculated, setIsCalculated] = useState(false);
@@ -32,9 +36,14 @@ const BestCardCalculator = () => {
   const [isCardListLoading, setIsCardListLoading] = useState(true);
   const [hasCalculated, setHasCalculated] = useState(false);
   const [failedImages, setFailedImages] = useState({});
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
   const [mccOptions, setMccOptions] = useState(mccList);
   const { user } = useAuth();
+  const [sortMethod, setSortMethod] = useState("default");
 
   useEffect(() => {
     const fetchUserCards = async () => {
@@ -64,7 +73,15 @@ const BestCardCalculator = () => {
     if (!value) {
       setMccOptions(mccList);
     } else {
-      const filteredOptions = searchMcc(value, mccList);
+      const searchTerm = value.toLowerCase();
+      const filteredOptions = mccList.filter(
+        (option) =>
+          option.mcc.toLowerCase().includes(searchTerm) ||
+          option.name.toLowerCase().includes(searchTerm) ||
+          option.knownMerchants.some((merchant) =>
+            merchant.toLowerCase().includes(searchTerm)
+          )
+      );
       setMccOptions(filteredOptions);
     }
   };
@@ -93,16 +110,11 @@ const BestCardCalculator = () => {
       })
     );
 
-    const sortedRewards = rewards.sort((a, b) => {
-      const aValue = a.points || a.cashback || a.miles || 0;
-      const bValue = b.points || b.cashback || b.miles || 0;
-      return bValue - aValue;
-    });
+    sortRewards(rewards, sortMethod);
 
-    setCardRewards(sortedRewards);
     setIsLoading(false);
     setIsCalculated(true);
-    
+
     if (!hasCalculated) {
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 5000);
@@ -110,17 +122,133 @@ const BestCardCalculator = () => {
     }
   };
 
+  const sortRewards = (rewards, method) => {
+    let sortedRewards = rewards.map((reward) => ({
+      ...reward,
+      displayValue: calculateDisplayValue(reward, method),
+      sortValue: calculateSortValue(reward, method),
+    }));
+
+    sortedRewards.sort((a, b) => b.sortValue - a.sortValue);
+    setCardRewards(sortedRewards);
+  };
+
+  const calculateDisplayValue = (reward, method) => {
+    if (!reward.cardType) {
+      console.log("Card type is missing for reward:", reward);
+      return "Card type missing";
+    }
+
+    if (method === "default") {
+      switch (reward.cardType) {
+        case "points":
+          return `${reward.points} points`;
+        case "miles":
+          return `${reward.miles} miles`;
+        case "cashback":
+          return `₹${reward.cashback.toFixed(2)}`;
+        case "hybrid":
+          return reward.points
+            ? `${reward.points} points`
+            : `₹${reward.cashback.toFixed(2)}`;
+        default:
+          return "No rewards";
+      }
+    } else {
+      // cashback value sort
+      switch (reward.cardType) {
+        case "points":
+          if (reward.cashbackValue?.cashValue) {
+            return `₹${reward.cashbackValue.cashValue.toFixed(2)} value`;
+          } else if (reward.cashbackValue?.airMiles) {
+            return `${reward.cashbackValue.airMiles} miles`;
+          }
+          return `${reward.points} points`;
+        case "miles":
+          return `${reward.miles} miles`;
+        case "cashback":
+          return `₹${reward.cashback.toFixed(2)} cashback`;
+        case "hybrid":
+          if (reward.points) {
+            if (reward.cashbackValue?.cashValue) {
+              return `₹${reward.cashbackValue.cashValue.toFixed(2)} value`;
+            } else if (reward.cashbackValue?.airMiles) {
+              return `${reward.cashbackValue.airMiles} miles`;
+            }
+            return `${reward.points} points`;
+          }
+          return `₹${reward.cashback.toFixed(2)} cashback`;
+        default:
+          return "No rewards";
+      }
+    }
+  };
+
+  const calculateSortValue = (reward, method) => {
+    if (!reward.cardType) {
+      console.log("Card type is missing for reward:", reward);
+      return 0;
+    }
+
+    if (method === "default") {
+      switch (reward.cardType) {
+        case "points":
+        case "miles":
+          return reward.points || reward.miles || 0;
+        case "cashback":
+        case "hybrid":
+          return reward.cashback || reward.points || 0;
+        default:
+          return 0;
+      }
+    } else {
+      // cashback value sort
+      switch (reward.cardType) {
+        case "points":
+          return (
+            reward.cashbackValue?.cashValue ||
+            reward.cashbackValue?.airMiles ||
+            reward.points ||
+            0
+          );
+        case "miles":
+          return reward.miles || 0;
+        case "hybrid":
+          if (reward.points) {
+            return (
+              reward.cashbackValue?.cashValue ||
+              reward.cashbackValue?.airMiles ||
+              reward.points ||
+              0
+            );
+          }
+          return reward.cashback || 0;
+        case "cashback":
+          return reward.cashback || 0;
+        default:
+          return 0;
+      }
+    }
+  };
+
+  const handleSortMethodChange = (event, newMethod) => {
+    if (newMethod !== null) {
+      setSortMethod(newMethod);
+      sortRewards(cardRewards, newMethod);
+    }
+  };
+
   const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setSnackbar({ ...snackbar, open: false });
   };
 
   const handleImageError = (cardId) => {
-    setFailedImages(prevFailedImages => ({
+    setFailedImages((prevFailedImages) => ({
       ...prevFailedImages,
-      [cardId]: true
+      [cardId]: true,
     }));
   };
 
@@ -139,14 +267,20 @@ const BestCardCalculator = () => {
             <li {...props}>
               {option.mcc} - {option.name}
               {option.knownMerchants.length > 0 && (
-                <span style={{ fontSize: '0.8em', color: 'gray' }}>
-                  {' '}(e.g., {option.knownMerchants.join(', ')})
+                <span style={{ fontSize: "0.8em", color: "gray" }}>
+                  {" "}
+                  (e.g., {option.knownMerchants.join(", ")})
                 </span>
               )}
             </li>
           )}
           renderInput={(params) => (
-            <TextField {...params} label="Search MCC or Merchant" margin="normal" fullWidth />
+            <TextField
+              {...params}
+              label="Search Merchant or MCC (Optional)"
+              margin="normal"
+              fullWidth
+            />
           )}
           onInputChange={handleMccSearch}
           onChange={(event, newValue) => setSelectedMcc(newValue)}
@@ -178,11 +312,50 @@ const BestCardCalculator = () => {
             disabled={!spentAmount || parseFloat(spentAmount) <= 0 || isLoading}
             sx={{ width: "100%" }}
           >
-            {isLoading ? <CircularProgress size={24} color="inherit" /> : "Calculate Best Card"}
+            {isLoading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Calculate Best Card"
+            )}
           </Button>
         </Box>
-        <List sx={{ width: '100%' }}>
-          {renderCardList(isCardListLoading, isCalculated, cardRewards, userCards, failedImages, handleImageError)}
+        {isCalculated && (
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+            <ToggleButtonGroup
+              value={sortMethod}
+              exclusive
+              onChange={handleSortMethodChange}
+              aria-label="sort method"
+            >
+              <ToggleButton value="default" aria-label="sort by default">
+                Sort by Points
+              </ToggleButton>
+              <ToggleButton
+                value="cashbackValue"
+                aria-label="sort by cashback value"
+              >
+                Sort by Cashback INR
+                <Tooltip
+                  title="For comparison purposes, we assume 1 mile = ₹1"
+                  arrow
+                >
+                  <IconButton size="small" sx={{ ml: 1 }}>
+                    <InfoIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+        )}
+        <List sx={{ width: "100%" }}>
+          {renderCardList(
+            isCardListLoading,
+            isCalculated,
+            cardRewards,
+            userCards,
+            failedImages,
+            handleImageError
+          )}
         </List>
       </Container>
       <Snackbar

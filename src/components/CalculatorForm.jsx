@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Autocomplete, TextField, Button, Box } from '@mui/material';
+import { useState, useEffect } from "react";
+import { Autocomplete, TextField, Button, Box } from "@mui/material";
 import { mccList } from "../data/mccData";
 import { bankData } from "../data/bankData";
-import { searchMcc } from "../utils/searchUtils";
-import DynamicCardInputs from './DynamicCardInputs';
+import DynamicCardInputs from "./DynamicCardInputs";
 
 const CalculatorForm = ({
   selectedBank,
@@ -18,14 +17,14 @@ const CalculatorForm = ({
   onAdditionalInputChange,
   onCalculate,
   onClear,
-  getCardConfig
+  getCardConfig,
 }) => {
   const [cardConfig, setCardConfig] = useState(null);
   const [mccOptions, setMccOptions] = useState(mccList);
 
   useEffect(() => {
     if (selectedBank && selectedCard) {
-      getCardConfig(selectedBank, selectedCard).then(config => {
+      getCardConfig(selectedBank, selectedCard).then((config) => {
         setCardConfig(config);
       });
     } else {
@@ -37,12 +36,24 @@ const CalculatorForm = ({
     if (!value) {
       setMccOptions(mccList);
     } else {
-      const filteredOptions = searchMcc(value, mccList);
+      const searchTerm = value.toLowerCase();
+      const filteredOptions = mccList.filter(
+        (option) =>
+          option.mcc.toLowerCase().includes(searchTerm) ||
+          option.name.toLowerCase().includes(searchTerm) ||
+          option.knownMerchants.some((merchant) =>
+            merchant.toLowerCase().includes(searchTerm)
+          )
+      );
       setMccOptions(filteredOptions);
     }
   };
 
-  const isCalculateDisabled = !selectedBank || !selectedCard || !spentAmount || parseFloat(spentAmount) <= 0;
+  const isCalculateDisabled =
+    !selectedBank ||
+    !selectedCard ||
+    !spentAmount ||
+    parseFloat(spentAmount) <= 0;
 
   return (
     <>
@@ -61,7 +72,7 @@ const CalculatorForm = ({
         onChange={(event, newValue) => onBankChange(newValue)}
       />
 
-<Autocomplete
+      <Autocomplete
         fullWidth
         options={selectedBank ? bankData[selectedBank] : []}
         renderInput={(params) => (
@@ -77,7 +88,7 @@ const CalculatorForm = ({
         disabled={!selectedBank}
       />
 
-<Autocomplete
+      <Autocomplete
         fullWidth
         options={mccOptions}
         getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
@@ -85,14 +96,19 @@ const CalculatorForm = ({
           <li {...props}>
             {option.mcc} - {option.name}
             {option.knownMerchants.length > 0 && (
-              <span style={{ fontSize: '0.8em', color: 'gray' }}>
-                {' '}(e.g., {option.knownMerchants.join(', ')})
+              <span style={{ fontSize: "0.8em", color: "gray" }}>
+                {" "}
+                (e.g., {option.knownMerchants.join(", ")})
               </span>
             )}
           </li>
         )}
         renderInput={(params) => (
-          <TextField {...params} label="Search Merchant or MCC (Optional)" margin="normal" />
+          <TextField
+            {...params}
+            label="Search Merchant or MCC (Optional)"
+            margin="normal"
+          />
         )}
         onInputChange={handleMccSearch}
         onChange={(event, newValue) => onMccChange(newValue)}
@@ -100,7 +116,7 @@ const CalculatorForm = ({
         filterOptions={(x) => x}
       />
 
-<TextField
+      <TextField
         fullWidth
         margin="normal"
         label="Enter spent amount (INR)"

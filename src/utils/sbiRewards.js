@@ -1,8 +1,10 @@
 export const sbiCardRewards = {
   "Air India Platinum": {
-    cardType: "points",
+    cardType: "miles",
     defaultRate: 2 / 100, // 2 Reward points for every Rs. 100 spent
-    redemptionRate: 1, // 1 Reward point is equal to 1 Air India Air mile
+    redemptionRate: {
+      airMiles: 1  // 1 point = 1 air mile
+    },
     mccRates: {
       "3020": 15 / 100, // Air India tickets booked through airindia.in or mobile app for self
       "3193": 5 / 100, // Air India tickets booked through other channels
@@ -24,10 +26,11 @@ export const sbiCardRewards = {
         }
       }
 
-      const points = Math.floor(amount * rate);
-      const airMiles = points; // 1:1 conversion
+      const miles = Math.floor(amount * rate);
 
-      return { points, airMiles, rate, rateType, category };
+      const rewardText = `${miles} Flying Returns miles (${category})`;
+
+      return { miles, rate, rateType, category, rewardText, cardType: sbiCardRewards["Air India Platinum"].cardType };
     },
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
       if (["3020", "3193"].includes(selectedMcc)) {
@@ -49,9 +52,11 @@ export const sbiCardRewards = {
     }
   },
   "Air India Signature": {
-    cardType: "points",
+    cardType: "miles",
     defaultRate: 4 / 100, // 4 Reward points for every Rs. 100 spent
-    redemptionRate: 1, // 1 Reward point is equal to 1 Air India Air mile
+    redemptionRate: {
+      airMiles: 1  // 1 point = 1 air mile
+    },
     mccRates: {
       "3020": 30 / 100, // Air India tickets booked through airindia.in or mobile app for self
       "3193": 10 / 100, // Air India tickets booked through other channels
@@ -73,10 +78,12 @@ export const sbiCardRewards = {
         }
       }
 
-      const points = Math.floor(amount * rate);
-      const airMiles = points; // 1:1 conversion
+      const miles = Math.floor(amount * rate);
 
-      return { points, airMiles, rate, rateType, category };
+      const rewardText = `${miles} Flying Returns miles (${category})`;
+
+      return { miles, rate, rateType, category, rewardText, cardType: sbiCardRewards["Air India Signature"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
       if (["3020", "3193"].includes(selectedMcc)) {
@@ -100,7 +107,9 @@ export const sbiCardRewards = {
   "Apollo": {
     cardType: "points",
     defaultRate: 1 / 200, // 1 Reward Point on every Rs. 200 spent on other non-fuel retail purchases
-    redemptionRate: 1, // 1 Reward Point = Rs. 1
+    redemptionRate: {
+      cashValue: 1  // 1 point = ₹1
+    },
     mccRates: {
       // 3X Reward Points on every Rs. 100 spent on all Apollo services
       "8011": 3 / 100, // Doctors
@@ -145,16 +154,23 @@ export const sbiCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards.Apollo.redemptionRate;
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["Apollo"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Apollo"].cardType };
+
     },
     dynamicInputs: () => []
   },
   "Aurum": {
     cardType: "points",
     defaultRate: 4 / 100, // 4 reward points on every Rs. 100 spent
-    redemptionRate: 0.25, // 1 Reward Point = Rs. 0.25
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     mccRates: {
       "6540": 0, "6541": 0 // Wallet loads
     },
@@ -170,16 +186,23 @@ export const sbiCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Aurum"].redemptionRate;
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["Aurum"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Aurum"].cardType };
+
     },
     dynamicInputs: () => []
   },
   "BPCL": {
     cardType: "points",
     defaultRate: 1 / 100, // 1 Reward Point for every Rs. 100 spent on non-fuel retail purchases
-    redemptionRate: 1 / 4, // 4 Reward Points = Re 1
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     mccRates: {
       "5411": 5 / 100, // Groceries
       "5311": 5 / 100, // Departmental Stores
@@ -219,10 +242,26 @@ export const sbiCardRewards = {
         rateType = "accelerated";
       }
 
-      const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["BPCL"].redemptionRate;
+      let points = Math.floor(amount * rate);
 
-      return { points, rate, rateType, category, cashbackValue, surchargeWaiver };
+      // Apply capping
+      if (category === "Accelerated Rewards") {
+        points = Math.min(points, sbiCardRewards["BPCL"].capping.categories["Accelerated Rewards"].points);
+      } else if (category === "BPCL Fuel") {
+        points = Math.min(points, sbiCardRewards["BPCL"].capping.categories["BPCL Fuel"].points);
+      }
+
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["BPCL"].redemptionRate.cashValue
+      };
+
+      let rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+      if (surchargeWaiver > 0) {
+        rewardText += ` + ₹${surchargeWaiver.toFixed(2)} Fuel Surcharge Waiver`;
+      }
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, surchargeWaiver, cardType: sbiCardRewards["BPCL"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
       if (["5541", "5542"].includes(selectedMcc)) {
@@ -246,7 +285,9 @@ export const sbiCardRewards = {
   "BPCL Octane": {
     cardType: "points",
     defaultRate: 1 / 100, // 1 Reward point per 100 Rs. spent on other retail purchases
-    redemptionRate: 1 / 4, // 4 Reward Point = 1 Rs
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     BharatGasRate: 25 / 100, // Added Bharat Gas rate
     mccRates: {
       "5541": 25 / 100, // BPCL fuel purchases
@@ -284,7 +325,7 @@ export const sbiCardRewards = {
           surchargeWaiver = amount * sbiCardRewards["BPCL Octane"].fuelSurchargeWaiver.rate;
         }
       } else if (additionalParams.isBharatGas) {
-        rate = 25 / 100;
+        rate = sbiCardRewards["BPCL Octane"].BharatGasRate;
         category = "Bharat Gas";
         rateType = "bharat-gas";
       } else if (mcc && sbiCardRewards["BPCL Octane"].mccRates[mcc]) {
@@ -293,10 +334,24 @@ export const sbiCardRewards = {
         rateType = "accelerated";
       }
 
-      const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["BPCL Octane"].redemptionRate;
+      let points = Math.floor(amount * rate);
 
-      return { points, rate, rateType, category, cashbackValue, surchargeWaiver };
+      // Apply capping
+      if (sbiCardRewards["BPCL Octane"].capping.categories[category]) {
+        points = Math.min(points, sbiCardRewards["BPCL Octane"].capping.categories[category].points);
+      }
+
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["BPCL Octane"].redemptionRate.cashValue
+      };
+
+      let rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+      if (surchargeWaiver > 0) {
+        rewardText += ` + ₹${surchargeWaiver.toFixed(2)} Fuel Surcharge Waiver`;
+      }
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, surchargeWaiver, cardType: sbiCardRewards["BPCL Octane"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
       const inputs = [];
@@ -363,8 +418,12 @@ export const sbiCardRewards = {
       }
 
       let cashback = Math.floor(amount * rate * 100) / 100; // Rounded down to 2 decimal places
+      let cappedCashback = Math.min(cashback, sbiCardRewards["Cashback"].maxCashback);
 
-      return { cashback, rate, rateType, category };
+      const rewardText = `₹${cappedCashback.toFixed(2)} Cashback (${category})`;
+
+      return { cashback: cappedCashback, rate, rateType, category, rewardText, cardType: sbiCardRewards["Cashback"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -383,7 +442,9 @@ export const sbiCardRewards = {
   "Elite": {
     cardType: "points",
     defaultRate: 2 / 100, // 2 Reward Points per Rs. 100 on all other spends
-    redemptionRate: 1 / 4, // 4 Reward Points = Rs. 1
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     mccRates: {
       // 5X Reward Points on Dining, Departmental stores and Grocery Spends
       "5812": 10 / 100, // Eating Places and Restaurants
@@ -429,17 +490,34 @@ export const sbiCardRewards = {
         }
       }
 
-      const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Elite"].redemptionRate;
+      let points = Math.floor(amount * rate);
 
-      return { points, rate, rateType, category, cashbackValue, surchargeWaiver };
+      // Apply capping
+      if (category === "Accelerated Rewards") {
+        const cap = sbiCardRewards["Elite"].capping.categories["Accelerated Rewards"];
+        points = Math.min(points, cap.points);
+      }
+
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["Elite"].redemptionRate.cashValue
+      };
+
+      let rewardText = `${points} SBI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+      if (surchargeWaiver > 0) {
+        rewardText += ` + ₹${surchargeWaiver.toFixed(2)} Fuel Surcharge Waiver`;
+      }
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, surchargeWaiver, cardType: sbiCardRewards["Elite"].cardType };
+
     },
     dynamicInputs: () => []
   },
   "Elite Advantage": {
     cardType: "points",
     defaultRate: 2 / 100, // 2 Reward Points per Rs. 100 on all other spends
-    redemptionRate: 1 / 4, // 4 Reward Points = Rs. 1
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     mccRates: {
       // 5X Reward Points on Dining, Departmental stores and Grocery Spends
       "5812": 10 / 100, // Eating Places and Restaurants
@@ -474,9 +552,17 @@ export const sbiCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Elite Advantage"].redemptionRate;
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["Elite Advantage"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashbackValue, surchargeWaiver };
+      let rewardText = `${points} SBI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+      if (surchargeWaiver > 0) {
+        rewardText += ` + ₹${surchargeWaiver.toFixed(2)} Fuel Surcharge Waiver`;
+      }
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, surchargeWaiver, cardType: sbiCardRewards["Elite Advantage"].cardType };
+
     },
     dynamicInputs: () => []
   },
@@ -492,7 +578,7 @@ export const sbiCardRewards = {
       let rate = sbiCardRewards["Etihad Guest"].defaultRate;
       let category = "Other Spends";
       let rateType = "default";
-    
+
       if (mcc === "3034") {
         rate = sbiCardRewards["Etihad Guest"].mccRates["3034"];
         category = "Etihad.com";
@@ -506,10 +592,13 @@ export const sbiCardRewards = {
         category = rate === 0 ? "Excluded Category" : "Category Spend";
         rateType = "mcc-specific";
       }
-    
+
       const miles = Math.floor(amount * rate);
-    
-      return { miles, rate, rateType, category };
+
+      const rewardText = `${miles} Etihad Guest Miles (${category})`;
+
+      return { miles, rate, rateType, category, rewardText, cardType: sbiCardRewards["Etihad Guest"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -525,6 +614,7 @@ export const sbiCardRewards = {
       }
     ]
   },
+  //TODO: Fix this to new structure 
   "Etihad Guest Premier": {
     cardType: "miles",
     defaultRate: 2 / 100, // 2 Etihad Guest Miles on every Rs. 100 spent on other spends
@@ -536,28 +626,30 @@ export const sbiCardRewards = {
       "5172": 0, "5541": 0, "5983": 0, "5542": 0, "6513": 0,
     },
     calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = sbiCardRewards["Etihad Guest Premier"].defaultRate;
+      let rate = sbiCardRewards["Etihad Guest"].defaultRate;
       let category = "Other Spends";
       let rateType = "default";
 
       if (mcc === "3034") {
-        rate = sbiCardRewards["Etihad Guest Premier"].mccRates["3034"];
+        rate = sbiCardRewards["Etihad Guest"].mccRates["3034"];
         category = "Etihad.com";
         rateType = "etihad";
       } else if (additionalParams.isInternational) {
-        rate = sbiCardRewards["Etihad Guest Premier"].internationalRate;
+        rate = sbiCardRewards["Etihad Guest"].internationalRate;
         category = "International Spends";
         rateType = "international";
-      } else if (sbiCardRewards["Etihad Guest Premier"].mccRates[mcc] !== undefined) {
-        rate = 0;
-        category = "Excluded Category";
-        rateType = "excluded";
+      } else if (sbiCardRewards["Etihad Guest"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["Etihad Guest"].mccRates[mcc];
+        category = rate === 0 ? "Excluded Category" : "Category Spend";
+        rateType = "mcc-specific";
       }
 
       const miles = Math.floor(amount * rate);
-      const tierMiles = Math.floor(amount * sbiCardRewards["Etihad Guest Premier"].tierMileRate);
 
-      return { miles, tierMiles, rate, rateType, category };
+      const rewardText = `${miles} Etihad Guest Miles (${category})`;
+
+      return { miles, rate, rateType, category, rewardText, cardType: sbiCardRewards["Etihad Guest Premier"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -577,7 +669,9 @@ export const sbiCardRewards = {
     cardType: "points",
     defaultRate: 1 / 100, // 1 Reward Point per Rs. 100 spent on other retail purchases
     acceleratedRate: 5 / 100, // 5 Reward Points per Rs. 100 spent on accelerated categories
-    redemptionRate: 1 / 4, // 4 Reward Points = Rs. 1
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     mccRates: {
       "5812": 5 / 100, // Dining
       "5813": 5 / 100, // Bars
@@ -601,9 +695,14 @@ export const sbiCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Lifestyle"].redemptionRate;
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["Lifestyle"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Lifestyle"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -622,7 +721,9 @@ export const sbiCardRewards = {
   "Lifestyle Prime": {
     cardType: "points",
     defaultRate: 2 / 100, // 2 Reward Points per Rs. 100 spent on other retail purchases
-    redemptionRate: 1 / 4, // 4 Reward Points = Rs. 1
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     mccRates: {
       "5812": 10 / 100, // Dining
       "5813": 10 / 100, // Bars
@@ -631,43 +732,82 @@ export const sbiCardRewards = {
       "5712": 0, "5541": 0, "5983": 0, "5542": 0, "6513": 0 // Excluded categories
     },
     calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = sbiCardRewards["Lifestyle"].defaultRate;
-      let category = "Other Retail";
+      let rate = sbiCardRewards["Prime"].defaultRate;
+      let category = "Other Retail Spends";
       let rateType = "default";
+      let surchargeWaiver = 0;
 
-      if (additionalParams.isLandmarkStore) {
-        rate = sbiCardRewards["Lifestyle"].acceleratedRate;
-        category = "Landmark Stores";
-        rateType = "landmark";
-      } else if (mcc && sbiCardRewards["Lifestyle"].mccRates[mcc] !== undefined) {
-        rate = sbiCardRewards["Lifestyle"].mccRates[mcc];
-        category = rate === 0 ? "Excluded Category" : "Dining & Movies";
-        rateType = rate === 0 ? "excluded" : "dining-movies";
+      if (additionalParams.isBirthday) {
+        rate = sbiCardRewards["Prime"].birthdayRate;
+        category = "Birthday Spend";
+        rateType = "birthday";
+      } else if (additionalParams.isUtilityBill) {
+        rate = sbiCardRewards["Prime"].utilityBillRate;
+        category = "Utility Bill";
+        rateType = "utility";
+      } else if (mcc && sbiCardRewards["Prime"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["Prime"].mccRates[mcc];
+        rateType = "mcc-specific";
+        if (["5812", "5813", "5814", "5411", "5311", "7832"].includes(mcc)) {
+          category = "Accelerated Rewards";
+        } else if (["5172", "5541", "5542", "5983"].includes(mcc)) {
+          category = "Fuel";
+          if (amount >= 500 && amount <= 4000) {
+            surchargeWaiver = Math.min(amount * sbiCardRewards["Prime"].fuelSurchargeWaiver.rate, sbiCardRewards["Prime"].fuelSurchargeWaiver.maxWaiver);
+          }
+        }
       }
 
-      const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Lifestyle"].redemptionRate;
+      let points = Math.floor(amount * rate);
 
-      return { points, rate, rateType, category, cashbackValue };
+      // Apply capping
+      if (sbiCardRewards["Prime"].capping.categories[category]) {
+        points = Math.min(points, sbiCardRewards["Prime"].capping.categories[category].points);
+      }
+
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["Prime"].redemptionRate.cashValue
+      };
+
+      let rewardText = `${points} SBI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+      if (surchargeWaiver > 0) {
+        rewardText += ` + ₹${surchargeWaiver.toFixed(2)} Fuel Surcharge Waiver`;
+      }
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Lifestyle Prime"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
         type: 'radio',
-        label: 'Is this a Landmark Store transaction?',
-        name: 'isLandmarkStore',
+        label: 'Is this a birthday transaction?',
+        name: 'isBirthday',
         options: [
           { label: 'Yes', value: true },
           { label: 'No', value: false }
         ],
-        value: currentInputs.isLandmarkStore || false,
-        onChange: (value) => onChange('isLandmarkStore', value === 'true')
+        value: currentInputs.isBirthday || false,
+        onChange: (value) => onChange('isBirthday', value === 'true')
+      },
+      {
+        type: 'radio',
+        label: 'Is this a utility bill transaction?',
+        name: 'isUtilityBill',
+        options: [
+          { label: 'Yes', value: true },
+          { label: 'No', value: false }
+        ],
+        value: currentInputs.isUtilityBill || false,
+        onChange: (value) => onChange('isUtilityBill', value === 'true')
       }
     ]
   },
   "Lifestyle Select": {
     cardType: "points",
     defaultRate: 2 / 100, // 2 Reward Points per Rs. 100 spent on other retail purchases
-    redemptionRate: 1 / 4, // 4 Reward Points = Rs. 1
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     mccRates: {
       "5812": 10 / 100, // Dining
       "5813": 10 / 100, // Bars
@@ -691,9 +831,13 @@ export const sbiCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Lifestyle Select"].redemptionRate;
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["Lifestyle Select"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Lifestyle Select"].cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -715,25 +859,7 @@ export const sbiCardRewards = {
     travelRate: 2 / 200, // 2 Travel Credits for every Rs. 200 on travel spends
     redemptionRate: {
       airMiles: 1,
-      travelBookings: 0.5,
-      catalogue: 0.25
-    },
-    mccRates: {
-      // Travel transactions (2 Travel Credits for every Rs. 200)
-      "4511": 2 / 200, "3020": 2 / 200, "3026": 2 / 200, "3034": 2 / 200, "3005": 2 / 200,
-      "3008": 2 / 200, "3075": 2 / 200, "3136": 2 / 200, "3007": 2 / 200, "3010": 2 / 200,
-      "3047": 2 / 200, "4722": 2 / 200, "4784": 2 / 200, "4131": 2 / 200, "4111": 2 / 200,
-      "4121": 2 / 200, "7512": 2 / 200, "4789": 2 / 200, "4214": 2 / 200, "7011": 2 / 200,
-      "3640": 2 / 200, "3509": 2 / 200, "3649": 2 / 200, "3501": 2 / 200,
-
-      // Excluded categories (same as MILES PRIME and MILES Elite)
-      "8211": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0,
-      "4900": 0, "4814": 0, "4899": 0, "9399": 0,
-      "5960": 0, "6300": 0, "6380": 0,
-      "6012": 0, "6051": 0, "9222": 0, "9311": 0, "9402": 0,
-      "5172": 0, "5541": 0, "5542": 0, "5983": 0,
-      "6540": 0, "6541": 0,
-      "6513": 0,
+      cashValue: 0.25
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = sbiCardRewards["Miles"].defaultRate;
@@ -749,11 +875,13 @@ export const sbiCardRewards = {
       const points = Math.floor(amount * rate);
       const cashbackValue = {
         airMiles: points * sbiCardRewards["Miles"].redemptionRate.airMiles,
-        travelBookings: points * sbiCardRewards["Miles"].redemptionRate.travelBookings,
-        catalogue: points * sbiCardRewards["Miles"].redemptionRate.catalogue
+        cashValue: points * sbiCardRewards["Miles"].redemptionRate.cashValue
       };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points} Travel Credits (${category}) - Worth ${cashbackValue.airMiles} Air Miles or ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Miles"].cardType };
+
     },
     dynamicInputs: () => []
   },
@@ -763,8 +891,7 @@ export const sbiCardRewards = {
     travelRate: 6 / 200, // 6 Travel Credits for every Rs. 200 on travel spends
     redemptionRate: {
       airMiles: 1,
-      travelBookings: 0.5,
-      catalogue: 0.25
+      cashValue: 0.25
     },
     mccRates: {
       // Travel transactions (6 Travel Credits for every Rs. 200)
@@ -797,11 +924,13 @@ export const sbiCardRewards = {
       const points = Math.floor(amount * rate);
       const cashbackValue = {
         airMiles: points * sbiCardRewards["Miles Elite"].redemptionRate.airMiles,
-        travelBookings: points * sbiCardRewards["Miles Elite"].redemptionRate.travelBookings,
-        catalogue: points * sbiCardRewards["Miles Elite"].redemptionRate.catalogue
+        cashValue: points * sbiCardRewards["Miles Elite"].redemptionRate.cashValue
       };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points} Travel Credits (${category}) - Worth ${cashbackValue.airMiles} Air Miles or ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Miles Elite"].cardType };
+
     },
     dynamicInputs: () => []
   },
@@ -811,8 +940,7 @@ export const sbiCardRewards = {
     travelRate: 4 / 200, // 4 Travel Credits for every Rs. 200 on travel spends
     redemptionRate: {
       airMiles: 1,
-      travelBookings: 0.5,
-      catalogue: 0.25
+      cashValue: 0.25
     },
     mccRates: {
       // Travel transactions
@@ -845,18 +973,22 @@ export const sbiCardRewards = {
       const points = Math.floor(amount * rate);
       const cashbackValue = {
         airMiles: points * sbiCardRewards["Miles Prime"].redemptionRate.airMiles,
-        travelBookings: points * sbiCardRewards["Miles Prime"].redemptionRate.travelBookings,
-        catalogue: points * sbiCardRewards["Miles Prime"].redemptionRate.catalogue
+        cashValue: points * sbiCardRewards["Miles Prime"].redemptionRate.cashValue
       };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points} Travel Credits (${category}) - Worth ${cashbackValue.airMiles} Air Miles or ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Miles Prime"].cardType };
+
     },
     dynamicInputs: () => []
   },
   "Ola Money": {
     cardType: "points",
     defaultRate: 1 / 100, // 1% Reward Points on all other spends
-    redemptionRate: 1, // 1 Reward Point = Re.1
+    redemptionRate: {
+      cashValue: 1  // 1 point = ₹1
+    },
     mccRates: {
       "4121": 7 / 100, // 7% Reward Points on all Ola rides
       // Excluded MCCs
@@ -886,10 +1018,21 @@ export const sbiCardRewards = {
         category = rate === 0 ? "Excluded Category" : "Category Spend";
       }
 
-      const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Ola Money"].redemptionRate;
+      let points = Math.floor(amount * rate);
 
-      return { points, rate, rateType, category, cashbackValue };
+      // Apply capping
+      if (category === "OLA Rides") {
+        points = Math.min(points, sbiCardRewards["Ola Money"].capping.categories["OLA Rides"].points);
+      }
+
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["Ola Money"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Ola Money"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
       if (selectedMcc === "4121") {
@@ -938,8 +1081,10 @@ export const sbiCardRewards = {
       }
 
       const cashback = amount * rate;
+      const rewardText = `₹${cashback.toFixed(2)} Cashback (${category})`;
 
-      return { cashback, rate, rateType, category };
+      return { cashback, rate, rateType, category, rewardText, cardType: sbiCardRewards["PayTM"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -988,8 +1133,10 @@ export const sbiCardRewards = {
       }
 
       const cashback = amount * rate;
+      const rewardText = `₹${cashback.toFixed(2)} Cashback (${category})`;
 
-      return { cashback, rate, rateType, category };
+      return { cashback, rate, rateType, category, rewardText, cardType: sbiCardRewards["PayTM"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -1013,7 +1160,9 @@ export const sbiCardRewards = {
   "Prime": {
     cardType: "points",
     defaultRate: 2 / 100, // 2 Reward Points per Rs. 100 on all other retail spends
-    redemptionRate: 1 / 4, // 4 Reward Points = Rs. 1
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     mccRates: {
       // 10 Reward Points per Rs. 100 on Dining, Groceries, Departmental stores and Movies
       "5812": 10 / 100, // Eating Places and Restaurants
@@ -1070,10 +1219,24 @@ export const sbiCardRewards = {
         }
       }
 
-      const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Prime"].redemptionRate;
+      let points = Math.floor(amount * rate);
 
-      return { points, rate, rateType, category, cashbackValue, surchargeWaiver };
+      // Apply capping
+      if (sbiCardRewards["Prime"].capping.categories[category]) {
+        points = Math.min(points, sbiCardRewards["Prime"].capping.categories[category].points);
+      }
+
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["Prime"].redemptionRate.cashValue
+      };
+
+      let rewardText = `${points} SBI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+      if (surchargeWaiver > 0) {
+        rewardText += ` + ₹${surchargeWaiver.toFixed(2)} Fuel Surcharge Waiver`;
+      }
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Prime"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -1103,7 +1266,9 @@ export const sbiCardRewards = {
   "Prime Advantage": {
     cardType: "points",
     defaultRate: 2 / 100, // 2 Reward Points per Rs. 100 on all other retail spends
-    redemptionRate: 1 / 4, // 4 Reward Points = Rs. 1
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     mccRates: {
       // 10 Reward Points per Rs. 100 on Dining, Departmental stores, Grocery & Movie spends
       "5812": 10 / 100, // Eating Places and Restaurants
@@ -1158,17 +1323,33 @@ export const sbiCardRewards = {
         }
       }
 
-      const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Prime Advantage"].redemptionRate;
+      let points = Math.floor(amount * rate);
 
-      return { points, rate, rateType, category, cashbackValue, surchargeWaiver };
+      // Apply capping
+      if (sbiCardRewards["Prime Advantage"].capping.categories[category]) {
+        points = Math.min(points, sbiCardRewards["Prime Advantage"].capping.categories[category].points);
+      }
+
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["Prime Advantage"].redemptionRate.cashValue
+      };
+
+      let rewardText = `${points} SBI Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+      if (surchargeWaiver > 0) {
+        rewardText += ` + ₹${surchargeWaiver.toFixed(2)} Fuel Surcharge Waiver`;
+      }
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Prime Advantage"].cardType };
+
     },
     dynamicInputs: () => []
   },
   "Pulse": {
     cardType: "points",
     defaultRate: 2 / 100, // 2 Reward Points per Rs. 100 on all other spends
-    redemptionRate: 1 / 4, // 4 Reward Points = Rs. 1
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     mccRates: {
       // 10 Reward Points per Rs. 100 spent on Chemist, Pharmacy, Sports, Dining and Movies
       "5912": 10 / 100, "8099": 10 / 100, // Pharmacy & Chemist
@@ -1205,16 +1386,23 @@ export const sbiCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Pulse"].redemptionRate;
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["Pulse"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Pulse"].cardType };
+
     },
     dynamicInputs: () => []
   },
   "Reliance": {
     cardType: "points",
     defaultRate: 1 / 100, // 1 Reward Point per Rs. 100 spent on other retail purchases
-    redemptionRate: 0.25, // 1 Reward Point = Rs. 0.25
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     mccRates: {
       "5812": 5 / 100, // Dining
       "5813": 5 / 100, // Bars
@@ -1238,9 +1426,14 @@ export const sbiCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Reliance"].redemptionRate;
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["Reliance"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Reliance"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -1259,7 +1452,9 @@ export const sbiCardRewards = {
   "Reliance Prime": {
     cardType: "points",
     defaultRate: 2 / 100, // 2 Reward Points per Rs. 100 spent on other retail purchases
-    redemptionRate: 0.25, // 1 Reward Point = Rs. 0.25
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     mccRates: {
       "5812": 5 / 100, // Dining
       "5813": 5 / 100, // Bars
@@ -1294,9 +1489,14 @@ export const sbiCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Reliance Prime"].redemptionRate;
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["Reliance Prime"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Reliance Prime"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -1321,6 +1521,9 @@ export const sbiCardRewards = {
     cardType: "points",
     mccRates: {
     },
+    redemptionRate: {
+      cashValue: 1  // 1 point = ₹1
+    },
     defaultRate: 1 / 125, // 1 Reward point for every Rs. 125 spent on non-fuel retail purchases
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = sbiCardRewards["IRCTC"].defaultRate;
@@ -1334,8 +1537,14 @@ export const sbiCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["IRCTC"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["IRCTC"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -1357,6 +1566,9 @@ export const sbiCardRewards = {
     mccRates: {
       "5172": 0, "5541": 0, "5983": 0, "5542": 0 // Fuel purchases
     },
+    redemptionRate: {
+      cashValue: 1  // 1 point = ₹1
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = sbiCardRewards["IRCTC Platinum"].defaultRate;
       let category = "Non-Fuel Retail";
@@ -1369,8 +1581,14 @@ export const sbiCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["IRCTC Platinum"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["IRCTC Platinum"].cardType };
+
     },
     dynamicInputs: () => []
   },
@@ -1382,6 +1600,9 @@ export const sbiCardRewards = {
       "5813": 3 / 125, // Drinking Places
       "5814": 3 / 125, // Fast Food
       "4900": 3 / 125, // Utilities
+    },
+    redemptionRate: {
+      cashValue: 1  // 1 point = ₹1
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = sbiCardRewards["IRCTC Premier"].defaultRate;
@@ -1399,8 +1620,14 @@ export const sbiCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["IRCTC Premier"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["IRCTC Premier"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -1417,7 +1644,7 @@ export const sbiCardRewards = {
     ]
   },
   "Vistara": {
-    cardType: "points",
+    cardType: "miles",
     defaultRate: 3 / 200, // 3 CV Points per Rs. 200 spent on all spends
     mccRates: {
       "6540": 0, "6541": 0, "6513": 0 // E-wallet loading and Rent Payment
@@ -1433,32 +1660,35 @@ export const sbiCardRewards = {
         rateType = "mcc-specific";
       }
 
-      const points = Math.floor(amount * rate);
+      const miles = Math.floor(amount * rate);
+      const rewardText = `${miles} Club Vistara Points (${category})`;
 
-      return { points, rate, rateType, category };
+      return { miles, rate, rateType, category, rewardText, cardType: sbiCardRewards["Vistara"].cardType };
+
     },
     dynamicInputs: () => []
   },
   "Vistara Prime": {
-    cardType: "points",
+    cardType: "miles",
     defaultRate: 4 / 200, // 4 CV Points per Rs. 200 spent on all spends
     mccRates: {
       "6540": 0, "6541": 0, "6513": 0 // E-wallet loading and Rent Payment
     },
     calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = sbiCardRewards["Vistara"].defaultRate;
+      let rate = sbiCardRewards["Vistara Prime"].defaultRate;
       let category = "All Spends";
       let rateType = "default";
 
-      if (mcc && sbiCardRewards["Vistara"].mccRates[mcc] !== undefined) {
-        rate = sbiCardRewards["Vistara"].mccRates[mcc];
+      if (mcc && sbiCardRewards["Vistara Prime"].mccRates[mcc] !== undefined) {
+        rate = sbiCardRewards["Vistara Prime"].mccRates[mcc];
         category = rate === 0 ? "Excluded Category" : "Category Spend";
         rateType = "mcc-specific";
       }
 
-      const points = Math.floor(amount * rate);
+      const miles = Math.floor(amount * rate);
+      const rewardText = `${miles} Club Vistara Points (${category})`;
 
-      return { points, rate, rateType, category };
+      return { miles, rate, rateType, category, rewardText, cardType: sbiCardRewards["Vistara Prime"].cardType };
     },
     dynamicInputs: () => []
   },
@@ -1467,7 +1697,9 @@ export const sbiCardRewards = {
     defaultRate: 1 / 100, // 1 Reward Point per Rs. 100 spent on all other spends
     onlineRate: 5 / 100, // 5X Reward Points on all other online spends
     partnerRate: 10 / 100, // 10X Reward Points on online spends with exclusive partners
-    redemptionRate: 1, // Assuming 1 point = Rs. 1 for simplicity
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     mccRates: {
       "6540": 0, "6541": 0, "5172": 0, "5541": 0, "5983": 0, "5542": 0, "6513": 0, "9399": 0, "9311": 0
     },
@@ -1491,9 +1723,14 @@ export const sbiCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["SimplyClick"].redemptionRate;
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["SimplyClick"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["SimplyClick"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -1536,7 +1773,9 @@ export const sbiCardRewards = {
     cardType: "points",
     defaultRate: 1 / 150, // 1 Reward Point per Rs. 150 spent on all other spends
     acceleratedRate: 10 / 150, // 10 Reward Points per Rs. 150 spent on accelerated categories
-    redemptionRate: 1 / 4, // 4 Reward Points = Rs. 1
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     mccRates: {
       "5812": 10 / 150, // Dining
       "5813": 10 / 150, // Bars
@@ -1568,16 +1807,19 @@ export const sbiCardRewards = {
 
       // Adjust rate for UPI transactions if applicable
       if (additionalParams.isUPITransaction) {
-        // Note: The card doesn't specify a different rate for UPI transactions,
-        // so we're using the same rate. Adjust this if there's a specific UPI rate.
         category += " (UPI)";
         rateType += "-upi";
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["SimplySave"].redemptionRate;
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["SimplySave"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["SimplySave"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -1615,8 +1857,9 @@ export const sbiCardRewards = {
       }
 
       const cashback = amount * rate;
+      const rewardText = `₹${cashback.toFixed(2)} Cashback (${category})`;
 
-      return { cashback, rate, rateType, category };
+      return { cashback, rate, rateType, category, rewardText, cardType: sbiCardRewards["Tata"].cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -1658,7 +1901,9 @@ export const sbiCardRewards = {
   "Tata Select": {
     cardType: "points",
     defaultRate: 1 / 100, // 1 Point per Rs. 100 spent on other retail outlets
-    redemptionRate: 1, // 1 Empower Point = Re. 1
+    redemptionRate: {
+      cashValue: 1 // 1 point = ₹1
+    },
     mccRates: {
       // 3X Points on Departmental & Grocery stores, Dining & International spends
       "5311": 3 / 100, // Department Stores
@@ -1701,9 +1946,13 @@ export const sbiCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Tata Select"].redemptionRate;
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["Tata Select"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Tata Select"].cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -1762,7 +2011,9 @@ export const sbiCardRewards = {
   "Titan": {
     cardType: "mixed",
     defaultRate: 6 / 100, // 6 Reward Points per Rs 100 spent on all other categories
-    redemptionRate: 0.25, // 1 Reward Point = Rs. 0.25
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     titanRates: {
       "Tanishq": 3 / 100, // 3% Value back on Tanishq
       "MiaCaratlaneZoya": 5 / 100, // 5% Cashback on Mia, Caratlane & Zoya
@@ -1791,9 +2042,19 @@ export const sbiCardRewards = {
         points = Math.floor(amount * rate);
       }
 
-      const cashbackValue = points * sbiCardRewards["Titan"].redemptionRate;
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["Titan"].redemptionRate.cashValue
+      };
 
-      return { points, cashback, rate, rateType, category, cashbackValue };
+      let rewardText = "";
+      if (cashback > 0) {
+        rewardText = `₹${cashback.toFixed(2)} Cashback (${category})`;
+      } else {
+        rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+      }
+
+      return { points, cashback, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Titan"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -1814,7 +2075,9 @@ export const sbiCardRewards = {
   "Yatra": {
     cardType: "points",
     defaultRate: 1 / 100, // 1 Reward Point on every Rs. 100 spent on all other categories
-    redemptionRate: 0.25, // 1 Reward point = Rs. 0.25
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     mccRates: {
       "5311": 6 / 100, // Departmental Stores
       "5411": 6 / 100, // Grocery
@@ -1851,10 +2114,20 @@ export const sbiCardRewards = {
         rateType = "international";
       }
 
-      const points = Math.floor(amount * rate);
-      const cashbackValue = points * sbiCardRewards["Yatra"].redemptionRate;
+      let points = Math.floor(amount * rate);
 
-      return { points, rate, rateType, category, cashbackValue };
+      // Apply capping
+      if (sbiCardRewards["Yatra"].capping.categories[category]) {
+        points = Math.min(points, sbiCardRewards["Yatra"].capping.categories[category].points);
+      }
+
+      const cashbackValue = {
+        cashValue: points * sbiCardRewards["Yatra"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["Yatra"].cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -1879,233 +2152,13 @@ export const calculateSBIRewards = (cardName, amount, mcc, additionalParams = {}
       points: 0,
       cashback: 0,
       rewardText: "Card not found",
-      uncappedPoints: 0,
-      cappedPoints: 0,
-      uncappedCashback: 0,
-      cappedCashback: 0,
-      appliedCap: null
+      category: "Unknown",
+      cashbackValue: 0,
+      cardType: "unknown",
     };
   }
 
-  const result = cardReward.calculateRewards(amount, mcc, additionalParams);
-
-  switch (cardReward.cardType) {
-    case "cashback":
-      return applyCashbackCapping(result, cardReward, cardName);
-    case "miles":
-      return applyMilesCapping(result, cardReward, cardName);
-    case "mixed":
-      return applyMixedRewardsCapping(result, cardReward, cardName);
-    case "points":
-    default:
-      return applyPointsCapping(result, cardReward, cardName);
-  }
-};
-
-const applyMixedRewardsCapping = (result, cardReward, cardName) => {
-  let { points, cashback, rate, rateType, category, cashbackValue } = result;
-  let cappedPoints = points;
-  let cappedCashback = cashback;
-  let appliedCap = null;
-
-  // Apply capping logic here if needed
-
-  const rewardText = generateMixedRewardText(cardName, cappedPoints, cappedCashback, rate, rateType, category, appliedCap, cashbackValue);
-
-  return {
-    points: cappedPoints,
-    cashback: cappedCashback,
-    rewardText,
-    uncappedPoints: points,
-    cappedPoints,
-    uncappedCashback: cashback,
-    cappedCashback,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category,
-    cashbackValue
-  };
-};
-
-const generateMixedRewardText = (cardName, points, cashback, rate, rateType, category, appliedCap, cashbackValue) => {
-  let rewardText = "";
-
-  if (cashback > 0) {
-    rewardText = `₹${cashback.toFixed(2)} Cashback`;
-  } else if (points > 0) {
-    rewardText = `${points} SBI Reward Points`;
-    if (cashbackValue > 0) {
-      rewardText += ` (Worth ₹${cashbackValue.toFixed(2)})`;
-    }
-  } else {
-    rewardText = "No rewards earned";
-  }
-
-  if (category !== "Other Categories") {
-    rewardText += ` (${category})`;
-  }
-
-  if (appliedCap) {
-    rewardText += ` (Capped at ${appliedCap.maxPoints || appliedCap.maxCashback})`;
-  }
-
-  return rewardText;
-};
-
-const applyMilesCapping = (result, cardReward, cardName) => {
-  let { miles, tierMiles, rate, rateType, category } = result;
-  let cappedMiles = miles;
-  let cappedTierMiles = tierMiles;
-  let appliedCap = null;
-
-  if (cardReward.tierMileCap && tierMiles > cardReward.tierMileCap) {
-    cappedTierMiles = cardReward.tierMileCap;
-    appliedCap = {
-      category: "Tier Miles",
-      maxMiles: cardReward.tierMileCap,
-      period: "yearly"
-    };
-  }
-
-  const rewardText = generateMilesRewardText(cardName, cappedMiles, cappedTierMiles, rate, rateType, category, appliedCap);
-
-  return {
-    miles: cappedMiles,
-    tierMiles: cappedTierMiles,
-    rewardText,
-    uncappedMiles: miles,
-    cappedMiles,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category
-  };
-};
-
-const applyCashbackCapping = (result, cardReward, cardName) => {
-  let { cashback, rate, rateType, category } = result;
-  let cappedCashback = cashback;
-  let appliedCap = null;
-
-  if (cardReward.maxCashback && cashback > cardReward.maxCashback) {
-    cappedCashback = cardReward.maxCashback;
-    appliedCap = { category: "Total Cashback", maxCashback: cardReward.maxCashback };
-  }
-
-  const rewardText = generateCashbackRewardText(cardName, cappedCashback, rate, rateType, category, appliedCap);
-
-  return {
-    cashback: cappedCashback,
-    rewardText,
-    uncappedCashback: cashback,
-    cappedCashback,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category
-  };
-};
-
-const applyPointsCapping = (result, cardReward, cardName) => {
-  let { points, rate, rateType, category, cashbackValue, surchargeWaiver } = result;
-  let cappedPoints = points;
-  let appliedCap = null;
-
-  if (cardReward.capping && cardReward.capping.categories && category) {
-    const cappingCategory = cardReward.capping.categories[category];
-    if (cappingCategory) {
-      const { points: maxPoints } = cappingCategory;
-      cappedPoints = Math.min(points, maxPoints);
-
-      if (cappedPoints < points) {
-        appliedCap = { category, maxPoints };
-      }
-    }
-  }
-
-  // Recalculate cashback value if points were capped
-  if (cappedPoints !== points && cardReward.redemptionRate) {
-    cashbackValue = cappedPoints * cardReward.redemptionRate;
-  }
-
-  const rewardText = generatePointsRewardText(cardName, cappedPoints, rate, rateType, category, appliedCap, cashbackValue, surchargeWaiver);
-
-  return {
-    points: cappedPoints,
-    rewardText,
-    uncappedPoints: points,
-    cappedPoints,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category,
-    cashbackValue,
-    surchargeWaiver
-  };
-};
-
-const generateMilesRewardText = (cardName, miles, tierMiles, rate, rateType, category, appliedCap) => {
-  let rewardText = `${miles} Etihad Guest Miles`;
-
-  if (tierMiles) {
-    rewardText += ` + ${tierMiles} Tier Miles`;
-  }
-
-  if (category !== "Other Spends") {
-    rewardText += ` (${category})`;
-  }
-
-  if (appliedCap) {
-    rewardText += ` (Tier Miles capped at ${appliedCap.maxMiles} per year)`;
-  }
-
-  return rewardText;
-};
-
-const generateCashbackRewardText = (cardName, cashback, rate, rateType, category, appliedCap) => {
-  let rewardText = `₹${cashback.toFixed(2)} Cashback`;
-
-  if (category !== "Other Spends") {
-    rewardText += ` (${category})`;
-  }
-
-  if (appliedCap) {
-    rewardText += ` (Capped at ₹${appliedCap.maxCashback})`;
-  }
-
-  return rewardText;
-};
-
-const generatePointsRewardText = (cardName, points, rate, rateType, category, appliedCap, cashbackValue, surchargeWaiver) => {
-  let rewardText = "";
-
-  if (cardName.toLowerCase().includes("miles") || cardName.toLowerCase().includes("etihad")) {
-    rewardText = `${points} ${cardName.includes("Etihad") ? "Etihad Guest Miles" : "Miles"}`;
-  } else {
-    rewardText = `${points} SBI Reward Points`;
-    if (typeof cashbackValue === 'number') {
-      rewardText += ` (Worth ₹${cashbackValue.toFixed(2)})`;
-    }
-  }
-
-  if (category !== "Other Spends") {
-    rewardText += ` (${category})`;
-  }
-
-  if (appliedCap) {
-    rewardText += ` (Capped at ${appliedCap.maxPoints || appliedCap.maxMiles} ${points ? "points" : "miles"}`;
-    if (appliedCap.maxSpent) {
-      rewardText += ` or ₹${appliedCap.maxSpent} spent`;
-    }
-    rewardText += ')';
-  }
-
-  if (surchargeWaiver && surchargeWaiver > 0) {
-    rewardText += ` + ₹${surchargeWaiver.toFixed(2)} Fuel Surcharge Waiver`;
-  }
-
-  return rewardText;
+  return cardReward.calculateRewards(amount, mcc, additionalParams);
 };
 
 export const getCardInputs = (cardName, currentInputs, onChange) => {
