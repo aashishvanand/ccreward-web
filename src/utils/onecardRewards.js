@@ -11,7 +11,9 @@ export const oneCardRewards = {
       "5983": 0, // Fuel
       // Add any other excluded MCCs for transfers here
     },
-    redemptionRate: 0.01, // 1 point = ₹0.01
+    redemptionRate: {
+      cashValue: 0.01  // 1 point = ₹0.25
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = oneCardRewards["One Card"].defaultRate;
       let rateType = "default";
@@ -37,9 +39,13 @@ export const oneCardRewards = {
       // Round to 2 decimal places for display
       points = Math.round(points * 100) / 100;
 
-      const cashbackValue = points * oneCardRewards["One Card"].redemptionRate;
+      const cashbackValue = {
+        cashValue: points * oneCardRewards["One Card"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points}  Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: oneCardRewards["One Card"].cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -64,94 +70,13 @@ export const calculateOneCardRewards = (cardName, amount, mcc, additionalParams 
       points: 0,
       cashback: 0,
       rewardText: "Card not found",
-      uncappedPoints: 0,
-      cappedPoints: 0,
-      appliedCap: null
+      category: "Unknown",
+      cashbackValue: 0,
+      cardType: "unknown",
     };
   }
 
-  const result = cardReward.calculateRewards(amount, mcc, additionalParams);
-
-  if (cardReward.cardType === "cashback") {
-    return applyCashbackCapping(result, cardReward, cardName);
-  } else {
-    return applyPointsCapping(result, cardReward, cardName);
-  }
-};
-
-const applyCashbackCapping = (result, cardReward, cardName) => {
-  // This function is not currently used for OneCard, but we'll include it for future use
-  let { cashback, rate, rateType, category } = result;
-  let cappedCashback = cashback;
-  let appliedCap = null;
-
-  // Apply capping logic here if needed in the future
-
-  const rewardText = generateCashbackRewardText(cardName, cappedCashback, rate, rateType, category, appliedCap);
-
-  return {
-    cashback: cappedCashback,
-    rewardText,
-    uncappedCashback: cashback,
-    cappedCashback,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category
-  };
-};
-
-const applyPointsCapping = (result, cardReward, cardName) => {
-  let { points, rate, rateType, category, cashbackValue } = result;
-  let cappedPoints = points;
-  let appliedCap = null;
-
-  // OneCard doesn't currently have capping, but we can add logic here if needed in the future
-
-  const rewardText = generatePointsRewardText(cardName, cappedPoints, rate, rateType, category, appliedCap, cashbackValue);
-
-  return {
-    points: cappedPoints,
-    rewardText,
-    uncappedPoints: points,
-    cappedPoints,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category,
-    cashbackValue
-  };
-};
-
-const generateCashbackRewardText = (cardName, cashback, rate, rateType, category, appliedCap) => {
-  // This function is not currently used for OneCard, but we'll include it for future use
-  let rewardText = rate === 0 ? "No cashback for this transaction" : `₹${cashback.toFixed(2)} Cashback`;
-
-  if (category !== "Other Spends") {
-    rewardText += ` (${category})`;
-  }
-
-  if (appliedCap) {
-    rewardText += ` (Capped at ₹${appliedCap.maxCashback})`;
-  }
-
-  return rewardText;
-};
-
-const generatePointsRewardText = (cardName, points, rate, rateType, category, appliedCap, cashbackValue) => {
-  let rewardText = rate === 0 ? "No OneCard Reward Points for this transaction" : `${points.toFixed(2)} OneCard Reward Points`;
-
-  if (category !== "Other Spends") {
-    rewardText += ` (${category})`;
-  }
-
-  rewardText += ` (Approx. value: ₹${cashbackValue.toFixed(2)})`;
-
-  if (appliedCap) {
-    rewardText += ` (Capped at ${appliedCap.maxPoints} points)`;
-  }
-
-  return rewardText;
+  return cardReward.calculateRewards(amount, mcc, additionalParams);
 };
 
 export const getCardInputs = (cardName, currentInputs, onChange) => {

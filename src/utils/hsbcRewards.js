@@ -27,6 +27,9 @@ export const hsbcCardRewards = {
         "Dining and Grocery": { cashback: 1000, maxSpent: 10000 }
       }
     },
+    redemptionRate: {
+      airMiles: 1, // 1 Reward Point = up to 1 Airmile
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = hsbcCardRewards["Live+"].defaultRate;
       let category = "Other Spends";
@@ -42,9 +45,17 @@ export const hsbcCardRewards = {
         }
       }
 
-      const cashback = amount * rate;
+      let cashback = amount * rate;
 
-      return { cashback, rate, rateType, category };
+      // Apply capping
+      if (category === "Dining and Grocery") {
+        const cap = hsbcCardRewards["Live+"].capping.categories["Dining and Grocery"];
+        cashback = Math.min(cashback, cap.cashback, amount * cap.cashback / cap.maxSpent);
+      }
+
+      const rewardText = `₹${cashback.toFixed(2)} Cashback (${category})`;
+
+      return { cashback, rate, rateType, category, rewardText, cardType: hsbcCardRewards["Live+"].cardType };
     },
     dynamicInputs: () => []
   },
@@ -54,6 +65,9 @@ export const hsbcCardRewards = {
     mccRates: {
       "5541": 0, // Fuel
       "5542": 0  // Fuel
+    },
+    redemptionRate: {
+      airMiles: 0.5, // 2 Reward Point = up to 1 Airmile
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = hsbcCardRewards["Platinum"].defaultRate;
@@ -67,8 +81,13 @@ export const hsbcCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
+      const cashbackValue = {
+        airMiles: points * hsbcCardRewards["Platinum"].redemptionRate.airMiles
+      };
 
-      return { points, rate, rateType, category };
+      const rewardText = `${points} Reward Points (${category}) - Worth ${cashbackValue.airMiles.toFixed(2)} Air Miles`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: hsbcCardRewards["Platinum"].cardType };
     },
     dynamicInputs: () => []
   },
@@ -76,14 +95,23 @@ export const hsbcCardRewards = {
     cardType: "points",
     defaultRate: 3 / 100,
     mccRates: {},
+    redemptionRate: {
+      airMiles: 0.5, // 2 Reward Point = up to 1 Airmile
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       const rate = hsbcCardRewards["Premier"].defaultRate;
       const category = "Other Spends";
       const rateType = "default";
 
       const points = Math.floor(amount * rate);
+      const cashbackValue = {
+        airMiles: points * hsbcCardRewards["Premier"].redemptionRate.airMiles,
+        cashValue: points * hsbcCardRewards["Premier"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category };
+      const rewardText = `${points} Reward Points (${category}) - Worth ${cashbackValue.airMiles.toFixed(2)} Air Miles`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: hsbcCardRewards["Premier"].cardType };
     },
     dynamicInputs: () => []
   },
@@ -96,100 +124,13 @@ export const calculateHSBCRewards = (cardName, amount, mcc, additionalParams = {
       points: 0,
       cashback: 0,
       rewardText: "Card not found",
-      uncappedPoints: 0,
-      cappedPoints: 0,
-      appliedCap: null
+      category: "Unknown",
+      cashbackValue: 0,
+      cardType: "unknown",
     };
   }
 
-  const result = cardReward.calculateRewards(amount, mcc, additionalParams);
-
-  if (cardReward.cardType === "cashback") {
-    return applyCashbackCapping(result, cardReward, cardName);
-  } else {
-    return applyPointsCapping(result, cardReward, cardName);
-  }
-};
-
-const applyCashbackCapping = (result, cardReward, cardName) => {
-  let { cashback, rate, rateType, category } = result;
-  let cappedCashback = cashback;
-  let appliedCap = null;
-
-  if (cardReward.capping && cardReward.capping.categories && category) {
-    const cappingCategory = cardReward.capping.categories[category];
-    if (cappingCategory) {
-      const { cashback: maxCashback, maxSpent } = cappingCategory;
-      cappedCashback = Math.min(cashback, maxCashback);
-
-      if (cappedCashback < cashback) {
-        appliedCap = { category, maxCashback, maxSpent };
-      }
-    }
-  }
-
-  const rewardText = generateCashbackRewardText(cardName, cappedCashback, rate, rateType, category, appliedCap);
-
-  return {
-    cashback: cappedCashback,
-    rewardText,
-    uncappedCashback: cashback,
-    cappedCashback,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category
-  };
-};
-
-const applyPointsCapping = (result, cardReward, cardName) => {
-  let { points, rate, rateType, category } = result;
-  let cappedPoints = points;
-  let appliedCap = null;
-
-  // Apply capping logic here if needed in the future
-
-  const rewardText = generatePointsRewardText(cardName, cappedPoints, rate, rateType, category, appliedCap);
-
-  return {
-    points: cappedPoints,
-    rewardText,
-    uncappedPoints: points,
-    cappedPoints,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category
-  };
-};
-
-
-const generateCashbackRewardText = (cardName, cashback, rate, rateType, category, appliedCap) => {
-  let rewardText = `₹${cashback.toFixed(2)} Cashback`;
-
-  if (category !== "Other Spends") {
-    rewardText += ` (${category})`;
-  }
-
-  if (appliedCap) {
-    rewardText += ` (Capped at ₹${appliedCap.maxCashback})`;
-  }
-
-  return rewardText;
-};
-
-const generatePointsRewardText = (cardName, points, rate, rateType, category, appliedCap) => {
-  let rewardText = `${points} HSBC Reward Points`;
-
-  if (category !== "Other Spends") {
-    rewardText += ` (${category})`;
-  }
-
-  if (appliedCap) {
-    rewardText += ` (Capped at ${appliedCap.maxPoints} points)`;
-  }
-
-  return rewardText;
+  return cardReward.calculateRewards(amount, mcc, additionalParams);
 };
 
 export const getCardInputs = (cardName, currentInputs, onChange) => {

@@ -5,7 +5,9 @@ export const kotakCardRewards = {
     },
     defaultRate: 1 / 100,
     onlineRate: 2 / 100,
-    redemptionRate: 0.25, // Assuming 1 point = Rs. 0.25
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     milestones: [
       { spend: 75000, reward: "cashback", value: 750 },
       { spend: 75000, reward: "pvrTickets", value: 4 }
@@ -22,9 +24,14 @@ export const kotakCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * kotakCardRewards["811"].redemptionRate;
+      const cashbackValue = {
+        cashValue: points * kotakCardRewards["811"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points} Kotak Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: kotakCardRewards["811"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -54,6 +61,9 @@ export const kotakCardRewards = {
       { spend: 36000, reward: "amazonVoucher", value: 250 },
       { spend: 72000, reward: "amazonVoucher", value: 1000 }
     ],
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = kotakCardRewards["811 #DreamDifferent"].defaultRate;
       let category = "Other Spends";
@@ -88,7 +98,14 @@ export const kotakCardRewards = {
         }
       }
 
-      return { points, milestoneReward, rate, rateType, category };
+      const cashbackValue = {
+        cashValue: points * kotakCardRewards["811 #DreamDifferent"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Kotak Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, milestoneReward, rate, rateType, category, rewardText, cashbackValue, cardType: kotakCardRewards["811 #DreamDifferent"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -121,12 +138,15 @@ export const kotakCardRewards = {
       }
     ]
   },
+  //TODO: mMove grocery and dining to mccRates
   "Indian Oil": {
     cardType: "points",
     defaultRate: 3 / 150,
     fuelRate: 24 / 150,
     groceryDiningRate: 12 / 150,
-    redemptionRate: 0.25,
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     mccRates: {
     },
     fuelMCCs: ["5541", "5542"],
@@ -150,10 +170,23 @@ export const kotakCardRewards = {
         rateType = "grocery-dining";
       }
 
-      const points = Math.floor(amount * rate);
-      const cashbackValue = points * kotakCardRewards["Indian Oil"].redemptionRate;
+      let points = Math.floor(amount * rate);
 
-      return { points, rate, rateType, category, cashbackValue };
+      // Apply capping
+      if (category === "Fuel") {
+        points = Math.min(points, kotakCardRewards["Indian Oil"].capping.fuel.points);
+      } else if (category === "Grocery and Dining") {
+        points = Math.min(points, kotakCardRewards["Indian Oil"].capping.groceryDining.points);
+      }
+
+      const cashbackValue = {
+        cashValue: points * kotakCardRewards["Indian Oil"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Kotak Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: kotakCardRewards["Indian Oil"].cardType };
+
     },
     dynamicInputs: () => []
   },
@@ -166,6 +199,9 @@ export const kotakCardRewards = {
     mccRates: {
       "6513": 0, "6540": 0, "8211": 0, "8220": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0,
       "9211": 0, "9222": 0, "9311": 0, "9399": 0, "9402": 0, "9405": 0, "9950": 0
+    },
+    redemptionRate: {
+      cashValue: 1  // 1 point = ₹1
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = kotakCardRewards["6E Rewards"].defaultRate;
@@ -187,7 +223,14 @@ export const kotakCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        cashValue: points * kotakCardRewards["6E Rewards"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} 6E Rewards Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: kotakCardRewards["6E Rewards"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -213,6 +256,9 @@ export const kotakCardRewards = {
       "6513": 0, "6540": 0, "8211": 0, "8220": 0, "8241": 0, "8244": 0, "8249": 0, "8299": 0,
       "9211": 0, "9222": 0, "9311": 0, "9399": 0, "9402": 0, "9405": 0, "9950": 0
     },
+    redemptionRate: {
+      cashValue: 1  // 1 point = ₹1
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = kotakCardRewards["6E Rewards XL"].defaultRate;
       let category = "Other Spends";
@@ -233,7 +279,14 @@ export const kotakCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        cashValue: points * kotakCardRewards["6E Rewards XL"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} 6E Rewards Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: kotakCardRewards["6E Rewards XL"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -256,6 +309,9 @@ export const kotakCardRewards = {
     defaultRate: 4 / 150,
     specialRate: 8 / 150,
     specialCategories: ["4722", "4723", "4511", "5732", "5722", "5311"],
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = kotakCardRewards["League"].defaultRate;
       let category = "Other Categories";
@@ -273,7 +329,14 @@ export const kotakCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        cashValue: points * kotakCardRewards["League"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Kotak Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: kotakCardRewards["League"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -319,7 +382,10 @@ export const kotakCardRewards = {
         rateType = "metro";
       }
 
-      return { cashback, rate, rateType, category };
+      const rewardText = `₹${cashback.toFixed(2)} Cashback (${category})`;
+
+      return { cashback, rate, rateType, category, rewardText, cardType: kotakCardRewards["Metro"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -353,7 +419,9 @@ export const kotakCardRewards = {
     cardType: "points",
     defaultRate: 1 / 100,
     onlineRate: 2.5 / 100,
-    redemptionRate: 0.40,
+    redemptionRate: {
+      cashValue: 0.40  // 1 point = ₹0.40
+    },
     mccRates: {
       "5541": 0, // Fuel
       "5542": 0, // Fuel
@@ -378,7 +446,9 @@ export const kotakCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * kotakCardRewards["MOJO"].redemptionRate;
+      const cashbackValue = {
+        cashValue: points * kotakCardRewards["MOJO"].redemptionRate.cashValue
+      };
 
       // Check for milestone bonus (only for first year, quarterly)
       let bonusPoints = 0;
@@ -392,7 +462,10 @@ export const kotakCardRewards = {
         }
       }
 
-      return { points, bonusPoints, rate, rateType, category, cashbackValue };
+      const rewardText = `${points + bonusPoints} Kotak Reward Points (${category}) - Worth ₹${((points + bonusPoints) * kotakCardRewards["MOJO"].redemptionRate.cashValue).toFixed(2)}`;
+
+      return { points, bonusPoints, rate, rateType, category, rewardText, cashbackValue, cardType: kotakCardRewards["MOJO"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -458,7 +531,12 @@ export const kotakCardRewards = {
         rateType = "excluded";
       }
 
-      return { cashback, instantDiscount, rate, rateType, category };
+      const rewardText = instantDiscount > 0
+        ? `₹${instantDiscount.toFixed(2)} Instant Discount (${category})`
+        : `₹${cashback.toFixed(2)} Cashback (${category})`;
+
+      return { cashback, instantDiscount, rate, rateType, category, rewardText, cardType: kotakCardRewards["Myntra"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -485,7 +563,9 @@ export const kotakCardRewards = {
     },
     defaultRate: 2 / 100,
     specialRate: 5 / 100,
-    redemptionRate: 0.25,
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     shopperCategories: ["5311", "5411", "5732", "5399", "5999"], // Apparel, Grocery, Electronics, Online, Department stores
     travellerCategories: ["4511", "7011", "5309", "4722"], // Airlines, Hotels, Duty Free, Travel Agencies
     calculateRewards: (amount, mcc, additionalParams) => {
@@ -502,9 +582,14 @@ export const kotakCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * kotakCardRewards["Privy League Signature"].redemptionRate;
+      const cashbackValue = {
+        cashValue: points * kotakCardRewards["Privy League Signature"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points} Kotak Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: kotakCardRewards["Privy League Signature"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
       const inputs = [
@@ -546,12 +631,25 @@ export const kotakCardRewards = {
     ticketRate: 1 / 10000, // 1 ticket per Rs. 10,000 spent
     ticketValue: 300,
     discountRate: 0.05, // 5% discount on movie tickets
+    redemptionRate: {
+      cashValue: 1  // 1 point = ₹1
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       const rate = 1 / 100;
       const category = "All Spends";
       const rateType = "default";
       const points = Math.floor(amount * rate);
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        cashValue: points * kotakCardRewards["PVR INOX"].redemptionRate.cashValue
+      };
+
+      const tickets = Math.floor(amount * kotakCardRewards["PVR INOX"].ticketRate);
+      const ticketValue = tickets * kotakCardRewards["PVR INOX"].ticketValue;
+
+      const rewardText = `${points} Kotak Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}, ${tickets} Free PVR Tickets - Worth ₹${ticketValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, tickets, ticketValue, cardType: kotakCardRewards["PVR INOX"].cardType };
+
     },
     dynamicInputs: () => []
   },
@@ -569,18 +667,24 @@ export const kotakCardRewards = {
       let cashback = 0;
       let category = "Other Spends";
       let rateType = "default";
+      let rate = 0;
 
       if (additionalParams.isPVRFood) {
         cashback = Math.min(amount * 0.15, 750);
         category = "PVR Food";
         rateType = "food-cashback";
+        rate = 0.15;
       } else if (additionalParams.isPVRTicket) {
         cashback = Math.min(amount * 0.05, 250);
         category = "PVR Ticket";
         rateType = "ticket-cashback";
+        rate = 0.05;
       }
 
-      return { cashback, rate: cashback / amount, rateType, category };
+      const rewardText = `₹${cashback.toFixed(2)} Cashback (${category})`;
+
+      return { cashback, rate, rateType, category, rewardText, cardType: kotakCardRewards["PVR INOX Gold"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -613,18 +717,24 @@ export const kotakCardRewards = {
       let cashback = 0;
       let category = "Other Spends";
       let rateType = "default";
+      let rate = 0;
 
       if (additionalParams.isPVRFood) {
         cashback = Math.min(amount * 0.15, 750);
         category = "PVR Food";
         rateType = "food-cashback";
+        rate = 0.15;
       } else if (additionalParams.isPVRTicket) {
         cashback = Math.min(amount * 0.05, 250);
         category = "PVR Ticket";
         rateType = "ticket-cashback";
+        rate = 0.05;
       }
 
-      return { cashback, rate: cashback / amount, rateType, category };
+      const rewardText = `₹${cashback.toFixed(2)} Cashback (${category})`;
+
+      return { cashback, rate, rateType, category, rewardText, cardType: kotakCardRewards["PVR Platinum"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -656,6 +766,9 @@ export const kotakCardRewards = {
       { spend: 400000, points: 10000 },
       { spend: 800000, points: 30000 }
     ],
+    redemptionRate: {
+      cashValue: 0.20  // 1 point = ₹0.25
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = kotakCardRewards["Royale Signature"].defaultRate;
       let category = "Other Categories";
@@ -680,7 +793,14 @@ export const kotakCardRewards = {
         }
       }
 
-      return { points, bonusPoints, rate, rateType, category };
+      const cashbackValue = {
+        cashValue: (points + bonusPoints) * kotakCardRewards["Royale Signature"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points + bonusPoints} Kotak Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, bonusPoints, rate, rateType, category, rewardText, cashbackValue, cardType: kotakCardRewards["Royale Signature"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -713,15 +833,22 @@ export const kotakCardRewards = {
     mccRates: {
     },
     defaultRate: 3 / 100,
-    redemptionRate: 0.1, // 1000 points = Rs. 100
+    redemptionRate: {
+      cashValue: 0.1  // 1 point = ₹0.10
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       const rate = kotakCardRewards["UPI RuPay"].defaultRate;
       const category = "All Spends";
       const rateType = "default";
       const points = Math.floor(amount * rate);
-      const cashbackValue = points * kotakCardRewards["UPI RuPay"].redemptionRate / 1000;
+      const cashbackValue = {
+        cashValue: points * kotakCardRewards["UPI RuPay"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashbackValue };
+      const rewardText = `${points} Kotak Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: kotakCardRewards["UPI RuPay"].cardType };
+
     },
     dynamicInputs: () => []
   },
@@ -738,8 +865,7 @@ export const kotakCardRewards = {
       { spend: 1200000, value: 8000 }
     ],
     redemptionRate: {
-      catalog: 1,
-      cashback: 0.7
+      cashValue: 0.7  // 1 point = ₹0.70
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let whitePassValue = 0;
@@ -755,7 +881,14 @@ export const kotakCardRewards = {
         }
       }
 
-      return { points: whitePassValue, rate: whitePassValue / amount, rateType, category };
+      const cashbackValue = {
+        cashValue: whitePassValue * kotakCardRewards.White.redemptionRate.cashValue
+      };
+
+      const rewardText = `${whitePassValue} White Pass Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points: whitePassValue, rate: whitePassValue / amount, rateType, category, rewardText, cashbackValue, cardType: kotakCardRewards["White"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -791,8 +924,7 @@ export const kotakCardRewards = {
       { spend: 10000000, value: 67000 }
     ],
     redemptionRate: {
-      catalog: 1,
-      cashback: 0.7
+      cashValue: 0.7  // 1 point = ₹0.70
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let whitePassValue = 0;
@@ -808,7 +940,14 @@ export const kotakCardRewards = {
         }
       }
 
-      return { points: whitePassValue, rate: whitePassValue / amount, rateType, category };
+      const cashbackValue = {
+        cashValue: whitePassValue * kotakCardRewards["White Reserve"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${whitePassValue} White Pass Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points: whitePassValue, rate: whitePassValue / amount, rateType, category, rewardText, cashbackValue, cardType: kotakCardRewards["White Reserve"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -829,8 +968,9 @@ export const kotakCardRewards = {
         value: currentInputs.spendTier || 0,
         onChange: (value) => onChange('spendTier', parseInt(value))
       }
-    ],
+    ]
   },
+
   "Zen": {
     cardType: "points",
     defaultRate: 5 / 150,
@@ -848,6 +988,9 @@ export const kotakCardRewards = {
       "5542": 0  // Fuel
     },
     pointsCap: 6500,
+    redemptionRate: {
+      cashValue: 0.25  // 1 point = ₹0.25
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = kotakCardRewards.Zen.defaultRate;
       let category = "Other Spends";
@@ -859,9 +1002,16 @@ export const kotakCardRewards = {
         rateType = rate === 0 ? "excluded" : "shopping";
       }
 
-      const points = Math.floor(amount * rate);
+      let points = Math.floor(amount * rate);
+      points = Math.min(points, kotakCardRewards.Zen.pointsCap);
 
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        cashValue: points * kotakCardRewards.Zen.redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Kotak Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: kotakCardRewards["Zen"].cardType };
     },
     dynamicInputs: () => []
   },
@@ -874,208 +1024,16 @@ export const calculateKotakRewards = (cardName, amount, mcc, additionalParams = 
       points: 0,
       cashback: 0,
       rewardText: "Card not found",
-      uncappedPoints: 0,
-      cappedPoints: 0,
-      appliedCap: null
+      category: "Unknown",
+      cashbackValue: 0,
+      cardType: "unknown",
     };
   }
 
-  const result = cardReward.calculateRewards(amount, mcc, additionalParams);
-
-  if (cardReward.cardType === "cashback") {
-    return applyCashbackCapping(result, cardReward, cardName);
-  } else if (cardReward.cardType === "tickets") {
-    return applyTicketCapping(result, cardReward, cardName);
-  } else {
-    return applyPointsCapping(result, cardReward, cardName);
-  }
+  return cardReward.calculateRewards(amount, mcc, additionalParams);
 };
 
-export const applyTicketCapping = (result, cardReward, cardName) => {
-  let { tickets, foodCashback, ticketCashback, rate, rateType, category } = result;
-  let cappedTickets = tickets;
-  let cappedFoodCashback = foodCashback;
-  let cappedTicketCashback = ticketCashback;
-  let appliedCap = null;
-
-  if (cardReward.capping) {
-    if (cardReward.capping.maxTickets) {
-      cappedTickets = Math.min(tickets, cardReward.capping.maxTickets);
-    }
-    if (cardReward.capping.maxFoodCashback) {
-      cappedFoodCashback = Math.min(foodCashback, cardReward.capping.maxFoodCashback);
-    }
-    if (cardReward.capping.maxTicketCashback) {
-      cappedTicketCashback = Math.min(ticketCashback, cardReward.capping.maxTicketCashback);
-    }
-
-    if (cappedTickets < tickets || cappedFoodCashback < foodCashback || cappedTicketCashback < ticketCashback) {
-      appliedCap = {
-        maxTickets: cardReward.capping.maxTickets,
-        maxFoodCashback: cardReward.capping.maxFoodCashback,
-        maxTicketCashback: cardReward.capping.maxTicketCashback,
-        period: cardReward.capping.period
-      };
-    }
-  }
-
-  const rewardText = generateTicketRewardText(cardName, cappedTickets, cappedFoodCashback, cappedTicketCashback, rate, rateType, category, appliedCap);
-
-  return {
-    tickets: cappedTickets,
-    foodCashback: cappedFoodCashback,
-    ticketCashback: cappedTicketCashback,
-    rewardText,
-    uncappedTickets: tickets,
-    uncappedFoodCashback: foodCashback,
-    uncappedTicketCashback: ticketCashback,
-    cappedTickets,
-    cappedFoodCashback,
-    cappedTicketCashback,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category
-  };
-};
-
-export const generateTicketRewardText = (cardName, tickets, foodCashback, ticketCashback, rate, rateType, category, appliedCap) => {
-  let rewardText = `${tickets} Free Movie Tickets`;
-
-  if (foodCashback > 0) {
-    rewardText += `, ₹${foodCashback.toFixed(2)} Food Cashback`;
-  }
-
-  if (ticketCashback > 0) {
-    rewardText += `, ₹${ticketCashback.toFixed(2)} Ticket Cashback`;
-  }
-
-  if (category !== "Other Spends") {
-    rewardText += ` (${category})`;
-  }
-
-  if (appliedCap) {
-    rewardText += ` (Capped at ${appliedCap.maxTickets} tickets, ₹${appliedCap.maxFoodCashback} food cashback, ₹${appliedCap.maxTicketCashback} ticket cashback per ${appliedCap.period})`;
-  }
-
-  return rewardText;
-};
-
-
-export const applyCashbackCapping = (result, cardReward, cardName) => {
-  let { cashback, tickets, foodCashback, ticketCashback, rate, rateType, category } = result;
-  let cappedCashback = cashback;
-  let appliedCap = null;
-
-  if (cardReward.capping) {
-    if (cardReward.capping.maxCashback) {
-      cappedCashback = Math.min(cashback, cardReward.capping.maxCashback);
-    }
-
-    // Handle ticket-based rewards as cashback
-    if (tickets > 0) {
-      cappedCashback += tickets * (cardReward.ticketValue || 0);
-    }
-    if (foodCashback > 0) {
-      cappedCashback += foodCashback;
-    }
-    if (ticketCashback > 0) {
-      cappedCashback += ticketCashback;
-    }
-
-    if (cappedCashback < (cashback + (tickets * (cardReward.ticketValue || 0)) + foodCashback + ticketCashback)) {
-      appliedCap = {
-        maxCashback: cardReward.capping.maxCashback,
-        period: cardReward.capping.period
-      };
-    }
-  }
-
-  const rewardText = generateCashbackRewardText(cardName, cappedCashback, rate, rateType, category, appliedCap);
-
-  return {
-    cashback: cappedCashback,
-    rewardText,
-    uncappedCashback: cashback + (tickets * (cardReward.ticketValue || 0)) + foodCashback + ticketCashback,
-    cappedCashback,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category
-  };
-};
-
-export const applyPointsCapping = (result, cardReward, cardName) => {
-  let { points, tickets, foodCashback, ticketCashback, rate, rateType, category } = result;
-  let cappedPoints = points;
-  let appliedCap = null;
-
-  if (cardReward.capping) {
-    if (cardReward.capping.maxPoints) {
-      cappedPoints = Math.min(points, cardReward.capping.maxPoints);
-    }
-
-    // Handle ticket-based rewards as points
-    if (tickets > 0) {
-      cappedPoints += tickets * (cardReward.ticketPointValue || 0);
-    }
-    if (foodCashback > 0) {
-      cappedPoints += Math.floor(foodCashback / (cardReward.pointValue || 1));
-    }
-    if (ticketCashback > 0) {
-      cappedPoints += Math.floor(ticketCashback / (cardReward.pointValue || 1));
-    }
-
-    if (cappedPoints < (points + (tickets * (cardReward.ticketPointValue || 0)) +
-      Math.floor(foodCashback / (cardReward.pointValue || 1)) +
-      Math.floor(ticketCashback / (cardReward.pointValue || 1)))) {
-      appliedCap = {
-        maxPoints: cardReward.capping.maxPoints,
-        period: cardReward.capping.period
-      };
-    }
-  }
-
-  const rewardText = generatePointsRewardText(cardName, cappedPoints, rate, rateType, category, appliedCap);
-
-  return {
-    points: cappedPoints,
-    rewardText,
-    uncappedPoints: points + (tickets * (cardReward.ticketPointValue || 0)) +
-      Math.floor(foodCashback / (cardReward.pointValue || 1)) +
-      Math.floor(ticketCashback / (cardReward.pointValue || 1)),
-    cappedPoints,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category
-  };
-};
-
-const generateCashbackRewardText = (cardName, cashback, rate, rateType, category, appliedCap) => {
-  let rewardText = `₹${cashback.toFixed(2)} Cashback`;
-
-  if (category !== "Other Spends") {
-    rewardText += ` (${category})`;
-  }
-
-  if (appliedCap) {
-    rewardText += ` (Capped at ₹${appliedCap.maxCashback} per ${appliedCap.period})`;
-  }
-
-  return rewardText;
-};
-
-const generatePointsRewardText = (cardName, points, rate, rateType, category, appliedCap) => {
-  let rewardText = `${points} Reward Points`;
-
-  if (category !== "Other Spends") {
-    rewardText += ` (${category})`;
-  }
-
-  if (appliedCap) {
-    rewardText += ` (Capped at ${appliedCap.maxPoints} points per ${appliedCap.period})`;
-  }
-
-  return rewardText;
+export const getCardInputs = (cardName, currentInputs, onChange) => {
+  const cardReward = kotakCardRewards[cardName];
+  return cardReward && cardReward.dynamicInputs ? cardReward.dynamicInputs(currentInputs, onChange) : [];
 };

@@ -9,7 +9,6 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import { formatRewardText } from "./CalculatorHelpers";
 import ExportedImage from "next-image-export-optimizer";
 import { CreditCard as CreditCardIcon } from "@mui/icons-material";
 import { getBankColor } from "./colorPalette";
@@ -125,7 +124,7 @@ export const renderCardList = (
                       index === 0 ? "success.contrastText" : "text.secondary",
                   }}
                 >
-                  {formatRewardText(card)}
+                  You earned {card.displayValue}
                 </Typography>
               ) : null
             }

@@ -5,7 +5,7 @@ export const yesCardRewards = {
     onlineRate: 8 / 200, // 8 YES Rewardz Points on every INR 200 for Online Shopping
     selectCategoriesRate: 2 / 200, // 2 YES Rewardz Points on every INR 200 on Select categories
     redemptionRate: {
-      airMiles: 1 / 10 // 10 YES Rewardz Points = 1 InterMile / 1 Club Vistara Point
+      airMiles: 0.1 // 10 YES Rewardz Points = 1 InterMile / 1 Club Vistara Point
     },
     mccRates: {
       "5541": 0,
@@ -37,9 +37,18 @@ export const yesCardRewards = {
         rateType = "excluded";
       }
 
-      const points = Math.floor(amount * rate);
+      let points = Math.floor(amount * rate);
+      let cappedPoints = Math.min(points, yesCardRewards["ACE"].capping.maxPoints);
 
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        airMiles: cappedPoints * yesCardRewards["ACE"].redemptionRate.airMiles
+      };
+
+      const rewardText = rateType === "excluded"
+        ? `No points earned (Excluded category: ${category})`
+        : `${cappedPoints} Points (${category}) - Worth ${cashbackValue.airMiles.toFixed(2)} Air Miles`;
+
+      return { points: cappedPoints, rate, rateType, category, rewardText, cashbackValue, cardType: yesCardRewards["ACE"].cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -82,11 +91,13 @@ export const yesCardRewards = {
       }
 
       let cashback = amount * rate;
-      if (cashback > yesCardRewards["BYOC"].maxCashbackPerMerchant) {
-        cashback = yesCardRewards["BYOC"].maxCashbackPerMerchant;
-      }
+      let cappedCashback = Math.min(cashback, yesCardRewards["BYOC"].maxCashbackPerMerchant);
 
-      return { cashback, rate, rateType, category };
+      const rewardText = rateType === "default"
+        ? "No cashback earned on this transaction"
+        : `₹${cappedCashback.toFixed(2)} Cashback (${category})`;
+
+      return { cashback: cappedCashback, rate, rateType, category, rewardText, cardType: yesCardRewards["BYOC"].cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -114,36 +125,28 @@ export const yesCardRewards = {
       }
     ]
   },
-  "First": {
-    cardType: "points",
-    mccRates: {
-    },
-    defaultRate: 6 / 100, // 6 Reward Points per INR 100 spent
-    calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = yesCardRewards["Yes First"].defaultRate;
-      let category = "All Spends";
-      let rateType = "default";
-
-      const points = Math.floor(amount * rate);
-
-      return { points, rate, rateType, category };
-    },
-    dynamicInputs: () => []
-  },
-
-  "First Exclusive": {
+  "First Preferred": {
     cardType: "points",
     mccRates: {
     },
     defaultRate: 12 / 100, // 12 Reward Points per INR 100 spent
+    redemptionRate: {
+      airMiles: 0.10
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = yesCardRewards["Yes First Exclusive"].defaultRate;
+      let rate = yesCardRewards["First Preferred"].defaultRate;
       let category = "All Spends";
       let rateType = "default";
 
       const points = Math.floor(amount * rate);
 
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        airMiles: points * yesCardRewards["First Preferred"].redemptionRate.airMiles,
+      };
+
+      const rewardText = `${points} Points (${category}) - Worth ${cashbackValue.airMiles.toFixed(2)} Air Miles`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: yesCardRewards["First Preferred"].cardType };
     },
     dynamicInputs: () => []
   },
@@ -153,7 +156,7 @@ export const yesCardRewards = {
     onlineRate: 12 / 200, // 12 YES Rewardz Points on every INR 200 for Online Shopping
     selectCategoriesRate: 4 / 200, // 4 YES Rewardz Points on every INR 200 on Select categories
     redemptionRate: {
-      airMiles: 1 / 10 // 10 YES Rewardz Points = 1 InterMile / 1 Club Vistara Point
+      cashValue: 0.25 // 1 YES Rewardz Points = ₹0.25: 
     },
     mccRates: {
       "5541": 0,
@@ -185,9 +188,18 @@ export const yesCardRewards = {
         rateType = "excluded";
       }
 
-      const points = Math.floor(amount * rate);
+      let points = Math.floor(amount * rate);
+      let cappedPoints = Math.min(points, yesCardRewards["Elite+"].capping.maxPoints);
 
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        airMiles: cappedPoints * yesCardRewards["Elite+"].redemptionRate.airMiles,
+      };
+
+      const rewardText = rateType === "excluded"
+        ? `No points earned (Excluded category: ${category})`
+        : `${cappedPoints} Points (${category}) - Worth ${cashbackValue.airMiles.toFixed(2)} Air Miles`;
+
+      return { points: cappedPoints, rate, rateType, category, rewardText, cashbackValue, cardType: yesCardRewards["Elite+"].cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -215,7 +227,8 @@ export const yesCardRewards = {
     onlineRate: 36 / 200, // 36 YES Rewardz Points on every INR 200 for Online Shopping
     selectCategoriesRate: 10 / 200, // 10 YES Rewardz Points on every INR 200 on Select categories
     redemptionRate: {
-      airMiles: 1 / 4 // 4 YES Rewardz Points = 1 InterMile / 1 Club Vistara Point
+      airMiles: 0.10,
+      cashValue: 0.10
     },
     mccRates: {
       "6513": 0,
@@ -249,9 +262,19 @@ export const yesCardRewards = {
         rateType = "excluded";
       }
 
-      const points = Math.floor(amount * rate);
+      let points = Math.floor(amount * rate);
+      let cappedPoints = Math.min(points, yesCardRewards["Marquee"].capping.maxPoints);
 
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        airMiles: cappedPoints * yesCardRewards["Marquee"].redemptionRate.airMiles,
+        cashValue: cappedPoints * yesCardRewards["Marquee"].redemptionRate.cashValue,
+      };
+
+      const rewardText = rateType === "excluded"
+        ? `No points earned (Excluded category: ${category})`
+        : `${cappedPoints} Points (${category}) - Worth ${cashbackValue.airMiles.toFixed(2)} Air Miles or ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      return { points: cappedPoints, rate, rateType, category, rewardText, cashbackValue, cardType: yesCardRewards["Marquee"].cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -277,15 +300,37 @@ export const yesCardRewards = {
     cardType: "points",
     mccRates: {
     },
+    redemptionRate: {
+      cashValue: 0.25 // To be filled in later
+    },
     defaultRate: 1 / 100, // 1 Reward Point per INR 100 spent
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = yesCardRewards["Prosperity"].defaultRate;
       let category = "All Spends";
       let rateType = "default";
 
-      const points = Math.floor(amount * rate);
+      // Apply MCC specific rates if available
+      if (mcc && yesCardRewards["Prosperity"].mccRates[mcc]) {
+        rate = yesCardRewards["Prosperity"].mccRates[mcc];
+        category = "MCC Specific";
+        rateType = "mcc-specific";
+      }
 
-      return { points, rate, rateType, category };
+      let points = Math.floor(amount * rate);
+
+      // Apply capping if available
+      if (yesCardRewards["Prosperity"].capping) {
+        // Implement capping logic here
+      }
+
+      const cashbackValue = {
+        airMiles: points * yesCardRewards["Prosperity"].redemptionRate.airMiles,
+        cashValue: points * yesCardRewards["Prosperity"].redemptionRate.cashValue
+      };
+
+      const rewardText = `You earned ${points} YES Rewardz Points in the ${category} category`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: yesCardRewards["Prosperity"].cardType };
     },
     dynamicInputs: () => []
   },
@@ -295,7 +340,7 @@ export const yesCardRewards = {
     onlineRate: 24 / 200, // 24 YES Rewardz Points on every INR 200 for Online Shopping
     selectCategoriesRate: 6 / 200, // 6 YES Rewardz Points on every INR 200 on Select categories
     redemptionRate: {
-      airMiles: 1 / 10 // 10 YES Rewardz Points = 1 InterMile / 1 Club Vistara Point
+      airMiles: 0.1 // 10 YES Rewardz Points = 1 InterMile / 1 Club Vistara Point
     },
     mccRates: {
       "5541": 0,
@@ -327,9 +372,19 @@ export const yesCardRewards = {
         rateType = "excluded";
       }
 
-      const points = Math.floor(amount * rate);
+      let points = Math.floor(amount * rate);
+      let cappedPoints = Math.min(points, yesCardRewards["Reserv"].capping.maxPoints);
 
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        airMiles: cappedPoints * yesCardRewards["Reserv"].redemptionRate.airMiles,
+      };
+
+      const rewardText = rateType === "excluded"
+        ? `No points earned (Excluded category: ${category})`
+        : `${cappedPoints} Points (${category}) - Worth ${cashbackValue.airMiles.toFixed(2)} Air Miles`;
+
+
+      return { points: cappedPoints, rate, rateType, category, rewardText, cashbackValue, cardType: yesCardRewards["Reserv"].cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -357,7 +412,7 @@ export const yesCardRewards = {
     onlineRate: 8 / 200, // 8 YES Rewardz Points on every INR 200 for Online Shopping
     selectCategoriesRate: 2 / 200, // 2 YES Rewardz Points on every INR 200 on Select categories
     redemptionRate: {
-      airMiles: 1 / 10 // 10 YES Rewardz Points = 1 InterMile / 1 Club Vistara Point
+      airMiles: 0.1 // 10 YES Rewardz Points = 1 InterMile / 1 Club Vistara Point
     },
     mccRates: {
       "5541": 0,
@@ -389,9 +444,19 @@ export const yesCardRewards = {
         rateType = "excluded";
       }
 
-      const points = Math.floor(amount * rate);
+      let points = Math.floor(amount * rate);
+      let cappedPoints = Math.min(points, yesCardRewards["Select"].capping.maxPoints);
 
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        airMiles: cappedPoints * yesCardRewards["Select"].redemptionRate.airMiles
+      };
+
+      const rewardText = rateType === "excluded"
+        ? `No points earned (Excluded category: ${category})`
+        : `${cappedPoints} Points (${category}) - Worth ${cashbackValue.airMiles.toFixed(2)} Air Miles`;
+
+
+      return { points: cappedPoints, rate, rateType, category, rewardText, cashbackValue, cardType: yesCardRewards["Select"].cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -418,7 +483,7 @@ export const yesCardRewards = {
     defaultRate: 4 / 200, // 4 Reward Points on spending INR 200 on other categories
     chemistRate: 20 / 200, // 20 Reward Points on every INR 200 spent on Chemists/Pharmaceutical stores
     redemptionRate: {
-      airMiles: 1 / 10 // 10 Reward Points = 1 InterMile / 1 Club Vistara Point
+      airMiles: 0.1 // 10 Reward Points = 1 InterMile / 1 Club Vistara Point
     },
     mccRates: {
       "6513": 0,
@@ -443,7 +508,15 @@ export const yesCardRewards = {
 
       const points = Math.floor(amount * rate);
 
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        airMiles: points * yesCardRewards["Wellness Plus"].redemptionRate.airMiles,
+      };
+
+      const rewardText = rateType === "excluded"
+        ? `No points earned (Excluded category: ${category})`
+        : `${points} Points (${category}) - Worth ${cashbackValue.airMiles.toFixed(2)} Air Miles`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: yesCardRewards["Wellness Plus"].cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -458,7 +531,7 @@ export const yesCardRewards = {
         onChange: (value) => onChange('isChemist', value === 'true')
       }
     ]
-  },
+  }
 
 };
 
@@ -469,105 +542,16 @@ export const calculateYESRewards = (cardName, amount, mcc, additionalParams = {}
       points: 0,
       cashback: 0,
       rewardText: "Card not found",
-      uncappedPoints: 0,
-      cappedPoints: 0,
-      appliedCap: null
+      category: "Unknown",
+      cashbackValue: 0,
+      cardType: "unknown",
     };
   }
 
-  const result = cardReward.calculateRewards(amount, mcc, additionalParams);
-
-  if (cardReward.cardType === "cashback") {
-    return applyCashbackCapping(result, cardReward, cardName);
-  } else {
-    return applyPointsCapping(result, cardReward, cardName);
-  }
+  return cardReward.calculateRewards(amount, mcc, additionalParams);
 };
 
-
-export const applyCashbackCapping = (result, cardReward, cardName) => {
-  let { cashback, rate, rateType, category } = result;
-  let cappedCashback = cashback;
-  let appliedCap = null;
-
-  if (cardReward.maxCashbackPerMerchant && cashback > cardReward.maxCashbackPerMerchant) {
-    cappedCashback = cardReward.maxCashbackPerMerchant;
-    appliedCap = { category: "Per Merchant", maxCashback: cardReward.maxCashbackPerMerchant };
-  }
-
-  const rewardText = generateCashbackRewardText(cardName, cappedCashback, rate, rateType, category, appliedCap);
-
-  return {
-    cashback: cappedCashback,
-    rewardText,
-    uncappedCashback: cashback,
-    cappedCashback,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category
-  };
-};
-
-export const applyPointsCapping = (result, cardReward, cardName) => {
-  let { points, rate, rateType, category } = result;
-  let cappedPoints = points;
-  let appliedCap = null;
-
-  if (cardReward.capping && cardReward.capping.maxPoints) {
-    cappedPoints = Math.min(points, cardReward.capping.maxPoints);
-    if (cappedPoints < points) {
-      appliedCap = {
-        category: "Total Points",
-        maxPoints: cardReward.capping.maxPoints,
-        period: cardReward.capping.period
-      };
-    }
-  }
-
-  const rewardText = generatePointsRewardText(cardName, cappedPoints, rate, rateType, category, appliedCap);
-
-  return {
-    points: cappedPoints,
-    rewardText,
-    uncappedPoints: points,
-    cappedPoints,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category
-  };
-};
-
-export const generateCashbackRewardText = (cardName, cashback, rate, rateType, category, appliedCap) => {
-  let rewardText = `₹${cashback.toFixed(2)} Cashback`;
-
-  if (category !== "Other Spends") {
-    rewardText += ` (${category})`;
-  }
-
-  if (appliedCap) {
-    rewardText += ` (Capped at ₹${appliedCap.maxCashback} per merchant)`;
-  }
-
-  return rewardText;
-};
-
-export const generatePointsRewardText = (cardName, points, rate, rateType, category, appliedCap) => {
-  let rewardText = `${points} YES Rewardz Points`;
-
-  if (category !== "Other Spends") {
-    rewardText += ` (${category})`;
-  }
-
-  if (appliedCap) {
-    rewardText += ` (Capped at ${appliedCap.maxPoints} points per ${appliedCap.period})`;
-  }
-
-  return rewardText;
-};
-
-export const getYESCardInputs = (cardName, currentInputs, onChange) => {
+export const getCardInputs = (cardName, currentInputs, onChange) => {
   const cardReward = yesCardRewards[cardName];
   return cardReward && cardReward.dynamicInputs ? cardReward.dynamicInputs(currentInputs, onChange) : [];
 };

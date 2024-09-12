@@ -15,8 +15,6 @@
   },
   "scripts": {
     "dev": "next dev",
-    "test": "jest",
-    "test:report": "npx jest",
     "build": "next build && next-image-export-optimizer",
     "start": "next start",
     "lint": "next lint"

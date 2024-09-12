@@ -28,7 +28,9 @@ export const indusIndCardRewards = {
       }
 
       const miles = Math.floor(amount * rate);
-      return { miles, rate, rateType, category };
+      const rewardText = `${miles} Avios Miles (${category})`;
+
+      return { miles, rate, rateType, category, rewardText, cardType: indusIndCardRewards["Avios"].cardType };
     },
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
       const inputs = [
@@ -63,8 +65,8 @@ export const indusIndCardRewards = {
     defaultRate: 1 / 100, // 1 Reward Point for every ₹100 spent on Domestic transactions
     internationalRate: 3 / 100, // 3 Reward Points for every ₹100 spent on International transactions
     redemptionRate: {
-      airmiles: 1, // 1 Reward Point = 1 Air mile
-      cashCredit: 0.75 // 1 Reward Point = ₹ 0.75
+      airMiles: 1, // 1 Reward Point = 1 Air mile
+      cashValue: 0.75 // 1 Reward Point = ₹ 0.75
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = indusIndCardRewards["Celesta"].defaultRate;
@@ -78,10 +80,15 @@ export const indusIndCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const airmiles = points * indusIndCardRewards["Celesta"].redemptionRate.airmiles;
-      const cashCredit = points * indusIndCardRewards["Celesta"].redemptionRate.cashCredit;
+      const cashbackValue = {
+        airMiles: points * indusIndCardRewards["Celesta"].redemptionRate.airMiles,
+        cashValue: points * indusIndCardRewards["Celesta"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, airmiles, cashCredit };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)} or ${cashbackValue.airMiles} Air Miles`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: indusIndCardRewards["Celesta"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -98,7 +105,7 @@ export const indusIndCardRewards = {
     ]
   },
   "Club Vistara Explorer": {
-    cardType: "points",
+    cardType: "miles",
     mccRates: {
     },
     defaultRate: 2 / 200, // 2 CV Points per INR 200 spent on all other spends
@@ -126,8 +133,10 @@ export const indusIndCardRewards = {
         rateType = "utility";
       }
 
-      const points = Math.floor(amount * rate);
-      return { points, rate, rateType, category };
+      const miles = Math.floor(amount * rate);
+      const rewardText = `${miles} CV Points (${category})`;
+
+      return { miles, rate, rateType, category, rewardText, cardType: indusIndCardRewards["Club Vistara Explorer"].cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -157,8 +166,8 @@ export const indusIndCardRewards = {
     defaultRate: 1 / 100, // 1 Reward point on every ₹ 100 spent on domestic transactions
     internationalRate: 2.5 / 100, // 2.5 Reward Points on every ₹ 100 spent on international transactions
     redemptionRate: {
-      airmiles: 1, // 1 Reward Point = 1 Air mile
-      cashCredit: 0.75 // 1 Reward Point = ₹ 0.75
+      airMiles: 1, // 1 Reward Point = 1 Air mile
+      cashValue: 0.75 // 1 Reward Point = ₹ 0.75
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = indusIndCardRewards["Crest"].defaultRate;
@@ -172,10 +181,15 @@ export const indusIndCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const airmiles = points * indusIndCardRewards["Crest"].redemptionRate.airmiles;
-      const cashCredit = points * indusIndCardRewards["Crest"].redemptionRate.cashCredit;
+      const cashbackValue = {
+        airMiles: points * indusIndCardRewards["Crest"].redemptionRate.airMiles,
+        cashValue: points * indusIndCardRewards["Crest"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, airmiles, cashCredit };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)} or ${cashbackValue.airMiles} Air Miles`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: indusIndCardRewards["Crest"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -191,11 +205,15 @@ export const indusIndCardRewards = {
       }
     ]
   },
+
   "Duo": {
     cardType: "points",
     mccRates: {
     },
     defaultRate: 1 / 150, // 1 Reward Point for every ₹ 150 spent
+    redemptionRate: {
+      cashValue: 0.75 // 1 Reward Point = ₹ 0.40 (Cash credit)
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       const rate = indusIndCardRewards["Duo"].defaultRate;
       const category = "All Spends";
@@ -203,10 +221,19 @@ export const indusIndCardRewards = {
 
       const points = Math.floor(amount * rate);
 
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        cashValue: points * indusIndCardRewards["Duo"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: indusIndCardRewards["Duo"].cardType };
+
     },
     dynamicInputs: () => []
   },
+  //TODO: add redemptionRate
   "EazyDiner Platinum": {
     cardType: "points",
     defaultRate: 2 / 100, // 2 Reward Points on every INR 100 spent
@@ -216,6 +243,9 @@ export const indusIndCardRewards = {
       "5541": 0, // Fuel transactions
       "5542": 0, // Fuel transactions
       // Add more excluded MCCs as needed
+    },
+    redemptionRate: {
+      cashValue: 0.20 // 1 Reward Point = ₹ 0.20 (Cash credit)
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = indusIndCardRewards["EazyDiner Platinum"].defaultRate;
@@ -238,7 +268,14 @@ export const indusIndCardRewards = {
         eazyPoints = points * indusIndCardRewards["EazyDiner Platinum"].eazyPointsMultiplier;
       }
 
-      return { points, eazyPoints, rate, rateType, category };
+      const cashbackValue = {
+        cashValue: points * indusIndCardRewards["EazyDiner Platinum"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}${eazyPoints ? ` + ${eazyPoints} EazyPoints` : ''}`;
+
+      return { points, eazyPoints, rate, rateType, category, rewardText, cashbackValue, cardType: indusIndCardRewards["EazyDiner Platinum"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -255,11 +292,11 @@ export const indusIndCardRewards = {
           onChange('transactionType', value);
           onChange('isSpecialCategory', value === 'special');
           onChange('isEazyDiner', value === 'eazyDiner');
-        },
-        helperText: 'Special categories typically include utilities, insurance, government payments, education, and real estate transactions. Check your card\'s terms for specific details.'
+        }
       }
     ]
   },
+  //TODO: Move diningShoppingEntertainmentMCCs to mccRates
   "EazyDiner Signature": {
     cardType: "points",
     defaultRate: 4 / 100, // 4 Reward Points on every Rs 100 spent on all other spends
@@ -275,6 +312,9 @@ export const indusIndCardRewards = {
       "5311", "5411", "5611", "5621", "5631", "5641", "5651", "5661", "5691", "5699", // Shopping
       "7832", "7922", "7929", "7991", "7996", "7998", "7999" // Entertainment
     ],
+    redemptionRate: {
+      cashValue: 0.20 // 1 Reward Point = ₹ 0.20 (Cash credit)
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = indusIndCardRewards["EazyDiner Signature"].defaultRate;
       let category = "Other Spends";
@@ -296,7 +336,14 @@ export const indusIndCardRewards = {
         eazyPoints = points * indusIndCardRewards["EazyDiner Signature"].eazyPointsMultiplier;
       }
 
-      return { points, eazyPoints, rate, rateType, category };
+      const cashbackValue = {
+        cashValue: points * indusIndCardRewards["EazyDiner Signature"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}${eazyPoints ? ` + ${eazyPoints} EazyPoints` : ''}`;
+
+      return { points, eazyPoints, rate, rateType, category, rewardText, cashbackValue, cardType: indusIndCardRewards["EazyDiner Signature"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -318,8 +365,8 @@ export const indusIndCardRewards = {
     },
     defaultRate: 1.5 / 100, // 1.5 Reward Points for every ₹100 spent
     redemptionRate: {
-      cashCredit: 1, // 1 Reward Point = ₹1 Cash Credit
-      airmiles: 1 // 1 Reward Point = 1 Air Mile
+      airMiles: 1, // 1 Reward Point = 1 Air mile
+      cashValue: 1 // 1 Reward Point = ₹ 0.75
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       const rate = indusIndCardRewards["Indulge"].defaultRate;
@@ -327,10 +374,15 @@ export const indusIndCardRewards = {
       const rateType = "default";
 
       const points = Math.floor(amount * rate);
-      const cashCredit = points * indusIndCardRewards["Indulge"].redemptionRate.cashCredit;
-      const airmiles = points * indusIndCardRewards["Indulge"].redemptionRate.airmiles;
+      const cashbackValue = {
+        airMiles: points * indusIndCardRewards["Indulge"].redemptionRate.airMiles,
+        cashValue: points * indusIndCardRewards["Indulge"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashCredit, airmiles };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)} or ${cashbackValue.airMiles} Air Miles`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: indusIndCardRewards["Indulge"].cardType };
+
     },
     dynamicInputs: () => []
   },
@@ -376,7 +428,10 @@ export const indusIndCardRewards = {
 
       const miles = Math.floor(amount * rate);
 
-      return { miles, rate, rateType, category };
+      const rewardText = `${miles} InterMiles (${category})`;
+
+      return { miles, rate, rateType, category, rewardText, cardType: indusIndCardRewards["InterMiles Odyssey"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -456,7 +511,10 @@ export const indusIndCardRewards = {
 
       const miles = Math.floor(amount * rate);
 
-      return { miles, rate, rateType, category };
+      const rewardText = `${miles} InterMiles (${category})`;
+
+      return { miles, rate, rateType, category, rewardText, cardType: indusIndCardRewards["InterMiles Voyage"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -500,8 +558,8 @@ export const indusIndCardRewards = {
     weekendRate: 2 / 100, // 2 reward points for every ₹ 100 spent on weekends
     specialRate: 0.7 / 100, // 0.7 Reward Points on select categories
     redemptionRate: {
-      nonCash: 0.75, // 1 RP = Rs.0.75 for non-cash redemption (excluding airmiles)
-      cash: 0.50 // 1 RP = Rs.0.50 for cash redemption
+      airMiles: 1,
+      cashValue: 0.50 // 1 RP = Rs.0.50 for cash redemption
     },
     mccRates: {
       "5541": 0, // Fuel transactions
@@ -529,10 +587,15 @@ export const indusIndCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      const cashValue = points * indusIndCardRewards["Legend"].redemptionRate.cash;
-      const nonCashValue = points * indusIndCardRewards["Legend"].redemptionRate.nonCash;
+      const cashbackValue = {
+        airMiles: points * indusIndCardRewards["Legend"].redemptionRate.airMiles,
+        cashValue: points * indusIndCardRewards["Legend"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, cashValue, nonCashValue };
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)} or ${cashbackValue.airMiles} Air Miles`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: indusIndCardRewards["Legend"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -549,11 +612,11 @@ export const indusIndCardRewards = {
           onChange('transactionType', value);
           onChange('isWeekend', value === 'weekend');
           onChange('isSpecialCategory', value === 'special');
-        },
-        helperText: 'Special categories typically include utilities, insurance, government payments, education, and real estate transactions. Check your card\'s terms for specific details.'
+        }
       }
     ],
   },
+  //TODO: Added cashbackValue
   "Nexxt": {
     cardType: "points",
     defaultRate: 1 / 150, // 1 Reward Point for every ₹ 150 spent
@@ -564,6 +627,10 @@ export const indusIndCardRewards = {
     specialCategories: {
       rate: 0.7 / 150, // Assuming 0.7 Reward Points for every INR 150 on special categories
       categories: ["Utility", "Insurance", "Government", "Education", "RealEstate"]
+    },
+    redemptionRate: {
+      airMiles: 1,
+      cashValue: 1
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = indusIndCardRewards["Nexxt"].defaultRate;
@@ -581,7 +648,16 @@ export const indusIndCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      return { points, rate, rateType, category };
+
+      const cashbackValue = {
+        airMiles: points * indusIndCardRewards["Nexxt"].redemptionRate.airMiles,
+        cashValue: points * indusIndCardRewards["Nexxt"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)} or ${cashbackValue.airMiles} Air Miles`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: indusIndCardRewards["Nexxt"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -593,8 +669,7 @@ export const indusIndCardRewards = {
           { label: 'No', value: false }
         ],
         value: currentInputs.isSpecialCategory || false,
-        onChange: (value) => onChange('isSpecialCategory', value === 'true'),
-        helperText: 'Special categories typically include utilities, insurance, government payments, education, and real estate transactions. Check your card\'s terms for specific details.'
+        onChange: (value) => onChange('isSpecialCategory', value === 'true')
       }
     ]
   },
@@ -612,6 +687,10 @@ export const indusIndCardRewards = {
     specialCategories: {
       rate: 0.7 / 100, // Assuming 0.7 Reward Points for every INR 100 on special categories
       categories: ["Utility", "Insurance", "Government", "Education"]
+    },
+    redemptionRate: {
+      airMiles: 1,
+      cashValue: 0.75
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = indusIndCardRewards["Pinnacle"].defaultRate;
@@ -637,7 +716,14 @@ export const indusIndCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        airMiles: points * indusIndCardRewards["Pinnacle"].redemptionRate.airMiles,
+        cashValue: points * indusIndCardRewards["Pinnacle"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)} or ${cashbackValue.airMiles} Air Miles`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: indusIndCardRewards["Pinnacle"].cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -656,8 +742,7 @@ export const indusIndCardRewards = {
           onChange('isEcommerce', value === 'ecommerce');
           onChange('isEcomTravelAirline', value === 'ecomTravelAirline');
           onChange('isSpecialCategory', value === 'special');
-        },
-        helperText: 'Special categories typically include utilities, insurance, government payments, education, and real estate transactions. Check your card\'s terms for specific details.'
+        }
       }
     ]
   },
@@ -669,6 +754,10 @@ export const indusIndCardRewards = {
     internationalRate: 2.5 / 100, // 2.5 Reward Points on every ₹ 100 spent on international transactions
     specialRate: 0.7 / 100, // Assuming 0.7 Reward Points for special categories
     specialCategories: ["Utility", "Government", "Education"],
+    redemptionRate: {
+      airMiles: 1,
+      cashValue: 1
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = indusIndCardRewards["Pioneer Heritage"].defaultRate;
       let category = "Domestic Spends";
@@ -685,7 +774,15 @@ export const indusIndCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        airMiles: points * indusIndCardRewards["Pioneer Heritage"].redemptionRate.airMiles,
+        cashValue: points * indusIndCardRewards["Pioneer Heritage"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)} or ${cashbackValue.airMiles} Air Miles`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: indusIndCardRewards["Pioneer Heritage"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -702,8 +799,7 @@ export const indusIndCardRewards = {
           onChange('transactionType', value);
           onChange('isInternational', value === 'international');
           onChange('isSpecialCategory', value === 'special');
-        },
-        helperText: 'Special categories typically include utilities, insurance, government payments, education, and real estate transactions. Check your card\'s terms for specific details.'
+        }
       }
     ],
   },
@@ -716,6 +812,10 @@ export const indusIndCardRewards = {
     mccRates: {
       "5541": 0, // Fuel transactions
       "5542": 0, // Fuel transactions
+    },
+    redemptionRate: {
+      airMiles: 1,
+      cashValue: 1
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = indusIndCardRewards["Pioneer Legacy"].defaultRate;
@@ -737,7 +837,15 @@ export const indusIndCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        airMiles: points * indusIndCardRewards["Pioneer Legacy"].redemptionRate.airMiles,
+        cashValue: points * indusIndCardRewards["Pioneer Legacy"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)} or ${cashbackValue.airMiles} Air Miles`;
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: indusIndCardRewards["Pioneer Legacy"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -754,10 +862,9 @@ export const indusIndCardRewards = {
           onChange('transactionType', value);
           onChange('isWeekend', value === 'weekend');
           onChange('isSpecialCategory', value === 'special');
-        },
-        helperText: 'Special categories typically include utilities, insurance, government payments, education, and real estate transactions. Check your card\'s terms for specific details.'
+        }
       }
-    ],
+    ]
   },
   "Pioneer Private": {
     cardType: "points",
@@ -766,6 +873,10 @@ export const indusIndCardRewards = {
     defaultRate: 3 / 100, // 3 Reward Points on all other spends
     specialRate: 0.7 / 100, // 0.7 Reward Points on certain spends
     specialCategories: ["Utility", "Government", "Education"],
+    redemptionRate: {
+      airMiles: 1,
+      cashValue: 1
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = indusIndCardRewards["Pioneer Private"].defaultRate;
       let category = "Other Spends";
@@ -778,7 +889,16 @@ export const indusIndCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        airMiles: points * indusIndCardRewards["Pioneer Private"].redemptionRate.airMiles,
+        cashValue: points * indusIndCardRewards["Pioneer Private"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)} or ${cashbackValue.airMiles} Air Miles`;
+
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: indusIndCardRewards["Pioneer Private"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -794,6 +914,7 @@ export const indusIndCardRewards = {
       }
     ]
   },
+
   "Platinum Aura Edge": {
     cardType: "points",
     defaultRate: 0.5 / 100, // 0.5 savings points for all other spends
@@ -841,6 +962,10 @@ export const indusIndCardRewards = {
       rate: 0.7 / 100, // 0.7 Reward Points on select categories
       categories: ["Utility", "Insurance", "Government", "Education", "RealEstate"]
     },
+    redemptionRate: {
+      airMiles: 1,
+      cashValue: 0.50
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = indusIndCardRewards["Platinum Aura Edge"].defaultRate;
       let category = "Other Spends";
@@ -864,7 +989,16 @@ export const indusIndCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        airMiles: points * indusIndCardRewards["Platinum Aura Edge"].redemptionRate.airMiles,
+        cashValue: points * indusIndCardRewards["Platinum Aura Edge"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)} or ${cashbackValue.airMiles} Air Miles`;
+
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: indusIndCardRewards["Platinum Aura Edge"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -918,6 +1052,9 @@ export const indusIndCardRewards = {
       rate: 0.7 / 100, // ₹ 0.70 for every ₹ 100 on select merchant categories
       categories: ["Utility", "Insurance", "Government", "Education", "RealEstate"]
     },
+    redemptionRate: {
+      cashValue: 0.35
+    },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = indusIndCardRewards["Platinum RuPay"].defaultRate;
       let category = "Other Spends";
@@ -938,7 +1075,15 @@ export const indusIndCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        cashValue: points * indusIndCardRewards["Platinum RuPay"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: indusIndCardRewards["Platinum RuPay"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -955,8 +1100,7 @@ export const indusIndCardRewards = {
           onChange('transactionType', value);
           onChange('isUPI', value === 'upi');
           onChange('isSpecialCategory', value === 'special');
-        },
-        helperText: 'Special categories typically include utilities, insurance, government payments, education, and real estate transactions. Check your card\'s terms for specific details.'
+        }
       }
     ],
   },
@@ -970,6 +1114,10 @@ export const indusIndCardRewards = {
     specialCategories: {
       rate: 0.7 / 150, // Assuming 0.7 Reward Points for every INR 150 on special categories
       categories: ["Utility", "Insurance", "Government", "Education", "RealEstate"]
+    },
+    redemptionRate: {
+      airMiles: 1,
+      cashValue: 0.75
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = indusIndCardRewards["Platinum"].defaultRate;
@@ -987,7 +1135,16 @@ export const indusIndCardRewards = {
       }
 
       const points = Math.floor(amount * rate);
-      return { points, rate, rateType, category };
+      const cashbackValue = {
+        airMiles: points * indusIndCardRewards["Platinum"].redemptionRate.airMiles,
+        cashValue: points * indusIndCardRewards["Platinum"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: indusIndCardRewards["Platinum"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -999,8 +1156,7 @@ export const indusIndCardRewards = {
           { label: 'No', value: false }
         ],
         value: currentInputs.isSpecialCategory || false,
-        onChange: (value) => onChange('isSpecialCategory', value === 'true'),
-        helperText: 'Special categories typically include utilities, insurance, government payments, education, and real estate transactions. Check your card\'s terms for specific details.'
+        onChange: (value) => onChange('isSpecialCategory', value === 'true')
       }
     ]
   },
@@ -1014,10 +1170,16 @@ export const indusIndCardRewards = {
     calculateRewards: (amount, mcc, additionalParams) => {
       let cashback = Math.min(amount, indusIndCardRewards["Samman"].maxSpend) * indusIndCardRewards["Samman"].defaultRate;
       cashback = Math.min(cashback, indusIndCardRewards["Samman"].maxCashback);
-      return { cashback, rate: indusIndCardRewards["Samman"].defaultRate, rateType: "default", category: "All Spends" };
+      const rate = indusIndCardRewards["Samman"].defaultRate;
+      const category = "All Spends";
+      const rateType = "default";
+      const rewardText = `₹${cashback.toFixed(2)} Cashback (${category})`;
+      return { cashback, rate, rateType, category, rewardText, cardType: indusIndCardRewards["Samman"].cardType };
+
     },
     dynamicInputs: () => []
   },
+
   "Solitaire": {
     cardType: "points",
     defaultRate: 1 / 100, // 1 Reward Point on every INR 100 spent
@@ -1027,6 +1189,10 @@ export const indusIndCardRewards = {
     mccRates: {
       "5541": 0, // Fuel transactions
       "5542": 0, // Fuel transactions
+    },
+    redemptionRate: {
+      airMiles: 0.80,
+      cashValue: 0.50
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = indusIndCardRewards["Solitaire"].defaultRate;
@@ -1049,7 +1215,16 @@ export const indusIndCardRewards = {
       }
 
       const points = Math.floor(amount * rate) + bonusPoints;
-      return { points, rate, rateType, category, bonusPoints };
+
+      const cashbackValue = {
+        airMiles: points * indusIndCardRewards["Solitaire"].redemptionRate.airMiles,
+        cashValue: points * indusIndCardRewards["Solitaire"].redemptionRate.cashValue
+      };
+
+      const rewardText = `${points} Reward Points (${category})${bonusPoints ? ` including ${bonusPoints} bonus points` : ''} - Worth ₹${cashbackValue.cashValue.toFixed(2)} or ${cashbackValue.airMiles} Air Miles`;
+
+      return { points, rate, rateType, category, rewardText, bonusPoints, cashbackValue, cardType: indusIndCardRewards["Solitaire"].cardType };
+
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -1092,8 +1267,8 @@ export const indusIndCardRewards = {
       { threshold: Infinity, multiplier: 6 }
     ],
     redemptionRate: {
-      airmiles: 1.2, // 1 Reward Point = 1.2 Airmiles
-      cashCredit: 0.4 // 1 Reward Point = ₹ 0.40 (Cash credit)
+      airMiles: 1.2, // 1 Reward Point = 1.2 Airmiles
+      cashValue: 0.4 // 1 Reward Point = ₹ 0.40 (Cash credit)
     },
     mccRates: {
       "5541": 0, // Fuel transactions
@@ -1128,10 +1303,14 @@ export const indusIndCardRewards = {
       }
 
       const points = Math.floor(amount * rate * multiplier);
-      const airmiles = points * indusIndCardRewards["Tiger"].redemptionRate.airmiles;
-      const cashCredit = points * indusIndCardRewards["Tiger"].redemptionRate.cashCredit;
+      const cashbackValue = {
+        airMiles: points * indusIndCardRewards["Tiger"].redemptionRate.airMiles,
+        cashValue: points * indusIndCardRewards["Tiger"].redemptionRate.cashValue
+      };
 
-      return { points, rate, rateType, category, multiplier, airmiles, cashCredit };
+      const rewardText = `${points} Reward Points (${category}, ${multiplier}x multiplier) - Worth ₹${cashbackValue.cashValue.toFixed(2)} or ${cashbackValue.airMiles.toFixed(2)} Air Miles`;
+
+      return { points, rate, rateType, category, multiplier, rewardText, cashbackValue, cardType: indusIndCardRewards["Tiger"].cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -1159,7 +1338,7 @@ export const indusIndCardRewards = {
         onChange: (value) => onChange('isSpecialCategory', value === 'true')
       }
     ]
-  },
+  }
 };
 
 export const calculateIndusIndRewards = (cardName, amount, mcc, additionalParams = {}) => {
@@ -1167,112 +1346,18 @@ export const calculateIndusIndRewards = (cardName, amount, mcc, additionalParams
   if (!cardReward) {
     return {
       points: 0,
-      miles: 0,
+      cashback: 0,
       rewardText: "Card not found",
-      uncappedPoints: 0,
-      cappedPoints: 0,
-      appliedCap: null
+      category: "Unknown",
+      cashbackValue: 0,
+      cardType: "unknown",
     };
   }
 
-  const result = cardReward.calculateRewards(amount, mcc, additionalParams);
-
-  if (cardReward.cardType === "miles") {
-    return applyMilesCapping(result, cardReward, cardName);
-  } else {
-    return applyPointsCapping(result, cardReward, cardName);
-  }
+  return cardReward.calculateRewards(amount, mcc, additionalParams);
 };
 
-export const applyMilesCapping = (result, cardReward, cardName) => {
-  let { miles, rate, rateType, category } = result;
-  let cappedMiles = miles;
-  let appliedCap = null;
-
-  if (cardReward.capping && cardReward.capping.maxMiles) {
-    cappedMiles = Math.min(miles, cardReward.capping.maxMiles);
-    if (cappedMiles < miles) {
-      appliedCap = {
-        category: "Total Miles",
-        maxMiles: cardReward.capping.maxMiles,
-        period: cardReward.capping.period
-      };
-    }
-  }
-
-  const rewardText = generateMilesRewardText(cardName, cappedMiles, rate, rateType, category, appliedCap);
-
-  return {
-    miles: cappedMiles,
-    rewardText,
-    uncappedMiles: miles,
-    cappedMiles,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category
-  };
-};
-
-export const applyPointsCapping = (result, cardReward, cardName) => {
-  let { points, rate, rateType, category } = result;
-  let cappedPoints = points;
-  let appliedCap = null;
-
-  if (cardReward.capping && cardReward.capping.maxPoints) {
-    cappedPoints = Math.min(points, cardReward.capping.maxPoints);
-    if (cappedPoints < points) {
-      appliedCap = {
-        category: "Total Points",
-        maxPoints: cardReward.capping.maxPoints,
-        period: cardReward.capping.period
-      };
-    }
-  }
-
-  const rewardText = generatePointsRewardText(cardName, cappedPoints, rate, rateType, category, appliedCap);
-
-  return {
-    points: cappedPoints,
-    rewardText,
-    uncappedPoints: points,
-    cappedPoints,
-    appliedCap,
-    rateUsed: rate,
-    rateType,
-    category
-  };
-};
-
-export const generateMilesRewardText = (cardName, miles, rate, rateType, category, appliedCap) => {
-  let rewardText = `${miles} Miles`;
-
-  if (category !== "Other Spends") {
-    rewardText += ` (${category})`;
-  }
-
-  if (appliedCap) {
-    rewardText += ` (Capped at ${appliedCap.maxMiles} miles per ${appliedCap.period})`;
-  }
-
-  return rewardText;
-};
-
-const generatePointsRewardText = (cardName, points, rate, rateType, category, appliedCap) => {
-  let rewardText = `${points} Reward Points`;
-
-  if (category !== "Other Spends") {
-    rewardText += ` (${category})`;
-  }
-
-  if (appliedCap) {
-    rewardText += ` (Capped at ${appliedCap.maxPoints} points per ${appliedCap.period})`;
-  }
-
-  return rewardText;
-};
-
-export const getIndusIndCardInputs = (cardName, currentInputs, onChange) => {
+export const getCardInputs = (cardName, currentInputs, onChange) => {
   const cardReward = indusIndCardRewards[cardName];
   return cardReward && cardReward.dynamicInputs ? cardReward.dynamicInputs(currentInputs, onChange) : [];
 };
