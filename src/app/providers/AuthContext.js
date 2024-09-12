@@ -12,11 +12,15 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
       if (user) {
+        setUser({
+          ...user,
+          isAnonymous: user.isAnonymous,
+        });
         const token = await getIdToken(user);
         setToken(token);
       } else {
+        setUser(null);
         setToken(null);
       }
       setLoading(false);
@@ -48,6 +52,17 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await signOut(auth);
+
+      if (typeof window !== 'undefined') {
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('userCardsCache_') || 
+              key.startsWith('userCardsCacheTimestamp_')) {
+            localStorage.removeItem(key);
+          }
+        });
+        localStorage.removeItem('calculationCount');
+      }
+      
     } catch (error) {
       console.error("Error signing out", error);
       throw error;

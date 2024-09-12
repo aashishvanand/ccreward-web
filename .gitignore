@@ -38,3 +38,4 @@ next-env.d.ts
 
 #tests
 error_log.json
+missing_cards.json

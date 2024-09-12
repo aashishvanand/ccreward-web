@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Box,
   Container,
@@ -22,12 +22,10 @@ import IncorrectRewardReportForm from "./IncorrectRewardReportForm";
 import { useCardSelection, useRewardCalculation } from "./CalculatorHooks";
 import { getCardConfig } from "./CalculatorHelpers";
 import ReactConfetti from "react-confetti";
+import { AnonymousConversionPrompt } from "./AnonymousConversionPrompt";
 
 function Calculator() {
-  const { mode, toggleTheme, theme } = useAppTheme();
   const { user, isAuthenticated, loading } = useAuth();
-  const router = useRouter();
-
   const [userCards, setUserCards] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -38,6 +36,7 @@ function Calculator() {
   });
   const [showConfetti, setShowConfetti] = useState(false);
   const [hasCalculated, setHasCalculated] = useState(false);
+  const conversionPromptRef = useRef(null);
 
   const {
     selectedBank,
@@ -69,6 +68,7 @@ function Calculator() {
   const [missingFormOpen, setMissingFormOpen] = useState(false);
   const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] =
     useState(false);
+    
 
   useEffect(() => {
     const fetchUserCards = async () => {
@@ -148,6 +148,9 @@ function Calculator() {
         setTimeout(() => setShowConfetti(false), 5000);
         setHasCalculated(true);
       }
+      if (user && user.isAnonymous && conversionPromptRef.current) {
+        conversionPromptRef.current.incrementCalculationCount();
+      }
     } else {
       setSnackbar({
         open: true,
@@ -222,6 +225,8 @@ function Calculator() {
           </>
         )}
       </Container>
+
+      <AnonymousConversionPrompt ref={conversionPromptRef} />
 
       <MissingBankCardForm
         open={missingFormOpen}

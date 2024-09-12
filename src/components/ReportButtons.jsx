@@ -20,7 +20,7 @@ const ReportButtons = ({ calculationPerformed, onMissingFormOpen, onIncorrectRew
           onClick={onMissingFormOpen}
           sx={{ mt: 2 }}
         >
-          Bank or Card Missing?
+          Bank or Card / MCC Missing?
         </Button>
       )}
     </>
