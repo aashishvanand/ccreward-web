@@ -258,7 +258,7 @@ export const axisCardRewards = {
       const cashbackValue = {
         cashValue: points * axisCardRewards.Aura.redemptionRate.cashValue
       };
-      const rewardText = `${points} EDGE REWARDS Points (${category}) - Worth ₹${cashbackValue.toFixed(2)}`;
+      const rewardText = `${points} EDGE REWARDS Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
 
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards.Aura.cardType };
     },
@@ -448,7 +448,7 @@ export const axisCardRewards = {
       const cashbackValue = {
         cashValue: points * axisCardRewards["Flipkart Super Elite"].redemptionRate.cashValue
       };
-      const rewardText = `${points} SuperCoins (${category}) - Worth ₹${cashbackValue.toFixed(2)}`;
+      const rewardText = `${points} SuperCoins (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
 
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards["Flipkart Super Elite"].cardType };
     },
@@ -524,7 +524,7 @@ export const axisCardRewards = {
       const cashbackValue = {
         cashValue: points * axisCardRewards["Indian Oil"].redemptionRate.cashValue
       };
-      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.toFixed(2)}`;
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
 
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards["Indian Oil"].cardType };
     },
@@ -584,7 +584,7 @@ export const axisCardRewards = {
       const cashbackValue = {
         cashValue: points * axisCardRewards["Indian Oil Premium"].redemptionRate.cashValue
       };
-      const rewardText = `${points} EDGE MILES (${category}) - Worth ₹${cashbackValue.toFixed(2)}`;
+      const rewardText = `${points} EDGE MILES (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
 
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards["Indian Oil Premium"].cardType };
     },
@@ -665,7 +665,7 @@ export const axisCardRewards = {
       const cashbackValue = {
         cashValue: points * axisCardRewards.Magnus.redemptionRate.cashValue
       };
-      const rewardText = `${points} EDGE Reward Points (${category}) - Worth ₹${cashbackValue.toFixed(2)}`;
+      const rewardText = `${points} EDGE Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
 
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards.Magnus.cardType };
     },
@@ -705,7 +705,7 @@ export const axisCardRewards = {
       const cashbackValue = {
         cashValue: points * axisCardRewards.MyZone.redemptionRate.cashValue
       };
-      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.toFixed(2)}`;
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards.MyZone.cardType };
     },
     dynamicInputs: () => []
@@ -725,7 +725,7 @@ export const axisCardRewards = {
       const cashbackValue = {
         cashValue: points * axisCardRewards.Neo.redemptionRate.cashValue
       };
-      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.toFixed(2)}`;
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards.Neo.cardType };
     },
     dynamicInputs: () => []
@@ -760,7 +760,7 @@ export const axisCardRewards = {
       const cashbackValue = {
         cashValue: points * axisCardRewards.Privilege.redemptionRate.cashValue
       };
-      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.toFixed(2)}`;
+      const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
 
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards.Privilege.cardType };
     },
@@ -805,7 +805,7 @@ export const axisCardRewards = {
       const cashbackValue = {
         cashValue: points * axisCardRewards.Reserve.redemptionRate.cashValue
       };
-      const rewardText = `${points} Edge Points (${category}) - Worth ₹${cashbackValue.toFixed(2)}`;
+      const rewardText = `${points} Edge Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
 
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards.Reserve.cardType };
     },
@@ -850,7 +850,7 @@ export const axisCardRewards = {
       const cashbackValue = {
         cashValue: points * axisCardRewards.Rewards.redemptionRate.cashValue
       };
-      const rewardText = `${points} EDGE REWARD Points (${category}) - Worth ₹${cashbackValue.toFixed(2)}`;
+      const rewardText = `${points} EDGE REWARD Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
 
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards.Rewards.cardType };
     },
@@ -912,7 +912,7 @@ export const axisCardRewards = {
       const cashbackValue = {
         cashValue: points * axisCardRewards.Select.redemptionRate.cashValue
       };
-      const rewardText = `${points} EDGE REWARD Points (${category}) - Worth ₹${cashbackValue.toFixed(2)}`;
+      const rewardText = `${points} EDGE REWARD Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
 
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards.Select.cardType };
     },
@@ -1157,7 +1157,7 @@ export const axisCardRewards = {
       const cashbackValue = {
         cashValue: points * axisCardRewards.Horizon.redemptionRate.cashValue
       };
-      const rewardText = `${points} EDGE Miles (${category}) - Worth ₹${cashbackValue.toFixed(2)}`;
+      const rewardText = `${points} EDGE Miles (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
 
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards.Horizon.cardType };
     },
