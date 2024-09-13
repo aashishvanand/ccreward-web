@@ -206,20 +206,7 @@ const BestCardCalculator = () => {
     }
 
     if (method === "default") {
-      switch (reward.cardType) {
-        case "points":
-          return `${reward.points} points`;
-        case "miles":
-          return `${reward.miles} miles`;
-        case "cashback":
-          return `₹${reward.cashback.toFixed(2)}`;
-        case "hybrid":
-          return reward.points
-            ? `${reward.points} points`
-            : `₹${reward.cashback.toFixed(2)}`;
-        default:
-          return "No rewards";
-      }
+      return reward.rewardText;
     } else {
       // cashback value sort
       switch (reward.cardType) {

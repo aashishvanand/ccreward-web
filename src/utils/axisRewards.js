@@ -23,9 +23,10 @@ export const axisCardRewards = {
     },
     capping: {
       categories: {
-        "Google Pay and Food Delivery": { cashback: 500, maxSpent: 10000 },
-        "Google Pay Bill Payments": { cashback: 500, maxSpent: 10000 }
-      }
+        "Google Pay and Food Delivery": { cashback: 500, maxSpent: 10000, period: "monthly" },
+        "Google Pay Bill Payments": { cashback: 500, maxSpent: 10000, period: "monthly" }
+      },
+      overall: { cashback: 500, period: "monthly" }
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = axisCardRewards.ACE.defaultRate;
@@ -34,7 +35,7 @@ export const axisCardRewards = {
 
       if (additionalParams.isGooglePay && ["4814", "4816", "4899", "4900"].includes(mcc)) {
         rate = axisCardRewards.ACE.googlePayRate;
-        category = "Google Pay and Food Delivery";
+        category = "Google Pay Bill Payments";
         rateType = "google-pay";
       } else if (axisCardRewards.ACE.mccRates[mcc] !== undefined) {
         rate = axisCardRewards.ACE.mccRates[mcc];
@@ -50,11 +51,14 @@ export const axisCardRewards = {
 
       let cashback = amount * rate;
 
-      // Apply capping
-      if (axisCardRewards.ACE.capping.categories[category]) {
-        const cap = axisCardRewards.ACE.capping.categories[category];
-        cashback = Math.min(cashback, cap.cashback);
+      // Apply category-specific capping
+      const cappingCategory = axisCardRewards.ACE.capping.categories[category];
+      if (cappingCategory) {
+        cashback = Math.min(cashback, cappingCategory.cashback, cappingCategory.maxSpent * rate);
       }
+
+      // Apply overall monthly capping
+      cashback = Math.min(cashback, axisCardRewards.ACE.capping.overall.cashback);
 
       const rewardText = `₹${cashback.toFixed(2)} Cashback (${category})`;
 
@@ -188,38 +192,60 @@ export const axisCardRewards = {
     redemptionRate: {
       airMiles: 2, // 1 Reward Point = 2 Air mile
     },
-    calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = axisCardRewards.Atlas.defaultRate;
+    calculateRewards: function(amount, mcc, additionalParams) {
+      const isTravelMcc = function(mccCode) {
+        const mccNum = parseInt(mccCode, 10);
+        return (
+          (mccNum >= 3000 && mccNum <= 3350 && mccNum !== 3099) ||
+          (mccNum >= 3501 && mccNum <= 3638) ||
+          mccCode === "7011" ||
+          mccCode === "4511"
+        );
+      };
+
+      let rate = this.defaultRate;
       let category = "Other Spends";
       let rateType = "default";
 
-      if (axisCardRewards.Atlas.mccRates[mcc]) {
-        rate = axisCardRewards.Atlas.travelRate;
+      if (isTravelMcc(mcc)) {
+        rate = this.travelRate;
         category = "Travel";
         rateType = "travel";
+      } else if (this.mccRates[mcc] !== undefined) {
+        rate = this.mccRates[mcc];
+        rateType = "mcc-specific";
+        category = mcc === "6381" ? "Insurance" : (rate === 0 ? "Excluded Category" : "Category Spend");
       }
 
-      let points = Math.floor(amount * rate);
-
-      // Apply capping
+      let points = 0;
       if (category === "Travel") {
-        const capThreshold = axisCardRewards.Atlas.travelCapThreshold;
-        if (amount > capThreshold) {
-          const pointsBelowCap = Math.floor(capThreshold * rate);
-          const pointsAboveCap = Math.floor((amount - capThreshold) * axisCardRewards.Atlas.travelRateAboveCap);
+        if (amount <= this.travelCapThreshold) {
+          points = Math.floor(amount * rate);
+        } else {
+          const pointsBelowCap = Math.floor(this.travelCapThreshold * rate);
+          const pointsAboveCap = Math.floor((amount - this.travelCapThreshold) * this.travelRateAboveCap);
           points = pointsBelowCap + pointsAboveCap;
         }
-        points = Math.min(points, axisCardRewards.Atlas.capping.categories.Travel.points);
+      } else {
+        points = Math.floor(amount * rate);
+      }
+
+      // Apply capping
+      if (this.capping.categories[category]) {
+        const cap = this.capping.categories[category];
+        points = Math.min(points, cap.points);
       }
 
       const cashbackValue = {
-        airMiles: points * axisCardRewards.Atlas.redemptionRate.airMiles
+        airMiles: points * this.redemptionRate.airMiles
       };
-      const rewardText = `${points} Atlas Points (${category}) - Worth ₹${cashbackValue.airMiles}`;
+      const rewardText = `${points} EDGE Miles (${category}) - Worth ${cashbackValue.airMiles.toFixed(2)} Air Miles`;
 
-      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards.Atlas.cardType };
+      return { points, rate, rateType, category, rewardText, cashbackValue, cardType: this.cardType };
     },
-    dynamicInputs: () => []
+    dynamicInputs: function() {
+      return [];
+    }
   },
   "Aura": {
     cardType: "points",
@@ -633,42 +659,43 @@ export const axisCardRewards = {
       cashValue: 0.20  // 1 point = ₹0.20
     },
     calculateRewards: (amount, mcc, additionalParams) => {
-      let rate = axisCardRewards.Magnus.defaultRate;
       let category = "Other Spends";
       let rateType = "default";
-
+      let rate = axisCardRewards.Magnus.defaultRate;
+      let points = 0;
+  
       if (additionalParams.isTravelEdgePortal) {
         const travelEdgeRewards = axisCardRewards.Magnus.acceleratedRewards.travelEdgePortal;
         rate = additionalParams.annualSpend <= travelEdgeRewards.tier1.threshold ? travelEdgeRewards.tier1.rate : travelEdgeRewards.tier2.rate;
         rateType = "travel-edge";
         category = "Travel Edge Portal";
-      } else if (additionalParams.annualSpend) {
-        const regularRewards = axisCardRewards.Magnus.acceleratedRewards.regularSpend;
-        rate = additionalParams.annualSpend <= regularRewards.tier1.threshold ? regularRewards.tier1.rate : regularRewards.tier2.rate;
-        rateType = additionalParams.annualSpend > regularRewards.tier1.threshold ? "accelerated" : "default";
-      }
-
-      if (mcc && axisCardRewards.Magnus.mccRates[mcc] !== undefined) {
+      } else if (mcc && axisCardRewards.Magnus.mccRates[mcc] !== undefined) {
         rate = axisCardRewards.Magnus.mccRates[mcc];
         rateType = "mcc-specific";
         category = mcc === "6513" ? "Rent" : (rate === 0 ? "Excluded Category" : "Category Spend");
+      } else {
+        // Apply tiered structure based on annual spend
+        rate = additionalParams.annualSpend <= axisCardRewards.Magnus.acceleratedRewards.regularSpend.tier1.threshold
+          ? axisCardRewards.Magnus.acceleratedRewards.regularSpend.tier1.rate
+          : axisCardRewards.Magnus.acceleratedRewards.regularSpend.tier2.rate;
+        rateType = additionalParams.annualSpend > axisCardRewards.Magnus.acceleratedRewards.regularSpend.tier1.threshold ? "accelerated" : "default";
       }
-
-      let points = Math.floor(amount * rate);
-
+  
+      points = Math.floor(amount * rate);
+  
       // Apply capping
       if (category === "Rent" && axisCardRewards.Magnus.capping.categories.Rent) {
         const cap = axisCardRewards.Magnus.capping.categories.Rent;
-        points = Math.min(points, cap.points, Math.floor(cap.maxSpent * rate));
+        points = Math.min(points, cap.points, Math.floor(cap.maxSpent * axisCardRewards.Magnus.defaultRate));
       }
-
+  
       const cashbackValue = {
         cashValue: points * axisCardRewards.Magnus.redemptionRate.cashValue,
         airMiles: points * axisCardRewards.Magnus.redemptionRate.airMiles
       };
-
+  
       const rewardText = `${points} EDGE Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)} or ${cashbackValue.airMiles.toFixed(2)} Air Miles`;
-
+  
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards.Magnus.cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
@@ -1446,10 +1473,10 @@ export const axisCardRewards = {
 
       if (additionalParams.isAirtelApp) {
         if (["4814", "4816", "4899", "4900"].includes(mcc)) {
-          rate = axisCardRewards.Airtel.airtelRate;
+          rate = axisCardRewards.Airtel.airtelTelecomRate;
           category = "Airtel Thanks App (Telecom)";
         } else {
-          rate = axisCardRewards.Airtel.airtelAppNonTelecomRate;
+          rate = axisCardRewards.Airtel.airtelNonTelecomRate;
           category = "Airtel Thanks App (Non-Telecom)";
         }
         rateType = "airtel-app";
@@ -1460,6 +1487,8 @@ export const axisCardRewards = {
           category = "Telecom/Utility Services";
         } else if (rate === 0) {
           category = "Excluded Category";
+        } else if (mcc === "5411") {
+          category = "Grocery";
         } else {
           category = "Preferred Merchant";
         }
@@ -1473,7 +1502,9 @@ export const axisCardRewards = {
         cashback = Math.min(cashback, cap.cashback);
       }
 
-      const rewardText = `₹${cashback.toFixed(2)} Cashback (${category})`;
+      const rewardText = rate === 0 
+        ? `No cashback for this transaction (${category})`
+        : `₹${cashback.toFixed(2)} Cashback (${category})`;
 
       return { cashback, rate, rateType, category, rewardText, cardType: axisCardRewards.Airtel.cardType };
     },
