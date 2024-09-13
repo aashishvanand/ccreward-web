@@ -11,6 +11,7 @@ import {
   Box,
   Tooltip,
   IconButton,
+  FormGroup,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 
@@ -21,9 +22,13 @@ const DynamicCardInputs = ({
   selectedMcc,
 }) => {
   const dynamicInputs =
-    cardConfig && typeof cardConfig.dynamicInputs === "function"
+    typeof cardConfig.dynamicInputs === "function"
       ? cardConfig.dynamicInputs(currentInputs, onChange, selectedMcc?.mcc)
-      : [];
+      : cardConfig.dynamicInputs;
+
+      if (!dynamicInputs || dynamicInputs.length === 0) {
+        return null;
+      }
 
   return (
     <>
@@ -110,15 +115,58 @@ const DynamicCardInputs = ({
                 component="fieldset"
                 sx={{ mt: 2, width: "100%" }}
               >
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={currentInputs[input.name] || false}
-                      onChange={(e) => input.onChange(e.target.checked)}
+                <Box display="flex" alignItems="center">
+                  <FormLabel component="legend">{input.label}</FormLabel>
+                  {input.helperText && (
+                    <Tooltip title={input.helperText}>
+                      <IconButton size="small">
+                        <InfoIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </Box>
+                <FormGroup>
+                  {input.options.map((option, optionIndex) => (
+                    <FormControlLabel
+                      key={optionIndex}
+                      control={
+                        <Checkbox
+                          checked={currentInputs[input.name]?.includes(
+                            option.value
+                          )}
+                          onChange={(e) => {
+                            const selectedValues =
+                              currentInputs[input.name] || [];
+                            if (e.target.checked) {
+                              if (
+                                selectedValues.length <
+                                (input.maxSelect || Infinity)
+                              ) {
+                                onChange(input.name, [
+                                  ...selectedValues,
+                                  option.value,
+                                ]);
+                              }
+                            } else {
+                              onChange(
+                                input.name,
+                                selectedValues.filter((v) => v !== option.value)
+                              );
+                            }
+                          }}
+                          disabled={
+                            !currentInputs[input.name]?.includes(
+                              option.value
+                            ) &&
+                            currentInputs[input.name]?.length >=
+                              (input.maxSelect || Infinity)
+                          }
+                        />
+                      }
+                      label={option.label}
                     />
-                  }
-                  label={input.label}
-                />
+                  ))}
+                </FormGroup>
               </FormControl>
             );
           default:

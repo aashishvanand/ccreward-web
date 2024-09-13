@@ -233,11 +233,15 @@ export const amexCardRewards = {
                 onChange: (value) => onChange('currentAnnualSpendRange', value)
             },
             {
-                type: 'checkbox',
+                type: 'radio',
                 label: 'Is this an Amazon Pay GYFTR transaction?',
                 name: 'isAmazonPayGYFTR',
+                options: [
+                    { label: 'Yes', value: true },
+                    { label: 'No', value: false }
+                ],
                 value: currentInputs.isAmazonPayGYFTR || false,
-                onChange: (value) => onChange('isAmazonPayGYFTR', value)
+                onChange: (value) => onChange('isAmazonPayGYFTR', value === 'true')
             }
         ]
     },
@@ -315,11 +319,15 @@ export const amexCardRewards = {
                 onChange: (value) => onChange('currentAnnualSpendRange', value)
             },
             {
-                type: 'checkbox',
+                type: 'radio',
                 label: 'Is this an Amazon Pay GYFTR transaction?',
                 name: 'isAmazonPayGYFTR',
+                options: [
+                    { label: 'Yes', value: true },
+                    { label: 'No', value: false }
+                ],
                 value: currentInputs.isAmazonPayGYFTR || false,
-                onChange: (value) => onChange('isAmazonPayGYFTR', value)
+                onChange: (value) => onChange('isAmazonPayGYFTR', value === 'true')
             }
         ]
     },

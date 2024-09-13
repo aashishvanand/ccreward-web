@@ -202,33 +202,49 @@ export const scCardRewards = {
       let rate = scCardRewards.Rewards.defaultRate;
       let category = "Retail Spend";
       let rateType = "default";
-
+    
       if (mcc && scCardRewards.Rewards.mccRates[mcc] !== undefined) {
         rate = scCardRewards.Rewards.mccRates[mcc];
         rateType = "mcc-specific";
         category = rate === 0 ? "Excluded Category" : "Government/Insurance Spend";
       }
-
-      if (additionalParams.monthlySpend && additionalParams.monthlySpend > scCardRewards.Rewards.acceleratedRewards.tier1.threshold) {
+    
+      if (additionalParams.monthlySpend > scCardRewards.Rewards.acceleratedRewards.tier1.threshold) {
         rate = scCardRewards.Rewards.acceleratedRewards.tier1.rate;
         rateType = "accelerated";
+        category = "Accelerated Spend";
       }
-
-      const points = Math.floor(amount * rate);
+    
+      let points = Math.floor(amount * rate);
+    
+      // Apply bonus points cap
+      if (rateType === "accelerated") {
+        const basePoints = Math.floor(amount * scCardRewards.Rewards.defaultRate);
+        const bonusPoints = Math.min(points - basePoints, scCardRewards.Rewards.rewardsCap.bonusPoints);
+        points = basePoints + bonusPoints;
+      }
+    
       const cashbackValue = {
         cashValue: points * scCardRewards.Rewards.redemptionRate.cashValue
       };
+    
       const rewardText = `${points} SC Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
-
+    
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: scCardRewards.Rewards.cardType };
     },
+    
     dynamicInputs: (currentInputs, onChange) => [
       {
-        type: 'number',
+        type: 'radio',
         label: 'Total monthly spend so far',
         name: 'monthlySpend',
+        options: [
+          { label: 'Up to ₹20,000', value: 0 },
+          { label: '₹20,001 - ₹50,000', value: 20001 },
+          { label: 'Above ₹50,000', value: 50001 }
+        ],
         value: currentInputs.monthlySpend || 0,
-        onChange: (value) => onChange('monthlySpend', parseFloat(value))
+        onChange: (value) => onChange('monthlySpend', parseInt(value))
       }
     ]
   }

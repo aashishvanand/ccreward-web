@@ -1,3 +1,4 @@
+import { mccList } from "../data/mccData";
 export const hdfcCardRewards = {
   "Pixel Go": {
     cardType: "cashback",
@@ -150,16 +151,22 @@ export const hdfcCardRewards = {
         onChange: (value) => onChange('isSmartbuy', value === 'true')
       },
       {
-        type: 'multiselect',
-        label: 'Selected Packs (Choose up to 2)',
+        type: 'checkbox',
+        label: 'Pixel Play Packs (Choose up to 2)',
         name: 'selectedPacks',
-        options: hdfcCardRewards["Pixel Play"].packs.map(pack => ({ label: pack.name, value: pack.name })),
+        options: [
+          { label: 'Dining & Entertainment', value: 'Dining & Entertainment' },
+          { label: 'Travel', value: 'Travel' },
+          { label: 'Grocery', value: 'Grocery' },
+          { label: 'Electronics', value: 'Electronics' },
+          { label: 'Fashion', value: 'Fashion' }
+        ],
         value: currentInputs.selectedPacks || [],
-        onChange: (value) => onChange('selectedPacks', value),
+        onChange: (selectedValues) => onChange('selectedPacks', selectedValues),
         maxSelect: 2
       },
       {
-        type: 'select',
+        type: 'radio',
         label: 'Selected E-commerce Merchant',
         name: 'selectedEcommerce',
         options: [
@@ -443,7 +450,7 @@ export const hdfcCardRewards = {
         onChange: (value) => onChange('isSmartBuy', value === 'true')
       },
       {
-        type: 'select',
+        type: 'radio',
         label: 'SmartBuy Category',
         name: 'smartbuyCategory',
         options: [
@@ -865,7 +872,7 @@ export const hdfcCardRewards = {
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
-        type: "radio",
+        type: 'radio',
         name: "isSmartbuy",
         label: "Is this a Smartbuy transaction?",
         options: [
@@ -875,7 +882,7 @@ export const hdfcCardRewards = {
         onChange: (value) => onChange("isSmartbuy", value === "true"),
       },
       {
-        type: "select",
+        type: 'radio',
         name: "smartbuyCategory",
         label: "Smartbuy Category",
         options: [
@@ -1688,7 +1695,7 @@ export const hdfcCardRewards = {
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
-        type: "radio",
+        type: 'radio',
         name: "isSmartbuy",
         label: "Is this a Smartbuy transaction?",
         options: [
@@ -1698,7 +1705,7 @@ export const hdfcCardRewards = {
         onChange: (value) => onChange("isSmartbuy", value === "true"),
       },
       {
-        type: "select",
+        type: 'radio',
         name: "smartbuyCategory",
         label: "Smartbuy Category",
         options: [
@@ -1977,19 +1984,25 @@ export const hdfcCardRewards = {
 
       return { cashback, rate, rateType, category, rewardText, cardType: hdfcCardRewards.Swiggy.cardType };
     },
-    dynamicInputs: (currentInputs, onChange) => [
-      {
-        type: 'radio',
-        label: 'Is this a Swiggy app transaction?',
-        name: 'isSwiggyTransaction',
-        options: [
-          { label: 'Yes', value: true },
-          { label: 'No', value: false }
-        ],
-        value: currentInputs.isSwiggyTransaction || false,
-        onChange: (value) => onChange('isSwiggyTransaction', value === 'true')
+    dynamicInputs: (currentInputs, onChange, selectedMcc) => {
+      const mccData = mccList.find(item => item.mcc === selectedMcc);
+      if (mccData && mccData.mcc === "5814" && mccData.knownMerchants.includes("Swiggy")) {
+        return [
+          {
+            type: 'radio',
+            label: 'Is this a Swiggy app transaction?',
+            name: 'isSwiggyTransaction',
+            options: [
+              { label: 'Yes', value: true },
+              { label: 'No', value: false }
+            ],
+            value: currentInputs.isSwiggyTransaction || false,
+            onChange: (value) => onChange('isSwiggyTransaction', value === 'true')
+          }
+        ];
       }
-    ]
+      return [];
+    }
   },
   "Tata Neu Infinity": {
     cardType: "points",

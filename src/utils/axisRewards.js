@@ -639,13 +639,13 @@ export const axisCardRewards = {
 
       if (additionalParams.isTravelEdgePortal) {
         const travelEdgeRewards = axisCardRewards.Magnus.acceleratedRewards.travelEdgePortal;
-        rate = amount <= travelEdgeRewards.tier1.threshold ? travelEdgeRewards.tier1.rate : travelEdgeRewards.tier2.rate;
+        rate = additionalParams.annualSpend <= travelEdgeRewards.tier1.threshold ? travelEdgeRewards.tier1.rate : travelEdgeRewards.tier2.rate;
         rateType = "travel-edge";
         category = "Travel Edge Portal";
       } else if (additionalParams.annualSpend) {
         const regularRewards = axisCardRewards.Magnus.acceleratedRewards.regularSpend;
-        rate = amount <= regularRewards.tier1.threshold ? regularRewards.tier1.rate : regularRewards.tier2.rate;
-        rateType = amount > regularRewards.tier1.threshold ? "accelerated" : "default";
+        rate = additionalParams.annualSpend <= regularRewards.tier1.threshold ? regularRewards.tier1.rate : regularRewards.tier2.rate;
+        rateType = additionalParams.annualSpend > regularRewards.tier1.threshold ? "accelerated" : "default";
       }
 
       if (mcc && axisCardRewards.Magnus.mccRates[mcc] !== undefined) {
@@ -663,9 +663,11 @@ export const axisCardRewards = {
       }
 
       const cashbackValue = {
-        cashValue: points * axisCardRewards.Magnus.redemptionRate.cashValue
+        cashValue: points * axisCardRewards.Magnus.redemptionRate.cashValue,
+        airMiles: points * axisCardRewards.Magnus.redemptionRate.airMiles
       };
-      const rewardText = `${points} EDGE Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+
+      const rewardText = `${points} EDGE Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)} or ${cashbackValue.airMiles.toFixed(2)} Air Miles`;
 
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards.Magnus.cardType };
     },
@@ -682,11 +684,16 @@ export const axisCardRewards = {
         onChange: (value) => onChange('isTravelEdgePortal', value === 'true')
       },
       {
-        type: 'number',
+        type: 'radio',
         label: 'Annual spend so far',
         name: 'annualSpend',
+        options: [
+          { label: 'Up to ₹150,000', value: 0 },
+          { label: '₹150,001 - ₹200,000', value: 150000 },
+          { label: 'Above ₹200,000', value: 200000 }
+        ],
         value: currentInputs.annualSpend || 0,
-        onChange: (value) => onChange('annualSpend', parseFloat(value))
+        onChange: (value) => onChange('annualSpend', parseInt(value))
       }
     ]
   },
@@ -897,32 +904,44 @@ export const axisCardRewards = {
       let rate = axisCardRewards.Select.defaultRate;
       let category = "Other Spends";
       let rateType = "default";
-
+  
       if (axisCardRewards.Select.mccRates[mcc] !== undefined) {
         rate = axisCardRewards.Select.mccRates[mcc];
         rateType = "mcc-specific";
         category = rate === 0 ? "Excluded Category" : "Retail Shopping";
-      } else if (amount <= axisCardRewards.Select.acceleratedRewards.tier1.threshold) {
-        rate = axisCardRewards.Select.acceleratedRewards.tier1.rate;
-        rateType = "accelerated";
-        category = "Accelerated Spend";
+      } else if (additionalParams.monthlySpend !== undefined) {
+        const totalSpend = additionalParams.monthlySpend + amount;
+        if (totalSpend <= axisCardRewards.Select.acceleratedRewards.tier1.threshold) {
+          rate = axisCardRewards.Select.acceleratedRewards.tier1.rate;
+          rateType = "accelerated";
+          category = "Accelerated Spend (Tier 1)";
+        } else {
+          rate = axisCardRewards.Select.acceleratedRewards.tier2.rate;
+          rateType = "accelerated";
+          category = "Accelerated Spend (Tier 2)";
+        }
       }
-
+  
       const points = Math.floor(amount * rate);
       const cashbackValue = {
         cashValue: points * axisCardRewards.Select.redemptionRate.cashValue
       };
       const rewardText = `${points} EDGE REWARD Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
-
+  
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards.Select.cardType };
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
-        type: 'number',
+        type: 'radio',
         label: 'Total monthly spend so far',
         name: 'monthlySpend',
+        options: [
+          { label: 'Up to ₹20,000', value: 0 },
+          { label: '₹20,001 - ₹50,000', value: 20000 },
+          { label: 'Above ₹50,000', value: 50000 }
+        ],
         value: currentInputs.monthlySpend || 0,
-        onChange: (value) => onChange('monthlySpend', parseFloat(value))
+        onChange: (value) => onChange('monthlySpend', parseInt(value))
       }
     ]
   },
@@ -1137,10 +1156,10 @@ export const axisCardRewards = {
       let rate = axisCardRewards.Horizon.defaultRate;
       let category = "Other Spends";
       let rateType = "default";
-
+    
       if (additionalParams.isTravelEdgePortal) {
         const travelEdgeRewards = axisCardRewards.Horizon.acceleratedRewards.travelEdgePortal;
-        rate = amount <= travelEdgeRewards.tier1.threshold ? travelEdgeRewards.tier1.rate : travelEdgeRewards.tier2.rate;
+        rate = additionalParams.monthlySpend <= travelEdgeRewards.tier1.threshold ? travelEdgeRewards.tier1.rate : travelEdgeRewards.tier2.rate;
         rateType = "travel-edge";
         category = "Travel Edge Portal";
       } else if (additionalParams.monthlySpend > axisCardRewards.Horizon.acceleratedRewards.regularSpend.tier1.threshold) {
@@ -1152,15 +1171,16 @@ export const axisCardRewards = {
         rateType = "mcc-specific";
         category = rate === 0 ? "Excluded Category" : "Travel";
       }
-
+    
       const points = Math.floor(amount * rate);
       const cashbackValue = {
-        cashValue: points * axisCardRewards.Horizon.redemptionRate.cashValue
+        airMiles: points * axisCardRewards.Horizon.redemptionRate.airMiles
       };
-      const rewardText = `${points} EDGE Miles (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
-
+      const rewardText = `${points} EDGE Miles (${category}) - Worth ${cashbackValue.airMiles.toFixed(2)} Air Miles`;
+    
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: axisCardRewards.Horizon.cardType };
     },
+    
     dynamicInputs: (currentInputs, onChange) => [
       {
         type: 'radio',
@@ -1174,11 +1194,16 @@ export const axisCardRewards = {
         onChange: (value) => onChange('isTravelEdgePortal', value === 'true')
       },
       {
-        type: 'number',
+        type: 'radio',
         label: 'Monthly spend so far',
         name: 'monthlySpend',
+        options: [
+          { label: 'Up to ₹150,000', value: 0 },
+          { label: '₹150,001 - ₹200,000', value: 150000 },
+          { label: 'Above ₹200,000', value: 200000 }
+        ],
         value: currentInputs.monthlySpend || 0,
-        onChange: (value) => onChange('monthlySpend', parseFloat(value))
+        onChange: (value) => onChange('monthlySpend', parseInt(value))
       }
     ]
   },

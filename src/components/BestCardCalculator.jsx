@@ -14,9 +14,13 @@ import {
   ToggleButtonGroup,
   Tooltip,
   IconButton,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
-import { calculateRewards } from "./CalculatorHelpers";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { calculateRewards, getCardConfig } from "./CalculatorHelpers";
 import Header from "./Header";
 import Footer from "./Footer";
 import { useAuth } from "../app/providers/AuthContext";
@@ -24,8 +28,11 @@ import { getCardsForUser } from "../utils/firebaseUtils";
 import { mccList } from "../data/mccData";
 import ReactConfetti from "react-confetti";
 import { renderCardList } from "./CardListRenderer";
+import DynamicCardInputs from "./DynamicCardInputs";
+import { useAppTheme } from "./ThemeRegistry";
 
 const BestCardCalculator = () => {
+  const { theme } = useAppTheme();
   const [userCards, setUserCards] = useState([]);
   const [selectedMcc, setSelectedMcc] = useState(null);
   const [spentAmount, setSpentAmount] = useState("");
@@ -44,6 +51,9 @@ const BestCardCalculator = () => {
   const [mccOptions, setMccOptions] = useState(mccList);
   const { user } = useAuth();
   const [sortMethod, setSortMethod] = useState("default");
+  const [advancedMode, setAdvancedMode] = useState(false);
+  const [cardConfigs, setCardConfigs] = useState({});
+  const [additionalInputs, setAdditionalInputs] = useState({});
 
   useEffect(() => {
     const fetchUserCards = async () => {
@@ -52,6 +62,7 @@ const BestCardCalculator = () => {
           setIsCardListLoading(true);
           const fetchedCards = await getCardsForUser(user.uid);
           setUserCards(fetchedCards);
+          await fetchCardConfigs(fetchedCards);
         } catch (error) {
           console.error("Error fetching user cards:", error);
           setSnackbar({
@@ -104,7 +115,7 @@ const BestCardCalculator = () => {
           card.cardName,
           selectedMcc,
           spentAmount,
-          {}
+          additionalInputs[`${card.bank}-${card.cardName}`] || {}
         );
         return { ...card, ...result };
       })
@@ -120,6 +131,61 @@ const BestCardCalculator = () => {
       setTimeout(() => setShowConfetti(false), 5000);
       setHasCalculated(true);
     }
+  };
+
+  const fetchCardConfigs = async (cards) => {
+    const configs = {};
+    for (const card of cards) {
+      try {
+        const config = await getCardConfig(card.bank, card.cardName);
+        if (config) {
+          configs[`${card.bank}-${card.cardName}`] = config;
+        }
+      } catch (error) {
+        console.error(
+          `Error fetching config for ${card.bank} ${card.cardName}:`,
+          error
+        );
+      }
+    }
+    setCardConfigs(configs);
+  };
+
+  const renderAdvancedModeContent = () => {
+    const cardsWithQuestions = Object.entries(cardConfigs).filter(
+      ([_, config]) => {
+        if (!config || typeof config.dynamicInputs !== 'function') {
+          return false;
+        }
+        const inputs = config.dynamicInputs({}, () => {}, selectedMcc?.mcc);
+        return inputs && inputs.length > 0;
+      }
+    );
+
+    if (cardsWithQuestions.length === 0) {
+      return <Typography>No additional questions available for your cards and the selected MCC.</Typography>;
+    }
+
+    return cardsWithQuestions.map(([cardKey, config]) => {
+      const dynamicInputs = config.dynamicInputs({}, () => {}, selectedMcc?.mcc);
+      if (!dynamicInputs || dynamicInputs.length === 0) {
+        return null;
+      }
+
+      return (
+        <Box key={cardKey} sx={{ mb: 2 }}>
+          <Typography variant="h6">{cardKey}</Typography>
+          <DynamicCardInputs
+            cardConfig={config}
+            onChange={(inputKey, value) =>
+              handleAdditionalInputChange(cardKey, inputKey, value)
+            }
+            currentInputs={additionalInputs[cardKey] || {}}
+            selectedMcc={selectedMcc}
+          />
+        </Box>
+      );
+    }).filter(Boolean);
   };
 
   const sortRewards = (rewards, method) => {
@@ -252,6 +318,16 @@ const BestCardCalculator = () => {
     }));
   };
 
+  const handleAdditionalInputChange = (cardKey, inputKey, value) => {
+    setAdditionalInputs((prevInputs) => ({
+      ...prevInputs,
+      [cardKey]: {
+        ...(prevInputs[cardKey] || {}),
+        [inputKey]: value,
+      },
+    }));
+  };
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Header />
@@ -296,6 +372,34 @@ const BestCardCalculator = () => {
           onChange={(e) => setSpentAmount(e.target.value)}
           required
         />
+        <Accordion
+          expanded={advancedMode}
+          onChange={() => setAdvancedMode(!advancedMode)}
+          sx={{
+            mt: 2,
+            mb: 2,
+            backgroundColor: theme.palette.background.paper,
+            "& .MuiAccordionSummary-root": {
+              backgroundColor:
+                theme.palette.mode === "light"
+                  ? theme.palette.grey[200]
+                  : theme.palette.grey[800],
+              color: theme.palette.text.primary,
+            },
+            "& .MuiAccordionSummary-expandIconWrapper": {
+              color: theme.palette.text.secondary,
+            },
+            "& .MuiAccordionDetails-root": {
+              backgroundColor: theme.palette.background.paper,
+              borderTop: `1px solid ${theme.palette.divider}`,
+            },
+          }}
+        >
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography>Advanced Mode</Typography>
+          </AccordionSummary>
+          <AccordionDetails>{renderAdvancedModeContent()}</AccordionDetails>
+        </Accordion>
         <Box
           sx={{
             display: "flex",
