@@ -617,7 +617,7 @@ export const idfcFirstCardRewards = {
       let rate = idfcFirstCardRewards.Mayura.defaultRate;
       let category = "Regular Spend";
       let rateType = "default";
-
+    
       if (additionalParams.isBirthday) {
         rate = idfcFirstCardRewards.Mayura.acceleratedRate;
         category = "Birthday Spend";
@@ -639,16 +639,17 @@ export const idfcFirstCardRewards = {
           rateType = "excluded";
         }
       }
-
+    
       const points = Math.floor(amount * rate);
       const cashbackValue = {
         cashValue: points * idfcFirstCardRewards.Mayura.redemptionRate.cashValue
       };
-
+    
       const rewardText = `${points} IDFC First Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
-
+    
       return { points, rate, rateType, category, cashbackValue, rewardText, cardType: idfcFirstCardRewards["Mayura"].cardType };
     },
+    
     dynamicInputs: (currentInputs, onChange) => [
       {
         type: 'radio',
@@ -662,15 +663,19 @@ export const idfcFirstCardRewards = {
         onChange: (value) => onChange('isBirthday', value === 'true')
       },
       {
-        type: 'number',
+        type: 'radio',
         label: 'Total monthly spend so far',
         name: 'monthlySpend',
+        options: [
+          { label: 'Up to ₹20,000', value: 0 },
+          { label: '₹20,001 - ₹50,000', value: 20001 },
+          { label: 'Above ₹50,000', value: 50001 }
+        ],
         value: currentInputs.monthlySpend || 0,
-        onChange: (value) => onChange('monthlySpend', parseFloat(value))
+        onChange: (value) => onChange('monthlySpend', parseInt(value))
       }
     ]
   },
-
   "Ashva": {
     cardType: "points",
     defaultRate: 5 / 150, // 5X reward points on spends up to ₹20,000
@@ -699,7 +704,7 @@ export const idfcFirstCardRewards = {
       let rate = idfcFirstCardRewards.Ashva.defaultRate;
       let category = "Regular Spend";
       let rateType = "default";
-
+    
       if (additionalParams.isBirthday) {
         rate = idfcFirstCardRewards.Ashva.acceleratedRate;
         category = "Birthday Spend";
@@ -721,16 +726,17 @@ export const idfcFirstCardRewards = {
           rateType = "excluded";
         }
       }
-
+    
       const points = Math.floor(amount * rate);
       const cashbackValue = {
         cashValue: points * idfcFirstCardRewards.Ashva.redemptionRate.cashValue
       };
-
+    
       const rewardText = `${points} IDFC First Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
-
+    
       return { points, rate, rateType, category, cashbackValue, rewardText, cardType: idfcFirstCardRewards["Ashva"].cardType };
     },
+    
     dynamicInputs: (currentInputs, onChange) => [
       {
         type: 'radio',
@@ -744,11 +750,16 @@ export const idfcFirstCardRewards = {
         onChange: (value) => onChange('isBirthday', value === 'true')
       },
       {
-        type: 'number',
+        type: 'radio',
         label: 'Total monthly spend so far',
         name: 'monthlySpend',
+        options: [
+          { label: 'Up to ₹20,000', value: 0 },
+          { label: '₹20,001 - ₹50,000', value: 20001 },
+          { label: 'Above ₹50,000', value: 50001 }
+        ],
         value: currentInputs.monthlySpend || 0,
-        onChange: (value) => onChange('monthlySpend', parseFloat(value))
+        onChange: (value) => onChange('monthlySpend', parseInt(value))
       }
     ]
   }

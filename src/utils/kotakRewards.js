@@ -125,7 +125,7 @@ export const kotakCardRewards = {
         }
       },
       {
-        type: 'select',
+        type: 'radio',
         label: 'Total annual spend so far',
         name: 'totalAnnualSpend',
         options: [
@@ -340,7 +340,7 @@ export const kotakCardRewards = {
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
-        type: 'select',
+        type: 'radio',
         label: 'Total annual spend so far',
         name: 'annualSpend',
         options: [
@@ -400,7 +400,7 @@ export const kotakCardRewards = {
         onChange: (value) => onChange('isMetroSpend', value === 'true')
       },
       {
-        type: 'select',
+        type: 'radio',
         label: 'Current monthly Metro spend tier',
         name: 'spendTier',
         options: [
@@ -485,7 +485,7 @@ export const kotakCardRewards = {
         }
       },
       {
-        type: 'select',
+        type: 'radio',
         label: 'Total quarterly spend so far',
         name: 'quarterlySpend',
         options: [
@@ -594,7 +594,7 @@ export const kotakCardRewards = {
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
       const inputs = [
         {
-          type: 'select',
+          type: 'radio',
           label: 'Reward Plan',
           name: 'plan',
           options: [
@@ -605,7 +605,7 @@ export const kotakCardRewards = {
           onChange: (value) => onChange('plan', value)
         }
       ];
-
+    
       const travellerCategories = ["4511", "7011", "5309", "4722"]; // Airlines, Hotels, Duty Free, Travel Agencies
       if (currentInputs.plan === 'Traveller' && travellerCategories.includes(selectedMcc)) {
         inputs.push({
@@ -620,7 +620,7 @@ export const kotakCardRewards = {
           onChange: (value) => onChange('isInternational', value === 'true')
         });
       }
-
+    
       return inputs;
     }
   },
@@ -815,7 +815,7 @@ export const kotakCardRewards = {
         onChange: (value) => onChange('isInternational', value === 'true')
       },
       {
-        type: 'select',
+        type: 'radio',
         label: 'Total annual spend so far',
         name: 'totalAnnualSpend',
         options: [
@@ -892,7 +892,7 @@ export const kotakCardRewards = {
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
-        type: 'select',
+        type: 'radio',
         label: 'Current annual spend range',
         name: 'spendTier',
         options: [
@@ -951,7 +951,7 @@ export const kotakCardRewards = {
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
-        type: 'select',
+        type: 'radio',
         label: 'Current annual spend range',
         name: 'spendTier',
         options: [

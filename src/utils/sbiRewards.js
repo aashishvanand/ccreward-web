@@ -2058,7 +2058,7 @@ export const sbiCardRewards = {
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
-        type: 'select',
+        type: 'radio',
         label: 'Titan Brand',
         name: 'titanBrand',
         options: [

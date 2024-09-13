@@ -112,7 +112,7 @@ export const yesCardRewards = {
         onChange: (value) => onChange('isSelectedMerchant', value === 'true')
       },
       {
-        type: 'select',
+        type: 'radio',
         label: 'Select your BYOC plan',
         name: 'byocPlan',
         options: [

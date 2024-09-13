@@ -1002,7 +1002,7 @@ export const indusIndCardRewards = {
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
-        type: 'select',
+        type: 'radio',
         label: 'Select Reward Plan',
         name: 'selectedPlan',
         options: [
@@ -1015,7 +1015,7 @@ export const indusIndCardRewards = {
         onChange: (value) => onChange('selectedPlan', value)
       },
       {
-        type: 'select',
+        type: 'radio',
         label: 'Select Category',
         name: 'selectedCategory',
         options: (currentInputs) => {
@@ -1244,7 +1244,7 @@ export const indusIndCardRewards = {
         }
       },
       {
-        type: 'select',
+        type: 'radio',
         label: 'Total spend in first 30 days',
         name: 'totalSpend',
         options: [
@@ -1314,7 +1314,7 @@ export const indusIndCardRewards = {
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
-        type: 'select',
+        type: 'radio',
         label: 'Annual Spend so far',
         name: 'annualSpend',
         options: [

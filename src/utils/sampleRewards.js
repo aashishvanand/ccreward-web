@@ -22,6 +22,7 @@ export const standardizedCardStructure = {
             // Should return { reward, category, rewardText, cashbackValue }
         },
         dynamicInputs: (currentInputs, onChange) => [
+            //type: 'radio' | 'select' | 'checkbox'
             // Array of dynamic input objects
         ]
     }
