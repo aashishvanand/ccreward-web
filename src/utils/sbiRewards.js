@@ -72,7 +72,7 @@ export const sbiCardRewards = {
           category = "Air India Self Booking";
           rateType = "air-india-self";
         } else {
-          rate = sbiCardRewards["Air India Signature"].mccRates[mcc];
+          rate = sbiCardRewards["Air India Signature"].mccRates["3193"];
           category = "Air India Related";
           rateType = "air-india-related";
         }
@@ -83,7 +83,6 @@ export const sbiCardRewards = {
       const rewardText = `${miles} Flying Returns miles (${category})`;
 
       return { miles, rate, rateType, category, rewardText, cardType: sbiCardRewards["Air India Signature"].cardType };
-
     },
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
       if (["3020", "3193"].includes(selectedMcc)) {
@@ -261,7 +260,6 @@ export const sbiCardRewards = {
       }
 
       return { points, rate, rateType, category, rewardText, cashbackValue, surchargeWaiver, cardType: sbiCardRewards["BPCL"].cardType };
-
     },
     dynamicInputs: (currentInputs, onChange, selectedMcc) => {
       if (["5541", "5542"].includes(selectedMcc)) {
@@ -397,7 +395,9 @@ export const sbiCardRewards = {
       "4011": 0, "4112": 0,
       "5172": 0, "5541": 0, "5542": 0, "5983": 0,
       "6540": 0, "6541": 0, "6513": 0,
-      "7349": 0
+      "7349": 0,
+      "9311": 0
+      //fuel surcharge 5172, 5541, 5542 and 5983 - 1% 500INR-3000INR
     },
     maxCashback: 5000, // Maximum cashback per statement cycle
     calculateRewards: (amount, mcc, additionalParams) => {
@@ -1730,7 +1730,6 @@ export const sbiCardRewards = {
       const rewardText = `${points} Reward Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
 
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: sbiCardRewards["SimplyClick"].cardType };
-
     },
     dynamicInputs: (currentInputs, onChange) => [
       {
@@ -2153,7 +2152,7 @@ export const calculateSBIRewards = (cardName, amount, mcc, additionalParams = {}
       cashback: 0,
       rewardText: "Card not found",
       category: "Unknown",
-      cashbackValue: 0,
+      cashbackValue: { airMiles: 0, cashValue: 0 },
       cardType: "unknown",
     };
   }

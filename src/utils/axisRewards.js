@@ -1761,7 +1761,7 @@ export const calculateAxisRewards = (cardName, amount, mcc, additionalParams = {
       cashback: 0,
       rewardText: "Card not found",
       category: "Unknown",
-      cashbackValue: 0,
+      cashbackValue: { airMiles: 0, cashValue: 0 },
       cardType: "unknown",
     };
   }
