@@ -12,7 +12,7 @@ export const oneCardRewards = {
       // Add any other excluded MCCs for transfers here
     },
     redemptionRate: {
-      cashValue: 0.01  // 1 point = ₹0.25
+      cashValue: 0.10  // 1 point = ₹0.10 (10 paisa)
     },
     calculateRewards: (amount, mcc, additionalParams) => {
       let rate = oneCardRewards["One Card"].defaultRate;
@@ -33,17 +33,20 @@ export const oneCardRewards = {
         category = rate === 0 ? "Excluded Category" : "Category Spend";
       }
 
-      // Calculate points with fractional precision
+      // Calculate points
       let points = amount * rate;
 
       // Round to 2 decimal places for display
       points = Math.round(points * 100) / 100;
 
+      const cashbackValuePaisa = points * (oneCardRewards["One Card"].redemptionRate.cashValue * 100);
+      const cashbackValueRupees = cashbackValuePaisa / 100;
+
       const cashbackValue = {
-        cashValue: points * oneCardRewards["One Card"].redemptionRate.cashValue
+        cashValue: cashbackValueRupees
       };
 
-      const rewardText = `${points}  Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
+      const rewardText = `${points} Points (${category}) - Worth ₹${cashbackValue.cashValue.toFixed(2)}`;
 
       return { points, rate, rateType, category, rewardText, cashbackValue, cardType: oneCardRewards["One Card"].cardType };
     },
