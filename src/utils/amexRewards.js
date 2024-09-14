@@ -80,10 +80,10 @@ export const amexCardRewards = {
             let points = Math.floor(amount * rate);
 
             let milestonePoints = 0;
-            const monthlySpendRange = additionalParams.monthlySpendRange || '0-24999';
+            const monthlySpendRange = additionalParams.monthlySpendRange || '0-19999';
             const transactionsOver1500Range = additionalParams.transactionsOver1500Range || '0-3';
 
-            if (monthlySpendRange !== '0-20000') {
+            if (monthlySpendRange !== '0-19999') {
                 milestonePoints += 1000;
             }
             if (transactionsOver1500Range === '4+') {
@@ -166,7 +166,7 @@ export const amexCardRewards = {
     "Platinum Travel": {
         cardType: "points",
         defaultRate: 1 / 50,
-        amazonRate: 3 / 50,
+        amazonPayGYFTRRate: 3 / 50,
         mccRates: {
             "5541": 0, "5542": 0, "6300": 0, "6381": 0, "6399": 0, "4900": 0, "9311": 0,
             "5399": 3 / 50
@@ -191,22 +191,21 @@ export const amexCardRewards = {
             }
 
             if (additionalParams.isAmazonPayGYFTR) {
-                rate = amexCardRewards["Platinum Travel"].amazonRate;
+                rate = amexCardRewards["Platinum Travel"].amazonPayGYFTRRate;
                 category = "Amazon Pay GYFTR";
                 rateType = "special";
             }
 
             let points = Math.floor(amount * rate);
 
-            // Apply milestone bonus only if currentAnnualSpendRange is provided
-            if (additionalParams.currentAnnualSpendRange) {
-                const currentSpendRangeLower = parseInt(additionalParams.currentAnnualSpendRange.split('-')[0]);
-                const totalSpend = currentSpendRangeLower + amount;
-                for (let milestone of amexCardRewards["Platinum Travel"].milestones) {
-                    if (totalSpend >= milestone.spend && currentSpendRangeLower < milestone.spend) {
-                        points += milestone.bonus;
-                        break;
-                    }
+            // Apply milestone bonus
+            const currentSpendRangeLower = additionalParams.currentAnnualSpendRange ?
+                parseInt(additionalParams.currentAnnualSpendRange.split('-')[0]) : 0;
+            const totalSpend = currentSpendRangeLower + amount;
+            for (let milestone of amexCardRewards["Platinum Travel"].milestones) {
+                if (totalSpend >= milestone.spend && currentSpendRangeLower < milestone.spend) {
+                    points += milestone.bonus;
+                    break;
                 }
             }
 
@@ -412,7 +411,7 @@ export const calculateAmexRewards = (cardName, amount, mcc, additionalParams = {
             cashback: 0,
             rewardText: "Card not found",
             category: "Unknown",
-            cashbackValue: 0,
+            cashbackValue: { airMiles: 0, cashValue: 0 },
             cardType: "unknown",
         };
     }
