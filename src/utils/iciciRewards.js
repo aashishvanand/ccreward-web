@@ -681,7 +681,7 @@ export const calculateICICIRewards = (cardName, amount, mcc, additionalParams = 
   return cardReward.calculateRewards(amount, mcc, additionalParams);
 };
 
-export const getAxisCardInputs = (cardName, currentInputs, onChange, selectedMcc) => {
+export const getCardInputs = (cardName, currentInputs, onChange, selectedMcc) => {
   const cardReward = iciciCardRewards[cardName];
   return cardReward && cardReward.dynamicInputs ? cardReward.dynamicInputs(currentInputs, onChange, selectedMcc) : [];
 };
