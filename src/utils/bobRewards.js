@@ -704,7 +704,7 @@ export const calculateBOBRewards = (cardName, amount, mcc, additionalParams = {}
       points: 0,
       rewardText: "Card not found",
       category: "Unknown",
-      cashbackValue: { cashValue: 0 },
+      cashbackValue: { airMiles: 0, cashValue: 0 },
       cardType: "unknown"
     };
   }
