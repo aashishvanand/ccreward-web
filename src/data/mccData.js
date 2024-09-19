@@ -21,7 +21,7 @@ export const mccList = [
         "mcc": "0780",
         "industryname": "Agricultural Services",
         "merchantCategory": "General",
-        "name": "L&scape & Horticultural Services"
+        "name": "Landscape & Horticultural Services"
     },
     {
         "mcc": "1520",
@@ -4459,7 +4459,7 @@ export const mccList = [
         "industryname": "Clothing Stores",
         "merchantCategory": "General",
         "name": "Shoe Stores",
-        "knownMerchants": "Bata, Metro, Mochi, Clarks, Crocs, Hush Puppies, Lee Cooper, Red Tape, Woodl&"
+        "knownMerchants": "Bata, Metro, Mochi, Clarks, Crocs, Hush Puppies, Lee Cooper, Red Tape, Woodands"
     },
     {
         "mcc": "5681",

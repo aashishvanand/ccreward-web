@@ -1,4 +1,4 @@
-//TODOD add kotak - "Kotak Infinite", "Urbane", "Urbane Gold",
+//TODO: add kotak - "Kotak Infinite", "Urbane", "Urbane Gold",
 export const bankData = {
     "AMEX": ["Gold", "Membership Rewards", "Platinum", "Platinum Reserve", "Platinum Travel", "SmartEarn"],
     // "AU": ["Altura", "Altura Plus", "LIT", "Vetta", "Zenith"],
