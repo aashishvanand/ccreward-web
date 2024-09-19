@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -6,7 +6,9 @@ import {
   Snackbar,
   Alert,
   Link,
+  CircularProgress,
 } from "@mui/material";
+import { GoogleAdSense, AdUnit } from "next-google-adsense";
 import CalculatorForm from "./CalculatorForm";
 import CalculationResults from "./CalculationResults";
 import { useCardSelection, useRewardCalculation } from "./CalculatorHooks";
@@ -18,6 +20,8 @@ function EmbeddableCalculator() {
     message: "",
     severity: "info",
   });
+  const [showAd, setShowAd] = useState(false);
+  const [adTimer, setAdTimer] = useState(5);
 
   const {
     selectedBank,
@@ -55,6 +59,7 @@ function EmbeddableCalculator() {
 
   const handleCalculate = () => {
     if (spentAmount && parseFloat(spentAmount) > 0) {
+      setShowAd(true);
       calculateRewards();
     } else {
       setSnackbar({
@@ -72,8 +77,20 @@ function EmbeddableCalculator() {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  useEffect(() => {
+    let timer;
+    if (showAd && adTimer > 0) {
+      timer = setTimeout(() => setAdTimer(adTimer - 1), 1000);
+    } else if (showAd && adTimer === 0) {
+      setShowAd(false);
+      setAdTimer(5);
+    }
+    return () => clearTimeout(timer);
+  }, [showAd, adTimer]);
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <GoogleAdSense publisherId="pub-3745126880980552" />
       <Container component="main" sx={{ mt: 4, mb: 4 }}>
         <Typography variant="h4" gutterBottom>
           <Link
@@ -109,8 +126,31 @@ function EmbeddableCalculator() {
           getCardConfig={getCardConfig}
         />
 
-        {calculationPerformed && calculationResult && (
-          <CalculationResults result={calculationResult} />
+        {showAd ? (
+          <Box 
+          sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            minHeight: '250px', 
+            my: 2 
+          }}
+        >
+            <Typography variant="body2" gutterBottom>Ad will close in {adTimer} seconds</Typography>
+            <CircularProgress size={24} sx={{ mb: 2 }} />
+            <AdUnit
+              publisherId="pub-3745126880980552"
+              slotId="9483663491"
+              layout="display"
+              responsive
+              style={{ display: 'block', width: '100%' }}
+            />
+          </Box>
+        ) : (
+          calculationPerformed && calculationResult && (
+            <CalculationResults result={calculationResult} />
+          )
         )}
       </Container>
 
@@ -132,4 +172,4 @@ function EmbeddableCalculator() {
   );
 }
 
-export default EmbeddableCalculator
+export default EmbeddableCalculator;

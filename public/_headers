@@ -2,7 +2,12 @@
 /og.png
   Access-Control-Allow-Origin: *
 
-# Security headers for all pages
+# Allow framing for the embeddable calculator only from abc.com
+/embeddable-calculator
+  X-Frame-Options: ALLOW-FROM https://iframetester.com/
+  Content-Security-Policy: frame-ancestors 'self' https://iframetester.com/
+
+# Security headers for all other pages
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
