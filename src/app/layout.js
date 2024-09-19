@@ -27,7 +27,7 @@ export default function RootLayout({ children }) {
         <meta name="twitter:description" content="Compare, calculate, and choose the best credit card rewards with CCReward." />
         <meta name="twitter:image" content="https://ccreward.app/og.png" />
         <meta name="keywords" content="Credit Card Rewards, ccgeeks, Reward Calculator, Credit Card Points Calculator, AMEX, Axis Bank, BOB, HDFC, HSBC, ICICI, IDFC First, IndusInd, Kotak, OneCard, RBL, SBI, Scapia, Standard Chartered, Yes Bank, Kiwi, AU Bank, Platinum, Atlas, Diners Club, Infinia, Regalia, Swiggy, AmazonPay, Emeralde, Sapphiro, Vistara, BPCL, Cashback, Forex Card, RuPay, MCC, Merchant Category Code" />
-
+        <meta name="google-adsense-account" content="ca-pub-3745126880980552"/>
         <Script id="microsoft-clarity" strategy="afterInteractive">
           {`
       (function(c,l,a,r,i,t,y){
