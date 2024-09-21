@@ -21,12 +21,28 @@ export const standardizedCardStructure = {
             // Implementation specific to this card
             // Should return { reward, category, rewardText, cashbackValue }
         },
-        dynamicInputs: (currentInputs, onChange) => [
-            //type: 'radio' | 'select' | 'checkbox'
-            // Array of dynamic input objects
+        dynamicInputs: [
+            {
+                type: 'radio' | 'select' | 'checkbox',
+                label: 'Question Label',
+                name: 'questionName',
+                options: [
+                    { label: 'Option 1', value: 'value1' },
+                    { label: 'Option 2', value: 'value2' }
+                ],
+                defaultValue: 'defaultValue',
+                applicableMCCs: ['1234', '5678'],
+                applicableMerchants: ['Merchant1', 'Merchant2'],
+                dependsOn: {
+                    question: 'anotherQuestionName',
+                    value: 'specificValue'
+                }
+            }
+            // ... other dynamic input objects
         ]
     }
 };
+
 
 // Example usage
 export const exampleCardRewards = {
@@ -97,7 +113,7 @@ export const exampleCardRewards = {
 
             return { points, rate, rateType, category, rewardText, cashbackValue, cardType: exampleCardRewards.ExampleCard.cardType };
         },
-        dynamicInputs: (currentInputs, onChange) => [
+        dynamicInputs: [
             {
                 type: 'radio',
                 label: 'Is this a special promotion period?',
@@ -106,8 +122,36 @@ export const exampleCardRewards = {
                     { label: 'Yes', value: true },
                     { label: 'No', value: false }
                 ],
-                value: currentInputs.isPromotion || false,
-                onChange: (value) => onChange('isPromotion', value === 'true')
+                defaultValue: false,
+                applicableMCCs: [] // Applies to all MCCs
+            },
+            {
+                type: 'radio',
+                label: 'Is this a weekend transaction?',
+                name: 'isWeekend',
+                options: [
+                    { label: 'Yes', value: true },
+                    { label: 'No', value: false }
+                ],
+                defaultValue: false,
+                applicableMCCs: ['5812', '5813', '5814'] // Dining MCCs
+            },
+            {
+                type: 'select',
+                label: 'Spend Category',
+                name: 'spendCategory',
+                options: [
+                    { label: 'Domestic', value: 'domestic' },
+                    { label: 'International', value: 'international' }
+                ],
+                defaultValue: 'domestic',
+                applicableMCCs: ['4511', '7011', '5309', '4722'], // Travel-related MCCs
+                autoSelectRules: [
+                    {
+                        applicableMCCs: ['4511', '4722'],
+                        value: 'international'
+                    }
+                ]
             }
         ]
     }

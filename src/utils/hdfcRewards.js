@@ -2874,11 +2874,7 @@ export const calculateHDFCRewards = (cardName, amount, mcc, additionalParams = {
   return cardReward.calculateRewards(amount, mcc, additionalParams);
 };
 
-
-export const getCardInputs = (cardName, currentInputs, onChange) => {
+export const getCardInputs = (cardName, currentInputs, onChange, selectedMcc) => {
   const cardReward = hdfcCardRewards[cardName];
-  if (!cardReward || typeof cardReward.dynamicInputs !== 'function') {
-    return [];
-  }
-  return cardReward.dynamicInputs(currentInputs, onChange);
+  return cardReward && cardReward.dynamicInputs ? cardReward.dynamicInputs(currentInputs, onChange, selectedMcc) : [];
 };

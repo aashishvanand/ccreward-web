@@ -1769,7 +1769,7 @@ export const calculateAxisRewards = (cardName, amount, mcc, additionalParams = {
   return cardReward.calculateRewards(amount, mcc, additionalParams);
 };
 
-export const getAxisCardInputs = (cardName, currentInputs, onChange, selectedMcc) => {
+export const getCardInputs = (cardName, currentInputs, onChange, selectedMcc) => {
   const cardReward = axisCardRewards[cardName];
   return cardReward && cardReward.dynamicInputs ? cardReward.dynamicInputs(currentInputs, onChange, selectedMcc) : [];
 };

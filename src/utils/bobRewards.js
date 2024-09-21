@@ -712,10 +712,7 @@ export const calculateBOBRewards = (cardName, amount, mcc, additionalParams = {}
   return cardReward.calculateRewards(amount, mcc, additionalParams);
 };
 
-export const getCardInputs = (cardName, currentInputs, onChange) => {
+export const getCardInputs = (cardName, currentInputs, onChange, selectedMcc) => {
   const cardReward = bobCardRewards[cardName];
-  if (!cardReward || typeof cardReward.dynamicInputs !== 'function') {
-    return [];
-  }
-  return cardReward.dynamicInputs(currentInputs, onChange);
+  return cardReward && cardReward.dynamicInputs ? cardReward.dynamicInputs(currentInputs, onChange, selectedMcc) : [];
 };
