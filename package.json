@@ -26,7 +26,6 @@
     "@mui/icons-material": "^5.16.6",
     "@mui/material": "^5.16.6",
     "@mui/material-nextjs": "^5.16.6",
-    "@simplewebauthn/browser": "^10.0.0",
     "firebase": "^10.13.0",
     "next": "14.2.12",
     "next-google-adsense": "^1.0.9",
