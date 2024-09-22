@@ -17,7 +17,8 @@
     "dev": "next dev",
     "build": "next build && next-image-export-optimizer",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "npm install --include=optional sharp"
   },
   "dependencies": {
     "@emotion/cache": "^11.13.1",
@@ -26,13 +27,14 @@
     "@mui/icons-material": "^5.16.6",
     "@mui/material": "^5.16.6",
     "@mui/material-nextjs": "^5.16.6",
-    "firebase": "^10.13.0",
-    "next": "14.2.12",
+    "firebase": "^10.13.2",
+    "next": "14.2.13",
     "next-google-adsense": "^1.0.9",
-    "next-image-export-optimizer": "^1.14.1",
+    "next-image-export-optimizer": "^1.15.1",
     "react": "^18",
     "react-confetti": "^6.1.0",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
     "eslint": "^8",
