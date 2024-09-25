@@ -417,7 +417,7 @@ export const bobCardRewards = {
     dynamicInputs: (currentInputs, onChange) => [
       {
         type: 'radio',
-        label: 'Is this a Snapdealpurchase?',
+        label: 'Is this a Snapdeal Purchase?',
         name: 'isSnapdeal',
         options: [
           { label: 'Yes', value: true },

@@ -1788,7 +1788,6 @@ export const hdfcCardRewards = {
       points += weekendOfferReward;
 
       const cashbackValue = {
-        airMiles: NaN,
         cashValue: points * hdfcCardRewards["Shoppers Stop"].redemptionRate.cashValue
       };
 
@@ -1891,7 +1890,6 @@ export const hdfcCardRewards = {
       points += weekendOfferReward;
 
       const cashbackValue = {
-        airMiles: NaN,
         cashValue: points * hdfcCardRewards["Shoppers Stop Black"].redemptionRate.cashValue
       };
 
@@ -2178,7 +2176,6 @@ export const hdfcCardRewards = {
       }
 
       const cashbackValue = {
-        airMiles: NaN,
         cashValue: points * hdfcCardRewards["Tata Neu Plus"].redemptionRate.cashValue
       };
 
@@ -2258,7 +2255,6 @@ export const hdfcCardRewards = {
 
       const points = Math.floor(amount * rate);
       const cashbackValue = {
-        airMiles: NaN,
         cashValue: points * hdfcCardRewards.Times.redemptionRate.cashValue
       };
 
@@ -2383,7 +2379,6 @@ export const hdfcCardRewards = {
       let points = Math.floor(amount * rate);
 
       const cashbackValue = {
-        airMiles: NaN,
         cashValue: points * hdfcCardRewards["UPI RuPay"].redemptionRate.cashValue
       };
 

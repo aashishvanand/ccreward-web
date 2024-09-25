@@ -10,6 +10,12 @@ import { calculateSBIRewards } from "../utils/sbiRewards";
 import { calculateYESRewards } from "../utils/yesRewards";
 import { calculateKotakRewards } from "../utils/kotakRewards";
 import { calculateIndusIndRewards } from "../utils/indusindRewards";
+import { calculateCanaraRewards } from "@/utils/canaraRewards";
+import { calculateRBLRewards } from "@/utils/rblRewards";
+import { calculateDBSRewards } from "@/utils/dbsRewards";
+import { calculateBOBRewards } from "@/utils/bobRewards";
+import { calculateIDBIRewards } from "@/utils/idbiRewards";
+import { calculateAURewards } from "@/utils/auRewards";
 
 export const calculateRewards = (
   selectedBank,
@@ -105,6 +111,24 @@ export const calculateRewards = (
         additionalInputs
       );
       break;
+    case "Canara":
+      result = calculateCanaraRewards(selectedCard, amount, mcc, additionalInputs);
+      break;
+    case "RBL":
+      result = calculateRBLRewards(selectedCard, amount, mcc, additionalInputs);
+      break;
+    case "IDBI":
+      result = calculateIDBIRewards(selectedCard, amount, mcc, additionalInputs);
+      break;
+    case "DBS":
+      result = calculateDBSRewards(selectedCard, amount, mcc, additionalInputs);
+      break;
+    case "BOB":
+      result = calculateBOBRewards(selectedCard, amount, mcc, additionalInputs);
+      break;
+    case "AU":
+      result = calculateAURewards(selectedCard, amount, mcc, additionalInputs);
+      break;
     default:
       console.error("Unknown bank selected:", selectedBank);
       return null;
@@ -174,6 +198,30 @@ export const getCardConfig = (bank, card) => {
     case "IndusInd":
       return import("../utils/indusindRewards").then(
         (module) => module.indusIndCardRewards[card]
+      );
+    case "Canara":
+      return import("../utils/canaraRewards").then(
+        (module) => module.canaraCardRewards[card]
+      );
+      case "RBL":
+    return import("../utils/rblRewards").then(
+      (module) => module.rblCardRewards[card]
+    );
+    case "IDBI":
+    return import("../utils/idbiRewards").then(
+      (module) => module.idbiCardRewards[card]
+    );
+    case "DBS":
+    return import("../utils/dbsRewards").then(
+      (module) => module.dbsCardRewards[card]
+    );
+    case "BOB":
+      return import("../utils/bobRewards").then(
+        (module) => module.bobCardRewards[card]
+      );
+    case "AU":
+      return import("../utils/auRewards").then(
+        (module) => module.auBankCards[card]
       );
     default:
       console.error("Unknown bank selected:", bank);
