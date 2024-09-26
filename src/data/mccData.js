@@ -4286,7 +4286,7 @@ export const mccList = [
         "mcc": "5399",
         "industryname": "Retail Outlet Services",
         "merchantCategory": "General",
-        "name": "General Merch&ise Or Convenience Food Discount Stores",
+        "name": "General Merchandise Or Convenience Food Discount Stores",
         "knownMerchants": "Flipkart, Meesho, Amazon, Ajio"
     },
     {
@@ -4639,7 +4639,7 @@ export const mccList = [
         "mcc": "5931",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Secondh& Or Used Merch&ise Stores"
+        "name": "Secondh& Or Used Merchandise Stores"
     },
     {
         "mcc": "5932",
@@ -4923,7 +4923,7 @@ export const mccList = [
         "mcc": "6012",
         "industryname": "Miscellaneous Stores",
         "merchantCategory": "General",
-        "name": "Financial Institutions \u2013 Merch&ise & Services, Quasi Cash",
+        "name": "Financial Institutions \u2013 Merchandise & Services, Quasi Cash",
         "knownMerchants": "Paytm, PhonePe, Google Pay, Amazon Pay, Freecharge, Mobikwik, Airtel Payments Bank, Jio Payments Bank, PayZapp, BHIM, CRED, MobiKwik, PayZapp, BHIM, CRED"
     },
     {
