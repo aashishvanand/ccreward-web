@@ -96,14 +96,14 @@ For any commercial use of this project, including but not limited to using it as
 
 Regardless of whether you are using the project under the open source or commercial license, if you use, modify, or distribute this project, please provide attribution by including the following:
 
-1. The name of the project: Credit Card Rewards India Calculator
+1. The name of the project: ccreward.app
 2. The project's GitHub repository URL: https://github.com/aashishvanand/credit-card-rewards-web
 3. The name of the original author: Aashish Vivekanand
 
 Example attribution:
 
 ```
-This project is based on the Credit Card Rewards India Calculator (https://github.com/aashishvanand/credit-card-rewards-india-calculator) by Aashish Vivekanand.
+This project is based on the Credit Card Rewards (https://github.com/aashishvanand/credit-card-rewards-india-calculator) by Aashish Vivekanand.
 ```
 
 ---
