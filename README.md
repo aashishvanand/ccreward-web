@@ -1,12 +1,12 @@
-# Credit Card Rewards India Calculator
+# Credit Card Rewards
 
 ## Overview
 
-The Credit Card Rewards India Calculator is a comprehensive tool designed to help users optimize their credit card rewards across multiple banks and credit cards in India. This project aims to simplify the process of comparing rewards based on specific Merchant Category Codes (MCCs) and finding the best card for various spending patterns.
+The Credit Card Rewards is a comprehensive tool designed to help users optimize their credit card rewards across multiple banks and credit cards in India. This project aims to simplify the process of comparing rewards based on specific Merchant Category Codes (MCCs) and finding the best card for various spending patterns.
 
 ## Features
 
-- Multi-bank support: Calculate rewards for cards from AMEX, Axis Bank, BOB, HDFC, HSBC, ICICI, IDFC First, IndusInd, Kotak, OneCard, RBL, SBI, Scapia, Standard Chartered, Yes Bank and AU Bank.
+- Multi-bank support: Calculate rewards for cards from AMEX, Axis, AU, BOB, Canara, DBS, Federal, HDFC, HSBC, ICICI, IDFC First, IndusInd, Kotak, OneCard, RBL, SBI, SC, Yes.
 - MCC-based calculations: Accurately calculate rewards based on specific Merchant Category Codes.
 - User-friendly interface: Easy-to-use calculator with intuitive design.
 - Dark mode support: Toggle between light and dark themes for comfortable viewing.
@@ -34,10 +34,10 @@ The Credit Card Rewards India Calculator is a comprehensive tool designed to hel
 
 ```bash
 # Clone the repository
-git clone https://github.com/aashishvanand/credit-card-rewards-india-calculator.git
+git clone https://github.com/aashishvanand/credit-card-rewards-web.git
 
 # Navigate to the project directory
-cd credit-card-rewards-india-calculator
+cd credit-card-rewards-web
 
 # Install dependencies
 npm install
