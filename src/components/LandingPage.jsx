@@ -9,6 +9,8 @@ import {
   CircularProgress,
   useMediaQuery,
   useTheme,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -22,6 +24,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { bankData } from "../data/bankData";
 import ExportedImage from "next-image-export-optimizer";
+import { getCardsForUser } from "../utils/firebaseUtils";
 
 const banks = [
   "AMEX",
@@ -67,8 +70,7 @@ const getRandomCardImages = (count, excludeList = []) => {
 };
 
 export default function LandingPage() {
-  const { signInWithGoogle, signInAnonymously, isAuthenticated, loading } =
-    useAuth();
+  const { signInWithGoogle, signInAnonymously, user, isAuthenticated, loading, isNewUser } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -77,6 +79,8 @@ export default function LandingPage() {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [hasCheckedCards, setHasCheckedCards] = useState(false);
 
   const fetchCardImage = async (excludeList = []) => {
     const [randomCard] = getRandomCardImages(1, excludeList);
@@ -105,6 +109,31 @@ export default function LandingPage() {
       };
     });
   };
+
+  useEffect(() => {
+    const authenticated = isAuthenticated();
+    if (!loading && authenticated && user?.uid && !hasCheckedCards) {
+      const checkUserCards = async () => {
+        try {
+          const fetchedCards = await getCardsForUser(user.uid);
+          if (fetchedCards.length === 0) {
+            console.log('User has no cards, redirecting to My Cards page');
+            router.push('/my-cards', undefined, { shallow: true });
+          }
+        } catch (error) {
+          console.error("Error checking user cards:", error);
+          setSnackbar({
+            open: true,
+            message: "Error checking your cards. Please try again later.",
+            severity: "error"
+          });
+        } finally {
+          setHasCheckedCards(true);
+        }
+      };
+      checkUserCards();
+    }
+  }, [loading, isAuthenticated, user?.uid, router, hasCheckedCards]);
 
   useEffect(() => {
     const fetchCardImages = async () => {
@@ -141,6 +170,32 @@ export default function LandingPage() {
     } catch (error) {
       console.error("Error replacing failed card image:", error);
     }
+  };
+
+  const handleSignIn = async (signInMethod) => {
+    setIsLoading(true);
+    try {
+      await signInMethod();
+      setSnackbar({
+        open: true,
+        message: "Sign-in successful! You can now use all features of the app.",
+        severity: "success"
+      });
+      setHasCheckedCards(false); // Reset this so we check cards after new sign-in
+    } catch (error) {
+      console.error("Error signing in:", error);
+      setError("Failed to sign in. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbar({ ...snackbar, open: false });
   };
 
   return (
@@ -183,7 +238,7 @@ export default function LandingPage() {
                     variant="contained"
                     color="primary"
                     size="large"
-                    onClick={signInWithGoogle}
+                    onClick={() => handleSignIn(signInWithGoogle)}
                     disabled={isLoading}
                     startIcon={
                       isLoading && (
@@ -197,7 +252,7 @@ export default function LandingPage() {
                     variant="outlined"
                     color="primary"
                     size="large"
-                    onClick={signInAnonymously}
+                    onClick={() => handleSignIn(signInAnonymously)}
                     disabled={isLoading}
                   >
                     Continue Anonymously
@@ -384,6 +439,17 @@ export default function LandingPage() {
           </Box>
         </Container>
       </Box>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
 
       <Footer />
     </Box>

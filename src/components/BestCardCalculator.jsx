@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Typography,
@@ -17,19 +17,20 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Divider
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { calculateRewards, getCardConfig } from "./CalculatorHelpers";
 import Header from "./Header";
 import Footer from "./Footer";
 import { useAuth } from "../app/providers/AuthContext";
 import { getCardsForUser } from "../utils/firebaseUtils";
-import { mccList } from "../data/mccData";
 import ReactConfetti from "react-confetti";
 import { renderCardList } from "./CardListRenderer";
 import DynamicCardInputs from "./DynamicCardInputs";
 import { useAppTheme } from "./ThemeRegistry";
+import { fetchBestCardQuestions, calculateBestCard, fetchMCC } from "../utils/api";
+import _ from "lodash";
 
 const BestCardCalculator = () => {
   const { theme } = useAppTheme();
@@ -48,12 +49,14 @@ const BestCardCalculator = () => {
     message: "",
     severity: "info",
   });
-  const [mccOptions, setMccOptions] = useState(mccList);
+  const [mccOptions, setMccOptions] = useState([]);
   const { user } = useAuth();
-  const [sortMethod, setSortMethod] = useState("default");
   const [advancedMode, setAdvancedMode] = useState(false);
-  const [cardConfigs, setCardConfigs] = useState({});
+  const [cardQuestions, setCardQuestions] = useState({});
   const [additionalInputs, setAdditionalInputs] = useState({});
+  const [sortMethod, setSortMethod] = useState("points");
+  const [lastCalculationParams, setLastCalculationParams] = useState(null);
+  const [mccInputValue, setMccInputValue] = useState("");
 
   useEffect(() => {
     const fetchUserCards = async () => {
@@ -62,7 +65,7 @@ const BestCardCalculator = () => {
           setIsCardListLoading(true);
           const fetchedCards = await getCardsForUser(user.uid);
           setUserCards(fetchedCards);
-          await fetchCardConfigs(fetchedCards);
+          await fetchCardQuestions(fetchedCards);
         } catch (error) {
           console.error("Error fetching user cards:", error);
           setSnackbar({
@@ -80,24 +83,55 @@ const BestCardCalculator = () => {
     setHasCalculated(false);
   }, [user]);
 
-  const handleMccSearch = (event, value) => {
-    if (!value) {
-      setMccOptions(mccList);
-    } else {
-      const searchTerm = value.toLowerCase();
-      const filteredOptions = mccList.filter(
-        (option) =>
-          option.mcc.toLowerCase().includes(searchTerm) ||
-          option.name.toLowerCase().includes(searchTerm) ||
-          option.knownMerchants.some((merchant) =>
-            merchant.toLowerCase().includes(searchTerm)
-          )
-      );
-      setMccOptions(filteredOptions);
+  const fetchCardQuestions = async (cards) => {
+    try {
+      const cardsData = cards.map((card) => ({
+        bank: card.bank,
+        cardName: card.cardName,
+      }));
+      console.log("Sending cards data:", cardsData);
+      const questions = await fetchBestCardQuestions(cardsData);
+      console.log("Received questions:", questions);
+      setCardQuestions(Array.isArray(questions) ? questions : []);
+    } catch (error) {
+      console.error("Error fetching card questions:", error);
+      setSnackbar({
+        open: true,
+        message: "Error fetching card questions. Please try again.",
+        severity: "error",
+      });
+      setCardQuestions([]);
     }
   };
 
-  const handleCalculate = async () => {
+  const debouncedFetchMCC = useCallback(
+    _.debounce(async (value) => {
+      if (value) {
+        try {
+          const mccData = await fetchMCC(value);
+          console.log("Fetched MCC data:", mccData);
+          setMccOptions(mccData);
+        } catch (error) {
+          console.error("Error fetching MCC data:", error);
+          setMccOptions([]);
+        }
+      } else {
+        setMccOptions([]);
+      }
+    }, 300),
+    []
+  );
+
+  useEffect(() => {
+    debouncedFetchMCC(mccInputValue);
+    return () => debouncedFetchMCC.cancel();
+  }, [mccInputValue, debouncedFetchMCC]);
+
+  const handleMccInputChange = (event, newInputValue) => {
+    setMccInputValue(newInputValue);
+  };
+
+  const handleCalculate = useCallback(async () => {
     if (!spentAmount || parseFloat(spentAmount) <= 0) {
       setSnackbar({
         open: true,
@@ -107,189 +141,125 @@ const BestCardCalculator = () => {
       return;
     }
 
+    const calculationParams = {
+      cards: userCards.map((card) => ({
+        bank: card.bank,
+        cardName: card.cardName,
+      })),
+      mcc: selectedMcc ? selectedMcc.mcc : null,
+      amount: parseFloat(spentAmount),
+      answers: additionalInputs,
+    };
+
+    if (
+      JSON.stringify(calculationParams) ===
+      JSON.stringify(lastCalculationParams)
+    ) {
+      setSnackbar({
+        open: true,
+        message:
+          "Calculation parameters haven't changed. No need to recalculate.",
+        severity: "info",
+      });
+      return;
+    }
+
     setIsLoading(true);
-    const rewards = await Promise.all(
-      userCards.map(async (card) => {
-        const result = await calculateRewards(
-          card.bank,
-          card.cardName,
-          selectedMcc,
-          spentAmount,
-          additionalInputs[`${card.bank}-${card.cardName}`] || {}
-        );
-        return { ...card, ...result };
-      })
-    );
+    try {
+      const response = await calculateBestCard(calculationParams);
+      setCardRewards(response.rankingByPoints);
+      setIsCalculated(true);
+      setLastCalculationParams(calculationParams);
 
-    sortRewards(rewards, sortMethod);
-
-    setIsLoading(false);
-    setIsCalculated(true);
-
-    if (!hasCalculated) {
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 5000);
-      setHasCalculated(true);
-    }
-  };
-
-  const fetchCardConfigs = async (cards) => {
-    const configs = {};
-    for (const card of cards) {
-      try {
-        const config = await getCardConfig(card.bank, card.cardName);
-        if (config) {
-          configs[`${card.bank}-${card.cardName}`] = config;
-        }
-      } catch (error) {
-        console.error(
-          `Error fetching config for ${card.bank} ${card.cardName}:`,
-          error
-        );
+      if (!hasCalculated) {
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 5000);
+        setHasCalculated(true);
       }
+    } catch (error) {
+      console.error("Error calculating rewards:", error);
+      setSnackbar({
+        open: true,
+        message: "Error calculating rewards. Please try again.",
+        severity: "error",
+      });
+    } finally {
+      setIsLoading(false);
     }
-    setCardConfigs(configs);
-  };
+  }, [
+    spentAmount,
+    userCards,
+    selectedMcc,
+    additionalInputs,
+    lastCalculationParams,
+    hasCalculated,
+  ]);
 
   const renderAdvancedModeContent = () => {
-    const cardsWithQuestions = Object.entries(cardConfigs).filter(
-      ([_, config]) => {
-        if (!config || typeof config.dynamicInputs !== 'function') {
-          return false;
-        }
-        const inputs = config.dynamicInputs({}, () => {}, selectedMcc?.mcc);
-        return inputs && inputs.length > 0;
-      }
-    );
-
-    if (cardsWithQuestions.length === 0) {
-      return <Typography>No additional questions available for your cards and the selected MCC.</Typography>;
+    if (!Array.isArray(cardQuestions) || cardQuestions.length === 0) {
+      return <Typography>No additional questions available for your cards.</Typography>;
     }
 
-    return cardsWithQuestions.map(([cardKey, config]) => {
-      const dynamicInputs = config.dynamicInputs({}, () => {}, selectedMcc?.mcc);
-      if (!dynamicInputs || dynamicInputs.length === 0) {
-        return null;
+    const groupedQuestions = cardQuestions.reduce((acc, question) => {
+      const key = `${question.bank} - ${question.cardName}`;
+      if (!acc[key]) {
+        acc[key] = [];
       }
+      acc[key].push(question);
+      return acc;
+    }, {});
 
-      return (
-        <Box key={cardKey} sx={{ mb: 2 }}>
-          <Typography variant="h6">{cardKey}</Typography>
-          <DynamicCardInputs
-            cardConfig={config}
-            onChange={(inputKey, value) =>
-              handleAdditionalInputChange(cardKey, inputKey, value)
-            }
-            currentInputs={additionalInputs[cardKey] || {}}
-            selectedMcc={selectedMcc}
-          />
-        </Box>
-      );
-    }).filter(Boolean);
-  };
-
-  const sortRewards = (rewards, method) => {
-    let sortedRewards = rewards.map((reward) => ({
-      ...reward,
-      displayValue: calculateDisplayValue(reward, method),
-      sortValue: calculateSortValue(reward, method),
-    }));
-
-    sortedRewards.sort((a, b) => b.sortValue - a.sortValue);
-    setCardRewards(sortedRewards);
-  };
-
-  const calculateDisplayValue = (reward, method) => {
-    if (!reward.cardType) {
-      console.log("Card type is missing for reward:", reward);
-      return "Card type missing";
-    }
-
-    if (method === "default") {
-      return reward.rewardText;
-    } else {
-      // cashback value sort
-      switch (reward.cardType) {
-        case "points":
-          if (reward.cashbackValue?.cashValue) {
-            return `₹${reward.cashbackValue.cashValue.toFixed(2)} value`;
-          } else if (reward.cashbackValue?.airMiles) {
-            return `${reward.cashbackValue.airMiles} miles`;
-          }
-          return `${reward.points} points`;
-        case "miles":
-          return `${reward.miles} miles`;
-        case "cashback":
-          return `₹${reward.cashback.toFixed(2)} cashback`;
-        case "hybrid":
-          if (reward.points) {
-            if (reward.cashbackValue?.cashValue) {
-              return `₹${reward.cashbackValue.cashValue.toFixed(2)} value`;
-            } else if (reward.cashbackValue?.airMiles) {
-              return `${reward.cashbackValue.airMiles} miles`;
-            }
-            return `${reward.points} points`;
-          }
-          return `₹${reward.cashback.toFixed(2)} cashback`;
-        default:
-          return "No rewards";
-      }
-    }
-  };
-
-  const calculateSortValue = (reward, method) => {
-    if (!reward.cardType) {
-      console.log("Card type is missing for reward:", reward);
-      return 0;
-    }
-
-    if (method === "default") {
-      switch (reward.cardType) {
-        case "points":
-        case "miles":
-          return reward.points || reward.miles || 0;
-        case "cashback":
-        case "hybrid":
-          return reward.cashback || reward.points || 0;
-        default:
-          return 0;
-      }
-    } else {
-      // cashback value sort
-      switch (reward.cardType) {
-        case "points":
-          return (
-            reward.cashbackValue?.cashValue ||
-            reward.cashbackValue?.airMiles ||
-            reward.points ||
-            0
-          );
-        case "miles":
-          return reward.miles || 0;
-        case "hybrid":
-          if (reward.points) {
-            return (
-              reward.cashbackValue?.cashValue ||
-              reward.cashbackValue?.airMiles ||
-              reward.points ||
-              0
-            );
-          }
-          return reward.cashback || 0;
-        case "cashback":
-          return reward.cashback || 0;
-        default:
-          return 0;
-      }
-    }
+    return Object.entries(groupedQuestions).map(([cardKey, questions], index) => (
+      <Box key={cardKey} sx={{ mb: 4 }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>{cardKey}</Typography>
+        {questions.map((question, qIndex) => (
+          <Box key={qIndex} sx={{ mb: 2 }}>
+            <DynamicCardInputs
+              cardConfig={{ dynamicInputs: [question] }}
+              onChange={(inputKey, value) =>
+                handleAdditionalInputChange(cardKey, inputKey, value)
+              }
+              currentInputs={additionalInputs[cardKey] || {}}
+              selectedMcc={selectedMcc}
+            />
+          </Box>
+        ))}
+        {index < Object.entries(groupedQuestions).length - 1 && (
+          <Divider sx={{ my: 2 }} />
+        )}
+      </Box>
+    ));
   };
 
   const handleSortMethodChange = (event, newMethod) => {
     if (newMethod !== null) {
       setSortMethod(newMethod);
-      sortRewards(cardRewards, newMethod);
+      sortRewards(newMethod);
     }
   };
+
+  const sortRewards = useCallback(
+    (method) => {
+      const sortedRewards = [...cardRewards].sort((a, b) => {
+        if (method === "points") {
+          return (b.points || b.cashback || 0) - (a.points || a.cashback || 0);
+        } else {
+          return (
+            (b.cashbackValue?.cashValue || b.cashback || 0) -
+            (a.cashbackValue?.cashValue || a.cashback || 0)
+          );
+        }
+      });
+      setCardRewards(sortedRewards);
+    },
+    [cardRewards]
+  );
+
+  useEffect(() => {
+    if (cardRewards.length > 0) {
+      sortRewards(sortMethod);
+    }
+  }, [sortMethod, cardRewards, sortRewards]);
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -345,7 +315,7 @@ const BestCardCalculator = () => {
               fullWidth
             />
           )}
-          onInputChange={handleMccSearch}
+          onInputChange={handleMccInputChange}
           onChange={(event, newValue) => setSelectedMcc(newValue)}
           value={selectedMcc}
           filterOptions={(x) => x}
@@ -418,8 +388,8 @@ const BestCardCalculator = () => {
               onChange={handleSortMethodChange}
               aria-label="sort method"
             >
-              <ToggleButton value="default" aria-label="sort by default">
-                Sort by Points
+              <ToggleButton value="points" aria-label="sort by points">
+                Sort by Points/Cashback
               </ToggleButton>
               <ToggleButton
                 value="cashbackValue"

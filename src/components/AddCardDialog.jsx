@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -7,11 +7,60 @@ import {
   TextField,
   Button,
   MenuItem,
+  CircularProgress,
 } from "@mui/material";
-import { bankData } from "../data/bankData";
+import { fetchBanks, fetchCards } from "../utils/api";
 
 function AddCardDialog({ open, onClose, onAddCard }) {
   const [newCard, setNewCard] = useState({ bank: "", cardName: "" });
+  const [banks, setBanks] = useState([]);
+  const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (open) {
+      fetchBankList();
+    }
+  }, [open]);
+
+  const fetchBankList = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const bankList = await fetchBanks();
+      setBanks(bankList);
+    } catch (error) {
+      console.error("Error fetching banks:", error);
+      setError("Failed to fetch banks. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCardList = async (bank) => {
+    setLoading(true);
+    setError("");
+    try {
+      const cardList = await fetchCards(bank);
+      setCards(cardList);
+    } catch (error) {
+      console.error(`Error fetching cards for ${bank}:`, error);
+      setError("Failed to fetch cards. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBankChange = (e) => {
+    const selectedBank = e.target.value;
+    setNewCard({ bank: selectedBank, cardName: "" });
+    if (selectedBank) {
+      fetchCardList(selectedBank);
+    } else {
+      setCards([]);
+    }
+  };
 
   const handleAddCard = () => {
     onAddCard(newCard);
@@ -23,15 +72,18 @@ function AddCardDialog({ open, onClose, onAddCard }) {
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>Add New Card</DialogTitle>
       <DialogContent>
+        {loading && <CircularProgress />}
+        {error && <p style={{ color: "red" }}>{error}</p>}
         <TextField
           select
           label="Bank"
           value={newCard.bank}
-          onChange={(e) => setNewCard({ ...newCard, bank: e.target.value })}
+          onChange={handleBankChange}
           fullWidth
           margin="normal"
         >
-          {Object.keys(bankData).map((bank) => (
+          <MenuItem value="">Select a bank</MenuItem>
+          {banks.map((bank) => (
             <MenuItem key={bank} value={bank}>
               {bank}
             </MenuItem>
@@ -44,14 +96,14 @@ function AddCardDialog({ open, onClose, onAddCard }) {
           onChange={(e) => setNewCard({ ...newCard, cardName: e.target.value })}
           fullWidth
           margin="normal"
-          disabled={!newCard.bank}
+          disabled={!newCard.bank || loading}
         >
-          {newCard.bank &&
-            bankData[newCard.bank].map((card) => (
-              <MenuItem key={card} value={card}>
-                {card}
-              </MenuItem>
-            ))}
+          <MenuItem value="">Select a card</MenuItem>
+          {cards.map((card) => (
+            <MenuItem key={card} value={card}>
+              {card}
+            </MenuItem>
+          ))}
         </TextField>
       </DialogContent>
       <DialogActions>
@@ -60,7 +112,7 @@ function AddCardDialog({ open, onClose, onAddCard }) {
           onClick={handleAddCard}
           color="primary"
           variant="contained"
-          disabled={!newCard.bank || !newCard.cardName}
+          disabled={!newCard.bank || !newCard.cardName || loading}
         >
           Add Card
         </Button>

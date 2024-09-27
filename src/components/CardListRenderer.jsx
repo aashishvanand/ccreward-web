@@ -67,19 +67,12 @@ export const renderCardList = (
       ));
   }
 
-  return (isCalculated ? cardRewards : userCards).map((card, index) => (
-    <ListItem
-      key={card.id}
-      sx={{
-        mb: 2,
-        borderRadius: 1,
-      }}
-    >
+  return cardRewards.map((card, index) => (
+    <ListItem key={card.bank + card.cardName} sx={{ mb: 2, borderRadius: 1 }}>
       <Card
         sx={{
           width: "100%",
-          bgcolor:
-            isCalculated && index === 0 ? "success.light" : "background.paper",
+          bgcolor: index === 0 ? "success.light" : "background.paper",
         }}
       >
         <CardContent sx={{ display: "flex", alignItems: "center" }}>
@@ -104,29 +97,21 @@ export const renderCardList = (
                 variant="h6"
                 component="div"
                 sx={{
-                  color:
-                    isCalculated && index === 0
-                      ? "success.contrastText"
-                      : "text.primary",
+                  color: index === 0 ? "success.contrastText" : "text.primary",
                 }}
               >
-                {isCalculated
-                  ? `${index + 1}. ${card.bank} - ${card.cardName}`
-                  : `${card.bank} - ${card.cardName}`}
+                {`${index + 1}. ${card.bank} - ${card.cardName}`}
               </Typography>
             }
             secondary={
-              isCalculated ? (
-                <Typography
-                  variant="body1"
-                  sx={{
-                    color:
-                      index === 0 ? "success.contrastText" : "text.secondary",
-                  }}
-                >
-                  You earned {card.displayValue}
-                </Typography>
-              ) : null
+              <Typography
+                variant="body1"
+                sx={{
+                  color: index === 0 ? "success.contrastText" : "text.secondary",
+                }}
+              >
+                {card.rewardText}
+              </Typography>
             }
           />
         </CardContent>
@@ -134,3 +119,4 @@ export const renderCardList = (
     </ListItem>
   ));
 };
+

@@ -7,15 +7,16 @@ import {
   Snackbar,
   Alert,
   CircularProgress,
+  Paper,
 } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
-import { useRouter } from "next/navigation";
 import { useAuth } from "../app/providers/AuthContext";
 import {
   getCardsForUser,
   addCardForUser,
   deleteCardForUser,
 } from "../utils/firebaseUtils";
+import { notifyCardUpdate } from "../utils/events";
 import Header from "./Header";
 import CardList from "./CardList";
 import AddCardDialog from "./AddCardDialog";
@@ -30,27 +31,22 @@ function MyCardsPage() {
     severity: "info",
   });
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
-  const { user, isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading, isNewUser, markUserAsNotNew } = useAuth();
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const fetchCards = async () => {
       if (loading) return;
       if (!isAuthenticated()) {
-        router.push("/");
-      } else {
-        await fetchUserCards();
+        setIsLoading(false);
+        return;
       }
+      await fetchUserCards();
     };
-    checkAuth();
-  }, [isAuthenticated, router, user, loading]);
+    fetchCards();
+  }, [isAuthenticated, user, loading]);
 
   const fetchUserCards = async () => {
     if (!user) {
-      showSnackbar(
-        "Authentication error. Please try logging in again.",
-        "error"
-      );
       setIsLoading(false);
       return;
     }
@@ -58,7 +54,7 @@ function MyCardsPage() {
       const fetchedCards = await getCardsForUser(user.uid);
       setCards(fetchedCards);
     } catch (error) {
-      showSnackbar("Error fetching cards. Please try again later.", "error");
+      console.error("Error fetching cards:", error);
     } finally {
       setIsLoading(false);
     }
@@ -77,9 +73,14 @@ function MyCardsPage() {
       }
       await addCardForUser(user.uid, newCard);
       await fetchUserCards();
+      notifyCardUpdate();
       showSnackbar("Card added successfully", "success");
+      if (isNewUser) {
+        markUserAsNotNew();
+      }
     } catch (error) {
-      showSnackbar("Error adding card. Please try again later.", "error");
+      console.error("Error adding card:", error);
+      showSnackbar("Failed to add card. Please try again.", "error");
     }
   };
 
@@ -87,8 +88,10 @@ function MyCardsPage() {
     try {
       await deleteCardForUser(user.uid, cardId);
       await fetchUserCards();
+      notifyCardUpdate();
       showSnackbar("Card deleted successfully", "success");
     } catch (error) {
+      console.error("Error deleting card:", error);
       showSnackbar("Error deleting card. Please try again later.", "error");
     }
   };
@@ -115,7 +118,7 @@ function MyCardsPage() {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Header />
-      <Container sx={{ py: 4 }} maxWidth="lg">
+      <Container sx={{ py: 4, flexGrow: 1 }} maxWidth="lg">
         <Box
           sx={{
             display: "flex",
@@ -136,6 +139,20 @@ function MyCardsPage() {
             Add New Card
           </Button>
         </Box>
+        {cards.length === 0 ? (
+          <Typography variant="h6" sx={{ mb: 4, textAlign: 'center' }}>
+            Welcome! Let&apos;s start by adding your first credit card.
+          </Typography>
+        ) : cards.length === 1 ? (
+          <Paper elevation={3} sx={{ p: 3, mb: 4, bgcolor: 'info.light', color: 'info.contrastText' }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Great start! You&apos;ve added your first card.
+            </Typography>
+            <Typography>
+              Add one more card to use our &quot;Best Card&quot; feature and start comparing rewards!
+            </Typography>
+          </Paper>
+        ) : null}
         <CardList cards={cards} onDeleteCard={handleDeleteCard} />
       </Container>
       <AddCardDialog

@@ -12,6 +12,7 @@ import {
   Tooltip,
   IconButton,
   FormGroup,
+  Typography,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 
@@ -21,18 +22,29 @@ const DynamicCardInputs = ({
   currentInputs,
   selectedMcc,
 }) => {
-  const dynamicInputs =
-    typeof cardConfig.dynamicInputs === "function"
-      ? cardConfig.dynamicInputs(currentInputs, onChange, selectedMcc?.mcc)
-      : cardConfig.dynamicInputs;
+  const dynamicInputs = cardConfig.dynamicInputs;
 
-      if (!dynamicInputs || dynamicInputs.length === 0) {
-        return null;
-      }
+  if (!Array.isArray(dynamicInputs) || dynamicInputs.length === 0) {
+    return <Typography>No additional inputs available.</Typography>;
+  }
 
+  const handleInputChange = (inputName, value) => {
+    if (value === "true") {
+      value = true;
+    } else if (value === "false") {
+      value = false;
+    }
+    onChange(inputName, value);
+  };
   return (
     <>
       {dynamicInputs.map((input, index) => {
+        if (input.applicableMCCs && input.applicableMCCs.length > 0 && selectedMcc) {
+          if (!input.applicableMCCs.includes(selectedMcc.mcc)) {
+            return null;
+          }
+        }
+
         switch (input.type) {
           case "radio":
             return (
@@ -54,8 +66,10 @@ const DynamicCardInputs = ({
                 <RadioGroup
                   aria-label={input.name}
                   name={input.name}
-                  value={String(currentInputs[input.name])}
-                  onChange={(e) => input.onChange(e.target.value)}
+                  value={String(currentInputs[input.name] ?? "")}
+                  onChange={(e) =>
+                    handleInputChange(input.name, e.target.value)
+                  }
                   row
                 >
                   {input.options.map((option, optionIndex) => (
@@ -83,8 +97,10 @@ const DynamicCardInputs = ({
                   )}
                 </Box>
                 <Select
-                  value={currentInputs[input.name] || ""}
-                  onChange={(e) => input.onChange(e.target.value)}
+                  value={currentInputs[input.name] ?? ""}
+                  onChange={(e) =>
+                    handleInputChange(input.name, e.target.value)
+                  }
                   displayEmpty
                 >
                   <MenuItem value="">
@@ -131,36 +147,16 @@ const DynamicCardInputs = ({
                       key={optionIndex}
                       control={
                         <Checkbox
-                          checked={currentInputs[input.name]?.includes(
-                            option.value
+                          checked={Boolean(
+                            currentInputs[input.name]?.[option.value]
                           )}
                           onChange={(e) => {
-                            const selectedValues =
-                              currentInputs[input.name] || [];
-                            if (e.target.checked) {
-                              if (
-                                selectedValues.length <
-                                (input.maxSelect || Infinity)
-                              ) {
-                                onChange(input.name, [
-                                  ...selectedValues,
-                                  option.value,
-                                ]);
-                              }
-                            } else {
-                              onChange(
-                                input.name,
-                                selectedValues.filter((v) => v !== option.value)
-                              );
-                            }
+                            const newValue = {
+                              ...currentInputs[input.name],
+                              [option.value]: e.target.checked,
+                            };
+                            handleInputChange(input.name, newValue);
                           }}
-                          disabled={
-                            !currentInputs[input.name]?.includes(
-                              option.value
-                            ) &&
-                            currentInputs[input.name]?.length >=
-                              (input.maxSelect || Infinity)
-                          }
                         />
                       }
                       label={option.label}

@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { calculateRewards as calculateRewardsHelper } from './CalculatorHelpers';
 
 export const useCardSelection = () => {
   const [selectedBank, setSelectedBank] = useState('');
@@ -11,10 +10,12 @@ export const useCardSelection = () => {
   const handleBankChange = useCallback((newBank) => {
     setSelectedBank(newBank);
     setSelectedCard('');
+    setAdditionalInputs({});
   }, []);
 
   const handleCardChange = useCallback((newCard) => {
     setSelectedCard(newCard);
+    setAdditionalInputs({});
   }, []);
 
   const handleMccChange = useCallback((newMcc) => {
@@ -55,17 +56,6 @@ export const useRewardCalculation = (selectedBank, selectedCard, selectedMcc, sp
   const [calculationResult, setCalculationResult] = useState(null);
   const [calculationPerformed, setCalculationPerformed] = useState(false);
 
-  const calculateRewards = useCallback(() => {
-    if (!selectedBank || !selectedCard || !spentAmount) {
-      // Handle error
-      return;
-    }
-
-    const result = calculateRewardsHelper(selectedBank, selectedCard, selectedMcc, spentAmount, additionalInputs);
-    setCalculationResult(result);
-    setCalculationPerformed(true);
-  }, [selectedBank, selectedCard, selectedMcc, spentAmount, additionalInputs]);
-
   const clearForm = useCallback(() => {
     setCalculationResult(null);
     setCalculationPerformed(false);
@@ -74,7 +64,6 @@ export const useRewardCalculation = (selectedBank, selectedCard, selectedMcc, sp
   return {
     calculationResult,
     calculationPerformed,
-    calculateRewards,
     clearForm,
   };
 };

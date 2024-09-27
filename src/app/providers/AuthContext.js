@@ -9,19 +9,25 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isNewUser, setIsNewUser] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log("Auth state changed:", user);
       if (user) {
+        const isNew = user.metadata.creationTime === user.metadata.lastSignInTime;
+        console.log("Is new user:", isNew);
         setUser({
           ...user,
           isAnonymous: user.isAnonymous,
         });
         const token = await getIdToken(user);
         setToken(token);
+        setIsNewUser(isNew);
       } else {
         setUser(null);
         setToken(null);
+        setIsNewUser(false);
       }
       setLoading(false);
     });
@@ -32,6 +38,7 @@ export function AuthProvider({ children }) {
   const signInWithGoogle = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
+      console.log("Google sign-in result:", result);
       return result.user;
     } catch (error) {
       console.error("Error signing in with Google", error);
@@ -42,6 +49,7 @@ export function AuthProvider({ children }) {
   const signInAnonymously = async () => {
     try {
       const result = await firebaseSignInAnonymously(auth);
+      console.log("Anonymous sign-in result:", result);
       return result.user;
     } catch (error) {
       console.error("Error signing in anonymously", error);
@@ -53,6 +61,10 @@ export function AuthProvider({ children }) {
     try {
       await signOut(auth);
 
+      console.log("User signed out");
+      setUser(null);
+      setToken(null);
+      setIsNewUser(false);
       if (typeof window !== 'undefined') {
         Object.keys(localStorage).forEach(key => {
           if (key.startsWith('userCardsCache_') || 
@@ -73,6 +85,10 @@ export function AuthProvider({ children }) {
     return !!user;
   };
 
+  const markUserAsNotNew = () => {
+    setIsNewUser(false);
+  };
+
   const value = {
     user,
     token,
@@ -81,6 +97,8 @@ export function AuthProvider({ children }) {
     logout,
     isAuthenticated,
     loading,
+    isNewUser,
+    markUserAsNotNew,
   };
 
   return (
