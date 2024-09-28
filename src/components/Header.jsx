@@ -29,6 +29,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { getCardsForUser } from "../utils/firebaseUtils";
 import { onCardUpdate } from "../utils/events";
+import ExportedImage from "next-image-export-optimizer";
 
 function Header() {
   const { mode, toggleTheme } = useAppTheme();
@@ -119,7 +120,17 @@ function Header() {
           component="div"
           sx={{ display: "flex", alignItems: "center" }}
         >
-          <CreditCard sx={{ mr: 1 }} />
+         <Box sx={{ position: 'relative', width: 40, height: 40, mr: 1 }}>
+              <ExportedImage
+                src="/ccreward-logo.webp"
+                alt="CCReward Logo"
+                width={40}
+                height={40}
+                layout="responsive"
+                placeholder="empty"
+                priority
+              />
+            </Box>
           CCReward
         </Typography>
         
