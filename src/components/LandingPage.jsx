@@ -22,9 +22,10 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../app/providers/AuthContext";
 import Header from "./Header";
 import Footer from "./Footer";
-import { bankData } from "../data/bankData";
 import ExportedImage from "next-image-export-optimizer";
 import { getCardsForUser } from "../utils/firebaseUtils";
+import horizontalCardImages from "../data/horizontalCardImages.json";
+const BASE_URL = "https://ccreward.app";
 
 const banks = [
   "AMEX",
@@ -41,36 +42,20 @@ const banks = [
   "YESBANK",
 ];
 
-const getCardImagePath = (bank, cardName) => {
-  const formattedCardName = cardName.replace(/\s+/g, "_").toLowerCase();
-  return `/card-images/${bank}/${bank.toLowerCase()}_${formattedCardName}.webp`;
-};
-
-const getRandomCardImages = (count, excludeList = []) => {
-  const allCards = [];
-  Object.entries(bankData).forEach(([bank, cards]) => {
-    cards.forEach((card) => {
-      // Skip specific cards
-      if (
-        (bank === "HDFC" && card === "Pixel Go") ||
-        (bank === "HDFC" && card === "Regalia Gold") ||
-        (bank === "KOTAK" && card === "811 #DreamDifferent") ||
-        excludeList.some(
-          (excluded) => excluded.bank === bank && excluded.cardName === card
-        )
-      ) {
-        return;
-      }
-      allCards.push({ bank, cardName: card });
-    });
-  });
-
-  const shuffled = allCards.sort(() => 0.5 - Math.random());
+const getRandomCardImages = (count) => {
+  const shuffled = [...horizontalCardImages].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 };
 
 export default function LandingPage() {
-  const { signInWithGoogle, signInAnonymously, user, isAuthenticated, loading, isNewUser } = useAuth();
+  const {
+    signInWithGoogle,
+    signInAnonymously,
+    user,
+    isAuthenticated,
+    loading,
+    isNewUser,
+  } = useAuth();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -79,34 +64,35 @@ export default function LandingPage() {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
   const [hasCheckedCards, setHasCheckedCards] = useState(false);
 
-  const fetchCardImage = async (excludeList = []) => {
-    const [randomCard] = getRandomCardImages(1, excludeList);
-    if (!randomCard) return null; // No more cards available
+  useEffect(() => {
+    const randomCards = getRandomCardImages(3);
+    setCardImages(randomCards.map(card => ({
+      ...card,
+      id: Date.now() + Math.random(), // Unique id for each card
+      fullImagePath: `${BASE_URL}${card.imagePath}`
+    })));
+  }, []);
 
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.src = getCardImagePath(randomCard.bank, randomCard.cardName);
-
-      img.onload = () => {
-        if (img.width > img.height) {
-          resolve({ ...randomCard, id: Date.now() }); // Use timestamp as a unique id
-        } else {
-          // If the image is not horizontal, try again with this card excluded
-          fetchCardImage([...excludeList, randomCard])
-            .then(resolve)
-            .catch(reject);
-        }
-      };
-
-      img.onerror = () => {
-        // If there's an error loading the image, try again with this card excluded
-        fetchCardImage([...excludeList, randomCard])
-          .then(resolve)
-          .catch(reject);
-      };
+  const handleImageError = (failedCardId) => {
+    console.error(`Failed to load image for card ${failedCardId}`);
+    setCardImages(prevImages => {
+      const newImages = prevImages.filter(img => img.id !== failedCardId);
+      if (newImages.length < 3) {
+        const additionalCard = getRandomCardImages(1)[0];
+        newImages.push({
+          ...additionalCard,
+          id: Date.now() + Math.random(),
+          fullImagePath: `${BASE_URL}${additionalCard.imagePath}`
+        });
+      }
+      return newImages;
     });
   };
 
@@ -117,14 +103,14 @@ export default function LandingPage() {
         try {
           const fetchedCards = await getCardsForUser(user.uid);
           if (fetchedCards.length === 0) {
-            router.push('/my-cards', undefined, { shallow: true });
+            router.push("/my-cards", undefined, { shallow: true });
           }
         } catch (error) {
           console.error("Error checking user cards:", error);
           setSnackbar({
             open: true,
             message: "Error checking your cards. Please try again later.",
-            severity: "error"
+            severity: "error",
           });
         } finally {
           setHasCheckedCards(true);
@@ -134,43 +120,6 @@ export default function LandingPage() {
     }
   }, [loading, isAuthenticated, user?.uid, router, hasCheckedCards]);
 
-  useEffect(() => {
-    const fetchCardImages = async () => {
-      const horizontalCards = [];
-      const excludeList = [];
-
-      while (horizontalCards.length < 3) {
-        try {
-          const card = await fetchCardImage(excludeList);
-          if (!card) break; // No more cards available
-          horizontalCards.push(card);
-          excludeList.push(card);
-        } catch (error) {
-          console.error("Error fetching card image:", error);
-          break; // Exit the loop if we encounter an error
-        }
-      }
-
-      setCardImages(horizontalCards);
-    };
-
-    fetchCardImages();
-  }, []);
-
-  const handleImageError = async (failedCardId) => {
-    console.error(`Failed to load image for card ${failedCardId}`);
-    try {
-      const newCard = await fetchCardImage(cardImages);
-      if (newCard) {
-        setCardImages((prev) =>
-          prev.map((card) => (card.id === failedCardId ? newCard : card))
-        );
-      }
-    } catch (error) {
-      console.error("Error replacing failed card image:", error);
-    }
-  };
-
   const handleSignIn = async (signInMethod) => {
     setIsLoading(true);
     try {
@@ -178,7 +127,7 @@ export default function LandingPage() {
       setSnackbar({
         open: true,
         message: "Sign-in successful! You can now use all features of the app.",
-        severity: "success"
+        severity: "success",
       });
       setHasCheckedCards(false); // Reset this so we check cards after new sign-in
     } catch (error) {
@@ -189,9 +138,8 @@ export default function LandingPage() {
     }
   };
 
-
   const handleCloseSnackbar = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setSnackbar({ ...snackbar, open: false });
@@ -308,7 +256,7 @@ export default function LandingPage() {
                     }}
                   >
                     <ExportedImage
-                      src={getCardImagePath(card.bank, card.cardName)}
+                      src={card.imagePath}
                       alt={`${card.bank} ${card.cardName}`}
                       fill
                       style={{ objectFit: "contain" }}
@@ -445,7 +393,11 @@ export default function LandingPage() {
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>
