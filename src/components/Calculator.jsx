@@ -40,6 +40,7 @@ function Calculator() {
   const [missingFormOpen, setMissingFormOpen] = useState(false);
   const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] =
     useState(false);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
   const {
     selectedBank,
@@ -216,18 +217,21 @@ function Calculator() {
     } else {
       setSnackbar({
         open: true,
-        message: "Please enter a valid spent amount",
+        message: isLoadingQuestions 
+          ? "Please wait for questions to load before calculating."
+          : "Please enter a valid spent amount",
         severity: "error",
       });
     }
   }, [
+    spentAmount,
     selectedBank,
     selectedCard,
     selectedMcc,
-    spentAmount,
     additionalInputs,
     hasCalculated,
     lastCalculationInputs,
+    isLoadingQuestions,  // Add this to the dependency array
   ]);
 
   const memoizedCalculatorForm = useMemo(
@@ -246,6 +250,8 @@ function Calculator() {
         onCalculate={handleCalculate}
         onClear={handleClear}
         onError={handleError}
+        isLoadingQuestions={isLoadingQuestions} 
+        setIsLoadingQuestions={setIsLoadingQuestions}
       />
     ),
     [
@@ -262,6 +268,7 @@ function Calculator() {
       handleCalculate,
       handleClear,
       handleError,
+      isLoadingQuestions,
     ]
   );
   return (

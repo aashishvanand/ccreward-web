@@ -110,30 +110,6 @@ const CalculationResults = ({ result, isLoading }) => {
               </Tooltip>
             )}
           </Box>
-          {expanded && (
-            <>
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                align="center"
-              >
-                {`Rate: ${result.rate}${
-                  result.rateType === 'percent' ? '%' : 'X'
-                } | Category: ${result.category}`}
-              </Typography>
-              {result.cashbackValue && (
-                <Typography
-                  variant="body2"
-                  color="textSecondary"
-                  align="center"
-                >
-                  {`Cashback Value: ₹${result.cashbackValue.cashValue.toFixed(
-                    2
-                  )} or ${result.cashbackValue.airMiles} air miles`}
-                </Typography>
-              )}
-            </>
-          )}
         </>
       )}
     </Paper>

@@ -5,6 +5,7 @@ import {
   Button,
   Box,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import DynamicCardInputs from "./DynamicCardInputs";
 import {
@@ -35,6 +36,7 @@ const CalculatorForm = ({
   const [mccOptions, setMccOptions] = useState([]);
   const [cardQuestions, setCardQuestions] = useState(null);
   const [mccInputValue, setMccInputValue] = useState("");
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
   useEffect(() => {
     fetchBanks().then(setBanks).catch(console.error);
@@ -50,12 +52,16 @@ const CalculatorForm = ({
 
   useEffect(() => {
     if (selectedBank && selectedCard) {
+      setIsLoadingQuestions(true);
       fetchCardQuestions(selectedBank, selectedCard)
-        .then(setCardQuestions)
+        .then((questions) => {
+          setCardQuestions(questions);
+          setIsLoadingQuestions(false);
+        })
         .catch((error) => {
           console.error("Error fetching card questions:", error);
           setCardQuestions(null);
-          // Call onError to handle the error in the parent component
+          setIsLoadingQuestions(false);
           onError(
             error.response?.data?.error ||
               error.message ||
@@ -72,6 +78,7 @@ const CalculatorForm = ({
       if (value) {
         try {
           const mccData = await fetchMCC(value);
+          console.log("Fetched MCC data:", mccData);
           setMccOptions(mccData);
         } catch (error) {
           console.error("Error fetching MCC data:", error);
@@ -97,7 +104,8 @@ const CalculatorForm = ({
     !selectedBank ||
     !selectedCard ||
     !spentAmount ||
-    parseFloat(spentAmount) <= 0;
+    parseFloat(spentAmount) <= 0 ||
+    isLoadingQuestions;
 
   const getOptionLabel = (option) => {
     if (typeof option === "string") return option;
@@ -198,13 +206,19 @@ const CalculatorForm = ({
         required
       />
 
-      {cardQuestions && (
-        <DynamicCardInputs
-          cardConfig={{ dynamicInputs: cardQuestions }}
-          onChange={onAdditionalInputChange}
-          currentInputs={additionalInputs}
-          selectedMcc={selectedMcc}
-        />
+      {isLoadingQuestions ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        cardQuestions && (
+          <DynamicCardInputs
+            cardConfig={{ dynamicInputs: cardQuestions }}
+            onChange={onAdditionalInputChange}
+            currentInputs={additionalInputs}
+            selectedMcc={selectedMcc}
+          />
+        )
       )}
 
       <Box
