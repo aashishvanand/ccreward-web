@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   FormControl,
   FormLabel,
@@ -24,9 +24,19 @@ const DynamicCardInputs = ({
 }) => {
   const dynamicInputs = cardConfig.dynamicInputs;
 
-  if (!Array.isArray(dynamicInputs) || dynamicInputs.length === 0) {
-    return <Typography>No additional inputs available.</Typography>;
-  }
+  useEffect(() => {
+    // Reset mutually exclusive inputs when component mounts or updates
+    const mutuallyExclusiveInputs = dynamicInputs.filter(input => input.mutuallyExclusiveWith && input.mutuallyExclusiveWith.length > 0);
+    mutuallyExclusiveInputs.forEach(input => {
+      if (currentInputs[input.name] === true) {
+        input.mutuallyExclusiveWith.forEach(exclusiveName => {
+          if (currentInputs[exclusiveName] === true) {
+            onChange(exclusiveName, false);
+          }
+        });
+      }
+    });
+  }, [dynamicInputs, currentInputs, onChange]);
 
   const handleInputChange = (inputName, value) => {
     if (value === "true") {
@@ -34,8 +44,25 @@ const DynamicCardInputs = ({
     } else if (value === "false") {
       value = false;
     }
+
+    // Handle mutually exclusive inputs
+    const currentInput = dynamicInputs.find(input => input.name === inputName);
+    if (currentInput && currentInput.mutuallyExclusiveWith && value === true) {
+      currentInput.mutuallyExclusiveWith.forEach(exclusiveName => {
+        onChange(exclusiveName, false);
+      });
+    }
+
     onChange(inputName, value);
   };
+
+  // Function to check if a question should be displayed based on dependsOn
+  const shouldDisplayQuestion = (question) => {
+    if (!question.dependsOn) return true;
+    const { question: dependentQuestion, value: dependentValue } = question.dependsOn;
+    return currentInputs[dependentQuestion] === dependentValue;
+  };
+
   return (
     <>
       {dynamicInputs.map((input, index) => {
@@ -43,6 +70,11 @@ const DynamicCardInputs = ({
           if (!input.applicableMCCs.includes(selectedMcc.mcc)) {
             return null;
           }
+        }
+
+        // Check if the question should be displayed based on dependsOn
+        if (!shouldDisplayQuestion(input)) {
+          return null;
         }
 
         switch (input.type) {

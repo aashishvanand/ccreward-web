@@ -174,12 +174,20 @@ const BestCardCalculator = () => {
         setHasCalculated(true);
       }
     } catch (error) {
-      console.error("Error calculating rewards:", error);
-      setSnackbar({
-        open: true,
-        message: "Error calculating rewards. Please try again.",
-        severity: "error",
-      });
+      if (error.message.includes("too many requests")) {
+        setSnackbar({
+          open: true,
+          message: error.message,
+          severity: "warning"
+        });
+      } else {
+        console.error("Error calculating rewards:", error);
+        setSnackbar({
+          open: true,
+          message: "Error calculating best card. Please try again.",
+          severity: "error"
+        });
+      }
     } finally {
       setIsLoading(false);
     }

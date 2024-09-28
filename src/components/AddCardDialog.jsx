@@ -8,6 +8,8 @@ import {
   Button,
   MenuItem,
   CircularProgress,
+  Snackbar,
+  Alert
 } from "@mui/material";
 import { fetchBanks, fetchCards } from "../utils/api";
 
@@ -17,6 +19,7 @@ function AddCardDialog({ open, onClose, onAddCard }) {
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "error" });
 
   useEffect(() => {
     if (open) {
@@ -26,13 +29,11 @@ function AddCardDialog({ open, onClose, onAddCard }) {
 
   const fetchBankList = async () => {
     setLoading(true);
-    setError("");
     try {
       const bankList = await fetchBanks();
       setBanks(bankList);
     } catch (error) {
-      console.error("Error fetching banks:", error);
-      setError("Failed to fetch banks. Please try again.");
+      handleError(error);
     } finally {
       setLoading(false);
     }
@@ -40,15 +41,29 @@ function AddCardDialog({ open, onClose, onAddCard }) {
 
   const fetchCardList = async (bank) => {
     setLoading(true);
-    setError("");
     try {
       const cardList = await fetchCards(bank);
       setCards(cardList);
     } catch (error) {
-      console.error(`Error fetching cards for ${bank}:`, error);
-      setError("Failed to fetch cards. Please try again.");
+      handleError(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleError = (error) => {
+    if (error.message.includes("too many requests")) {
+      setSnackbar({
+        open: true,
+        message: error.message,
+        severity: "warning"
+      });
+    } else {
+      setSnackbar({
+        open: true,
+        message: "An error occurred. Please try again.",
+        severity: "error"
+      });
     }
   };
 
@@ -68,7 +83,15 @@ function AddCardDialog({ open, onClose, onAddCard }) {
     onClose();
   };
 
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbar({ ...snackbar, open: false });
+  };
+
   return (
+    <>
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>Add New Card</DialogTitle>
       <DialogContent>
@@ -118,6 +141,12 @@ function AddCardDialog({ open, onClose, onAddCard }) {
         </Button>
       </DialogActions>
     </Dialog>
+     <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+     <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+       {snackbar.message}
+     </Alert>
+   </Snackbar>
+   </>
   );
 }
 

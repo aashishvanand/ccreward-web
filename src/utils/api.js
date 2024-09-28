@@ -52,6 +52,13 @@ const refreshAuthToken = async () => {
     throw new Error('No user is currently signed in');
 };
 
+const handleApiError = (error) => {
+    if (error.response && error.response.status === 429) {
+        throw new Error("You've made too many requests. Please take a coffee break and try again later.");
+    }
+    throw error;
+};
+
 export const setAuthToken = (token) => {
     if (token) {
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -92,8 +99,7 @@ const authenticatedRequest = async (method, url, data = null) => {
                 throw refreshError;
             }
         }
-        console.error(`Error in ${method} request to ${url}:`, error);
-        throw error;
+        return handleApiError(error);
     }
 };
 
@@ -107,8 +113,7 @@ export const fetchBanks = async () => {
         setToCache(cacheKey, response);
         return response;
     } catch (error) {
-        console.error('Error fetching banks:', error);
-        throw error;
+        return handleApiError(error);
     }
 };
 
@@ -122,20 +127,17 @@ export const fetchCards = async (bank) => {
         setToCache(cacheKey, response);
         return response;
     } catch (error) {
-        console.error(`Error fetching cards for ${bank}:`, error);
-        throw error;
+        return handleApiError(error);
     }
 };
 
 let mccCancelToken = null;
 
 export const fetchMCC = async (search) => {
-    // Cancel the previous request if it exists
     if (mccCancelToken) {
         mccCancelToken.cancel('Operation canceled due to new request.');
     }
 
-    // Create a new CancelToken
     mccCancelToken = axios.CancelToken.source();
 
     try {
@@ -147,29 +149,33 @@ export const fetchMCC = async (search) => {
         if (axios.isCancel(error)) {
             console.log('Request canceled:', error.message);
         } else {
-            console.error('Error fetching MCC:', error);
-            throw error;
+            return handleApiError(error);
         }
     }
 };
 
 export const fetchCardQuestions = async (bank, card) => {
+    const encodedBank = encodeURIComponent(bank);
+    const encodedCard = encodeURIComponent(card);
     const cacheKey = `questions_${bank}_${card}`;
     const cachedData = getFromCache(cacheKey);
     if (cachedData) return cachedData;
 
     try {
-        const response = await authenticatedRequest('get', `/cardQuestions?bank=${bank}&card=${card}`);
+        const response = await authenticatedRequest('get', `/cardQuestions?bank=${encodedBank}&card=${encodedCard}`);
         setToCache(cacheKey, response);
         return response;
     } catch (error) {
-        console.error(`Error fetching questions for ${bank} ${card}:`, error);
-        throw error;
+        return handleApiError(error);
     }
 };
 
 export const calculateRewards = async (data) => {
-    return authenticatedRequest('post', '/calculateRewards', data);
+    try {
+        return await authenticatedRequest('post', '/calculateRewards', data);
+    } catch (error) {
+        return handleApiError(error);
+    }
 };
 
 export const fetchBestCardQuestions = async (cards) => {
@@ -177,8 +183,7 @@ export const fetchBestCardQuestions = async (cards) => {
         const response = await authenticatedRequest('post', '/bestCardQuestions', { cards });
         return response;
     } catch (error) {
-        console.error('Error fetching best card questions:', error);
-        throw error;
+        return handleApiError(error);
     }
 };
 
@@ -187,7 +192,6 @@ export const calculateBestCard = async (data) => {
         const response = await authenticatedRequest('post', '/calculateBestCard', data);
         return response;
     } catch (error) {
-        console.error('Error calculating best card:', error);
-        throw error;
+        return handleApiError(error);
     }
 };

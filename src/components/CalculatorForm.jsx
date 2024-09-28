@@ -59,14 +59,18 @@ const CalculatorForm = ({
           setIsLoadingQuestions(false);
         })
         .catch((error) => {
-          console.error("Error fetching card questions:", error);
-          setCardQuestions(null);
-          setIsLoadingQuestions(false);
-          onError(
-            error.response?.data?.error ||
-              error.message ||
-              "An error occurred while fetching card questions."
-          );
+          if (error.message.includes("too many requests")) {
+            onError(error.message, "warning");
+          } else {
+            console.error("Error fetching card questions:", error);
+            setCardQuestions(null);
+            setIsLoadingQuestions(false);
+            onError(
+              error.response?.data?.error ||
+                error.message ||
+                "An error occurred while fetching card questions."
+            );
+          }
         });
     } else {
       setCardQuestions(null);
@@ -207,7 +211,7 @@ const CalculatorForm = ({
       />
 
       {isLoadingQuestions ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
           <CircularProgress />
         </Box>
       ) : (
