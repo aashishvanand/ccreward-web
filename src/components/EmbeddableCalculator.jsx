@@ -12,10 +12,11 @@ import {
 import CalculatorForm from "./CalculatorForm";
 import CalculationResults from "./CalculationResults";
 import { useCardSelection } from "./CalculatorHooks";
-import { signInAnonymously } from "../utils/firebaseUtils";
+import { useAuth } from "../app/providers/AuthContext";
 import { calculateRewards, setAuthToken, fetchCardQuestions } from "../utils/api";
 
 function EmbeddableCalculator() {
+  const { signInAnonymously, user, isAuthenticated, loading } = useAuth();
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -41,22 +42,32 @@ function EmbeddableCalculator() {
 
   useEffect(() => {
     const initializeAnonymousUser = async () => {
-      try {
-        const user = await signInAnonymously();
-        const token = await user.getIdToken();
-        setAuthToken(token);
-      } catch (error) {
-        console.error("Error signing in anonymously:", error);
-        setSnackbar({
-          open: true,
-          message: "Error initializing calculator. Please try again.",
-          severity: "error",
-        });
+      if (!isAuthenticated && !loading) {
+        try {
+          await signInAnonymously();
+        } catch (error) {
+          console.error("Error signing in anonymously:", error);
+          setSnackbar({
+            open: true,
+            message: "Error initializing calculator. Please try again.",
+            severity: "error",
+          });
+        }
       }
     };
 
     initializeAnonymousUser();
-  }, []);
+  }, [isAuthenticated, loading, signInAnonymously]);
+
+  useEffect(() => {
+    if (user) {
+      user.getIdToken().then(token => {
+        setAuthToken(token);
+      }).catch(error => {
+        console.error("Error getting user token:", error);
+      });
+    }
+  }, [user]);
 
   const handleClear = () => {
     resetAllFields();

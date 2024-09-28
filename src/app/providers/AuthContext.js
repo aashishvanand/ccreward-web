@@ -13,10 +13,8 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log("Auth state changed:", user);
       if (user) {
         const isNew = user.metadata.creationTime === user.metadata.lastSignInTime;
-        console.log("Is new user:", isNew);
         setUser({
           ...user,
           isAnonymous: user.isAnonymous,
@@ -38,7 +36,6 @@ export function AuthProvider({ children }) {
   const signInWithGoogle = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      console.log("Google sign-in result:", result);
       return result.user;
     } catch (error) {
       console.error("Error signing in with Google", error);
@@ -49,7 +46,6 @@ export function AuthProvider({ children }) {
   const signInAnonymously = async () => {
     try {
       const result = await firebaseSignInAnonymously(auth);
-      console.log("Anonymous sign-in result:", result);
       return result.user;
     } catch (error) {
       console.error("Error signing in anonymously", error);
@@ -60,8 +56,6 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await signOut(auth);
-
-      console.log("User signed out");
       setUser(null);
       setToken(null);
       setIsNewUser(false);

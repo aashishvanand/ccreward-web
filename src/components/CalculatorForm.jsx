@@ -72,7 +72,6 @@ const CalculatorForm = ({
       if (value) {
         try {
           const mccData = await fetchMCC(value);
-          console.log("Fetched MCC data:", mccData); // Debug log
           setMccOptions(mccData);
         } catch (error) {
           console.error("Error fetching MCC data:", error);

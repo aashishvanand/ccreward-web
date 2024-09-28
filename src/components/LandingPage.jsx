@@ -117,7 +117,6 @@ export default function LandingPage() {
         try {
           const fetchedCards = await getCardsForUser(user.uid);
           if (fetchedCards.length === 0) {
-            console.log('User has no cards, redirecting to My Cards page');
             router.push('/my-cards', undefined, { shallow: true });
           }
         } catch (error) {

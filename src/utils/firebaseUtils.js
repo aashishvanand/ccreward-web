@@ -68,7 +68,6 @@ export const getCardsForUser = async (userId) => {
     const userDoc = await getDoc(userRef);
 
     if (!userDoc.exists()) {
-      console.log('No user document found, creating one');
       try {
         await setDoc(userRef, { createdAt: serverTimestamp(), cards: {} });
       } catch (error) {
@@ -123,7 +122,6 @@ export const refreshCardCache = async (userId) => {
     const userDoc = await getDoc(userRef);
 
     if (!userDoc.exists()) {
-      console.log('No user document found');
       setCachedData(userId, []);
       return [];
     }

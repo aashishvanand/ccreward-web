@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getAuth, getIdToken } from "firebase/auth";
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 
 const API_BASE_URL = 'https://api.ccreward.app';
 

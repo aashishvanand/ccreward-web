@@ -89,9 +89,7 @@ const BestCardCalculator = () => {
         bank: card.bank,
         cardName: card.cardName,
       }));
-      console.log("Sending cards data:", cardsData);
       const questions = await fetchBestCardQuestions(cardsData);
-      console.log("Received questions:", questions);
       setCardQuestions(Array.isArray(questions) ? questions : []);
     } catch (error) {
       console.error("Error fetching card questions:", error);
@@ -109,7 +107,6 @@ const BestCardCalculator = () => {
       if (value) {
         try {
           const mccData = await fetchMCC(value);
-          console.log("Fetched MCC data:", mccData);
           setMccOptions(mccData);
         } catch (error) {
           console.error("Error fetching MCC data:", error);
