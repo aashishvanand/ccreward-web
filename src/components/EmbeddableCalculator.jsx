@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import ExportedImage from "next-image-export-optimizer";
 import {
   Box,
@@ -11,8 +11,9 @@ import {
 } from "@mui/material";
 import CalculatorForm from "./CalculatorForm";
 import CalculationResults from "./CalculationResults";
-import { useCardSelection, useRewardCalculation } from "./CalculatorHooks";
-import { getCardConfig } from "./CalculatorHelpers";
+import { useCardSelection } from "./CalculatorHooks";
+import { signInAnonymously } from "../utils/firebaseUtils";
+import { calculateRewards, setAuthToken, fetchCardQuestions } from "../utils/api";
 
 function EmbeddableCalculator() {
   const [snackbar, setSnackbar] = useState({
@@ -20,6 +21,9 @@ function EmbeddableCalculator() {
     message: "",
     severity: "info",
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [calculationResult, setCalculationResult] = useState(null);
+  const [calculationPerformed, setCalculationPerformed] = useState(false);
 
   const {
     selectedBank,
@@ -35,29 +39,54 @@ function EmbeddableCalculator() {
     resetAllFields,
   } = useCardSelection();
 
-  const {
-    calculationResult,
-    calculationPerformed,
-    calculateRewards,
-    clearForm,
-  } = useRewardCalculation(
-    selectedBank,
-    selectedCard,
-    selectedMcc,
-    spentAmount,
-    additionalInputs
-  );
+  useEffect(() => {
+    const initializeAnonymousUser = async () => {
+      try {
+        const user = await signInAnonymously();
+        const token = await user.getIdToken();
+        setAuthToken(token);
+      } catch (error) {
+        console.error("Error signing in anonymously:", error);
+        setSnackbar({
+          open: true,
+          message: "Error initializing calculator. Please try again.",
+          severity: "error",
+        });
+      }
+    };
+
+    initializeAnonymousUser();
+  }, []);
 
   const handleClear = () => {
-    if (resetAllFields) {
-      resetAllFields();
-    }
-    clearForm();
+    resetAllFields();
+    setCalculationResult(null);
+    setCalculationPerformed(false);
   };
 
-  const handleCalculate = () => {
+  const handleCalculate = useCallback(async () => {
     if (spentAmount && parseFloat(spentAmount) > 0) {
-      calculateRewards();
+      setIsLoading(true);
+      try {
+        const result = await calculateRewards({
+          bank: selectedBank,
+          card: selectedCard,
+          mcc: selectedMcc ? selectedMcc.mcc : null,
+          amount: parseFloat(spentAmount),
+          answers: additionalInputs,
+        });
+        setCalculationResult(result);
+        setCalculationPerformed(true);
+      } catch (error) {
+        console.error("Error calculating rewards:", error);
+        setSnackbar({
+          open: true,
+          message: "Error calculating rewards. Please try again.",
+          severity: "error",
+        });
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       setSnackbar({
         open: true,
@@ -65,7 +94,7 @@ function EmbeddableCalculator() {
         severity: "error",
       });
     }
-  };
+  }, [selectedBank, selectedCard, selectedMcc, spentAmount, additionalInputs]);
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -122,11 +151,11 @@ function EmbeddableCalculator() {
             onAdditionalInputChange={handleAdditionalInputChange}
             onCalculate={handleCalculate}
             onClear={handleClear}
-            getCardConfig={getCardConfig}
+            getCardConfig={fetchCardQuestions}
           />
 
           {calculationPerformed && calculationResult && (
-            <CalculationResults result={calculationResult} />
+            <CalculationResults result={calculationResult} isLoading={isLoading} />
           )}
         </Container>
       </Paper>
