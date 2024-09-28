@@ -81,8 +81,8 @@ function Header() {
 
   const menuItems = [
     { label: 'Home', icon: <HomeIcon />, href: '/' },
-    { label: 'Calculator', icon: <CalculateIcon />, href: '/calculator' },
     ...(isAuthenticated() ? [
+      { label: 'Calculator', icon: <CalculateIcon />, href: '/calculator' },
       { label: 'My Cards', icon: <CreditCard />, href: '/my-cards' },
       { 
         label: 'Best Card', 

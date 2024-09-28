@@ -40,11 +40,6 @@
     "imagePath": "/card-images/AU/au_lit.webp"
   },
   {
-    "bank": "AU",
-    "cardName": "Zenith+",
-    "imagePath": "/card-images/AU/au_zenith+.webp"
-  },
-  {
     "bank": "Axis",
     "cardName": "ACE",
     "imagePath": "/card-images/Axis/axis_ace.webp"
@@ -713,16 +708,6 @@
     "bank": "RBL",
     "cardName": "IRCTC",
     "imagePath": "/card-images/RBL/rbl_irctc.webp"
-  },
-  {
-    "bank": "RBL",
-    "cardName": "IndianOil XTRA",
-    "imagePath": "/card-images/RBL/rbl_indianoil_xtra.webp"
-  },
-  {
-    "bank": "RBL",
-    "cardName": "IndianOil",
-    "imagePath": "/card-images/RBL/rbl_indianoil.webp"
   },
   {
     "bank": "RBL",

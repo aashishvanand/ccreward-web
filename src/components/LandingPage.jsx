@@ -11,11 +11,16 @@ import {
   useTheme,
   Snackbar,
   Alert,
+  Tabs,
+  Tab,
+  CardContent,
 } from "@mui/material";
 import {
   Search as SearchIcon,
   Calculate as CalculateIcon,
   Bolt as BoltIcon,
+  CompareArrows as CompareArrowsIcon,
+  TrendingUp as TrendingUpIcon,
 } from "@mui/icons-material";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
@@ -40,6 +45,11 @@ const banks = [
   "KOTAK",
   "INDUSIND",
   "YESBANK",
+  "BOB",
+  "CANARA",
+  "DBS",
+  "FEDERAL",
+  "AU",
 ];
 
 const getRandomCardImages = (count) => {
@@ -70,26 +80,33 @@ export default function LandingPage() {
     severity: "success",
   });
   const [hasCheckedCards, setHasCheckedCards] = useState(false);
+  const [tabValue, setTabValue] = useState(0);
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+  };
 
   useEffect(() => {
     const randomCards = getRandomCardImages(3);
-    setCardImages(randomCards.map(card => ({
-      ...card,
-      id: Date.now() + Math.random(), // Unique id for each card
-      fullImagePath: `${BASE_URL}${card.imagePath}`
-    })));
+    setCardImages(
+      randomCards.map((card) => ({
+        ...card,
+        id: Date.now() + Math.random(), // Unique id for each card
+        fullImagePath: `${BASE_URL}${card.imagePath}`,
+      }))
+    );
   }, []);
 
   const handleImageError = (failedCardId) => {
     console.error(`Failed to load image for card ${failedCardId}`);
-    setCardImages(prevImages => {
-      const newImages = prevImages.filter(img => img.id !== failedCardId);
+    setCardImages((prevImages) => {
+      const newImages = prevImages.filter((img) => img.id !== failedCardId);
       if (newImages.length < 3) {
         const additionalCard = getRandomCardImages(1)[0];
         newImages.push({
           ...additionalCard,
           id: Date.now() + Math.random(),
-          fullImagePath: `${BASE_URL}${additionalCard.imagePath}`
+          fullImagePath: `${BASE_URL}${additionalCard.imagePath}`,
         });
       }
       return newImages;
@@ -149,6 +166,7 @@ export default function LandingPage() {
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Header />
 
+      {/* Hero Section */}
       <Box sx={{ bgcolor: "background.default", py: { xs: 4, md: 6, lg: 8 } }}>
         <Container maxWidth="lg">
           <Grid
@@ -271,6 +289,7 @@ export default function LandingPage() {
         </Container>
       </Box>
 
+      {/* Key Features Section */}
       <Box sx={{ bgcolor: "background.paper", py: 8 }}>
         <Container maxWidth="lg">
           <Typography variant="h3" align="center" gutterBottom>
@@ -332,47 +351,46 @@ export default function LandingPage() {
         </Container>
       </Box>
 
-      <Box sx={{ bgcolor: "background.default", py: 8, overflow: "hidden" }}>
+      {/* Supported Banks Section */}
+      <Box sx={{ bgcolor: "background.default", py: 8 }}>
         <Container maxWidth="lg">
           <Typography variant="h3" align="center" gutterBottom>
-            Supported Banks and Card Issuers
+            Supported Banks
           </Typography>
-          <Box
-            sx={{
-              display: "flex",
-              animation: "marquee 30s linear infinite",
-              "&:hover": { animationPlayState: "paused" },
-              "@keyframes marquee": {
-                "0%": { transform: "translateX(100%)" },
-                "100%": { transform: "translateX(-100%)" },
-              },
-            }}
-          >
-            {[...banks, ...banks].map((bank, index) => (
-              <Typography
-                key={index}
-                variant="h6"
-                sx={{ mx: 4, whiteSpace: "nowrap", color: "primary.main" }}
-              >
-                {bank}
-              </Typography>
+          <Grid container spacing={2} justifyContent="center">
+            {banks.map((bank) => (
+              <Grid item key={bank} xs={6} sm={4} md={3} lg={2}>
+                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 2 }}>
+                  <Box sx={{ width: 80, height: 80, position: 'relative', mb: 1 }}>
+                    <ExportedImage
+                      src={`/bank-images/${bank.toLowerCase()}.webp`}
+                      alt={`${bank} logo`}
+                      fill
+                      style={{ objectFit: 'contain' }}
+                    />
+                  </Box>
+                  <Typography variant="subtitle2" align="center">
+                    {bank}
+                  </Typography>
+                </Card>
+              </Grid>
             ))}
-          </Box>
+          </Grid>
         </Container>
       </Box>
 
+      {/* Call to Action Section */}
       <Box
         sx={{ bgcolor: "primary.main", color: "primary.contrastText", py: 8 }}
       >
         <Container maxWidth="sm">
           <Typography variant="h3" align="center" gutterBottom>
-            Ready to Find Your Perfect Card?
+            Ready to Maximize Your Rewards?
           </Typography>
           <Typography variant="h6" align="center" paragraph>
-            Start comparing cards and maximizing your rewards today. No sign-up
-            required!
+            Start comparing cards and maximizing your rewards today.
           </Typography>
-          <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
+          {/* <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
             <NextLink href="/calculator" passHref>
               <Button
                 variant="contained"
@@ -383,7 +401,7 @@ export default function LandingPage() {
                 Points Calculator
               </Button>
             </NextLink>
-          </Box>
+          </Box> */}
         </Container>
       </Box>
 
