@@ -236,11 +236,6 @@
   },
   {
     "bank": "Canara",
-    "cardName": "MasterCard World",
-    "imagePath": "/card-images/Canara/canara_mastercard_world.webp"
-  },
-  {
-    "bank": "Canara",
     "cardName": "Platinum",
     "imagePath": "/card-images/Canara/canara_platinum.webp"
   },
