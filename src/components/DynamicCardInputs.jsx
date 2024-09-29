@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   FormControl,
   FormLabel,
@@ -12,7 +12,6 @@ import {
   Tooltip,
   IconButton,
   FormGroup,
-  Typography,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 
@@ -23,9 +22,18 @@ const DynamicCardInputs = ({
   selectedMcc,
 }) => {
   const dynamicInputs = cardConfig.dynamicInputs;
+  const prevInputsRef = useRef(dynamicInputs);
 
   useEffect(() => {
-    // Reset mutually exclusive inputs when component mounts or updates
+    if (dynamicInputs !== prevInputsRef.current) {
+      Object.keys(currentInputs).forEach(key => {
+        onChange(key, undefined);
+      });
+      prevInputsRef.current = dynamicInputs;
+    }
+  }, [dynamicInputs, currentInputs, onChange]);
+
+  useEffect(() => {
     const mutuallyExclusiveInputs = dynamicInputs.filter(input => input.mutuallyExclusiveWith && input.mutuallyExclusiveWith.length > 0);
     mutuallyExclusiveInputs.forEach(input => {
       if (currentInputs[input.name] === true) {
@@ -38,14 +46,13 @@ const DynamicCardInputs = ({
     });
   }, [dynamicInputs, currentInputs, onChange]);
 
-  const handleInputChange = (inputName, value) => {
+  const handleInputChange = (inputName, value, maxSelect = null) => {
     if (value === "true") {
       value = true;
     } else if (value === "false") {
       value = false;
     }
 
-    // Handle mutually exclusive inputs
     const currentInput = dynamicInputs.find(input => input.name === inputName);
     if (currentInput && currentInput.mutuallyExclusiveWith && value === true) {
       currentInput.mutuallyExclusiveWith.forEach(exclusiveName => {
@@ -53,27 +60,45 @@ const DynamicCardInputs = ({
       });
     }
 
+    if (maxSelect !== null && typeof value === 'object') {
+      const newSelectedCount = Object.values(value).filter(Boolean).length;
+      const currentSelectedCount = Object.values(currentInputs[inputName] || {}).filter(Boolean).length;
+
+      if (newSelectedCount > currentSelectedCount && newSelectedCount > maxSelect) {
+        return; // Don't allow more selections than maxSelect
+      }
+    }
+
     onChange(inputName, value);
   };
 
-  // Function to check if a question should be displayed based on dependsOn
-  const shouldDisplayQuestion = (question) => {
-    if (!question.dependsOn) return true;
-    const { question: dependentQuestion, value: dependentValue } = question.dependsOn;
-    return currentInputs[dependentQuestion] === dependentValue;
+  const shouldDisplayQuestion = (input) => {
+    if (!input.dependsOn) return true;
+    const { question: dependentQuestion, value: dependentValue } = input.dependsOn;
+    
+    if (!(dependentQuestion in currentInputs)) return false;
+    
+    const currentValue = currentInputs[dependentQuestion];
+    
+    // Handle both boolean and string comparisons
+    if (typeof dependentValue === 'boolean') {
+      return currentValue === dependentValue;
+    } else {
+      return String(currentValue) === String(dependentValue);
+    }
+  };
+
+  const isInputApplicable = (input) => {
+    if (!input.applicableMCCs || input.applicableMCCs.length === 0) {
+      return true;
+    }
+    return selectedMcc && input.applicableMCCs.includes(selectedMcc.mcc);
   };
 
   return (
     <>
-      {dynamicInputs.map((input, index) => {
-        if (input.applicableMCCs && input.applicableMCCs.length > 0 && selectedMcc) {
-          if (!input.applicableMCCs.includes(selectedMcc.mcc)) {
-            return null;
-          }
-        }
-
-        // Check if the question should be displayed based on dependsOn
-        if (!shouldDisplayQuestion(input)) {
+      {dynamicInputs.map((input) => {
+        if (!isInputApplicable(input) || !shouldDisplayQuestion(input)) {
           return null;
         }
 
@@ -81,7 +106,7 @@ const DynamicCardInputs = ({
           case "radio":
             return (
               <FormControl
-                key={index}
+                key={input.name}
                 component="fieldset"
                 sx={{ mt: 2, width: "100%" }}
               >
@@ -117,7 +142,7 @@ const DynamicCardInputs = ({
             );
           case "select":
             return (
-              <FormControl key={index} fullWidth sx={{ mt: 2 }}>
+              <FormControl key={input.name} fullWidth sx={{ mt: 2 }}>
                 <Box display="flex" alignItems="center">
                   <FormLabel component="legend">{input.label}</FormLabel>
                   {input.helperText && (
@@ -159,7 +184,7 @@ const DynamicCardInputs = ({
           case "checkbox":
             return (
               <FormControl
-                key={index}
+                key={input.name}
                 component="fieldset"
                 sx={{ mt: 2, width: "100%" }}
               >
@@ -187,7 +212,7 @@ const DynamicCardInputs = ({
                               ...currentInputs[input.name],
                               [option.value]: e.target.checked,
                             };
-                            handleInputChange(input.name, newValue);
+                            handleInputChange(input.name, newValue, input.maxSelect);
                           }}
                         />
                       }

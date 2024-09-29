@@ -82,22 +82,34 @@ const CalculatorForm = ({
       if (value) {
         try {
           const mccData = await fetchMCC(value);
-          console.log("Fetched MCC data:", mccData);
-          setMccOptions(mccData);
+          return mccData;
         } catch (error) {
           console.error("Error fetching MCC data:", error);
-          setMccOptions([]);
+          return [];
         }
       } else {
-        setMccOptions([]);
+        return [];
       }
     }, 300),
     []
   );
 
   useEffect(() => {
-    debouncedFetchMCC(mccInputValue);
-    return () => debouncedFetchMCC.cancel();
+    const fetchData = async () => {
+      try {
+        const result = await debouncedFetchMCC(mccInputValue);
+        setMccOptions(result || []); // Ensure we always set an array
+      } catch (error) {
+        console.error("Error fetching MCC data:", error);
+        setMccOptions([]); // Set empty array in case of error
+      }
+    };
+
+    if (mccInputValue) {
+      fetchData();
+    } else {
+      setMccOptions([]); // Clear options if input is empty
+    }
   }, [mccInputValue, debouncedFetchMCC]);
 
   const handleMccInputChange = (event, newInputValue) => {
@@ -184,9 +196,21 @@ const CalculatorForm = ({
       <Autocomplete
         fullWidth
         options={mccOptions}
-        getOptionLabel={getOptionLabel}
-        renderOption={renderOption}
-        filterOptions={filterOptions}
+        getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
+        renderOption={(props, option) => (
+          <li {...props}>
+            <Box>
+              <Typography variant="body1">
+                {option.mcc} - {option.name}
+              </Typography>
+              {option.knownMerchants && option.knownMerchants.length > 0 && (
+                <Typography variant="body2" color="text.secondary">
+                  Known merchants: {option.knownMerchants.join(", ")}
+                </Typography>
+              )}
+            </Box>
+          </li>
+        )}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -198,6 +222,17 @@ const CalculatorForm = ({
         onChange={(event, newValue) => onMccChange(newValue)}
         value={selectedMcc}
         inputValue={mccInputValue}
+        filterOptions={(options, { inputValue }) => {
+          const filterValue = inputValue.toLowerCase();
+          return options.filter(
+            (option) =>
+              option.mcc.toLowerCase().includes(filterValue) ||
+              option.name.toLowerCase().includes(filterValue) ||
+              option.knownMerchants.some((merchant) =>
+                merchant.toLowerCase().includes(filterValue)
+              )
+          );
+        }}
       />
 
       <TextField

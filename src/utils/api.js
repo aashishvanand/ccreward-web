@@ -145,24 +145,25 @@ let mccCancelToken = null;
 
 export const fetchMCC = async (search) => {
     if (mccCancelToken) {
-        mccCancelToken.cancel('Operation canceled due to new request.');
+      mccCancelToken.cancel('Operation canceled due to new request.');
     }
-
+  
     mccCancelToken = axios.CancelToken.source();
-
+  
     try {
-        const response = await api.get(`/mcc?search=${search}`, {
-            cancelToken: mccCancelToken.token
-        });
-        return response.data;
+      const response = await api.get(`/mcc?search=${search}`, {
+        cancelToken: mccCancelToken.token
+      });
+      return response.data; // Make sure this is returning the array of MCC objects
     } catch (error) {
-        if (axios.isCancel(error)) {
-            console.log('Request canceled:', error.message);
-        } else {
-            return handleApiError(error);
-        }
+      if (axios.isCancel(error)) {
+        console.log('Request canceled:', error.message);
+      } else {
+        console.error('Error fetching MCC data:', error);
+      }
+      return []; // Return an empty array in case of error or cancellation
     }
-};
+  };
 
 export const fetchCardQuestions = async (bank, card) => {
     const encodedBank = encodeURIComponent(bank);
