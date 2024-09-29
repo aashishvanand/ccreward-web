@@ -10,6 +10,7 @@ const api = axios.create({
 
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
+
 const getFromCache = (key) => {
     const cached = localStorage.getItem(key);
     if (cached) {
@@ -43,6 +44,7 @@ const refreshAuthToken = async () => {
         try {
             const token = await getIdToken(auth.currentUser, true);
             setAuthToken(token);
+            localStorage.setItem('authToken', token);
             return token;
         } catch (error) {
             console.error('Error refreshing token:', error);
@@ -51,6 +53,35 @@ const refreshAuthToken = async () => {
     }
     throw new Error('No user is currently signed in');
 };
+
+export const initializeAuth = async () => {
+    const storedToken = localStorage.getItem('authToken');
+    if (storedToken && !isTokenExpired(storedToken)) {
+        setAuthToken(storedToken);
+    } else if (getAuth().currentUser) {
+        await refreshAuthToken();
+    }
+};
+
+// Interceptor to add the token to each request
+api.interceptors.request.use(async (config) => {
+    const auth = getAuth();
+    if (auth.currentUser) {
+        try {
+            const token = await auth.currentUser.getIdToken(true);
+            config.headers.Authorization = `Bearer ${token}`;
+            console.log('Token added to request:', token.substring(0, 10) + '...');
+        } catch (error) {
+            console.error('Error getting token:', error);
+        }
+    } else {
+        console.warn('No authenticated user found when making request');
+    }
+    return config;
+}, (error) => {
+    console.error('Error in request interceptor:', error);
+    return Promise.reject(error);
+});
 
 const handleApiError = (error) => {
     if (error.response && error.response.status === 429) {
@@ -69,17 +100,6 @@ export const setAuthToken = (token) => {
 
 // Helper function for making authenticated requests
 const authenticatedRequest = async (method, url, data = null) => {
-    const currentToken = api.defaults.headers.common['Authorization']?.split(' ')[1];
-
-    if (isTokenExpired(currentToken)) {
-        try {
-            await refreshAuthToken();
-        } catch (refreshError) {
-            console.error('Error refreshing token:', refreshError);
-            throw refreshError;
-        }
-    }
-
     try {
         const config = { method, url };
         if (data) {
@@ -88,20 +108,10 @@ const authenticatedRequest = async (method, url, data = null) => {
         const response = await api(config);
         return response.data;
     } catch (error) {
-        if (error.response && error.response.status === 401) {
-            // Token might be expired (edge case), try to refresh
-            try {
-                await refreshAuthToken();
-                // Retry the request with the new token
-                return await authenticatedRequest(method, url, data);
-            } catch (refreshError) {
-                console.error('Error refreshing token:', refreshError);
-                throw refreshError;
-            }
-        }
         return handleApiError(error);
     }
 };
+
 
 export const fetchBanks = async () => {
     const cacheKey = 'banks';

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Typography,
   Button,
@@ -14,6 +14,8 @@ import {
   Tabs,
   Tab,
   CardContent,
+  Avatar,
+  IconButton,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -21,8 +23,10 @@ import {
   Bolt as BoltIcon,
   CompareArrows as CompareArrowsIcon,
   TrendingUp as TrendingUpIcon,
+  Twitter as TwitterIcon,
+  ChevronLeft as ChevronLeftIcon,
+  ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";
-import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../app/providers/AuthContext";
 import Header from "./Header";
@@ -57,6 +61,65 @@ const getRandomCardImages = (count) => {
   return shuffled.slice(0, count);
 };
 
+const tweets = [
+  {
+    id: 1,
+    author: "Amit Chopra | Every Paisa Matters",
+    handle: "@EvryPaisaMatter",
+    avatar: "https://pbs.twimg.com/profile_images/1481104355919282176/5lZaqKF9_400x400.jpg",
+    content: "One stop shop to go to for all Credit Card Rewards related answers!",
+    url: "https://x.com/aashishvanand/status/1834868453498601877/quotes",
+  },
+  {
+    id: 2,
+    author: "Rewards Maverick",
+    handle: "@RewardsMaverick",
+    avatar: "https://pbs.twimg.com/profile_images/1689934420067905536/Sx4B6taZ_400x400.jpg",
+    content: "Ever wondered which card to use for what kind of payment!!! No more. Use the rewards calculator and be sure of the points and maximize your rewards!!!",
+    url: "https://x.com/RewardsMaverick/status/1830421884623630555",
+  },
+  {
+    id: 3,
+    author: "Gajender Yadav",
+    handle: "@imYadav31",
+    avatar: "https://pbs.twimg.com/profile_images/1763209842020483072/Pa8pVMzP_400x400.jpg",
+    content: "New Launch alert 🔥💯 Credit Card Reward Calculator 💰",
+    url: "https://x.com/imYadav31/status/1830173465514475970",
+  },
+  {
+    id: 4,
+    author: "Bachat Xpert",
+    handle: "@BachatXpert",
+    avatar: "https://pbs.twimg.com/profile_images/1559278856988925953/BBSNPR2S_400x400.jpg",
+    content: "Really liked @aashishvanand work on card by card expected points on various transactions. Visit http://ccreward.app Since its beta stage, u can test and give feedback to make corrections..",
+    url: "https://x.com/BachatXpert/status/1830295336532979927",
+  },
+  {
+    id: 5,
+    author: "CardMaven",
+    handle: "@CardMavenIn",
+    avatar: "https://pbs.twimg.com/profile_images/1609594059651444737/EpWK43O__400x400.png",
+    content: "Check out this credit card rewards calculator from @aashishvanand and know which is the best one for your spends ✅",
+    url: "https://x.com/CardMavenIn/status/1830266994152837504",
+  },
+  {
+    id: 6,
+    author: "Creditkeeda",
+    handle: "@creditkeeda",
+    avatar: "https://pbs.twimg.com/profile_images/1785035352736231424/w1DKxAM8_400x400.jpg",
+    content: "✨ If you're trying to figure out which card will give you the best rewards, check out this credit card rewards calculator. 🔥 👉 http://ccreward.app Great work, @aashishvanand! Best wishes! 🎉 #ccgeek #ccgeeks #CreditCardTips",
+    url: "https://x.com/creditkeeda/status/1830219490463739933",
+  },
+  {
+    id: 7,
+    author: "Satish Kumar Agarwal",
+    handle: "@iSatishAgarwal",
+    avatar: "https://pbs.twimg.com/profile_images/1679892355405557768/3XHiJvsD_400x400.jpg",
+    content: "Credit Card Rewards Calculator 📱 💰Maximize Rewards & Save time Great work @aashishvanand 👏 Like ❤️ n Repost ♻️ if useful #CreditCard #ccgeek",
+    url: "https://x.com/iSatishAgarwal/status/1830639440861040697",
+  },
+];
+
 export default function LandingPage() {
   const {
     signInWithGoogle,
@@ -80,11 +143,28 @@ export default function LandingPage() {
     severity: "success",
   });
   const [hasCheckedCards, setHasCheckedCards] = useState(false);
-  const [tabValue, setTabValue] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
+  const shuffledTweets = useMemo(() => {
+    return [...tweets].sort(() => Math.random() - 0.5);
+  }, []);
 
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
+  const tweetsPerPage = isMobile ? 1 : isTablet ? 2 : 3;
+  const totalPages = Math.ceil(shuffledTweets.length / tweetsPerPage);
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) => (prevPage + 1) % totalPages);
   };
+
+  const handlePrevPage = () => {
+    setCurrentPage((prevPage) => (prevPage - 1 + totalPages) % totalPages);
+  };
+
+  const visibleTweets = shuffledTweets.slice(
+    currentPage * tweetsPerPage,
+    (currentPage + 1) * tweetsPerPage
+  );
+
+
 
   useEffect(() => {
     const randomCards = getRandomCardImages(3);
@@ -390,18 +470,72 @@ export default function LandingPage() {
           <Typography variant="h6" align="center" paragraph>
             Start comparing cards and maximizing your rewards today.
           </Typography>
-          {/* <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
-            <NextLink href="/calculator" passHref>
-              <Button
-                variant="contained"
-                color="secondary"
-                size="large"
-                component="a"
-              >
-                Points Calculator
-              </Button>
-            </NextLink>
-          </Box> */}
+        </Container>
+      </Box>
+
+      {/*X Community Recommendations */}
+      <Box sx={{ bgcolor: "background.default", py: 8 }}>
+        <Container maxWidth="lg">
+          <Typography variant="h3" align="center" gutterBottom>
+            Recommended by the X Community
+          </Typography>
+          <Box sx={{ position: 'relative', mt: 4, px: { xs: 4, sm: 6, md: 8 } }}>
+            <IconButton
+              onClick={handlePrevPage}
+              sx={{
+                position: 'absolute',
+                left: { xs: -8, sm: -16, md: -24 },
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 1,
+              }}
+              aria-label="Previous page"
+            >
+              <ChevronLeftIcon />
+            </IconButton>
+            <Grid container spacing={3} justifyContent="center">
+              {visibleTweets.map((tweet) => (
+                <Grid item xs={12} sm={6} md={4} key={tweet.id}>
+                  <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                    <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <Avatar src={tweet.avatar} alt={tweet.author} sx={{ mr: 2 }} />
+                        <Box>
+                          <Typography variant="subtitle1">{tweet.author}</Typography>
+                          <Typography variant="body2" color="text.secondary">{tweet.handle}</Typography>
+                        </Box>
+                      </Box>
+                      <Typography variant="body1" sx={{ mb: 2, flexGrow: 1 }}>{tweet.content}</Typography>
+                      <Button
+                        variant="outlined"
+                        startIcon={<TwitterIcon />}
+                        href={tweet.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        fullWidth
+                        sx={{ mt: 'auto' }}
+                      >
+                        View on X
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+            <IconButton
+              onClick={handleNextPage}
+              sx={{
+                position: 'absolute',
+                right: { xs: -8, sm: -16, md: -24 },
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 1,
+              }}
+              aria-label="Next page"
+            >
+              <ChevronRightIcon />
+            </IconButton>
+          </Box>
         </Container>
       </Box>
 
