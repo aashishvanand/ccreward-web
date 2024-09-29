@@ -7,6 +7,12 @@
   X-Frame-Options: ALLOW-FROM https://www.professorcardz.com/
   Content-Security-Policy: frame-ancestors 'self' https://www.professorcardz.com/
 
+# CORS headers for API endpoint
+/bank
+  Access-Control-Allow-Origin: https://ccreward.app
+  Access-Control-Allow-Methods: GET, POST, OPTIONS
+  Access-Control-Allow-Headers: Origin, Content-Type, Accept
+
 # Security headers for all other pages
 /*
   X-Frame-Options: DENY
