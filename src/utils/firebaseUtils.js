@@ -61,17 +61,21 @@ export const getCardsForUser = async (userId) => {
   try {
     // Check cache first
     const cachedCards = getCachedData(userId);
-    if (cachedCards) {
-      return cachedCards;
-    }
+    if (cachedCards) return cachedCards;
 
     // If not in cache, fetch from Firebase
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
 
     if (!userDoc.exists()) {
-      console.log('No user document found');
-      return [];
+      try {
+        await setDoc(userRef, { createdAt: serverTimestamp(), cards: {} });
+      } catch (error) {
+        console.error('Error creating user document:', error);
+        // If we can't create the document, return an empty array
+        return [];
+      }
+      return []; // New user, no cards yet
     }
 
     const userData = userDoc.data();
@@ -88,7 +92,8 @@ export const getCardsForUser = async (userId) => {
     return cardList;
   } catch (error) {
     console.error("Error fetching cards:", error);
-    throw error;
+    // Instead of throwing the error, return an empty array
+    return [];
   }
 };
 
@@ -117,7 +122,6 @@ export const refreshCardCache = async (userId) => {
     const userDoc = await getDoc(userRef);
 
     if (!userDoc.exists()) {
-      console.log('No user document found');
       setCachedData(userId, []);
       return [];
     }

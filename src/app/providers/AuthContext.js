@@ -9,19 +9,23 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isNewUser, setIsNewUser] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        const isNew = user.metadata.creationTime === user.metadata.lastSignInTime;
         setUser({
           ...user,
           isAnonymous: user.isAnonymous,
         });
         const token = await getIdToken(user);
         setToken(token);
+        setIsNewUser(isNew);
       } else {
         setUser(null);
         setToken(null);
+        setIsNewUser(false);
       }
       setLoading(false);
     });
@@ -52,7 +56,9 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await signOut(auth);
-
+      setUser(null);
+      setToken(null);
+      setIsNewUser(false);
       if (typeof window !== 'undefined') {
         Object.keys(localStorage).forEach(key => {
           if (key.startsWith('userCardsCache_') || 
@@ -73,6 +79,10 @@ export function AuthProvider({ children }) {
     return !!user;
   };
 
+  const markUserAsNotNew = () => {
+    setIsNewUser(false);
+  };
+
   const value = {
     user,
     token,
@@ -81,6 +91,8 @@ export function AuthProvider({ children }) {
     logout,
     isAuthenticated,
     loading,
+    isNewUser,
+    markUserAsNotNew,
   };
 
   return (

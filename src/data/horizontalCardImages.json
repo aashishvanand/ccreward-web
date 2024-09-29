@@ -1,0 +1,927 @@
+[
+  {
+    "bank": "AMEX",
+    "cardName": "Gold",
+    "imagePath": "/card-images/AMEX/amex_gold.webp"
+  },
+  {
+    "bank": "AMEX",
+    "cardName": "Membership Rewards",
+    "imagePath": "/card-images/AMEX/amex_membership_rewards.webp"
+  },
+  {
+    "bank": "AMEX",
+    "cardName": "Platinum",
+    "imagePath": "/card-images/AMEX/amex_platinum.webp"
+  },
+  {
+    "bank": "AMEX",
+    "cardName": "Platinum Reserve",
+    "imagePath": "/card-images/AMEX/amex_platinum_reserve.webp"
+  },
+  {
+    "bank": "AMEX",
+    "cardName": "Platinum Travel",
+    "imagePath": "/card-images/AMEX/amex_platinum_travel.webp"
+  },
+  {
+    "bank": "AMEX",
+    "cardName": "SmartEarn",
+    "imagePath": "/card-images/AMEX/amex_smartearn.webp"
+  },
+  {
+    "bank": "AU",
+    "cardName": "Altura Plus",
+    "imagePath": "/card-images/AU/au_altura_plus.webp"
+  },
+  {
+    "bank": "AU",
+    "cardName": "LIT",
+    "imagePath": "/card-images/AU/au_lit.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "ACE",
+    "imagePath": "/card-images/Axis/axis_ace.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Airtel",
+    "imagePath": "/card-images/Axis/axis_airtel.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Atlas",
+    "imagePath": "/card-images/Axis/axis_atlas.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Aura",
+    "imagePath": "/card-images/Axis/axis_aura.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Flipkart",
+    "imagePath": "/card-images/Axis/axis_flipkart.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Flipkart Super Elite",
+    "imagePath": "/card-images/Axis/axis_flipkart_super_elite.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Freecharge",
+    "imagePath": "/card-images/Axis/axis_freecharge.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Freecharge Plus",
+    "imagePath": "/card-images/Axis/axis_freecharge_plus.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Horizon",
+    "imagePath": "/card-images/Axis/axis_horizon.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Indian Oil",
+    "imagePath": "/card-images/Axis/axis_indian_oil.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Indian Oil Premium",
+    "imagePath": "/card-images/Axis/axis_indian_oil_premium.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "LIC",
+    "imagePath": "/card-images/Axis/axis_lic.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Miles & More World",
+    "imagePath": "/card-images/Axis/axis_miles_&_more_world.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Miles & More World Select",
+    "imagePath": "/card-images/Axis/axis_miles_&_more_world_select.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "MyZone",
+    "imagePath": "/card-images/Axis/axis_myzone.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Neo",
+    "imagePath": "/card-images/Axis/axis_neo.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Privilege",
+    "imagePath": "/card-images/Axis/axis_privilege.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Rewards",
+    "imagePath": "/card-images/Axis/axis_rewards.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Samsung Infinite",
+    "imagePath": "/card-images/Axis/axis_samsung_infinite.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Samsung Signature",
+    "imagePath": "/card-images/Axis/axis_samsung_signature.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Select",
+    "imagePath": "/card-images/Axis/axis_select.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Shoppers Stop",
+    "imagePath": "/card-images/Axis/axis_shoppers_stop.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Vistara",
+    "imagePath": "/card-images/Axis/axis_vistara.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Vistara Infinite",
+    "imagePath": "/card-images/Axis/axis_vistara_infinite.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Vistara Signature",
+    "imagePath": "/card-images/Axis/axis_vistara_signature.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Voyage",
+    "imagePath": "/card-images/Axis/axis_voyage.webp"
+  },
+  {
+    "bank": "Axis",
+    "cardName": "Voyage Black",
+    "imagePath": "/card-images/Axis/axis_voyage_black.webp"
+  },
+  {
+    "bank": "BOB",
+    "cardName": "Easy",
+    "imagePath": "/card-images/BOB/bob_easy.webp"
+  },
+  {
+    "bank": "BOB",
+    "cardName": "Eterna",
+    "imagePath": "/card-images/BOB/bob_eterna.webp"
+  },
+  {
+    "bank": "BOB",
+    "cardName": "HPCL Energie",
+    "imagePath": "/card-images/BOB/bob_hpcl_energie.webp"
+  },
+  {
+    "bank": "BOB",
+    "cardName": "IRCTC",
+    "imagePath": "/card-images/BOB/bob_irctc.webp"
+  },
+  {
+    "bank": "BOB",
+    "cardName": "Indian Coast Guard Rakshamah",
+    "imagePath": "/card-images/BOB/bob_indian_coast_guard_rakshamah.webp"
+  },
+  {
+    "bank": "BOB",
+    "cardName": "Indian Army Yoddha",
+    "imagePath": "/card-images/BOB/bob_indian_army_yoddha.webp"
+  },
+  {
+    "bank": "BOB",
+    "cardName": "Nainital Renaissance",
+    "imagePath": "/card-images/BOB/bob_nainital_renaissance.webp"
+  },
+  {
+    "bank": "BOB",
+    "cardName": "Premier",
+    "imagePath": "/card-images/BOB/bob_premier.webp"
+  },
+  {
+    "bank": "BOB",
+    "cardName": "Prime",
+    "imagePath": "/card-images/BOB/bob_prime.webp"
+  },
+  {
+    "bank": "BOB",
+    "cardName": "Select",
+    "imagePath": "/card-images/BOB/bob_select.webp"
+  },
+  {
+    "bank": "BOB",
+    "cardName": "Snapdeal",
+    "imagePath": "/card-images/BOB/bob_snapdeal.webp"
+  },
+  {
+    "bank": "Canara",
+    "cardName": "Rupay Select",
+    "imagePath": "/card-images/Canara/canara_rupay_select.webp"
+  },
+  {
+    "bank": "Canara",
+    "cardName": "Platinum",
+    "imagePath": "/card-images/Canara/canara_platinum.webp"
+  },
+  {
+    "bank": "Canara",
+    "cardName": "Gold",
+    "imagePath": "/card-images/Canara/canara_gold.webp"
+  },
+  {
+    "bank": "Canara",
+    "cardName": "Classic",
+    "imagePath": "/card-images/Canara/canara_classic.webp"
+  },
+  {
+    "bank": "Canara",
+    "cardName": "MasterCard Standard",
+    "imagePath": "/card-images/Canara/canara_mastercard_standard.webp"
+  },
+  {
+    "bank": "DBS",
+    "cardName": "Spark",
+    "imagePath": "/card-images/DBS/dbs_spark.webp"
+  },
+  {
+    "bank": "DBS",
+    "cardName": "Vantage",
+    "imagePath": "/card-images/DBS/dbs_vantage.webp"
+  },
+  {
+    "bank": "Federal",
+    "cardName": "Imperio",
+    "imagePath": "/card-images/Federal/federal_imperio.webp"
+  },
+  {
+    "bank": "Federal",
+    "cardName": "Signet",
+    "imagePath": "/card-images/Federal/federal_signet.webp"
+  },
+  {
+    "bank": "Federal",
+    "cardName": "Wave",
+    "imagePath": "/card-images/Federal/federal_wave.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Biz Black Metal Edition",
+    "imagePath": "/card-images/HDFC/hdfc_biz_black_metal_edition.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Biz Power",
+    "imagePath": "/card-images/HDFC/hdfc_biz_power.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Biz Grow",
+    "imagePath": "/card-images/HDFC/hdfc_biz_grow.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Biz First",
+    "imagePath": "/card-images/HDFC/hdfc_biz_first.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Diners Club Black Metal",
+    "imagePath": "/card-images/HDFC/hdfc_diners_club_black_metal.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Diners Club Privilege",
+    "imagePath": "/card-images/HDFC/hdfc_diners_club_privilege.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Freedom",
+    "imagePath": "/card-images/HDFC/hdfc_freedom.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "H.O.G Diners",
+    "imagePath": "/card-images/HDFC/hdfc_h.o.g_diners.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Harley Davidson",
+    "imagePath": "/card-images/HDFC/hdfc_harley_davidson.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "IndianOil",
+    "imagePath": "/card-images/HDFC/hdfc_indianoil.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Infinia Metal",
+    "imagePath": "/card-images/HDFC/hdfc_infinia_metal.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "IRCTC",
+    "imagePath": "/card-images/HDFC/hdfc_irctc.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Marriott Bonvoy",
+    "imagePath": "/card-images/HDFC/hdfc_marriott_bonvoy.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Millennia",
+    "imagePath": "/card-images/HDFC/hdfc_millennia.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "MoneyBack Plus",
+    "imagePath": "/card-images/HDFC/hdfc_moneyback_plus.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Paytm",
+    "imagePath": "/card-images/HDFC/hdfc_paytm.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Paytm Select",
+    "imagePath": "/card-images/HDFC/hdfc_paytm_select.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Paytm Mobile",
+    "imagePath": "/card-images/HDFC/hdfc_paytm_mobile.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Paytm Digital",
+    "imagePath": "/card-images/HDFC/hdfc_paytm_digital.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Regalia",
+    "imagePath": "/card-images/HDFC/hdfc_regalia.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Shoppers Stop",
+    "imagePath": "/card-images/HDFC/hdfc_shoppers_stop.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Shoppers Stop Black",
+    "imagePath": "/card-images/HDFC/hdfc_shoppers_stop_black.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Swiggy",
+    "imagePath": "/card-images/HDFC/hdfc_swiggy.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Times",
+    "imagePath": "/card-images/HDFC/hdfc_times.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "Times Platinum",
+    "imagePath": "/card-images/HDFC/hdfc_times_platinum.webp"
+  },
+  {
+    "bank": "HDFC",
+    "cardName": "UPI RuPay",
+    "imagePath": "/card-images/HDFC/hdfc_upi_rupay.webp"
+  },
+  {
+    "bank": "HSBC",
+    "cardName": "Platinum",
+    "imagePath": "/card-images/HSBC/hsbc_platinum.webp"
+  },
+  {
+    "bank": "HSBC",
+    "cardName": "Premier",
+    "imagePath": "/card-images/HSBC/hsbc_premier.webp"
+  },
+  {
+    "bank": "ICICI",
+    "cardName": "AmazonPay",
+    "imagePath": "/card-images/ICICI/icici_amazonpay.webp"
+  },
+  {
+    "bank": "ICICI",
+    "cardName": "Emeralde",
+    "imagePath": "/card-images/ICICI/icici_emeralde.webp"
+  },
+  {
+    "bank": "ICICI",
+    "cardName": "Emeralde Private",
+    "imagePath": "/card-images/ICICI/icici_emeralde_private.webp"
+  },
+  {
+    "bank": "ICICI",
+    "cardName": "HPCL Coral",
+    "imagePath": "/card-images/ICICI/icici_hpcl_coral.webp"
+  },
+  {
+    "bank": "ICICI",
+    "cardName": "MMT Signature",
+    "imagePath": "/card-images/ICICI/icici_mmt_signature.webp"
+  },
+  {
+    "bank": "ICICI",
+    "cardName": "Mine",
+    "imagePath": "/card-images/ICICI/icici_mine.webp"
+  },
+  {
+    "bank": "ICICI",
+    "cardName": "MMT",
+    "imagePath": "/card-images/ICICI/icici_mmt.webp"
+  },
+  {
+    "bank": "ICICI",
+    "cardName": "Sapphiro",
+    "imagePath": "/card-images/ICICI/icici_sapphiro.webp"
+  },
+  {
+    "bank": "IDBI",
+    "cardName": "Aspire",
+    "imagePath": "/card-images/IDBI/idbi_aspire.webp"
+  },
+  {
+    "bank": "IDBI",
+    "cardName": "Euphoria",
+    "imagePath": "/card-images/IDBI/idbi_euphoria.webp"
+  },
+  {
+    "bank": "IDBI",
+    "cardName": "Imperium Platinum",
+    "imagePath": "/card-images/IDBI/idbi_imperium_platinum.webp"
+  },
+  {
+    "bank": "IDBI",
+    "cardName": "Royale Signature",
+    "imagePath": "/card-images/IDBI/idbi_royale_signature.webp"
+  },
+  {
+    "bank": "IDBI",
+    "cardName": "Winnings",
+    "imagePath": "/card-images/IDBI/idbi_winnings.webp"
+  },
+  {
+    "bank": "IDFCFirst",
+    "cardName": "Ashva",
+    "imagePath": "/card-images/IDFCFirst/idfcfirst_ashva.webp"
+  },
+  {
+    "bank": "IDFCFirst",
+    "cardName": "Classic",
+    "imagePath": "/card-images/IDFCFirst/idfcfirst_classic.webp"
+  },
+  {
+    "bank": "IDFCFirst",
+    "cardName": "Club Vistara",
+    "imagePath": "/card-images/IDFCFirst/idfcfirst_club_vistara.webp"
+  },
+  {
+    "bank": "IDFCFirst",
+    "cardName": "Mayura",
+    "imagePath": "/card-images/IDFCFirst/idfcfirst_mayura.webp"
+  },
+  {
+    "bank": "IDFCFirst",
+    "cardName": "Power",
+    "imagePath": "/card-images/IDFCFirst/idfcfirst_power.webp"
+  },
+  {
+    "bank": "IDFCFirst",
+    "cardName": "Power+",
+    "imagePath": "/card-images/IDFCFirst/idfcfirst_power+.webp"
+  },
+  {
+    "bank": "IDFCFirst",
+    "cardName": "Select",
+    "imagePath": "/card-images/IDFCFirst/idfcfirst_select.webp"
+  },
+  {
+    "bank": "IDFCFirst",
+    "cardName": "Wealth",
+    "imagePath": "/card-images/IDFCFirst/idfcfirst_wealth.webp"
+  },
+  {
+    "bank": "IDFCFirst",
+    "cardName": "WOW",
+    "imagePath": "/card-images/IDFCFirst/idfcfirst_wow.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "Avios",
+    "imagePath": "/card-images/IndusInd/indusind_avios.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "Celesta",
+    "imagePath": "/card-images/IndusInd/indusind_celesta.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "Club Vistara Explorer",
+    "imagePath": "/card-images/IndusInd/indusind_club_vistara_explorer.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "Crest",
+    "imagePath": "/card-images/IndusInd/indusind_crest.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "Duo",
+    "imagePath": "/card-images/IndusInd/indusind_duo.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "EazyDiner Platinum",
+    "imagePath": "/card-images/IndusInd/indusind_eazydiner_platinum.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "EazyDiner Signature",
+    "imagePath": "/card-images/IndusInd/indusind_eazydiner_signature.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "Indulge",
+    "imagePath": "/card-images/IndusInd/indusind_indulge.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "InterMiles Odyssey",
+    "imagePath": "/card-images/IndusInd/indusind_intermiles_odyssey.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "InterMiles Voyage",
+    "imagePath": "/card-images/IndusInd/indusind_intermiles_voyage.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "Legend",
+    "imagePath": "/card-images/IndusInd/indusind_legend.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "Nexxt",
+    "imagePath": "/card-images/IndusInd/indusind_nexxt.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "Pioneer Heritage",
+    "imagePath": "/card-images/IndusInd/indusind_pioneer_heritage.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "Pioneer Legacy",
+    "imagePath": "/card-images/IndusInd/indusind_pioneer_legacy.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "Pioneer Private",
+    "imagePath": "/card-images/IndusInd/indusind_pioneer_private.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "Platinum",
+    "imagePath": "/card-images/IndusInd/indusind_platinum.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "Platinum RuPay",
+    "imagePath": "/card-images/IndusInd/indusind_platinum_rupay.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "Platinum Aura Edge",
+    "imagePath": "/card-images/IndusInd/indusind_platinum_aura_edge.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "Samman",
+    "imagePath": "/card-images/IndusInd/indusind_samman.webp"
+  },
+  {
+    "bank": "IndusInd",
+    "cardName": "Solitaire",
+    "imagePath": "/card-images/IndusInd/indusind_solitaire.webp"
+  },
+  {
+    "bank": "Kotak",
+    "cardName": "Indian Oil",
+    "imagePath": "/card-images/Kotak/kotak_indian_oil.webp"
+  },
+  {
+    "bank": "Kotak",
+    "cardName": "League",
+    "imagePath": "/card-images/Kotak/kotak_league.webp"
+  },
+  {
+    "bank": "Kotak",
+    "cardName": "Metro",
+    "imagePath": "/card-images/Kotak/kotak_metro.webp"
+  },
+  {
+    "bank": "Kotak",
+    "cardName": "MOJO",
+    "imagePath": "/card-images/Kotak/kotak_mojo.webp"
+  },
+  {
+    "bank": "Kotak",
+    "cardName": "Myntra",
+    "imagePath": "/card-images/Kotak/kotak_myntra.webp"
+  },
+  {
+    "bank": "Kotak",
+    "cardName": "Privy League Signature",
+    "imagePath": "/card-images/Kotak/kotak_privy_league_signature.webp"
+  },
+  {
+    "bank": "Kotak",
+    "cardName": "PVR INOX",
+    "imagePath": "/card-images/Kotak/kotak_pvr_inox.webp"
+  },
+  {
+    "bank": "Kotak",
+    "cardName": "PVR INOX Gold",
+    "imagePath": "/card-images/Kotak/kotak_pvr_inox_gold.webp"
+  },
+  {
+    "bank": "Kotak",
+    "cardName": "PVR INOX Platinum",
+    "imagePath": "/card-images/Kotak/kotak_pvr_inox_platinum.webp"
+  },
+  {
+    "bank": "Kotak",
+    "cardName": "Royale Signature",
+    "imagePath": "/card-images/Kotak/kotak_royale_signature.webp"
+  },
+  {
+    "bank": "Kotak",
+    "cardName": "UPI Rupay",
+    "imagePath": "/card-images/Kotak/kotak_upi_rupay.webp"
+  },
+  {
+    "bank": "Kotak",
+    "cardName": "White",
+    "imagePath": "/card-images/Kotak/kotak_white.webp"
+  },
+  {
+    "bank": "Kotak",
+    "cardName": "White Reserve",
+    "imagePath": "/card-images/Kotak/kotak_white_reserve.webp"
+  },
+  {
+    "bank": "Kotak",
+    "cardName": "Zen",
+    "imagePath": "/card-images/Kotak/kotak_zen.webp"
+  },
+  {
+    "bank": "RBL",
+    "cardName": "IRCTC",
+    "imagePath": "/card-images/RBL/rbl_irctc.webp"
+  },
+  {
+    "bank": "RBL",
+    "cardName": "ShopRite",
+    "imagePath": "/card-images/RBL/rbl_shoprite.webp"
+  },
+  {
+    "bank": "RBL",
+    "cardName": "World Safari",
+    "imagePath": "/card-images/RBL/rbl_world_safari.webp"
+  },
+  {
+    "bank": "RBL",
+    "cardName": "Icon",
+    "imagePath": "/card-images/RBL/rbl_icon.webp"
+  },
+  {
+    "bank": "RBL",
+    "cardName": "Platinum Maxima Plus",
+    "imagePath": "/card-images/RBL/rbl_platinum_maxima_plus.webp"
+  },
+  {
+    "bank": "RBL",
+    "cardName": "Platinum Delight",
+    "imagePath": "/card-images/RBL/rbl_platinum_delight.webp"
+  },
+  {
+    "bank": "RBL",
+    "cardName": "Cookies",
+    "imagePath": "/card-images/RBL/rbl_cookies.webp"
+  },
+  {
+    "bank": "RBL",
+    "cardName": "Platinum Maxima",
+    "imagePath": "/card-images/RBL/rbl_platinum_maxima.webp"
+  },
+  {
+    "bank": "RBL",
+    "cardName": "Insignia Preferred Banking",
+    "imagePath": "/card-images/RBL/rbl_insignia_preferred_banking.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Air India Platinum",
+    "imagePath": "/card-images/SBI/sbi_air_india_platinum.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Air India Signature",
+    "imagePath": "/card-images/SBI/sbi_air_india_signature.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Apollo",
+    "imagePath": "/card-images/SBI/sbi_apollo.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Aurum",
+    "imagePath": "/card-images/SBI/sbi_aurum.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "BPCL",
+    "imagePath": "/card-images/SBI/sbi_bpcl.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "BPCL Octane",
+    "imagePath": "/card-images/SBI/sbi_bpcl_octane.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Elite",
+    "imagePath": "/card-images/SBI/sbi_elite.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Elite Advantage",
+    "imagePath": "/card-images/SBI/sbi_elite_advantage.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Lifestyle",
+    "imagePath": "/card-images/SBI/sbi_lifestyle.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Lifestyle Prime",
+    "imagePath": "/card-images/SBI/sbi_lifestyle_prime.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Lifestyle Select",
+    "imagePath": "/card-images/SBI/sbi_lifestyle_select.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "PayTM",
+    "imagePath": "/card-images/SBI/sbi_paytm.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "PayTM Select",
+    "imagePath": "/card-images/SBI/sbi_paytm_select.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Prime",
+    "imagePath": "/card-images/SBI/sbi_prime.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Prime Advantage",
+    "imagePath": "/card-images/SBI/sbi_prime_advantage.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Pulse",
+    "imagePath": "/card-images/SBI/sbi_pulse.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "IRCTC",
+    "imagePath": "/card-images/SBI/sbi_irctc.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "IRCTC Platinum",
+    "imagePath": "/card-images/SBI/sbi_irctc_platinum.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "IRCTC Premier",
+    "imagePath": "/card-images/SBI/sbi_irctc_premier.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Vistara",
+    "imagePath": "/card-images/SBI/sbi_vistara.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Vistara Prime",
+    "imagePath": "/card-images/SBI/sbi_vistara_prime.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "SimplyClick",
+    "imagePath": "/card-images/SBI/sbi_simplyclick.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "SimplySave",
+    "imagePath": "/card-images/SBI/sbi_simplysave.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Tata",
+    "imagePath": "/card-images/SBI/sbi_tata.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Tata Select",
+    "imagePath": "/card-images/SBI/sbi_tata_select.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Titan",
+    "imagePath": "/card-images/SBI/sbi_titan.webp"
+  },
+  {
+    "bank": "SBI",
+    "cardName": "Yatra",
+    "imagePath": "/card-images/SBI/sbi_yatra.webp"
+  },
+  {
+    "bank": "SC",
+    "cardName": "EaseMyTrip",
+    "imagePath": "/card-images/SC/sc_easemytrip.webp"
+  },
+  {
+    "bank": "SC",
+    "cardName": "Platinum Rewards",
+    "imagePath": "/card-images/SC/sc_platinum_rewards.webp"
+  },
+  {
+    "bank": "SC",
+    "cardName": "Rewards",
+    "imagePath": "/card-images/SC/sc_rewards.webp"
+  },
+  {
+    "bank": "SC",
+    "cardName": "Smart",
+    "imagePath": "/card-images/SC/sc_smart.webp"
+  },
+  {
+    "bank": "SC",
+    "cardName": "Ultimate",
+    "imagePath": "/card-images/SC/sc_ultimate.webp"
+  },
+  {
+    "bank": "YesBank",
+    "cardName": "BYOC",
+    "imagePath": "/card-images/YesBank/yesbank_byoc.webp"
+  },
+  {
+    "bank": "YesBank",
+    "cardName": "First Preferred",
+    "imagePath": "/card-images/YesBank/yesbank_first_preferred.webp"
+  },
+  {
+    "bank": "YesBank",
+    "cardName": "Prosperity",
+    "imagePath": "/card-images/YesBank/yesbank_prosperity.webp"
+  },
+  {
+    "bank": "YesBank",
+    "cardName": "Wellness Plus",
+    "imagePath": "/card-images/YesBank/yesbank_wellness_plus.webp"
+  }
+]

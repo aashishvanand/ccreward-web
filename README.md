@@ -1,12 +1,12 @@
-# Credit Card Rewards India Calculator
+# Credit Card Rewards
 
 ## Overview
 
-The Credit Card Rewards India Calculator is a comprehensive tool designed to help users optimize their credit card rewards across multiple banks and credit cards in India. This project aims to simplify the process of comparing rewards based on specific Merchant Category Codes (MCCs) and finding the best card for various spending patterns.
+The Credit Card Rewards is a comprehensive tool designed to help users optimize their credit card rewards across multiple banks and credit cards in India. This project aims to simplify the process of comparing rewards based on specific Merchant Category Codes (MCCs) and finding the best card for various spending patterns.
 
 ## Features
 
-- Multi-bank support: Calculate rewards for cards from AMEX, Axis Bank, BOB, HDFC, HSBC, ICICI, IDFC First, IndusInd, Kotak, OneCard, RBL, SBI, Scapia, Standard Chartered, Yes Bank and AU Bank.
+- Multi-bank support: Calculate rewards for cards from AMEX, Axis, AU, BOB, Canara, DBS, Federal, HDFC, HSBC, ICICI, IDFC First, IndusInd, Kotak, OneCard, RBL, SBI, SC, Yes.
 - MCC-based calculations: Accurately calculate rewards based on specific Merchant Category Codes.
 - User-friendly interface: Easy-to-use calculator with intuitive design.
 - Dark mode support: Toggle between light and dark themes for comfortable viewing.
@@ -34,10 +34,10 @@ The Credit Card Rewards India Calculator is a comprehensive tool designed to hel
 
 ```bash
 # Clone the repository
-git clone https://github.com/aashishvanand/credit-card-rewards-india-calculator.git
+git clone https://github.com/aashishvanand/credit-card-rewards-web.git
 
 # Navigate to the project directory
-cd credit-card-rewards-india-calculator
+cd credit-card-rewards-web
 
 # Install dependencies
 npm install
@@ -84,20 +84,26 @@ For more substantial contributions:
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is available under a dual license - open source for non-commercial use and a commercial license for business use. See the [LICENSE](LICENSE) file for details.
+
+Open Source License (for non-commercial use)
+The project is freely available for non-commercial use under the terms specified in the LICENSE file. This allows for personal use, educational purposes, and open source projects.
+
+Commercial License
+For any commercial use of this project, including but not limited to using it as part of a business process or incorporating it into a commercial product or service, a separate commercial license is required. The fee for the commercial license varies based on the size of the company. Please contact the author for more information on commercial licensing.
 
 ## Attribution Requirements
 
-If you use, modify, or distribute this project, please provide attribution by including the following:
+Regardless of whether you are using the project under the open source or commercial license, if you use, modify, or distribute this project, please provide attribution by including the following:
 
-1. The name of the project: Credit Card Rewards India Calculator
-2. The project's GitHub repository URL: https://github.com/aashishvanand/credit-card-rewards-india-calculator
+1. The name of the project: ccreward.app
+2. The project's GitHub repository URL: https://github.com/aashishvanand/credit-card-rewards-web
 3. The name of the original author: Aashish Vivekanand
 
 Example attribution:
 
 ```
-This project is based on the Credit Card Rewards India Calculator (https://github.com/aashishvanand/credit-card-rewards-india-calculator) by Aashish Vivekanand.
+This project is based on the Credit Card Rewards (https://github.com/aashishvanand/credit-card-rewards-india-calculator) by Aashish Vivekanand.
 ```
 
 ---

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   FormControl,
   FormLabel,
@@ -21,23 +21,92 @@ const DynamicCardInputs = ({
   currentInputs,
   selectedMcc,
 }) => {
-  const dynamicInputs =
-    typeof cardConfig.dynamicInputs === "function"
-      ? cardConfig.dynamicInputs(currentInputs, onChange, selectedMcc?.mcc)
-      : cardConfig.dynamicInputs;
+  const dynamicInputs = cardConfig.dynamicInputs;
+  const prevInputsRef = useRef(dynamicInputs);
 
-      if (!dynamicInputs || dynamicInputs.length === 0) {
-        return null;
+  useEffect(() => {
+    if (dynamicInputs !== prevInputsRef.current) {
+      Object.keys(currentInputs).forEach(key => {
+        onChange(key, undefined);
+      });
+      prevInputsRef.current = dynamicInputs;
+    }
+  }, [dynamicInputs, currentInputs, onChange]);
+
+  useEffect(() => {
+    const mutuallyExclusiveInputs = dynamicInputs.filter(input => input.mutuallyExclusiveWith && input.mutuallyExclusiveWith.length > 0);
+    mutuallyExclusiveInputs.forEach(input => {
+      if (currentInputs[input.name] === true) {
+        input.mutuallyExclusiveWith.forEach(exclusiveName => {
+          if (currentInputs[exclusiveName] === true) {
+            onChange(exclusiveName, false);
+          }
+        });
       }
+    });
+  }, [dynamicInputs, currentInputs, onChange]);
+
+  const handleInputChange = (inputName, value, maxSelect = null) => {
+    if (value === "true") {
+      value = true;
+    } else if (value === "false") {
+      value = false;
+    }
+
+    const currentInput = dynamicInputs.find(input => input.name === inputName);
+    if (currentInput && currentInput.mutuallyExclusiveWith && value === true) {
+      currentInput.mutuallyExclusiveWith.forEach(exclusiveName => {
+        onChange(exclusiveName, false);
+      });
+    }
+
+    if (maxSelect !== null && typeof value === 'object') {
+      const newSelectedCount = Object.values(value).filter(Boolean).length;
+      const currentSelectedCount = Object.values(currentInputs[inputName] || {}).filter(Boolean).length;
+
+      if (newSelectedCount > currentSelectedCount && newSelectedCount > maxSelect) {
+        return; // Don't allow more selections than maxSelect
+      }
+    }
+
+    onChange(inputName, value);
+  };
+
+  const shouldDisplayQuestion = (input) => {
+    if (!input.dependsOn) return true;
+    const { question: dependentQuestion, value: dependentValue } = input.dependsOn;
+    
+    if (!(dependentQuestion in currentInputs)) return false;
+    
+    const currentValue = currentInputs[dependentQuestion];
+    
+    // Handle both boolean and string comparisons
+    if (typeof dependentValue === 'boolean') {
+      return currentValue === dependentValue;
+    } else {
+      return String(currentValue) === String(dependentValue);
+    }
+  };
+
+  const isInputApplicable = (input) => {
+    if (!input.applicableMCCs || input.applicableMCCs.length === 0) {
+      return true;
+    }
+    return selectedMcc && input.applicableMCCs.includes(selectedMcc.mcc);
+  };
 
   return (
     <>
-      {dynamicInputs.map((input, index) => {
+      {dynamicInputs.map((input) => {
+        if (!isInputApplicable(input) || !shouldDisplayQuestion(input)) {
+          return null;
+        }
+
         switch (input.type) {
           case "radio":
             return (
               <FormControl
-                key={index}
+                key={input.name}
                 component="fieldset"
                 sx={{ mt: 2, width: "100%" }}
               >
@@ -54,8 +123,10 @@ const DynamicCardInputs = ({
                 <RadioGroup
                   aria-label={input.name}
                   name={input.name}
-                  value={String(currentInputs[input.name])}
-                  onChange={(e) => input.onChange(e.target.value)}
+                  value={String(currentInputs[input.name] ?? "")}
+                  onChange={(e) =>
+                    handleInputChange(input.name, e.target.value)
+                  }
                   row
                 >
                   {input.options.map((option, optionIndex) => (
@@ -71,7 +142,7 @@ const DynamicCardInputs = ({
             );
           case "select":
             return (
-              <FormControl key={index} fullWidth sx={{ mt: 2 }}>
+              <FormControl key={input.name} fullWidth sx={{ mt: 2 }}>
                 <Box display="flex" alignItems="center">
                   <FormLabel component="legend">{input.label}</FormLabel>
                   {input.helperText && (
@@ -83,8 +154,10 @@ const DynamicCardInputs = ({
                   )}
                 </Box>
                 <Select
-                  value={currentInputs[input.name] || ""}
-                  onChange={(e) => input.onChange(e.target.value)}
+                  value={currentInputs[input.name] ?? ""}
+                  onChange={(e) =>
+                    handleInputChange(input.name, e.target.value)
+                  }
                   displayEmpty
                 >
                   <MenuItem value="">
@@ -111,7 +184,7 @@ const DynamicCardInputs = ({
           case "checkbox":
             return (
               <FormControl
-                key={index}
+                key={input.name}
                 component="fieldset"
                 sx={{ mt: 2, width: "100%" }}
               >
@@ -131,36 +204,16 @@ const DynamicCardInputs = ({
                       key={optionIndex}
                       control={
                         <Checkbox
-                          checked={currentInputs[input.name]?.includes(
-                            option.value
+                          checked={Boolean(
+                            currentInputs[input.name]?.[option.value]
                           )}
                           onChange={(e) => {
-                            const selectedValues =
-                              currentInputs[input.name] || [];
-                            if (e.target.checked) {
-                              if (
-                                selectedValues.length <
-                                (input.maxSelect || Infinity)
-                              ) {
-                                onChange(input.name, [
-                                  ...selectedValues,
-                                  option.value,
-                                ]);
-                              }
-                            } else {
-                              onChange(
-                                input.name,
-                                selectedValues.filter((v) => v !== option.value)
-                              );
-                            }
+                            const newValue = {
+                              ...currentInputs[input.name],
+                              [option.value]: e.target.checked,
+                            };
+                            handleInputChange(input.name, newValue, input.maxSelect);
                           }}
-                          disabled={
-                            !currentInputs[input.name]?.includes(
-                              option.value
-                            ) &&
-                            currentInputs[input.name]?.length >=
-                              (input.maxSelect || Infinity)
-                          }
                         />
                       }
                       label={option.label}

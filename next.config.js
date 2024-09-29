@@ -18,6 +18,11 @@ const nextConfig = {
   experimental: {
     forceSwcTransforms: true,
   },
+  compiler:{
+    removeConsole:{
+      exclude:["error"]
+    }
+  }
 };
 
 module.exports = nextConfig;

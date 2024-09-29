@@ -11,6 +11,7 @@ import {
   MenuItem,
   useMediaQuery,
   useTheme,
+  Tooltip,
 } from "@mui/material";
 import {
   CreditCard,
@@ -27,6 +28,8 @@ import { useAuth } from "../app/providers/AuthContext";
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { getCardsForUser } from "../utils/firebaseUtils";
+import { onCardUpdate } from "../utils/events";
+import ExportedImage from "next-image-export-optimizer";
 
 function Header() {
   const { mode, toggleTheme } = useAppTheme();
@@ -51,7 +54,14 @@ function Header() {
     };
 
     fetchUserCardCount();
+
+    // Add event listener for card updates
+    const unsubscribe = onCardUpdate(fetchUserCardCount);
+
+    // Cleanup function
+    return () => unsubscribe();
   }, [user]);
+
 
   const handleLogout = async () => {
     try {
@@ -72,10 +82,16 @@ function Header() {
 
   const menuItems = [
     { label: 'Home', icon: <HomeIcon />, href: '/' },
-    { label: 'Calculator', icon: <CalculateIcon />, href: '/calculator' },
     ...(isAuthenticated() ? [
+      { label: 'Calculator', icon: <CalculateIcon />, href: '/calculator' },
       { label: 'My Cards', icon: <CreditCard />, href: '/my-cards' },
-      ...(userCardCount > 1 ? [{ label: 'Best Card', icon: <StarsIcon />, href: '/best-card' }] : [])
+      { 
+        label: 'Best Card', 
+        icon: <StarsIcon />, 
+        href: '/best-card',
+        disabled: userCardCount < 2,
+        tooltip: userCardCount < 2 ? "Add at least two cards to use this feature" : ""
+      }
     ] : []),
   ];
 
@@ -87,6 +103,7 @@ function Header() {
           onClick={handleMenuClose}
           component={Link}
           href={item.href}
+          disabled={item.disabled}
         >
           {item.icon}
           <Typography sx={{ ml: 1 }}>{item.label}</Typography>
@@ -103,7 +120,17 @@ function Header() {
           component="div"
           sx={{ display: "flex", alignItems: "center" }}
         >
-          <CreditCard sx={{ mr: 1 }} />
+         <Box sx={{ position: 'relative', width: 40, height: 40, mr: 1 }}>
+              <ExportedImage
+                src="/ccreward-logo.webp"
+                alt="CCReward Logo"
+                width={40}
+                height={40}
+                layout="responsive"
+                placeholder="empty"
+                priority
+              />
+            </Box>
           CCReward
         </Typography>
         
@@ -140,16 +167,20 @@ function Header() {
             <>
               {menuItems.map((item) => (
                 pathname !== item.href && (
-                  <Button
-                    key={item.label}
-                    color="inherit"
-                    startIcon={item.icon}
-                    component={Link}
-                    href={item.href}
-                    sx={{ ml: 2 }}
-                  >
-                    {item.label}
-                  </Button>
+                  <Tooltip key={item.label} title={item.tooltip || ""} arrow>
+                    <span>
+                      <Button
+                        color="inherit"
+                        startIcon={item.icon}
+                        component={Link}
+                        href={item.href}
+                        sx={{ ml: 2 }}
+                        disabled={item.disabled}
+                      >
+                        {item.label}
+                      </Button>
+                    </span>
+                  </Tooltip>
                 )
               ))}
               

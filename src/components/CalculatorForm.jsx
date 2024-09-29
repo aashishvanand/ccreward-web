@@ -1,8 +1,20 @@
-import { useState, useEffect } from "react";
-import { Autocomplete, TextField, Button, Box } from "@mui/material";
-import { mccList } from "../data/mccData";
-import { bankData } from "../data/bankData";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Autocomplete,
+  TextField,
+  Button,
+  Box,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import DynamicCardInputs from "./DynamicCardInputs";
+import {
+  fetchBanks,
+  fetchCards,
+  fetchMCC,
+  fetchCardQuestions,
+} from "../utils/api";
+import _ from "lodash";
 
 const CalculatorForm = ({
   selectedBank,
@@ -17,49 +29,142 @@ const CalculatorForm = ({
   onAdditionalInputChange,
   onCalculate,
   onClear,
-  getCardConfig,
+  onError,
 }) => {
-  const [cardConfig, setCardConfig] = useState(null);
-  const [mccOptions, setMccOptions] = useState(mccList);
+  const [banks, setBanks] = useState([]);
+  const [cards, setCards] = useState([]);
+  const [mccOptions, setMccOptions] = useState([]);
+  const [cardQuestions, setCardQuestions] = useState(null);
+  const [mccInputValue, setMccInputValue] = useState("");
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
+
+  useEffect(() => {
+    fetchBanks().then(setBanks).catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    if (selectedBank) {
+      fetchCards(selectedBank).then(setCards).catch(console.error);
+    } else {
+      setCards([]);
+    }
+  }, [selectedBank]);
 
   useEffect(() => {
     if (selectedBank && selectedCard) {
-      getCardConfig(selectedBank, selectedCard).then((config) => {
-        setCardConfig(config);
-      });
+      setIsLoadingQuestions(true);
+      fetchCardQuestions(selectedBank, selectedCard)
+        .then((questions) => {
+          setCardQuestions(questions);
+          setIsLoadingQuestions(false);
+        })
+        .catch((error) => {
+          if (error.message.includes("too many requests")) {
+            onError(error.message, "warning");
+          } else {
+            console.error("Error fetching card questions:", error);
+            setCardQuestions(null);
+            setIsLoadingQuestions(false);
+            onError(
+              error.response?.data?.error ||
+                error.message ||
+                "An error occurred while fetching card questions."
+            );
+          }
+        });
     } else {
-      setCardConfig(null);
+      setCardQuestions(null);
     }
-  }, [selectedBank, selectedCard, getCardConfig]);
+  }, [selectedBank, selectedCard, onError]);
 
-  const handleMccSearch = (event, value) => {
-    if (!value) {
-      setMccOptions(mccList);
+  const debouncedFetchMCC = useCallback(
+    _.debounce(async (value) => {
+      if (value) {
+        try {
+          const mccData = await fetchMCC(value);
+          return mccData;
+        } catch (error) {
+          console.error("Error fetching MCC data:", error);
+          return [];
+        }
+      } else {
+        return [];
+      }
+    }, 300),
+    []
+  );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await debouncedFetchMCC(mccInputValue);
+        setMccOptions(result || []); // Ensure we always set an array
+      } catch (error) {
+        console.error("Error fetching MCC data:", error);
+        setMccOptions([]); // Set empty array in case of error
+      }
+    };
+
+    if (mccInputValue) {
+      fetchData();
     } else {
-      const searchTerm = value.toLowerCase();
-      const filteredOptions = mccList.filter(
-        (option) =>
-          option.mcc.toLowerCase().includes(searchTerm) ||
-          option.name.toLowerCase().includes(searchTerm) ||
-          option.knownMerchants.some((merchant) =>
-            merchant.toLowerCase().includes(searchTerm)
-          )
-      );
-      setMccOptions(filteredOptions);
+      setMccOptions([]); // Clear options if input is empty
     }
+  }, [mccInputValue, debouncedFetchMCC]);
+
+  const handleMccInputChange = (event, newInputValue) => {
+    setMccInputValue(newInputValue);
   };
 
   const isCalculateDisabled =
     !selectedBank ||
     !selectedCard ||
     !spentAmount ||
-    parseFloat(spentAmount) <= 0;
+    parseFloat(spentAmount) <= 0 ||
+    isLoadingQuestions;
+
+  const getOptionLabel = (option) => {
+    if (typeof option === "string") return option;
+    return `${option.mcc} - ${option.name}`;
+  };
+
+  const renderOption = (props, option) => {
+    return (
+      <li {...props} key={option.mcc}>
+        <Box>
+          <Typography variant="body1">
+            {option.mcc} - {option.name}
+          </Typography>
+          {option.knownMerchants && option.knownMerchants.length > 0 && (
+            <Typography variant="body2" color="text.secondary">
+              Known merchants: {option.knownMerchants.join(", ")}
+            </Typography>
+          )}
+        </Box>
+      </li>
+    );
+  };
+
+  const filterOptions = (options, { inputValue }) => {
+    return options.filter((option) => {
+      const matchMcc = option.mcc
+        .toLowerCase()
+        .includes(inputValue.toLowerCase());
+      const matchName = option.name
+        .toLowerCase()
+        .includes(inputValue.toLowerCase());
+      const matchMerchants = option.knownMerchants.some((merchant) =>
+        merchant.toLowerCase().includes(inputValue.toLowerCase())
+      );
+      return matchMcc || matchName || matchMerchants;
+    });
+  };
 
   return (
     <>
       <Autocomplete
         fullWidth
-        options={Object.keys(bankData)}
+        options={banks}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -74,7 +179,7 @@ const CalculatorForm = ({
 
       <Autocomplete
         fullWidth
-        options={selectedBank ? bankData[selectedBank] : []}
+        options={cards}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -94,26 +199,40 @@ const CalculatorForm = ({
         getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
         renderOption={(props, option) => (
           <li {...props}>
-            {option.mcc} - {option.name}
-            {option.knownMerchants.length > 0 && (
-              <span style={{ fontSize: "0.8em", color: "gray" }}>
-                {" "}
-                (e.g., {option.knownMerchants.join(", ")})
-              </span>
-            )}
+            <Box>
+              <Typography variant="body1">
+                {option.mcc} - {option.name}
+              </Typography>
+              {option.knownMerchants && option.knownMerchants.length > 0 && (
+                <Typography variant="body2" color="text.secondary">
+                  Known merchants: {option.knownMerchants.join(", ")}
+                </Typography>
+              )}
+            </Box>
           </li>
         )}
         renderInput={(params) => (
           <TextField
             {...params}
-            label="Search Merchant or MCC (Optional)"
+            label="Search MCC, Merchant Category, or Known Merchants"
             margin="normal"
           />
         )}
-        onInputChange={handleMccSearch}
+        onInputChange={handleMccInputChange}
         onChange={(event, newValue) => onMccChange(newValue)}
         value={selectedMcc}
-        filterOptions={(x) => x}
+        inputValue={mccInputValue}
+        filterOptions={(options, { inputValue }) => {
+          const filterValue = inputValue.toLowerCase();
+          return options.filter(
+            (option) =>
+              option.mcc.toLowerCase().includes(filterValue) ||
+              option.name.toLowerCase().includes(filterValue) ||
+              option.knownMerchants.some((merchant) =>
+                merchant.toLowerCase().includes(filterValue)
+              )
+          );
+        }}
       />
 
       <TextField
@@ -126,13 +245,19 @@ const CalculatorForm = ({
         required
       />
 
-      {cardConfig && (
-        <DynamicCardInputs
-          cardConfig={cardConfig}
-          onChange={onAdditionalInputChange}
-          currentInputs={additionalInputs}
-          selectedMcc={selectedMcc}
-        />
+      {isLoadingQuestions ? (
+        <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        cardQuestions && (
+          <DynamicCardInputs
+            cardConfig={{ dynamicInputs: cardQuestions }}
+            onChange={onAdditionalInputChange}
+            currentInputs={additionalInputs}
+            selectedMcc={selectedMcc}
+          />
+        )
       )}
 
       <Box
