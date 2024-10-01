@@ -61,14 +61,14 @@ export function AuthProvider({ children }) {
       setIsNewUser(false);
       if (typeof window !== 'undefined') {
         Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('userCardsCache_') || 
-              key.startsWith('userCardsCacheTimestamp_')) {
+          if (key.startsWith('userCardsCache_') ||
+            key.startsWith('userCardsCacheTimestamp_')) {
             localStorage.removeItem(key);
           }
         });
         localStorage.removeItem('calculationCount');
       }
-      
+
     } catch (error) {
       console.error("Error signing out", error);
       throw error;

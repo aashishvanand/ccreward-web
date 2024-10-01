@@ -107,7 +107,8 @@ export const renderCardList = (
               <Typography
                 variant="body1"
                 sx={{
-                  color: index === 0 ? "success.contrastText" : "text.secondary",
+                  color:
+                    index === 0 ? "success.contrastText" : "text.secondary",
                 }}
               >
                 {card.rewardText}
@@ -119,4 +120,3 @@ export const renderCardList = (
     </ListItem>
   ));
 };
-

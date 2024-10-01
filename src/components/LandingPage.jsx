@@ -66,23 +66,28 @@ const tweets = [
     id: 1,
     author: "Amit Chopra | Every Paisa Matters",
     handle: "@EvryPaisaMatter",
-    avatar: "https://pbs.twimg.com/profile_images/1481104355919282176/5lZaqKF9_400x400.jpg",
-    content: "One stop shop to go to for all Credit Card Rewards related answers!",
+    avatar:
+      "https://pbs.twimg.com/profile_images/1481104355919282176/5lZaqKF9_400x400.jpg",
+    content:
+      "One stop shop to go to for all Credit Card Rewards related answers!",
     url: "https://x.com/aashishvanand/status/1834868453498601877/quotes",
   },
   {
     id: 2,
     author: "Rewards Maverick",
     handle: "@RewardsMaverick",
-    avatar: "https://pbs.twimg.com/profile_images/1689934420067905536/Sx4B6taZ_400x400.jpg",
-    content: "Ever wondered which card to use for what kind of payment!!! No more. Use the rewards calculator and be sure of the points and maximize your rewards!!!",
+    avatar:
+      "https://pbs.twimg.com/profile_images/1689934420067905536/Sx4B6taZ_400x400.jpg",
+    content:
+      "Ever wondered which card to use for what kind of payment!!! No more. Use the rewards calculator and be sure of the points and maximize your rewards!!!",
     url: "https://x.com/RewardsMaverick/status/1830421884623630555",
   },
   {
     id: 3,
     author: "Gajender Yadav",
     handle: "@imYadav31",
-    avatar: "https://pbs.twimg.com/profile_images/1763209842020483072/Pa8pVMzP_400x400.jpg",
+    avatar:
+      "https://pbs.twimg.com/profile_images/1763209842020483072/Pa8pVMzP_400x400.jpg",
     content: "New Launch alert 🔥💯 Credit Card Reward Calculator 💰",
     url: "https://x.com/imYadav31/status/1830173465514475970",
   },
@@ -90,32 +95,40 @@ const tweets = [
     id: 4,
     author: "Bachat Xpert",
     handle: "@BachatXpert",
-    avatar: "https://pbs.twimg.com/profile_images/1559278856988925953/BBSNPR2S_400x400.jpg",
-    content: "Really liked @aashishvanand work on card by card expected points on various transactions. Visit http://ccreward.app Since its beta stage, u can test and give feedback to make corrections..",
+    avatar:
+      "https://pbs.twimg.com/profile_images/1559278856988925953/BBSNPR2S_400x400.jpg",
+    content:
+      "Really liked @aashishvanand work on card by card expected points on various transactions. Visit http://ccreward.app Since its beta stage, u can test and give feedback to make corrections..",
     url: "https://x.com/BachatXpert/status/1830295336532979927",
   },
   {
     id: 5,
     author: "CardMaven",
     handle: "@CardMavenIn",
-    avatar: "https://pbs.twimg.com/profile_images/1609594059651444737/EpWK43O__400x400.png",
-    content: "Check out this credit card rewards calculator from @aashishvanand and know which is the best one for your spends ✅",
+    avatar:
+      "https://pbs.twimg.com/profile_images/1609594059651444737/EpWK43O__400x400.png",
+    content:
+      "Check out this credit card rewards calculator from @aashishvanand and know which is the best one for your spends ✅",
     url: "https://x.com/CardMavenIn/status/1830266994152837504",
   },
   {
     id: 6,
     author: "Creditkeeda",
     handle: "@creditkeeda",
-    avatar: "https://pbs.twimg.com/profile_images/1785035352736231424/w1DKxAM8_400x400.jpg",
-    content: "✨ If you're trying to figure out which card will give you the best rewards, check out this credit card rewards calculator. 🔥 👉 http://ccreward.app Great work, @aashishvanand! Best wishes! 🎉 #ccgeek #ccgeeks #CreditCardTips",
+    avatar:
+      "https://pbs.twimg.com/profile_images/1785035352736231424/w1DKxAM8_400x400.jpg",
+    content:
+      "✨ If you're trying to figure out which card will give you the best rewards, check out this credit card rewards calculator. 🔥 👉 http://ccreward.app Great work, @aashishvanand! Best wishes! 🎉 #ccgeek #ccgeeks #CreditCardTips",
     url: "https://x.com/creditkeeda/status/1830219490463739933",
   },
   {
     id: 7,
     author: "Satish Kumar Agarwal",
     handle: "@iSatishAgarwal",
-    avatar: "https://pbs.twimg.com/profile_images/1679892355405557768/3XHiJvsD_400x400.jpg",
-    content: "Credit Card Rewards Calculator 📱 💰Maximize Rewards & Save time Great work @aashishvanand 👏 Like ❤️ n Repost ♻️ if useful #CreditCard #ccgeek",
+    avatar:
+      "https://pbs.twimg.com/profile_images/1679892355405557768/3XHiJvsD_400x400.jpg",
+    content:
+      "Credit Card Rewards Calculator 📱 💰Maximize Rewards & Save time Great work @aashishvanand 👏 Like ❤️ n Repost ♻️ if useful #CreditCard #ccgeek",
     url: "https://x.com/iSatishAgarwal/status/1830639440861040697",
   },
 ];
@@ -163,8 +176,6 @@ export default function LandingPage() {
     currentPage * tweetsPerPage,
     (currentPage + 1) * tweetsPerPage
   );
-
-
 
   useEffect(() => {
     const randomCards = getRandomCardImages(3);
@@ -440,13 +451,24 @@ export default function LandingPage() {
           <Grid container spacing={2} justifyContent="center">
             {banks.map((bank) => (
               <Grid item key={bank} xs={6} sm={4} md={3} lg={2}>
-                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 2 }}>
-                  <Box sx={{ width: 80, height: 80, position: 'relative', mb: 1 }}>
+                <Card
+                  sx={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    p: 2,
+                  }}
+                >
+                  <Box
+                    sx={{ width: 80, height: 80, position: "relative", mb: 1 }}
+                  >
                     <ExportedImage
                       src={`/bank-images/${bank.toLowerCase()}.webp`}
                       alt={`${bank} logo`}
                       fill
-                      style={{ objectFit: 'contain' }}
+                      style={{ objectFit: "contain" }}
                     />
                   </Box>
                   <Typography variant="subtitle2" align="center">
@@ -479,14 +501,16 @@ export default function LandingPage() {
           <Typography variant="h3" align="center" gutterBottom>
             Recommended by the X Community
           </Typography>
-          <Box sx={{ position: 'relative', mt: 4, px: { xs: 4, sm: 6, md: 8 } }}>
+          <Box
+            sx={{ position: "relative", mt: 4, px: { xs: 4, sm: 6, md: 8 } }}
+          >
             <IconButton
               onClick={handlePrevPage}
               sx={{
-                position: 'absolute',
+                position: "absolute",
                 left: { xs: -8, sm: -16, md: -24 },
-                top: '50%',
-                transform: 'translateY(-50%)',
+                top: "50%",
+                transform: "translateY(-50%)",
                 zIndex: 1,
               }}
               aria-label="Previous page"
@@ -496,16 +520,40 @@ export default function LandingPage() {
             <Grid container spacing={3} justifyContent="center">
               {visibleTweets.map((tweet) => (
                 <Grid item xs={12} sm={6} md={4} key={tweet.id}>
-                  <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                    <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                        <Avatar src={tweet.avatar} alt={tweet.author} sx={{ mr: 2 }} />
+                  <Card
+                    sx={{
+                      height: "100%",
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <CardContent
+                      sx={{
+                        flexGrow: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
+                    >
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 2 }}
+                      >
+                        <Avatar
+                          src={tweet.avatar}
+                          alt={tweet.author}
+                          sx={{ mr: 2 }}
+                        />
                         <Box>
-                          <Typography variant="subtitle1">{tweet.author}</Typography>
-                          <Typography variant="body2" color="text.secondary">{tweet.handle}</Typography>
+                          <Typography variant="subtitle1">
+                            {tweet.author}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {tweet.handle}
+                          </Typography>
                         </Box>
                       </Box>
-                      <Typography variant="body1" sx={{ mb: 2, flexGrow: 1 }}>{tweet.content}</Typography>
+                      <Typography variant="body1" sx={{ mb: 2, flexGrow: 1 }}>
+                        {tweet.content}
+                      </Typography>
                       <Button
                         variant="outlined"
                         startIcon={<TwitterIcon />}
@@ -513,7 +561,7 @@ export default function LandingPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         fullWidth
-                        sx={{ mt: 'auto' }}
+                        sx={{ mt: "auto" }}
                       >
                         View on X
                       </Button>
@@ -525,10 +573,10 @@ export default function LandingPage() {
             <IconButton
               onClick={handleNextPage}
               sx={{
-                position: 'absolute',
+                position: "absolute",
                 right: { xs: -8, sm: -16, md: -24 },
-                top: '50%',
-                transform: 'translateY(-50%)',
+                top: "50%",
+                transform: "translateY(-50%)",
                 zIndex: 1,
               }}
               aria-label="Next page"

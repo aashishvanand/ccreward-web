@@ -1,15 +1,15 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
 
 export const useCardSelection = () => {
-  const [selectedBank, setSelectedBank] = useState('');
-  const [selectedCard, setSelectedCard] = useState('');
+  const [selectedBank, setSelectedBank] = useState("");
+  const [selectedCard, setSelectedCard] = useState("");
   const [selectedMcc, setSelectedMcc] = useState(null);
-  const [spentAmount, setSpentAmount] = useState('');
+  const [spentAmount, setSpentAmount] = useState("");
   const [additionalInputs, setAdditionalInputs] = useState({});
 
   const handleBankChange = useCallback((newBank) => {
     setSelectedBank(newBank);
-    setSelectedCard('');
+    setSelectedCard("");
     setAdditionalInputs({});
   }, []);
 
@@ -27,14 +27,14 @@ export const useCardSelection = () => {
   }, []);
 
   const handleAdditionalInputChange = useCallback((key, value) => {
-    setAdditionalInputs(prev => ({ ...prev, [key]: value }));
+    setAdditionalInputs((prev) => ({ ...prev, [key]: value }));
   }, []);
 
   const resetAllFields = useCallback(() => {
-    setSelectedBank('');
-    setSelectedCard('');
+    setSelectedBank("");
+    setSelectedCard("");
     setSelectedMcc(null);
-    setSpentAmount('');
+    setSpentAmount("");
     setAdditionalInputs({});
   }, []);
 
@@ -52,7 +52,13 @@ export const useCardSelection = () => {
     resetAllFields,
   };
 };
-export const useRewardCalculation = (selectedBank, selectedCard, selectedMcc, spentAmount, additionalInputs) => {
+export const useRewardCalculation = (
+  selectedBank,
+  selectedCard,
+  selectedMcc,
+  spentAmount,
+  additionalInputs
+) => {
   const [calculationResult, setCalculationResult] = useState(null);
   const [calculationPerformed, setCalculationPerformed] = useState(false);
 

@@ -10,6 +10,12 @@ const api = axios.create({
 
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
+let getCurrentUserToken = null;
+
+export const initializeApi = (context) => {
+    getCurrentUserToken = context.getCurrentUserToken;
+};
+
 
 const getFromCache = (key) => {
     const cached = localStorage.getItem(key);
@@ -26,40 +32,16 @@ const setToCache = (key, data) => {
     localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
 };
 
-const isTokenExpired = (token) => {
-    if (!token) return true;
-    try {
-        const decodedToken = jwtDecode(token);
-        const currentTime = Date.now() / 1000;
-        return decodedToken.exp < currentTime;
-    } catch (error) {
-        console.error('Error decoding token:', error);
-        return true;
-    }
-};
-
-const refreshAuthToken = async () => {
+export const initializeAuth = async () => {
     const auth = getAuth();
     if (auth.currentUser) {
         try {
             const token = await getIdToken(auth.currentUser, true);
             setAuthToken(token);
             localStorage.setItem('authToken', token);
-            return token;
         } catch (error) {
-            console.error('Error refreshing token:', error);
-            throw error;
+            console.error('Error initializing auth:', error);
         }
-    }
-    throw new Error('No user is currently signed in');
-};
-
-export const initializeAuth = async () => {
-    const storedToken = localStorage.getItem('authToken');
-    if (storedToken && !isTokenExpired(storedToken)) {
-        setAuthToken(storedToken);
-    } else if (getAuth().currentUser) {
-        await refreshAuthToken();
     }
 };
 
@@ -145,25 +127,25 @@ let mccCancelToken = null;
 
 export const fetchMCC = async (search) => {
     if (mccCancelToken) {
-      mccCancelToken.cancel('Operation canceled due to new request.');
+        mccCancelToken.cancel('Operation canceled due to new request.');
     }
-  
+
     mccCancelToken = axios.CancelToken.source();
-  
+
     try {
-      const response = await api.get(`/mcc?search=${search}`, {
-        cancelToken: mccCancelToken.token
-      });
-      return response.data; // Make sure this is returning the array of MCC objects
+        const response = await api.get(`/mcc?search=${search}`, {
+            cancelToken: mccCancelToken.token
+        });
+        return response.data; // Make sure this is returning the array of MCC objects
     } catch (error) {
-      if (axios.isCancel(error)) {
-        console.log('Request canceled:', error.message);
-      } else {
-        console.error('Error fetching MCC data:', error);
-      }
-      return []; // Return an empty array in case of error or cancellation
+        if (axios.isCancel(error)) {
+            console.log('Request canceled:', error.message);
+        } else {
+            console.error('Error fetching MCC data:', error);
+        }
+        return []; // Return an empty array in case of error or cancellation
     }
-  };
+};
 
 export const fetchCardQuestions = async (bank, card) => {
     const encodedBank = encodeURIComponent(bank);

@@ -26,7 +26,7 @@ const DynamicCardInputs = ({
 
   useEffect(() => {
     if (dynamicInputs !== prevInputsRef.current) {
-      Object.keys(currentInputs).forEach(key => {
+      Object.keys(currentInputs).forEach((key) => {
         onChange(key, undefined);
       });
       prevInputsRef.current = dynamicInputs;
@@ -34,10 +34,13 @@ const DynamicCardInputs = ({
   }, [dynamicInputs, currentInputs, onChange]);
 
   useEffect(() => {
-    const mutuallyExclusiveInputs = dynamicInputs.filter(input => input.mutuallyExclusiveWith && input.mutuallyExclusiveWith.length > 0);
-    mutuallyExclusiveInputs.forEach(input => {
+    const mutuallyExclusiveInputs = dynamicInputs.filter(
+      (input) =>
+        input.mutuallyExclusiveWith && input.mutuallyExclusiveWith.length > 0
+    );
+    mutuallyExclusiveInputs.forEach((input) => {
       if (currentInputs[input.name] === true) {
-        input.mutuallyExclusiveWith.forEach(exclusiveName => {
+        input.mutuallyExclusiveWith.forEach((exclusiveName) => {
           if (currentInputs[exclusiveName] === true) {
             onChange(exclusiveName, false);
           }
@@ -53,18 +56,25 @@ const DynamicCardInputs = ({
       value = false;
     }
 
-    const currentInput = dynamicInputs.find(input => input.name === inputName);
+    const currentInput = dynamicInputs.find(
+      (input) => input.name === inputName
+    );
     if (currentInput && currentInput.mutuallyExclusiveWith && value === true) {
-      currentInput.mutuallyExclusiveWith.forEach(exclusiveName => {
+      currentInput.mutuallyExclusiveWith.forEach((exclusiveName) => {
         onChange(exclusiveName, false);
       });
     }
 
-    if (maxSelect !== null && typeof value === 'object') {
+    if (maxSelect !== null && typeof value === "object") {
       const newSelectedCount = Object.values(value).filter(Boolean).length;
-      const currentSelectedCount = Object.values(currentInputs[inputName] || {}).filter(Boolean).length;
+      const currentSelectedCount = Object.values(
+        currentInputs[inputName] || {}
+      ).filter(Boolean).length;
 
-      if (newSelectedCount > currentSelectedCount && newSelectedCount > maxSelect) {
+      if (
+        newSelectedCount > currentSelectedCount &&
+        newSelectedCount > maxSelect
+      ) {
         return; // Don't allow more selections than maxSelect
       }
     }
@@ -74,14 +84,15 @@ const DynamicCardInputs = ({
 
   const shouldDisplayQuestion = (input) => {
     if (!input.dependsOn) return true;
-    const { question: dependentQuestion, value: dependentValue } = input.dependsOn;
-    
+    const { question: dependentQuestion, value: dependentValue } =
+      input.dependsOn;
+
     if (!(dependentQuestion in currentInputs)) return false;
-    
+
     const currentValue = currentInputs[dependentQuestion];
-    
+
     // Handle both boolean and string comparisons
-    if (typeof dependentValue === 'boolean') {
+    if (typeof dependentValue === "boolean") {
       return currentValue === dependentValue;
     } else {
       return String(currentValue) === String(dependentValue);
@@ -212,7 +223,11 @@ const DynamicCardInputs = ({
                               ...currentInputs[input.name],
                               [option.value]: e.target.checked,
                             };
-                            handleInputChange(input.name, newValue, input.maxSelect);
+                            handleInputChange(
+                              input.name,
+                              newValue,
+                              input.maxSelect
+                            );
                           }}
                         />
                       }

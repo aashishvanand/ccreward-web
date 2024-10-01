@@ -47,6 +47,7 @@ npm run dev
 ```
 
 ## Firebase Setup
+
 To run this project locally, you need to set up a Firebase project and add the configuration to your local environment. Follow these steps:
 
 1. Go to the Firebase Console.
@@ -68,7 +69,7 @@ NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=xxx
 ```
 
 8. Save the .env.local file.
-Make sure to add .env.local to your .gitignore file to prevent sensitive information from being committed to your repository.
+   Make sure to add .env.local to your .gitignore file to prevent sensitive information from being committed to your repository.
 
 ## Contributing
 
@@ -103,7 +104,7 @@ Regardless of whether you are using the project under the open source or commerc
 Example attribution:
 
 ```
-This project is based on the Credit Card Rewards (https://github.com/aashishvanand/credit-card-rewards-india-calculator) by Aashish Vivekanand.
+This project is based on the Credit Card Rewards (https://github.com/aashishvanand/credit-card-rewards-web) by Aashish Vivekanand.
 ```
 
 ---

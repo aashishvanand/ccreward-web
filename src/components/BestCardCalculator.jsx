@@ -17,7 +17,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Divider
+  Divider,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -29,7 +29,11 @@ import ReactConfetti from "react-confetti";
 import { renderCardList } from "./CardListRenderer";
 import DynamicCardInputs from "./DynamicCardInputs";
 import { useAppTheme } from "./ThemeRegistry";
-import { fetchBestCardQuestions, calculateBestCard, fetchMCC } from "../utils/api";
+import {
+  fetchBestCardQuestions,
+  calculateBestCard,
+  fetchMCC,
+} from "../utils/api";
 import _ from "lodash";
 
 const BestCardCalculator = () => {
@@ -178,14 +182,14 @@ const BestCardCalculator = () => {
         setSnackbar({
           open: true,
           message: error.message,
-          severity: "warning"
+          severity: "warning",
         });
       } else {
         console.error("Error calculating rewards:", error);
         setSnackbar({
           open: true,
           message: "Error calculating best card. Please try again.",
-          severity: "error"
+          severity: "error",
         });
       }
     } finally {
@@ -202,7 +206,11 @@ const BestCardCalculator = () => {
 
   const renderAdvancedModeContent = () => {
     if (!Array.isArray(cardQuestions) || cardQuestions.length === 0) {
-      return <Typography>No additional questions available for your cards.</Typography>;
+      return (
+        <Typography>
+          No additional questions available for your cards.
+        </Typography>
+      );
     }
 
     const groupedQuestions = cardQuestions.reduce((acc, question) => {
@@ -214,26 +222,30 @@ const BestCardCalculator = () => {
       return acc;
     }, {});
 
-    return Object.entries(groupedQuestions).map(([cardKey, questions], index) => (
-      <Box key={cardKey} sx={{ mb: 4 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>{cardKey}</Typography>
-        {questions.map((question, qIndex) => (
-          <Box key={qIndex} sx={{ mb: 2 }}>
-            <DynamicCardInputs
-              cardConfig={{ dynamicInputs: [question] }}
-              onChange={(inputKey, value) =>
-                handleAdditionalInputChange(cardKey, inputKey, value)
-              }
-              currentInputs={additionalInputs[cardKey] || {}}
-              selectedMcc={selectedMcc}
-            />
-          </Box>
-        ))}
-        {index < Object.entries(groupedQuestions).length - 1 && (
-          <Divider sx={{ my: 2 }} />
-        )}
-      </Box>
-    ));
+    return Object.entries(groupedQuestions).map(
+      ([cardKey, questions], index) => (
+        <Box key={cardKey} sx={{ mb: 4 }}>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            {cardKey}
+          </Typography>
+          {questions.map((question, qIndex) => (
+            <Box key={qIndex} sx={{ mb: 2 }}>
+              <DynamicCardInputs
+                cardConfig={{ dynamicInputs: [question] }}
+                onChange={(inputKey, value) =>
+                  handleAdditionalInputChange(cardKey, inputKey, value)
+                }
+                currentInputs={additionalInputs[cardKey] || {}}
+                selectedMcc={selectedMcc}
+              />
+            </Box>
+          ))}
+          {index < Object.entries(groupedQuestions).length - 1 && (
+            <Divider sx={{ my: 2 }} />
+          )}
+        </Box>
+      )
+    );
   };
 
   const handleSortMethodChange = (event, newMethod) => {

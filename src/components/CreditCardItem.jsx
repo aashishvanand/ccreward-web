@@ -39,7 +39,7 @@ function CreditCardItem({ card, onDelete, onImageLoad, isHorizontal }) {
   };
 
   const getCardImagePath = (bank, cardName) => {
-    const formattedCardName = cardName.replace(/\s+/g, '_').toLowerCase();
+    const formattedCardName = cardName.replace(/\s+/g, "_").toLowerCase();
     return `/card-images/${bank}/${bank.toLowerCase()}_${formattedCardName}.webp`;
   };
 
@@ -76,7 +76,11 @@ function CreditCardItem({ card, onDelete, onImageLoad, isHorizontal }) {
             alt={`${card.bank} ${card.cardName}`}
             fill
             style={{ objectFit: "contain" }}
-            sizes={isHorizontal ? "(max-width: 600px) 50vw, (max-width: 960px) 33vw, 25vw" : "(max-width: 600px) 33vw, (max-width: 960px) 25vw, 16vw"}
+            sizes={
+              isHorizontal
+                ? "(max-width: 600px) 50vw, (max-width: 960px) 33vw, 25vw"
+                : "(max-width: 600px) 33vw, (max-width: 960px) 25vw, 16vw"
+            }
             onLoad={(e) => {
               const img = e.target;
               onImageLoad(card.id, img.naturalWidth, img.naturalHeight);

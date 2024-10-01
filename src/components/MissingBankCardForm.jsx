@@ -41,9 +41,11 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
 
     let submitUrl = "";
     if (reportType === "bank_or_card") {
-      submitUrl = "https://docs.google.com/forms/u/0/d/e/1FAIpQLScN5YIru311tyglwI3vLjAbeOEHnW8BRWE2ce1qwgch-1mDbQ/formResponse";
+      submitUrl =
+        "https://docs.google.com/forms/u/0/d/e/1FAIpQLScN5YIru311tyglwI3vLjAbeOEHnW8BRWE2ce1qwgch-1mDbQ/formResponse";
     } else if (reportType === "mcc") {
-      submitUrl = "https://docs.google.com/forms/u/0/d/e/1FAIpQLSc7xUzKZe9EGWt6p35mTl8Cf0ZlUDFe2ZGWPIKr5PysZSfqIQ/formResponse";
+      submitUrl =
+        "https://docs.google.com/forms/u/0/d/e/1FAIpQLSc7xUzKZe9EGWt6p35mTl8Cf0ZlUDFe2ZGWPIKr5PysZSfqIQ/formResponse";
     }
 
     fetch(submitUrl, {
@@ -74,22 +76,32 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
     setMerchantName("");
   };
 
-  const steps = ['Select Report Type', 'Enter Details'];
+  const steps = ["Select Report Type", "Enter Details"];
 
   const getStepContent = (step) => {
     switch (step) {
       case 0:
         return (
           <FormControl component="fieldset">
-            <FormLabel component="legend">What would you like to report?</FormLabel>
+            <FormLabel component="legend">
+              What would you like to report?
+            </FormLabel>
             <RadioGroup
               aria-label="report-type"
               name="report-type"
               value={reportType}
               onChange={(e) => setReportType(e.target.value)}
             >
-              <FormControlLabel value="bank_or_card" control={<Radio />} label="Missing Bank or Card" />
-              <FormControlLabel value="mcc" control={<Radio />} label="Missing MCC" />
+              <FormControlLabel
+                value="bank_or_card"
+                control={<Radio />}
+                label="Missing Bank or Card"
+              />
+              <FormControlLabel
+                value="mcc"
+                control={<Radio />}
+                label="Missing MCC"
+              />
             </RadioGroup>
           </FormControl>
         );
@@ -145,7 +157,7 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
         }
         return null;
       default:
-        return 'Unknown step';
+        return "Unknown step";
     }
   };
 
@@ -174,15 +186,17 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
                 </Step>
               ))}
             </Stepper>
-            <Typography variant="body2" color="textSecondary" paragraph sx={{ mt: 2 }}>
-            </Typography>
+            <Typography
+              variant="body2"
+              color="textSecondary"
+              paragraph
+              sx={{ mt: 2 }}
+            ></Typography>
             {getStepContent(activeStep)}
           </DialogContent>
           <DialogActions>
             <Button onClick={onClose}>Cancel</Button>
-            {activeStep > 0 && (
-              <Button onClick={handleBack}>Back</Button>
-            )}
+            {activeStep > 0 && <Button onClick={handleBack}>Back</Button>}
             {activeStep < steps.length - 1 ? (
               <Button onClick={handleNext} disabled={!reportType}>
                 Next

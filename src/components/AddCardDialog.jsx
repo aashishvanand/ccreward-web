@@ -9,7 +9,7 @@ import {
   MenuItem,
   CircularProgress,
   Snackbar,
-  Alert
+  Alert,
 } from "@mui/material";
 import { fetchBanks, fetchCards } from "../utils/api";
 
@@ -19,7 +19,11 @@ function AddCardDialog({ open, onClose, onAddCard }) {
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "error" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "error",
+  });
 
   useEffect(() => {
     if (open) {
@@ -56,13 +60,13 @@ function AddCardDialog({ open, onClose, onAddCard }) {
       setSnackbar({
         open: true,
         message: error.message,
-        severity: "warning"
+        severity: "warning",
       });
     } else {
       setSnackbar({
         open: true,
         message: "An error occurred. Please try again.",
-        severity: "error"
+        severity: "error",
       });
     }
   };
@@ -84,7 +88,7 @@ function AddCardDialog({ open, onClose, onAddCard }) {
   };
 
   const handleCloseSnackbar = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setSnackbar({ ...snackbar, open: false });
@@ -92,61 +96,71 @@ function AddCardDialog({ open, onClose, onAddCard }) {
 
   return (
     <>
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Add New Card</DialogTitle>
-      <DialogContent>
-        {loading && <CircularProgress />}
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <TextField
-          select
-          label="Bank"
-          value={newCard.bank}
-          onChange={handleBankChange}
-          fullWidth
-          margin="normal"
+      <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+        <DialogTitle>Add New Card</DialogTitle>
+        <DialogContent>
+          {loading && <CircularProgress />}
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          <TextField
+            select
+            label="Bank"
+            value={newCard.bank}
+            onChange={handleBankChange}
+            fullWidth
+            margin="normal"
+          >
+            <MenuItem value="">Select a bank</MenuItem>
+            {banks.map((bank) => (
+              <MenuItem key={bank} value={bank}>
+                {bank}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            select
+            label="Card Name"
+            value={newCard.cardName}
+            onChange={(e) =>
+              setNewCard({ ...newCard, cardName: e.target.value })
+            }
+            fullWidth
+            margin="normal"
+            disabled={!newCard.bank || loading}
+          >
+            <MenuItem value="">Select a card</MenuItem>
+            {cards.map((card) => (
+              <MenuItem key={card} value={card}>
+                {card}
+              </MenuItem>
+            ))}
+          </TextField>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button
+            onClick={handleAddCard}
+            color="primary"
+            variant="contained"
+            disabled={!newCard.bank || !newCard.cardName || loading}
+          >
+            Add Card
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
         >
-          <MenuItem value="">Select a bank</MenuItem>
-          {banks.map((bank) => (
-            <MenuItem key={bank} value={bank}>
-              {bank}
-            </MenuItem>
-          ))}
-        </TextField>
-        <TextField
-          select
-          label="Card Name"
-          value={newCard.cardName}
-          onChange={(e) => setNewCard({ ...newCard, cardName: e.target.value })}
-          fullWidth
-          margin="normal"
-          disabled={!newCard.bank || loading}
-        >
-          <MenuItem value="">Select a card</MenuItem>
-          {cards.map((card) => (
-            <MenuItem key={card} value={card}>
-              {card}
-            </MenuItem>
-          ))}
-        </TextField>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button
-          onClick={handleAddCard}
-          color="primary"
-          variant="contained"
-          disabled={!newCard.bank || !newCard.cardName || loading}
-        >
-          Add Card
-        </Button>
-      </DialogActions>
-    </Dialog>
-     <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-     <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
-       {snackbar.message}
-     </Alert>
-   </Snackbar>
-   </>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }
 
