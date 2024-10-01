@@ -25,7 +25,12 @@ import {
   CheckCircleOutline as CheckCircleOutlineIcon,
 } from "@mui/icons-material";
 import { useAuth } from "../app/providers/AuthContext";
-import { linkWithPopup, GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
+import {
+  linkWithPopup,
+  GoogleAuthProvider,
+  getAuth,
+  signInWithPopup,
+} from "firebase/auth";
 
 const CALCULATION_THRESHOLDS = [2, 4, 8, 16, 32, 64, 128];
 
@@ -33,7 +38,11 @@ const AnonymousConversionPrompt = forwardRef((props, ref) => {
   const { user } = useAuth();
   const [calculationCount, setCalculationCount] = useState(0);
   const [showPrompt, setShowPrompt] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
   const [pendingCred, setPendingCred] = useState(null);
 
@@ -65,27 +74,27 @@ const AnonymousConversionPrompt = forwardRef((props, ref) => {
       const auth = getAuth();
       const currentUser = auth.currentUser;
       if (!currentUser) {
-        throw new Error('No user is currently signed in');
+        throw new Error("No user is currently signed in");
       }
       const provider = new GoogleAuthProvider();
       await linkWithPopup(currentUser, provider);
       setSnackbar({
         open: true,
-        message: 'Account successfully converted to Google account!',
-        severity: 'success',
+        message: "Account successfully converted to Google account!",
+        severity: "success",
       });
       setShowPrompt(false);
     } catch (error) {
-      console.error('Error converting account:', error);
-      if (error.code === 'auth/credential-already-in-use') {
+      console.error("Error converting account:", error);
+      if (error.code === "auth/credential-already-in-use") {
         // Store the pending credential
         setPendingCred(error.credential);
         setErrorDialogOpen(true);
       } else {
         setSnackbar({
           open: true,
-          message: 'Failed to convert account. Please try again.',
-          severity: 'error',
+          message: "Failed to convert account. Please try again.",
+          severity: "error",
         });
       }
     }
@@ -96,33 +105,32 @@ const AnonymousConversionPrompt = forwardRef((props, ref) => {
       const auth = getAuth();
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      
+
       // Now link the pending credential to the new sign-in
       if (pendingCred) {
         await result.user.linkWithCredential(pendingCred);
         setPendingCred(null);
       }
-      
+
       setSnackbar({
         open: true,
-        message: 'Successfully signed in and linked accounts!',
-        severity: 'success',
+        message: "Successfully signed in and linked accounts!",
+        severity: "success",
       });
       setErrorDialogOpen(false);
       setShowPrompt(false);
     } catch (error) {
-      console.error('Error signing in:', error);
+      console.error("Error signing in:", error);
       setSnackbar({
         open: true,
-        message: 'Failed to sign in. Please try again.',
-        severity: 'error',
+        message: "Failed to sign in. Please try again.",
+        severity: "error",
       });
     }
   };
 
-
   const handleCloseSnackbar = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setSnackbar({ ...snackbar, open: false });
@@ -178,24 +186,26 @@ const AnonymousConversionPrompt = forwardRef((props, ref) => {
               ))}
             </List>
           </CardContent>
-          <CardActions sx={{ 
-            flexDirection: 'column', 
-            alignItems: 'stretch', 
-            px: 2, 
-            pb: 2,
-            '& .MuiButton-root': {
-              width: '100%',
-              justifyContent: 'center',
-              height: 36,
-              margin: '4px 0', // Add vertical margin
-              marginLeft: '0 !important', // Override the default left margin
-            }
-          }}>
+          <CardActions
+            sx={{
+              flexDirection: "column",
+              alignItems: "stretch",
+              px: 2,
+              pb: 2,
+              "& .MuiButton-root": {
+                width: "100%",
+                justifyContent: "center",
+                height: 36,
+                margin: "4px 0", // Add vertical margin
+                marginLeft: "0 !important", // Override the default left margin
+              },
+            }}
+          >
             <Button
               variant="contained"
-              sx={{ 
-                '& .MuiButton-startIcon': {
-                  position: 'absolute',
+              sx={{
+                "& .MuiButton-startIcon": {
+                  position: "absolute",
                   left: 16,
                 },
               }}
@@ -204,10 +214,7 @@ const AnonymousConversionPrompt = forwardRef((props, ref) => {
               <GoogleIcon sx={{ mr: 1 }} />
               Link with Google Account
             </Button>
-            <Button 
-              variant="outlined" 
-              onClick={() => setShowPrompt(false)}
-            >
+            <Button variant="outlined" onClick={() => setShowPrompt(false)}>
               Maybe Later
             </Button>
           </CardActions>
@@ -215,17 +222,18 @@ const AnonymousConversionPrompt = forwardRef((props, ref) => {
       </Dialog>
 
       <Dialog open={errorDialogOpen} onClose={() => setErrorDialogOpen(false)}>
-        <Card sx={{ width: '100%' }}>
+        <Card sx={{ width: "100%" }}>
           <CardContent>
             <Typography variant="h6" component="div" gutterBottom>
               Account Already Exists
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              The Google account youre trying to link is already associated with another account. 
-              Would you like to sign in to that account instead?
+              The Google account youre trying to link is already associated with
+              another account. Would you like to sign in to that account
+              instead?
             </Typography>
           </CardContent>
-          <CardActions sx={{ justifyContent: 'flex-end', p: 2 }}>
+          <CardActions sx={{ justifyContent: "flex-end", p: 2 }}>
             <Button onClick={() => setErrorDialogOpen(false)}>Cancel</Button>
             <Button variant="contained" onClick={handleSignInExistingAccount}>
               Sign In
@@ -233,7 +241,6 @@ const AnonymousConversionPrompt = forwardRef((props, ref) => {
           </CardActions>
         </Card>
       </Dialog>
-
 
       <Snackbar
         open={snackbar.open}

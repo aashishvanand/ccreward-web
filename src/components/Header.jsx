@@ -25,8 +25,8 @@ import {
 } from "@mui/icons-material";
 import { useAppTheme } from "../components/ThemeRegistry";
 import { useAuth } from "../app/providers/AuthContext";
-import { useRouter, usePathname } from 'next/navigation';
-import Link from 'next/link';
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import { getCardsForUser } from "../utils/firebaseUtils";
 import { onCardUpdate } from "../utils/events";
 import ExportedImage from "next-image-export-optimizer";
@@ -37,7 +37,7 @@ function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [userCardCount, setUserCardCount] = useState(0);
 
@@ -62,11 +62,10 @@ function Header() {
     return () => unsubscribe();
   }, [user]);
 
-
   const handleLogout = async () => {
     try {
       await logout();
-      router.push('/');
+      router.push("/");
     } catch (error) {
       console.error("Error logging out:", error);
     }
@@ -81,64 +80,70 @@ function Header() {
   };
 
   const menuItems = [
-    { label: 'Home', icon: <HomeIcon />, href: '/' },
-    ...(isAuthenticated() ? [
-      { label: 'Calculator', icon: <CalculateIcon />, href: '/calculator' },
-      { label: 'My Cards', icon: <CreditCard />, href: '/my-cards' },
-      { 
-        label: 'Best Card', 
-        icon: <StarsIcon />, 
-        href: '/best-card',
-        disabled: userCardCount < 2,
-        tooltip: userCardCount < 2 ? "Add at least two cards to use this feature" : ""
-      }
-    ] : []),
+    { label: "Home", icon: <HomeIcon />, href: "/" },
+    ...(isAuthenticated()
+      ? [
+          { label: "Calculator", icon: <CalculateIcon />, href: "/calculator" },
+          { label: "My Cards", icon: <CreditCard />, href: "/my-cards" },
+          {
+            label: "Best Card",
+            icon: <StarsIcon />,
+            href: "/best-card",
+            disabled: userCardCount < 2,
+            tooltip:
+              userCardCount < 2
+                ? "Add at least two cards to use this feature"
+                : "",
+          },
+        ]
+      : []),
   ];
 
   const renderMenuItems = () => {
-    return menuItems.map((item) => (
-      pathname !== item.href && (
-        <MenuItem
-          key={item.label}
-          onClick={handleMenuClose}
-          component={Link}
-          href={item.href}
-          disabled={item.disabled}
-        >
-          {item.icon}
-          <Typography sx={{ ml: 1 }}>{item.label}</Typography>
-        </MenuItem>
-      )
-    ));
+    return menuItems.map(
+      (item) =>
+        pathname !== item.href && (
+          <MenuItem
+            key={item.label}
+            onClick={handleMenuClose}
+            component={Link}
+            href={item.href}
+            disabled={item.disabled}
+          >
+            {item.icon}
+            <Typography sx={{ ml: 1 }}>{item.label}</Typography>
+          </MenuItem>
+        )
+    );
   };
 
   return (
     <AppBar position="static" color="default" elevation={0}>
-      <Toolbar sx={{ justifyContent: 'space-between' }}>
+      <Toolbar sx={{ justifyContent: "space-between" }}>
         <Typography
           variant="h6"
           component="div"
           sx={{ display: "flex", alignItems: "center" }}
         >
-         <Box sx={{ position: 'relative', width: 40, height: 40, mr: 1 }}>
-              <ExportedImage
-                src="/ccreward-logo.webp"
-                alt="CCReward Logo"
-                width={40}
-                height={40}
-                layout="responsive"
-                placeholder="empty"
-                priority
-              />
-            </Box>
+          <Box sx={{ position: "relative", width: 40, height: 40, mr: 1 }}>
+            <ExportedImage
+              src="/ccreward-logo.webp"
+              alt="CCReward Logo"
+              width={40}
+              height={40}
+              layout="responsive"
+              placeholder="empty"
+              priority
+            />
+          </Box>
           CCReward
         </Typography>
-        
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+
+        <Box sx={{ display: "flex", alignItems: "center" }}>
           <IconButton onClick={toggleTheme} color="inherit">
             {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
           </IconButton>
-          
+
           {isMobile ? (
             <>
               <IconButton
@@ -165,25 +170,26 @@ function Header() {
             </>
           ) : (
             <>
-              {menuItems.map((item) => (
-                pathname !== item.href && (
-                  <Tooltip key={item.label} title={item.tooltip || ""} arrow>
-                    <span>
-                      <Button
-                        color="inherit"
-                        startIcon={item.icon}
-                        component={Link}
-                        href={item.href}
-                        sx={{ ml: 2 }}
-                        disabled={item.disabled}
-                      >
-                        {item.label}
-                      </Button>
-                    </span>
-                  </Tooltip>
-                )
-              ))}
-              
+              {menuItems.map(
+                (item) =>
+                  pathname !== item.href && (
+                    <Tooltip key={item.label} title={item.tooltip || ""} arrow>
+                      <span>
+                        <Button
+                          color="inherit"
+                          startIcon={item.icon}
+                          component={Link}
+                          href={item.href}
+                          sx={{ ml: 2 }}
+                          disabled={item.disabled}
+                        >
+                          {item.label}
+                        </Button>
+                      </span>
+                    </Tooltip>
+                  )
+              )}
+
               {isAuthenticated() && (
                 <Button
                   color="inherit"
@@ -196,7 +202,7 @@ function Header() {
               )}
             </>
           )}
-          
+
           {isAuthenticated() && (
             <Avatar
               src={user?.photoURL || ""}

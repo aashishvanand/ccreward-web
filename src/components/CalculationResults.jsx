@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import {
   Paper,
   Typography,
@@ -8,16 +8,16 @@ import {
   CircularProgress,
   useMediaQuery,
   useTheme,
-} from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
 const CalculationResults = ({ result, isLoading }) => {
   const [expanded, setExpanded] = useState(false);
   const [isOverflowing, setIsOverflowing] = useState(false);
   const textRef = useRef(null);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     const checkOverflow = () => {
@@ -47,8 +47,7 @@ const CalculationResults = ({ result, isLoading }) => {
   };
 
   const hasRewards =
-    result &&
-    (result.points > 0 || result.cashback > 0 || result.miles > 0);
+    result && (result.points > 0 || result.cashback > 0 || result.miles > 0);
 
   return (
     <Paper
@@ -56,22 +55,22 @@ const CalculationResults = ({ result, isLoading }) => {
       sx={{
         p: 2,
         mt: 2,
-        width: '100%',
-        bgcolor: hasRewards ? 'success.light' : 'error.light',
+        width: "100%",
+        bgcolor: hasRewards ? "success.light" : "error.light",
         borderRadius: 2,
       }}
     >
       {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
           <CircularProgress />
         </Box>
       ) : (
         <>
           <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <Typography
@@ -82,28 +81,26 @@ const CalculationResults = ({ result, isLoading }) => {
               fontWeight="bold"
               onClick={toggleExpand}
               sx={{
-                fontSize: { xs: '1rem', sm: '1.25rem' },
-                cursor: 'pointer',
-                maxWidth: 'calc(100% - 40px)',
+                fontSize: { xs: "1rem", sm: "1.25rem" },
+                cursor: "pointer",
+                maxWidth: "calc(100% - 40px)",
                 ...(expanded
                   ? {}
                   : {
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
                     }),
               }}
             >
               {hasRewards ? (
-                <>
-                  🎉 {result.rewardText} 🎉
-                </>
+                <>🎉 {result.rewardText} 🎉</>
               ) : (
                 <>😢 No rewards earned 😢</>
               )}
             </Typography>
             {(isMobile || isOverflowing) && (
-              <Tooltip title={expanded ? 'Collapse' : 'Expand'}>
+              <Tooltip title={expanded ? "Collapse" : "Expand"}>
                 <IconButton size="small" onClick={toggleExpand} sx={{ ml: 1 }}>
                   {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </IconButton>

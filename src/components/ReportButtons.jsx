@@ -1,7 +1,11 @@
-import React from 'react';
-import { Button } from '@mui/material';
+import React from "react";
+import { Button } from "@mui/material";
 
-const ReportButtons = ({ calculationPerformed, onMissingFormOpen, onIncorrectRewardOpen }) => {
+const ReportButtons = ({
+  calculationPerformed,
+  onMissingFormOpen,
+  onIncorrectRewardOpen,
+}) => {
   return (
     <>
       {calculationPerformed ? (

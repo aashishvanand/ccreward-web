@@ -15,7 +15,8 @@ function CardList({ cards, onDeleteCard }) {
   if (cards.length === 0) {
     return (
       <Typography variant="h6" align="center" sx={{ mt: 4 }}>
-        You haven&apos;t added any cards yet. Click &quot;Add New Card&quot; to get started!
+        You haven&apos;t added any cards yet. Click &quot;Add New Card&quot; to
+        get started!
       </Typography>
     );
   }

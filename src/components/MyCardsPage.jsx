@@ -31,7 +31,8 @@ function MyCardsPage() {
     severity: "info",
   });
   const [isLoading, setIsLoading] = useState(true);
-  const { user, isAuthenticated, loading, isNewUser, markUserAsNotNew } = useAuth();
+  const { user, isAuthenticated, loading, isNewUser, markUserAsNotNew } =
+    useAuth();
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -140,16 +141,25 @@ function MyCardsPage() {
           </Button>
         </Box>
         {cards.length === 0 ? (
-          <Typography variant="h6" sx={{ mb: 4, textAlign: 'center' }}>
+          <Typography variant="h6" sx={{ mb: 4, textAlign: "center" }}>
             Welcome! Let&apos;s start by adding your first credit card.
           </Typography>
         ) : cards.length === 1 ? (
-          <Paper elevation={3} sx={{ p: 3, mb: 4, bgcolor: 'info.light', color: 'info.contrastText' }}>
+          <Paper
+            elevation={3}
+            sx={{
+              p: 3,
+              mb: 4,
+              bgcolor: "info.light",
+              color: "info.contrastText",
+            }}
+          >
             <Typography variant="h6" sx={{ mb: 2 }}>
               Great start! You&apos;ve added your first card.
             </Typography>
             <Typography>
-              Add one more card to use our &quot;Best Card&quot; feature and start comparing rewards!
+              Add one more card to use our &quot;Best Card&quot; feature and
+              start comparing rewards!
             </Typography>
           </Paper>
         ) : null}

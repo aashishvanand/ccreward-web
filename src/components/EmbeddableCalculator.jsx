@@ -13,7 +13,12 @@ import CalculatorForm from "./CalculatorForm";
 import CalculationResults from "./CalculationResults";
 import { useCardSelection } from "./CalculatorHooks";
 import { useAuth } from "../app/providers/AuthContext";
-import { calculateRewards, setAuthToken, fetchCardQuestions } from "../utils/api";
+import {
+  calculateRewards,
+  setAuthToken,
+  fetchCardQuestions,
+  initializeApi,
+} from "../utils/api";
 
 function EmbeddableCalculator() {
   const { signInAnonymously, user, isAuthenticated, loading } = useAuth();
@@ -25,6 +30,7 @@ function EmbeddableCalculator() {
   const [isLoading, setIsLoading] = useState(false);
   const [calculationResult, setCalculationResult] = useState(null);
   const [calculationPerformed, setCalculationPerformed] = useState(false);
+  const [signInAttempted, setSignInAttempted] = useState(false);
 
   const {
     selectedBank,
@@ -40,11 +46,45 @@ function EmbeddableCalculator() {
     resetAllFields,
   } = useCardSelection();
 
+  console.log("EmbeddableCalculator rendered");
+  console.log("Current auth state:", {
+    user,
+    isAuthenticated: isAuthenticated(),
+    loading,
+  });
+
   useEffect(() => {
+    console.log("useEffect triggered");
+    console.log("signInAttempted:", signInAttempted);
+    console.log("isAuthenticated:", isAuthenticated());
+    console.log("loading:", loading);
+
     const initializeAnonymousUser = async () => {
-      if (!isAuthenticated && !loading) {
+      if (!isAuthenticated() && !loading && !signInAttempted) {
+        console.log("Attempting anonymous sign-in...");
+        setSignInAttempted(true);
         try {
-          await signInAnonymously();
+          const anonymousUser = await signInAnonymously();
+          console.log("Anonymous sign-in result:", anonymousUser);
+
+          if (anonymousUser) {
+            console.log("Anonymous user ID:", anonymousUser.uid);
+            const token = await anonymousUser.getIdToken();
+            console.log("Token received:", token ? "Valid token" : "No token");
+
+            if (token) {
+              console.log("Setting auth token...");
+              setAuthToken(token);
+              initializeApi({
+                getCurrentUserToken: () => anonymousUser.getIdToken(),
+              });
+              console.log("Auth token set successfully");
+            } else {
+              console.error("Failed to get token for anonymous user");
+            }
+          } else {
+            console.error("Anonymous sign-in completed but no user returned");
+          }
         } catch (error) {
           console.error("Error signing in anonymously:", error);
           setSnackbar({
@@ -53,20 +93,16 @@ function EmbeddableCalculator() {
             severity: "error",
           });
         }
+      } else {
+        console.log("Skipping anonymous sign-in");
       }
     };
 
     initializeAnonymousUser();
-  }, [isAuthenticated, loading, signInAnonymously]);
+  }, [isAuthenticated, loading, signInAnonymously, signInAttempted]);
 
   useEffect(() => {
-    if (user) {
-      user.getIdToken().then(token => {
-        setAuthToken(token);
-      }).catch(error => {
-        console.error("Error getting user token:", error);
-      });
-    }
+    console.log("User state changed:", user);
   }, [user]);
 
   const handleClear = () => {
@@ -79,6 +115,15 @@ function EmbeddableCalculator() {
     if (spentAmount && parseFloat(spentAmount) > 0) {
       setIsLoading(true);
       try {
+        console.log("Calculating rewards...");
+        console.log("Request payload:", {
+          bank: selectedBank,
+          card: selectedCard,
+          mcc: selectedMcc ? selectedMcc.mcc : null,
+          amount: parseFloat(spentAmount),
+          answers: additionalInputs,
+        });
+
         const result = await calculateRewards({
           bank: selectedBank,
           card: selectedCard,
@@ -86,6 +131,8 @@ function EmbeddableCalculator() {
           amount: parseFloat(spentAmount),
           answers: additionalInputs,
         });
+
+        console.log("Calculation result:", result);
         setCalculationResult(result);
         setCalculationPerformed(true);
       } catch (error) {
@@ -99,6 +146,7 @@ function EmbeddableCalculator() {
         setIsLoading(false);
       }
     } else {
+      console.log("Invalid spent amount");
       setSnackbar({
         open: true,
         message: "Please enter a valid spent amount",
@@ -114,12 +162,18 @@ function EmbeddableCalculator() {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  console.log("Before rendering, auth state:", {
+    user,
+    isAuthenticated: isAuthenticated(),
+    loading,
+  });
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Paper elevation={3} sx={{ p: 3, mt: 2, mb: 4 }}>
         <Container maxWidth="md">
           <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-            <Box sx={{ position: 'relative', width: 50, height: 50, mr: 2 }}>
+            <Box sx={{ position: "relative", width: 50, height: 50, mr: 2 }}>
               <ExportedImage
                 src="/ccreward-logo.png"
                 alt="CCReward Logo"
@@ -137,10 +191,10 @@ function EmbeddableCalculator() {
                 rel="noopener noreferrer"
                 color="inherit"
                 underline="hover"
-                sx={{ 
-                  cursor: 'pointer',
-                  '&:hover': {
-                    color: 'primary.main',
+                sx={{
+                  cursor: "pointer",
+                  "&:hover": {
+                    color: "primary.main",
                   },
                 }}
               >
@@ -166,7 +220,10 @@ function EmbeddableCalculator() {
           />
 
           {calculationPerformed && calculationResult && (
-            <CalculationResults result={calculationResult} isLoading={isLoading} />
+            <CalculationResults
+              result={calculationResult}
+              isLoading={isLoading}
+            />
           )}
         </Container>
       </Paper>

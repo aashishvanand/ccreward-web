@@ -15,6 +15,7 @@ Permission is hereby granted, free of charge, to any person or organization obta
 For any commercial use of the Software, including but not limited to using the Software as part of a business process, incorporating it into a commercial product or service, or any use intended for or resulting in commercial advantage or monetary compensation, a separate commercial license is required.
 
 The fee for the commercial license varies based on the size of the company:
+
 - Small companies (1-10 employees): Formal Proposal can be done over email
 - Medium companies (11-250 employees): Formal Proposal can be done over email
 - Large companies (251+ employees): Formal Proposal can be done over email

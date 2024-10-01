@@ -1,10 +1,16 @@
-import React from 'react';
-import { Button } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import React from "react";
+import { Button } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 
-const AddToMyCardsButton = ({ user, selectedBank, selectedCard, userCards, onAddCard }) => {
+const AddToMyCardsButton = ({
+  user,
+  selectedBank,
+  selectedCard,
+  userCards,
+  onAddCard,
+}) => {
   const isCardInCollection = userCards.some(
-    card => card.bank === selectedBank && card.cardName === selectedCard
+    (card) => card.bank === selectedBank && card.cardName === selectedCard
   );
 
   if (isCardInCollection) {
