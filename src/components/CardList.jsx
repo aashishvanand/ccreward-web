@@ -1,16 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Grid, Typography } from "@mui/material";
 import CreditCardItem from "./CreditCardItem";
+import cardImagesData from '../data/cardImages.json';
 
 function CardList({ cards, onDeleteCard }) {
-  const [cardOrientations, setCardOrientations] = useState({});
+  const [horizontalCards, setHorizontalCards] = useState([]);
+  const [verticalCards, setVerticalCards] = useState([]);
 
-  const handleImageLoad = (cardId, width, height) => {
-    setCardOrientations((prev) => ({
-      ...prev,
-      [cardId]: width / height > 1 ? "horizontal" : "vertical",
-    }));
-  };
+  useEffect(() => {
+    const horizontal = [];
+    const vertical = [];
+
+    cards.forEach(card => {
+      const cardDetails = cardImagesData.find(
+        item => item.bank.toLowerCase() === card.bank.toLowerCase() && 
+                item.cardName.toLowerCase() === card.cardName.toLowerCase()
+      );
+
+      if (cardDetails) {
+        if (cardDetails.orientation === "horizontal") {
+          horizontal.push(card);
+        } else {
+          vertical.push(card);
+        }
+      }
+    });
+
+    setHorizontalCards(horizontal);
+    setVerticalCards(vertical);
+  }, [cards]);
 
   if (cards.length === 0) {
     return (
@@ -21,13 +39,6 @@ function CardList({ cards, onDeleteCard }) {
     );
   }
 
-  const horizontalCards = cards.filter(
-    (card) => cardOrientations[card.id] !== "vertical"
-  );
-  const verticalCards = cards.filter(
-    (card) => cardOrientations[card.id] === "vertical"
-  );
-
   return (
     <>
       <Grid container spacing={2}>
@@ -36,8 +47,6 @@ function CardList({ cards, onDeleteCard }) {
             <CreditCardItem
               card={card}
               onDelete={onDeleteCard}
-              onImageLoad={handleImageLoad}
-              isHorizontal={true}
             />
           </Grid>
         ))}
@@ -49,8 +58,6 @@ function CardList({ cards, onDeleteCard }) {
               <CreditCardItem
                 card={card}
                 onDelete={onDeleteCard}
-                onImageLoad={handleImageLoad}
-                isHorizontal={false}
               />
             </Grid>
           ))}
