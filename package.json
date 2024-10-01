@@ -15,7 +15,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build && next-image-export-optimizer",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "npm install --include=optional sharp",
@@ -33,7 +33,6 @@
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "next": "14.2.13",
-    "next-image-export-optimizer": "^1.15.1",
     "react": "^18",
     "react-confetti": "^6.1.0",
     "react-dom": "^18",

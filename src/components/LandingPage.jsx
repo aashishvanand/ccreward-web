@@ -31,9 +31,11 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../app/providers/AuthContext";
 import Header from "./Header";
 import Footer from "./Footer";
-import ExportedImage from "next-image-export-optimizer";
 import { getCardsForUser } from "../utils/firebaseUtils";
-import horizontalCardImages from "../data/horizontalCardImages.json";
+import cardImagesData from '../data/cardImages.json';
+import bankImagesData from '../data/bankImages';
+import Image from 'next/image';
+
 const BASE_URL = "https://ccreward.app";
 
 const banks = [
@@ -55,11 +57,6 @@ const banks = [
   "FEDERAL",
   "AU",
 ];
-
-const getRandomCardImages = (count) => {
-  const shuffled = [...horizontalCardImages].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
-};
 
 const tweets = [
   {
@@ -177,28 +174,28 @@ export default function LandingPage() {
     (currentPage + 1) * tweetsPerPage
   );
 
+  const bankImages = useMemo(() => {
+    return bankImagesData.reduce((acc, bank) => {
+      acc[bank.bank] = bank.id;
+      return acc;
+    }, {});
+  }, []);
+
   useEffect(() => {
-    const randomCards = getRandomCardImages(3);
-    setCardImages(
-      randomCards.map((card) => ({
-        ...card,
-        id: Date.now() + Math.random(), // Unique id for each card
-        fullImagePath: `${BASE_URL}${card.imagePath}`,
-      }))
-    );
+    const horizontalCards = cardImagesData.filter(card => card.orientation === "horizontal");
+    const shuffled = [...horizontalCards].sort(() => 0.5 - Math.random());
+    setCardImages(shuffled.slice(0, 3));
   }, []);
 
   const handleImageError = (failedCardId) => {
-    console.error(`Failed to load image for card ${failedCardId}`);
-    setCardImages((prevImages) => {
-      const newImages = prevImages.filter((img) => img.id !== failedCardId);
+    setCardImages(prevImages => {
+      const newImages = prevImages.filter(img => img.id !== failedCardId);
       if (newImages.length < 3) {
-        const additionalCard = getRandomCardImages(1)[0];
-        newImages.push({
-          ...additionalCard,
-          id: Date.now() + Math.random(),
-          fullImagePath: `${BASE_URL}${additionalCard.imagePath}`,
-        });
+        const horizontalCards = cardImagesData.filter(card => 
+          card.orientation === "horizontal" && !prevImages.some(img => img.id === card.id)
+        );
+        const additionalCard = horizontalCards[Math.floor(Math.random() * horizontalCards.length)];
+        newImages.push(additionalCard);
       }
       return newImages;
     });
@@ -364,14 +361,14 @@ export default function LandingPage() {
                       },
                     }}
                   >
-                    <ExportedImage
-                      src={card.imagePath}
-                      alt={`${card.bank} ${card.cardName}`}
-                      fill
-                      style={{ objectFit: "contain" }}
-                      sizes="(max-width: 600px) 240px, (max-width: 960px) 280px, 320px"
-                      onError={() => handleImageError(card.id)}
-                    />
+                    <Image
+                    src={card.id}
+                    alt={`${card.bank} ${card.cardName}`}
+                    layout="fill"
+                    objectFit="contain"
+                    sizes="(max-width: 600px) 240px, (max-width: 960px) 280px, 320px"
+                    onError={() => handleImageError(card.id)}
+                  />
                   </Card>
                 ))}
               </Box>
@@ -449,7 +446,7 @@ export default function LandingPage() {
             Supported Banks
           </Typography>
           <Grid container spacing={2} justifyContent="center">
-            {banks.map((bank) => (
+            {Object.entries(bankImages).map(([bank, imageId]) => (
               <Grid item key={bank} xs={6} sm={4} md={3} lg={2}>
                 <Card
                   sx={{
@@ -462,17 +459,18 @@ export default function LandingPage() {
                   }}
                 >
                   <Box
-                    sx={{ width: 80, height: 80, position: "relative", mb: 1 }}
+                    sx={{ width: 80, height: 80, display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 1 }}
                   >
-                    <ExportedImage
-                      src={`/bank-images/${bank.toLowerCase()}.webp`}
-                      alt={`${bank} logo`}
-                      fill
+                    <Image
+                      src={imageId}
+                      alt={`${bank.toUpperCase()} logo`}
+                      width={80}
+                      height={80}
                       style={{ objectFit: "contain" }}
                     />
                   </Box>
                   <Typography variant="subtitle2" align="center">
-                    {bank}
+                    {bank.toUpperCase()}
                   </Typography>
                 </Card>
               </Grid>

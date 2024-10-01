@@ -1,56 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardMedia,
   CardContent,
   Typography,
   IconButton,
+  Box,
 } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
-import ExportedImage from "next-image-export-optimizer";
+import Image from 'next/image';
+import cardImagesData from '../data/cardImages.json';
+import { getBankColor } from "./colorPalette";
 
-function CreditCardItem({ card, onDelete, onImageLoad, isHorizontal }) {
+function CreditCardItem({ card, onDelete }) {
+  const [cardDetails, setCardDetails] = useState(null);
   const [hasFailedImage, setHasFailedImage] = useState(false);
 
-  const getBankColor = (bankName) => {
-    const bankColors = {
-      HDFC: "#004C8F",
-      ICICI: "#B02A30",
-      SBI: "#22409A",
-      Axis: "#800000",
-      AMEX: "#006FCF",
-      YESBank: "#00518F",
-      SC: "#0072AA",
-      Kotak: "#ED1C24",
-      IDFCFirst: "#9C1D26",
-      HSBC: "#EE3524",
-      OneCard: "#000000",
-      RBL: "#21317D",
-      IndusInd: "#98272A",
-      IDBI: "#00836C",
-      Federal: "#F7A800",
-      BOB: "#F15A29",
-      AU: "#ec691f",
-    };
-    return (
-      bankColors[bankName] ||
-      "#" + Math.floor(Math.random() * 16777215).toString(16)
+  useEffect(() => {
+    const details = cardImagesData.find(
+      (item) => item.bank.toLowerCase() === card.bank.toLowerCase() && 
+                item.cardName.toLowerCase() === card.cardName.toLowerCase()
     );
-  };
-
-  const getCardImagePath = (bank, cardName) => {
-    const formattedCardName = cardName.replace(/\s+/g, "_").toLowerCase();
-    return `/card-images/${bank}/${bank.toLowerCase()}_${formattedCardName}.webp`;
-  };
+    setCardDetails(details);
+  }, [card]);
 
   const handleImageError = () => {
     setHasFailedImage(true);
-    onImageLoad(card.id, isHorizontal ? 1.6 : 0.63, 1); // Assume default aspect ratio
   };
 
-  const startColor = getBankColor(card.bank);
-  const endColor = getBankColor(card.bank);
-  const imagePath = getCardImagePath(card.bank, card.cardName);
+  if (!cardDetails) {
+    return null; // or a loading state
+  }
+
+  const startColor = getBankColor(cardDetails.bank);
+  const endColor = getBankColor(cardDetails.bank);
+  const isHorizontal = cardDetails.orientation === "horizontal";
 
   return (
     <Card
@@ -65,28 +49,26 @@ function CreditCardItem({ card, onDelete, onImageLoad, isHorizontal }) {
       <CardMedia
         component="div"
         sx={{
-          paddingTop: isHorizontal ? "63%" : "158%", // Reduced height for vertical cards
+          paddingTop: isHorizontal ? "63%" : "158%",
           position: "relative",
           background: `linear-gradient(45deg, ${startColor}, ${endColor})`,
         }}
       >
         {!hasFailedImage && (
-          <ExportedImage
-            src={imagePath}
-            alt={`${card.bank} ${card.cardName}`}
-            fill
-            style={{ objectFit: "contain" }}
-            sizes={
-              isHorizontal
-                ? "(max-width: 600px) 50vw, (max-width: 960px) 33vw, 25vw"
-                : "(max-width: 600px) 33vw, (max-width: 960px) 25vw, 16vw"
-            }
-            onLoad={(e) => {
-              const img = e.target;
-              onImageLoad(card.id, img.naturalWidth, img.naturalHeight);
-            }}
-            onError={handleImageError}
-          />
+          <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+            <Image
+              src={cardDetails.id}
+              alt={`${cardDetails.bank} ${cardDetails.cardName}`}
+              layout="fill"
+              objectFit="contain"
+              sizes={
+                isHorizontal
+                  ? "(max-width: 600px) 50vw, (max-width: 960px) 33vw, 25vw"
+                  : "(max-width: 600px) 33vw, (max-width: 960px) 25vw, 16vw"
+              }
+              onError={handleImageError}
+            />
+          </Box>
         )}
       </CardMedia>
       <CardContent
@@ -99,10 +81,10 @@ function CreditCardItem({ card, onDelete, onImageLoad, isHorizontal }) {
         }}
       >
         <Typography variant="subtitle2" component="h2" noWrap>
-          {card.bank}
+          {cardDetails.bank}
         </Typography>
         <Typography variant="caption" noWrap>
-          {card.cardName}
+          {cardDetails.cardName}
         </Typography>
       </CardContent>
       <IconButton
@@ -117,7 +99,7 @@ function CreditCardItem({ card, onDelete, onImageLoad, isHorizontal }) {
           "&:hover": { backgroundColor: "rgba(0,0,0,0.7)" },
           padding: "4px",
         }}
-        onClick={() => onDelete(card.id)}
+        onClick={() => onDelete(cardDetails.id)}
       >
         <DeleteIcon sx={{ color: "white", fontSize: "1rem" }} />
       </IconButton>
