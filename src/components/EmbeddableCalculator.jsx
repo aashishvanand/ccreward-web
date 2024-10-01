@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import ExportedImage from "next-image-export-optimizer";
+import Image from 'next/image';
 import {
   Box,
   Container,
@@ -17,7 +17,6 @@ import {
   calculateRewards,
   setAuthToken,
   fetchCardQuestions,
-  initializeApi,
 } from "../utils/api";
 
 function EmbeddableCalculator() {
@@ -46,39 +45,19 @@ function EmbeddableCalculator() {
     resetAllFields,
   } = useCardSelection();
 
-  console.log("EmbeddableCalculator rendered");
-  console.log("Current auth state:", {
-    user,
-    isAuthenticated: isAuthenticated(),
-    loading,
-  });
-
   useEffect(() => {
-    console.log("useEffect triggered");
-    console.log("signInAttempted:", signInAttempted);
-    console.log("isAuthenticated:", isAuthenticated());
-    console.log("loading:", loading);
-
     const initializeAnonymousUser = async () => {
       if (!isAuthenticated() && !loading && !signInAttempted) {
-        console.log("Attempting anonymous sign-in...");
         setSignInAttempted(true);
         try {
           const anonymousUser = await signInAnonymously();
-          console.log("Anonymous sign-in result:", anonymousUser);
-
+          
           if (anonymousUser) {
-            console.log("Anonymous user ID:", anonymousUser.uid);
             const token = await anonymousUser.getIdToken();
-            console.log("Token received:", token ? "Valid token" : "No token");
-
+            
             if (token) {
-              console.log("Setting auth token...");
               setAuthToken(token);
-              initializeApi({
-                getCurrentUserToken: () => anonymousUser.getIdToken(),
-              });
-              console.log("Auth token set successfully");
+      
             } else {
               console.error("Failed to get token for anonymous user");
             }
@@ -92,9 +71,11 @@ function EmbeddableCalculator() {
             message: "Error initializing calculator. Please try again.",
             severity: "error",
           });
+        } finally {
+          setIsLoading(false);
         }
       } else {
-        console.log("Skipping anonymous sign-in");
+        setIsLoading(false);
       }
     };
 
@@ -102,7 +83,6 @@ function EmbeddableCalculator() {
   }, [isAuthenticated, loading, signInAnonymously, signInAttempted]);
 
   useEffect(() => {
-    console.log("User state changed:", user);
   }, [user]);
 
   const handleClear = () => {
@@ -115,14 +95,6 @@ function EmbeddableCalculator() {
     if (spentAmount && parseFloat(spentAmount) > 0) {
       setIsLoading(true);
       try {
-        console.log("Calculating rewards...");
-        console.log("Request payload:", {
-          bank: selectedBank,
-          card: selectedCard,
-          mcc: selectedMcc ? selectedMcc.mcc : null,
-          amount: parseFloat(spentAmount),
-          answers: additionalInputs,
-        });
 
         const result = await calculateRewards({
           bank: selectedBank,
@@ -132,7 +104,6 @@ function EmbeddableCalculator() {
           answers: additionalInputs,
         });
 
-        console.log("Calculation result:", result);
         setCalculationResult(result);
         setCalculationPerformed(true);
       } catch (error) {
@@ -146,7 +117,6 @@ function EmbeddableCalculator() {
         setIsLoading(false);
       }
     } else {
-      console.log("Invalid spent amount");
       setSnackbar({
         open: true,
         message: "Please enter a valid spent amount",
@@ -162,27 +132,19 @@ function EmbeddableCalculator() {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  console.log("Before rendering, auth state:", {
-    user,
-    isAuthenticated: isAuthenticated(),
-    loading,
-  });
-
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Paper elevation={3} sx={{ p: 3, mt: 2, mb: 4 }}>
         <Container maxWidth="md">
           <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
             <Box sx={{ position: "relative", width: 50, height: 50, mr: 2 }}>
-              <ExportedImage
-                src="/ccreward-logo.png"
-                alt="CCReward Logo"
-                width={50}
-                height={50}
-                layout="responsive"
-                placeholder="empty"
-                priority
-              />
+            <Image
+              src="c68cca10-3860-4546-74e7-06ea7aa8e000"
+              alt="CCReward Logo"
+              width={40}
+              height={40}
+              priority
+            />
             </Box>
             <Typography variant="h4" component="h1">
               <Link

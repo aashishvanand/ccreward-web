@@ -10,13 +10,6 @@ const api = axios.create({
 
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-let getCurrentUserToken = null;
-
-export const initializeApi = (context) => {
-    getCurrentUserToken = context.getCurrentUserToken;
-};
-
-
 const getFromCache = (key) => {
     const cached = localStorage.getItem(key);
     if (cached) {
@@ -50,9 +43,9 @@ api.interceptors.request.use(async (config) => {
     const auth = getAuth();
     if (auth.currentUser) {
         try {
-            const token = await auth.currentUser.getIdToken(true);
-            config.headers.Authorization = `Bearer ${token}`;
-            console.log('Token added to request:', token.substring(0, 10) + '...');
+            const token = await getIdToken(auth.currentUser, true);
+            config.headers['Authorization'] = `Bearer ${token}`;
+            console.log("Token added to request:", token.substring(0, 10) + "...");  // Log first 10 characters of token
         } catch (error) {
             console.error('Error getting token:', error);
         }
@@ -61,11 +54,12 @@ api.interceptors.request.use(async (config) => {
     }
     return config;
 }, (error) => {
-    console.error('Error in request interceptor:', error);
     return Promise.reject(error);
 });
 
+
 const handleApiError = (error) => {
+    console.error("API Error:", error.response ? error.response.data : error.message);
     if (error.response && error.response.status === 429) {
         throw new Error("You've made too many requests. Please take a coffee break and try again later.");
     }
