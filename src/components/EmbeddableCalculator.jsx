@@ -1,26 +1,25 @@
 import React, { useState, useEffect, useCallback } from "react";
-import Image from 'next/image';
 import {
   Box,
   Container,
   Typography,
   Snackbar,
   Alert,
-  Link,
   Paper,
+  Link,
 } from "@mui/material";
 import CalculatorForm from "./CalculatorForm";
 import CalculationResults from "./CalculationResults";
 import { useCardSelection } from "./CalculatorHooks";
-import { useAuth } from "../app/providers/AuthContext";
 import {
   calculateRewards,
   setAuthToken,
   fetchCardQuestions,
+  getCustomToken,
+  isTokenExpired,
 } from "../utils/api";
 
 function EmbeddableCalculator() {
-  const { signInAnonymously, user, isAuthenticated, loading } = useAuth();
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -29,7 +28,8 @@ function EmbeddableCalculator() {
   const [isLoading, setIsLoading] = useState(false);
   const [calculationResult, setCalculationResult] = useState(null);
   const [calculationPerformed, setCalculationPerformed] = useState(false);
-  const [signInAttempted, setSignInAttempted] = useState(false);
+  const [customToken, setCustomToken] = useState(null);
+  const [apiKeyMissing, setApiKeyMissing] = useState(false);
 
   const {
     selectedBank,
@@ -45,57 +45,39 @@ function EmbeddableCalculator() {
     resetAllFields,
   } = useCardSelection();
 
-  useEffect(() => {
-    const initializeAnonymousUser = async () => {
-      if (!isAuthenticated() && !loading && !signInAttempted) {
-        setSignInAttempted(true);
-        try {
-          const anonymousUser = await signInAnonymously();
-          
-          if (anonymousUser) {
-            const token = await anonymousUser.getIdToken();
-            
-            if (token) {
-              setAuthToken(token);
-      
-            } else {
-              console.error("Failed to get token for anonymous user");
-            }
-          } else {
-            console.error("Anonymous sign-in completed but no user returned");
-          }
-        } catch (error) {
-          console.error("Error signing in anonymously:", error);
-          setSnackbar({
-            open: true,
-            message: "Error initializing calculator. Please try again.",
-            severity: "error",
-          });
-        } finally {
-          setIsLoading(false);
-        }
-      } else {
-        setIsLoading(false);
-      }
-    };
-
-    initializeAnonymousUser();
-  }, [isAuthenticated, loading, signInAnonymously, signInAttempted]);
-
-  useEffect(() => {
-  }, [user]);
-
-  const handleClear = () => {
-    resetAllFields();
-    setCalculationResult(null);
-    setCalculationPerformed(false);
+  const getApiKey = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get("apiKey");
   };
 
+  const refreshCustomToken = useCallback(async () => {
+    const apiKey = getApiKey();
+    if (!apiKey) {
+      setApiKeyMissing(true);
+      return;
+    }
+    try {
+      const token = await getCustomToken(apiKey);
+      setCustomToken(token);
+      setAuthToken(token, true);
+    } catch (error) {
+      console.error("Error refreshing custom token:", error);
+      showSnackbar("Failed to authenticate. Please try again.", "error");
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshCustomToken();
+  }, [refreshCustomToken]);
+
   const handleCalculate = useCallback(async () => {
+    if (!customToken || isTokenExpired(customToken)) {
+      await refreshCustomToken();
+    }
+
     if (spentAmount && parseFloat(spentAmount) > 0) {
       setIsLoading(true);
       try {
-
         const result = await calculateRewards({
           bank: selectedBank,
           card: selectedCard,
@@ -103,68 +85,76 @@ function EmbeddableCalculator() {
           amount: parseFloat(spentAmount),
           answers: additionalInputs,
         });
-
         setCalculationResult(result);
         setCalculationPerformed(true);
       } catch (error) {
         console.error("Error calculating rewards:", error);
-        setSnackbar({
-          open: true,
-          message: "Error calculating rewards. Please try again.",
-          severity: "error",
-        });
+        showSnackbar("Error calculating rewards. Please try again.", "error");
       } finally {
         setIsLoading(false);
       }
     } else {
-      setSnackbar({
-        open: true,
-        message: "Please enter a valid spent amount",
-        severity: "error",
-      });
+      showSnackbar("Please enter a valid spent amount", "error");
     }
-  }, [selectedBank, selectedCard, selectedMcc, spentAmount, additionalInputs]);
+  }, [
+    customToken,
+    selectedBank,
+    selectedCard,
+    selectedMcc,
+    spentAmount,
+    additionalInputs,
+    refreshCustomToken,
+  ]);
 
-  const handleSnackbarClose = (event, reason) => {
+  const showSnackbar = (message, severity = "info") => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
     if (reason === "clickaway") {
       return;
     }
     setSnackbar({ ...snackbar, open: false });
   };
 
+  if (apiKeyMissing) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Paper elevation={3} sx={{ p: 4, maxWidth: 400, textAlign: "center" }}>
+          <Typography variant="h5" component="h1" gutterBottom>
+            API Key Missing
+          </Typography>
+          <Typography variant="body1" paragraph>
+            The API key is missing. If you feel you are lost here, please visit
+            our main website for more information.
+          </Typography>
+          <Link
+            href="https://ccreward.app"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ccreward.app
+          </Link>
+        </Paper>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Paper elevation={3} sx={{ p: 3, mt: 2, mb: 4 }}>
         <Container maxWidth="md">
-          <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-            <Box sx={{ position: "relative", width: 50, height: 50, mr: 2 }}>
-            <Image
-              src="c68cca10-3860-4546-74e7-06ea7aa8e000"
-              alt="CCReward Logo"
-              width={40}
-              height={40}
-              priority
-            />
-            </Box>
-            <Typography variant="h4" component="h1">
-              <Link
-                href="https://ccreward.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                color="inherit"
-                underline="hover"
-                sx={{
-                  cursor: "pointer",
-                  "&:hover": {
-                    color: "primary.main",
-                  },
-                }}
-              >
-                Credit Card Reward Calculator by ccreward.app
-              </Link>
-            </Typography>
-          </Box>
-
+          <Typography variant="h4" component="h1" gutterBottom>
+            Credit Card Reward Calculator
+          </Typography>
           <CalculatorForm
             selectedBank={selectedBank}
             selectedCard={selectedCard}
@@ -177,10 +167,9 @@ function EmbeddableCalculator() {
             onSpentAmountChange={handleSpentAmountChange}
             onAdditionalInputChange={handleAdditionalInputChange}
             onCalculate={handleCalculate}
-            onClear={handleClear}
+            onClear={resetAllFields}
             getCardConfig={fetchCardQuestions}
           />
-
           {calculationPerformed && calculationResult && (
             <CalculationResults
               result={calculationResult}
@@ -189,15 +178,14 @@ function EmbeddableCalculator() {
           )}
         </Container>
       </Paper>
-
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
-        onClose={handleSnackbarClose}
+        onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
-          onClose={handleSnackbarClose}
+          onClose={handleCloseSnackbar}
           severity={snackbar.severity}
           sx={{ width: "100%" }}
         >

@@ -2,14 +2,18 @@ import axios from 'axios';
 import { getAuth, getIdToken } from "firebase/auth";
 import { jwtDecode } from "jwt-decode";
 
+// Define the base URL for API calls
 const API_BASE_URL = 'https://api.ccreward.app';
 
+// Create an axios instance with the base URL
 const api = axios.create({
     baseURL: API_BASE_URL,
 });
 
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+// Set cache duration to 24 hours
+const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
+// Helper function to get data from cache
 const getFromCache = (key) => {
     const cached = localStorage.getItem(key);
     if (cached) {
@@ -21,10 +25,43 @@ const getFromCache = (key) => {
     return null;
 };
 
+// Helper function to set data to cache
 const setToCache = (key, data) => {
     localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
 };
 
+// Function to get a custom token for embeddable calculator
+export const getCustomToken = async (apiKey) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/createCustomToken`, { apiKey });
+        return response.data.token;
+    } catch (error) {
+        console.error('Error getting custom token:', error);
+        throw error;
+    }
+};
+
+// Function to set the authentication token
+export const setAuthToken = (token, isCustomToken = false) => {
+    if (token) {
+        api.defaults.headers.common['Authorization'] = isCustomToken ? `Bearer ${token}` : `Bearer ${token}`;
+    } else {
+        delete api.defaults.headers.common['Authorization'];
+    }
+};
+
+// Function to check if a token is expired
+export const isTokenExpired = (token) => {
+    try {
+        const decodedToken = jwtDecode(token);
+        return decodedToken.exp * 1000 < Date.now();
+    } catch (error) {
+        console.error('Error decoding token:', error);
+        return true;
+    }
+};
+
+// Initialize authentication
 export const initializeAuth = async () => {
     const auth = getAuth();
     if (auth.currentUser) {
@@ -57,21 +94,13 @@ api.interceptors.request.use(async (config) => {
     return Promise.reject(error);
 });
 
-
+// Handle API errors
 const handleApiError = (error) => {
     console.error("API Error:", error.response ? error.response.data : error.message);
     if (error.response && error.response.status === 429) {
         throw new Error("You've made too many requests. Please take a coffee break and try again later.");
     }
     throw error;
-};
-
-export const setAuthToken = (token) => {
-    if (token) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    } else {
-        delete api.defaults.headers.common['Authorization'];
-    }
 };
 
 // Helper function for making authenticated requests
@@ -88,7 +117,7 @@ const authenticatedRequest = async (method, url, data = null) => {
     }
 };
 
-
+// Fetch banks
 export const fetchBanks = async () => {
     const cacheKey = 'banks';
     const cachedData = getFromCache(cacheKey);
@@ -103,6 +132,7 @@ export const fetchBanks = async () => {
     }
 };
 
+// Fetch cards for a specific bank
 export const fetchCards = async (bank) => {
     const cacheKey = `cards_${bank}`;
     const cachedData = getFromCache(cacheKey);
@@ -117,8 +147,10 @@ export const fetchCards = async (bank) => {
     }
 };
 
+// Cancel token for MCC requests
 let mccCancelToken = null;
 
+// Fetch MCC (Merchant Category Code) data
 export const fetchMCC = async (search) => {
     if (mccCancelToken) {
         mccCancelToken.cancel('Operation canceled due to new request.');
@@ -141,6 +173,7 @@ export const fetchMCC = async (search) => {
     }
 };
 
+// Fetch card questions for a specific bank and card
 export const fetchCardQuestions = async (bank, card) => {
     const encodedBank = encodeURIComponent(bank);
     const encodedCard = encodeURIComponent(card);
@@ -157,6 +190,7 @@ export const fetchCardQuestions = async (bank, card) => {
     }
 };
 
+// Calculate rewards based on provided data
 export const calculateRewards = async (data) => {
     try {
         return await authenticatedRequest('post', '/calculateRewards', data);
@@ -165,6 +199,7 @@ export const calculateRewards = async (data) => {
     }
 };
 
+// Fetch questions for best card calculation
 export const fetchBestCardQuestions = async (cards) => {
     try {
         const response = await authenticatedRequest('post', '/bestCardQuestions', { cards });
@@ -174,6 +209,7 @@ export const fetchBestCardQuestions = async (cards) => {
     }
 };
 
+// Calculate the best card based on provided data
 export const calculateBestCard = async (data) => {
     try {
         const response = await authenticatedRequest('post', '/calculateBestCard', data);
