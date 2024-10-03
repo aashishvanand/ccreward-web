@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, Container, Typography, Snackbar, Alert, Paper, Link } from "@mui/material";
+import {
+  Box,
+  Container,
+  Typography,
+  Snackbar,
+  Alert,
+  Paper,
+  Link,
+} from "@mui/material";
 import CalculatorForm from "./CalculatorForm";
 import CalculationResults from "./CalculationResults";
 import { useCardSelection } from "./CalculatorHooks";
@@ -38,9 +46,9 @@ function EmbeddableCalculator() {
   } = useCardSelection();
 
   const getApiKey = () => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get('apiKey');
+      return urlParams.get("apiKey");
     }
     return null;
   };
@@ -95,7 +103,15 @@ function EmbeddableCalculator() {
     } else {
       showSnackbar("Please enter a valid spent amount", "error");
     }
-  }, [customToken, selectedBank, selectedCard, selectedMcc, spentAmount, additionalInputs, refreshCustomToken]);
+  }, [
+    customToken,
+    selectedBank,
+    selectedCard,
+    selectedMcc,
+    spentAmount,
+    additionalInputs,
+    refreshCustomToken,
+  ]);
 
   const showSnackbar = (message, severity = "info") => {
     setSnackbar({ open: true, message, severity });
@@ -110,7 +126,15 @@ function EmbeddableCalculator() {
 
   if (apiKeyInvalid) {
     return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', justifyContent: 'center', alignItems: 'center' }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <Paper elevation={3} sx={{ p: 4, maxWidth: 400, textAlign: "center" }}>
           <Typography variant="h5" component="h1" gutterBottom>
             API Key Invalid
@@ -132,7 +156,7 @@ function EmbeddableCalculator() {
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Paper elevation={3} sx={{ p: 3, mt: 2, mb: 4 }}>
         <Container maxWidth="md">
           <Typography variant="h4" component="h1" gutterBottom>
