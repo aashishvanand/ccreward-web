@@ -85,10 +85,16 @@ function MyCardsPage() {
     }
   };
 
-  const handleDeleteCard = async (cardId) => {
+  const handleDeleteCard = async (bank, cardName) => {
     try {
-      await deleteCardForUser(user.uid, cardId);
-      await fetchUserCards();
+      const cardKey = `${bank}_${cardName}`;
+      await deleteCardForUser(user.uid, cardKey);
+      // Update the local state immediately
+      setCards((prevCards) =>
+        prevCards.filter(
+          (card) => card.bank !== bank || card.cardName !== cardName
+        )
+      );
       notifyCardUpdate();
       showSnackbar("Card deleted successfully", "success");
     } catch (error) {
@@ -96,6 +102,7 @@ function MyCardsPage() {
       showSnackbar("Error deleting card. Please try again later.", "error");
     }
   };
+
 
   const showSnackbar = (message, severity = "info") => {
     setSnackbar({ open: true, message, severity });
