@@ -9,20 +9,23 @@ import {
 } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 import Image from 'next/image';
-import cardImagesData from '../data/cardImages.json';
+import useCardImagesData from '../hooks/useCardImagesData';
 import { getBankColor } from "./colorPalette";
 
 function CreditCardItem({ card, onDelete }) {
+  const { cardImagesData } = useCardImagesData();
   const [cardDetails, setCardDetails] = useState(null);
   const [hasFailedImage, setHasFailedImage] = useState(false);
 
   useEffect(() => {
-    const details = cardImagesData.find(
-      (item) => item.bank.toLowerCase() === card.bank.toLowerCase() && 
-                item.cardName.toLowerCase() === card.cardName.toLowerCase()
-    );
-    setCardDetails(details);
-  }, [card]);
+    if (cardImagesData.length > 0) {
+      const details = cardImagesData.find(
+        (item) => item.bank.toLowerCase() === card.bank.toLowerCase() && 
+                  item.cardName.toLowerCase() === card.cardName.toLowerCase()
+      );
+      setCardDetails(details);
+    }
+  }, [card, cardImagesData]);
 
   const handleImageError = () => {
     setHasFailedImage(true);

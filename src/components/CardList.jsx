@@ -1,34 +1,50 @@
 import React, { useState, useEffect } from "react";
-import { Grid, Typography } from "@mui/material";
+import { Grid, Typography, CircularProgress } from "@mui/material";
 import CreditCardItem from "./CreditCardItem";
-import cardImagesData from '../data/cardImages.json';
+import useCardImagesData from "../hooks/useCardImagesData";
 
 function CardList({ cards, onDeleteCard }) {
+  const { cardImagesData, isLoading, error } = useCardImagesData();
   const [horizontalCards, setHorizontalCards] = useState([]);
   const [verticalCards, setVerticalCards] = useState([]);
 
   useEffect(() => {
-    const horizontal = [];
-    const vertical = [];
+    if (cardImagesData.length > 0) {
+      const horizontal = [];
+      const vertical = [];
 
-    cards.forEach(card => {
-      const cardDetails = cardImagesData.find(
-        item => item.bank.toLowerCase() === card.bank.toLowerCase() && 
-                item.cardName.toLowerCase() === card.cardName.toLowerCase()
-      );
+      cards.forEach((card) => {
+        const cardDetails = cardImagesData.find(
+          (item) =>
+            item.bank.toLowerCase() === card.bank.toLowerCase() &&
+            item.cardName.toLowerCase() === card.cardName.toLowerCase()
+        );
 
-      if (cardDetails) {
-        if (cardDetails.orientation === "horizontal") {
-          horizontal.push(card);
-        } else {
-          vertical.push(card);
+        if (cardDetails) {
+          if (cardDetails.orientation === "horizontal") {
+            horizontal.push(card);
+          } else {
+            vertical.push(card);
+          }
         }
-      }
-    });
+      });
 
-    setHorizontalCards(horizontal);
-    setVerticalCards(vertical);
-  }, [cards]);
+      setHorizontalCards(horizontal);
+      setVerticalCards(vertical);
+    }
+  }, [cards, cardImagesData]);
+
+  if (isLoading) {
+    return <CircularProgress />;
+  }
+
+  if (error) {
+    return (
+      <Typography color="error">
+        Error loading card data: {error.message}
+      </Typography>
+    );
+  }
 
   if (cards.length === 0) {
     return (
@@ -44,10 +60,7 @@ function CardList({ cards, onDeleteCard }) {
       <Grid container spacing={2}>
         {horizontalCards.map((card) => (
           <Grid item xs={12} sm={6} md={3} key={card.id}>
-            <CreditCardItem
-              card={card}
-              onDelete={onDeleteCard}
-            />
+            <CreditCardItem card={card} onDelete={onDeleteCard} />
           </Grid>
         ))}
       </Grid>
@@ -55,10 +68,7 @@ function CardList({ cards, onDeleteCard }) {
         <Grid container spacing={2} sx={{ mt: 4 }}>
           {verticalCards.map((card) => (
             <Grid item xs={6} sm={4} md={2} key={card.id}>
-              <CreditCardItem
-                card={card}
-                onDelete={onDeleteCard}
-              />
+              <CreditCardItem card={card} onDelete={onDeleteCard} />
             </Grid>
           ))}
         </Grid>

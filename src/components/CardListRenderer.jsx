@@ -8,50 +8,53 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import Image from "next/image";
 import { CreditCard as CreditCardIcon } from "@mui/icons-material";
 import { getBankColor } from "./colorPalette";
-import cardImagesData from '../data/cardImages.json';
+import useCardImagesData from '../hooks/useCardImagesData';
 
-const findCardDetails = (bank, cardName) => {
-  return cardImagesData.find(
-    (item) => item.bank.toLowerCase() === bank.toLowerCase() && 
-              item.cardName.toLowerCase() === cardName.toLowerCase()
-  );
-};
-
-const renderCardImage = (card, failedImages, handleImageError) => {
-  const bankColor = getBankColor(card.bank);
-  const cardDetails = findCardDetails(card.bank, card.cardName);
-
-  if (!cardDetails || failedImages[card.id]) {
-    return <CreditCardIcon sx={{ fontSize: 40, color: bankColor }} />;
-  }
-
-  const isHorizontal = cardDetails.orientation === "horizontal";
-
-  return (
-    <Image
-      src={cardDetails.id}
-      alt={`${card.bank} ${card.cardName}`}
-      width={isHorizontal ? 60 : 40}
-      height={isHorizontal ? 40 : 60}
-      objectFit="contain"
-      onError={() => handleImageError(card.id)}
-    />
-  );
-};
-
-export const renderCardList = (
+const CardListRenderer = ({
   isCardListLoading,
   isCalculated,
   cardRewards,
   userCards,
   failedImages,
   handleImageError
-) => {
-  if (isCardListLoading) {
+}) => {
+  const { cardImagesData, isLoading: isLoadingCardImages, error: cardImagesError } = useCardImagesData();
+
+  const findCardDetails = (bank, cardName) => {
+    return cardImagesData.find(
+      (item) => item.bank.toLowerCase() === bank.toLowerCase() && 
+                item.cardName.toLowerCase() === cardName.toLowerCase()
+    );
+  };
+
+  const renderCardImage = (card) => {
+    const bankColor = getBankColor(card.bank);
+    const cardDetails = findCardDetails(card.bank, card.cardName);
+
+    if (!cardDetails || failedImages[card.id]) {
+      return <CreditCardIcon sx={{ fontSize: 40, color: bankColor }} />;
+    }
+
+    const isHorizontal = cardDetails.orientation === "horizontal";
+
+    return (
+      <Image
+        src={cardDetails.id}
+        alt={`${card.bank} ${card.cardName}`}
+        width={isHorizontal ? 60 : 40}
+        height={isHorizontal ? 40 : 60}
+        objectFit="contain"
+        onError={() => handleImageError(card.id)}
+      />
+    );
+  };
+
+  if (isCardListLoading || isLoadingCardImages) {
     return Array(3)
       .fill(0)
       .map((_, index) => (
@@ -72,6 +75,12 @@ export const renderCardList = (
           </Card>
         </ListItem>
       ));
+  }
+
+  if (cardImagesError) {
+    return (
+      <Typography color="error">Error loading card images: {cardImagesError.message}</Typography>
+    );
   }
 
   return cardRewards.map((card, index) => (
@@ -95,7 +104,7 @@ export const renderCardList = (
                 alignItems: "center",
               }}
             >
-              {renderCardImage(card, failedImages, handleImageError)}
+              {renderCardImage(card)}
             </Box>
           </ListItemIcon>
           <ListItemText
@@ -126,3 +135,5 @@ export const renderCardList = (
     </ListItem>
   ));
 };
+
+export { CardListRenderer };

@@ -32,7 +32,7 @@ import { useAuth } from "../app/providers/AuthContext";
 import Header from "./Header";
 import Footer from "./Footer";
 import { getCardsForUser } from "../utils/firebaseUtils";
-import cardImagesData from '../data/cardImages.json';
+import useCardImagesData from '../hooks/useCardImagesData';
 import bankImagesData from '../data/bankImages';
 import Image from 'next/image';
 
@@ -157,7 +157,7 @@ export default function LandingPage() {
   const shuffledTweets = useMemo(() => {
     return [...tweets].sort(() => Math.random() - 0.5);
   }, []);
-
+  const { cardImagesData, isLoading: isLoadingCardImages, error: cardImagesError } = useCardImagesData();
   const tweetsPerPage = isMobile ? 1 : isTablet ? 2 : 3;
   const totalPages = Math.ceil(shuffledTweets.length / tweetsPerPage);
 
@@ -180,6 +180,14 @@ export default function LandingPage() {
       return acc;
     }, {});
   }, []);
+
+  useEffect(() => {
+    if (cardImagesData.length > 0) {
+      const horizontalCards = cardImagesData.filter(card => card.orientation === "horizontal");
+      const shuffled = [...horizontalCards].sort(() => 0.5 - Math.random());
+      setCardImages(shuffled.slice(0, 3));
+    }
+  }, [cardImagesData]);
 
   useEffect(() => {
     const horizontalCards = cardImagesData.filter(card => card.orientation === "horizontal");
@@ -249,6 +257,21 @@ export default function LandingPage() {
     }
     setSnackbar({ ...snackbar, open: false });
   };
+
+  if (isLoading || loading || isLoadingCardImages) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>

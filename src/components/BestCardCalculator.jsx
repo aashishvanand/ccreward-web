@@ -26,7 +26,7 @@ import Footer from "./Footer";
 import { useAuth } from "../app/providers/AuthContext";
 import { getCardsForUser } from "../utils/firebaseUtils";
 import ReactConfetti from "react-confetti";
-import { renderCardList } from "./CardListRenderer";
+import { CardListRenderer } from "./CardListRenderer";
 import DynamicCardInputs from "./DynamicCardInputs";
 import { useAppTheme } from "./ThemeRegistry";
 import {
@@ -426,14 +426,14 @@ const BestCardCalculator = () => {
           </Box>
         )}
         <List sx={{ width: "100%" }}>
-          {renderCardList(
-            isCardListLoading,
-            isCalculated,
-            cardRewards,
-            userCards,
-            failedImages,
-            handleImageError
-          )}
+          <CardListRenderer
+            isCardListLoading={isCardListLoading}
+            isCalculated={isCalculated}
+            cardRewards={cardRewards}
+            userCards={userCards}
+            failedImages={failedImages}
+            handleImageError={handleImageError}
+          />
         </List>
       </Container>
       <Snackbar
