@@ -2,7 +2,7 @@
 /og.png
   Access-Control-Allow-Origin: *
 
-# Allow framing for the embeddable calculator only from abc.com
+# Allow framing for the embeddable calculator only from selected domains
 /embeddable-calculator
   X-Frame-Options: ALLOW-FROM https://www.professorcardz.com/
   Content-Security-Policy: frame-ancestors 'self' https://www.professorcardz.com/
@@ -18,5 +18,5 @@
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Content-Security-Policy: default-src 'self' https://*.clarity.ms https://c.bing.com https://*.google.com https://apis.google.com https://*.firebaseapp.com https://*.firebase.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://*.clarity.ms https://c.bing.com local.adguard.org https://static.cloudflareinsights.com https://pagead2.googlesyndication.com https://tpc.googlesyndication.com https://googleads.g.doubleclick.net; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https: wss://*.firebaseio.com; frame-src 'self' https://*.firebaseapp.com https://*.firebase.com https://googleads.g.doubleclick.net; child-src 'self' https://googleads.g.doubleclick.net;
+  Content-Security-Policy: default-src 'self' https://*.clarity.ms https://c.bing.com https://*.google.com https://apis.google.com https://*.firebaseapp.com https://*.firebase.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://*.clarity.ms https://c.bing.com local.adguard.org https://static.cloudflareinsights.com https://pagead2.googlesyndication.com https://tpc.googlesyndication.com https://googleads.g.doubleclick.net; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https://imagedelivery.net; connect-src 'self' https: wss://*.firebaseio.com https://files.ccreward.app https://imagedelivery.net; frame-src 'self' https://*.firebaseapp.com https://*.firebase.com https://googleads.g.doubleclick.net; child-src 'self' https://googleads.g.doubleclick.net;
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
