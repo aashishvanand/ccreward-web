@@ -30,6 +30,8 @@ const CalculatorForm = ({
   onCalculate,
   onClear,
   onError,
+  isEmbedded = false,
+  tokenReady = true,
 }) => {
   const [banks, setBanks] = useState([]);
   const [cards, setCards] = useState([]);
@@ -39,21 +41,23 @@ const CalculatorForm = ({
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
   useEffect(() => {
-    fetchBanks().then(setBanks).catch(console.error);
-  }, []);
+    if (tokenReady) {
+      fetchBanks(isEmbedded).then(setBanks).catch(console.error);
+    }
+  }, [isEmbedded, tokenReady]);
 
   useEffect(() => {
-    if (selectedBank) {
-      fetchCards(selectedBank).then(setCards).catch(console.error);
+    if (selectedBank && tokenReady) {
+      fetchCards(selectedBank, isEmbedded).then(setCards).catch(console.error);
     } else {
       setCards([]);
     }
-  }, [selectedBank]);
+  }, [selectedBank, isEmbedded, tokenReady]);
 
   useEffect(() => {
-    if (selectedBank && selectedCard) {
+    if (selectedBank && selectedCard && tokenReady) {
       setIsLoadingQuestions(true);
-      fetchCardQuestions(selectedBank, selectedCard)
+      fetchCardQuestions(selectedBank, selectedCard, isEmbedded)
         .then((questions) => {
           setCardQuestions(questions);
           setIsLoadingQuestions(false);
@@ -72,16 +76,16 @@ const CalculatorForm = ({
             );
           }
         });
-    } else {
-      setCardQuestions(null);
-    }
-  }, [selectedBank, selectedCard, onError]);
+      } else {
+        setCardQuestions(null);
+      }
+    }, [selectedBank, selectedCard, isEmbedded, tokenReady, onError]);
 
   const debouncedFetchMCC = useCallback(
     _.debounce(async (value) => {
       if (value) {
         try {
-          const mccData = await fetchMCC(value);
+          const mccData = await fetchMCC(value, isEmbedded);
           return mccData;
         } catch (error) {
           console.error("Error fetching MCC data:", error);
@@ -91,7 +95,7 @@ const CalculatorForm = ({
         return [];
       }
     }, 300),
-    []
+    [isEmbedded]
   );
 
   useEffect(() => {
