@@ -30,7 +30,7 @@ function EmbeddableCalculator() {
   const [calculationPerformed, setCalculationPerformed] = useState(false);
   const [customToken, setCustomToken] = useState(null);
   const [apiKeyInvalid, setApiKeyInvalid] = useState(false);
-
+  const [tokenReady, setTokenReady] = useState(false);
   const {
     selectedBank,
     selectedCard,
@@ -62,11 +62,15 @@ function EmbeddableCalculator() {
     try {
       const token = await getCustomToken(apiKey);
       setCustomToken(token);
-      setAuthToken(token, true);
+      setAuthToken(token, true, true);
+      setTokenReady(true);
     } catch (error) {
       console.error("Error refreshing custom token:", error);
+      setTokenReady(false);
       if (error.response && error.response.status === 401) {
         setApiKeyInvalid(true);
+      } else if (error.message.includes('Network Error')) {
+        showSnackbar("Network error. Please check your connection.", "error");
       } else {
         showSnackbar("Failed to authenticate. Please try again.", "error");
       }
@@ -76,6 +80,7 @@ function EmbeddableCalculator() {
   useEffect(() => {
     refreshCustomToken();
   }, [refreshCustomToken]);
+
 
   const handleCalculate = useCallback(async () => {
     if (!customToken || isTokenExpired(customToken)) {
@@ -176,6 +181,8 @@ function EmbeddableCalculator() {
             onCalculate={handleCalculate}
             onClear={resetAllFields}
             getCardConfig={fetchCardQuestions}
+            isEmbedded={true}
+            tokenReady={tokenReady}
           />
           {calculationPerformed && calculationResult && (
             <CalculationResults
