@@ -1,13 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  Box,
-  Container,
-  Typography,
-  Snackbar,
-  Alert,
-  Paper,
-  Link,
-} from "@mui/material";
+import { Box, Container, Typography, Snackbar, Alert, Paper, Link } from "@mui/material";
 import CalculatorForm from "./CalculatorForm";
 import CalculationResults from "./CalculationResults";
 import { useCardSelection } from "./CalculatorHooks";
@@ -29,7 +21,7 @@ function EmbeddableCalculator() {
   const [calculationResult, setCalculationResult] = useState(null);
   const [calculationPerformed, setCalculationPerformed] = useState(false);
   const [customToken, setCustomToken] = useState(null);
-  const [apiKeyMissing, setApiKeyMissing] = useState(false);
+  const [apiKeyInvalid, setApiKeyInvalid] = useState(false);
 
   const {
     selectedBank,
@@ -46,14 +38,17 @@ function EmbeddableCalculator() {
   } = useCardSelection();
 
   const getApiKey = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get("apiKey");
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('apiKey');
+    }
+    return null;
   };
 
   const refreshCustomToken = useCallback(async () => {
     const apiKey = getApiKey();
     if (!apiKey) {
-      setApiKeyMissing(true);
+      setApiKeyInvalid(true);
       return;
     }
     try {
@@ -62,7 +57,11 @@ function EmbeddableCalculator() {
       setAuthToken(token, true);
     } catch (error) {
       console.error("Error refreshing custom token:", error);
-      showSnackbar("Failed to authenticate. Please try again.", "error");
+      if (error.response && error.response.status === 401) {
+        setApiKeyInvalid(true);
+      } else {
+        showSnackbar("Failed to authenticate. Please try again.", "error");
+      }
     }
   }, []);
 
@@ -96,15 +95,7 @@ function EmbeddableCalculator() {
     } else {
       showSnackbar("Please enter a valid spent amount", "error");
     }
-  }, [
-    customToken,
-    selectedBank,
-    selectedCard,
-    selectedMcc,
-    spentAmount,
-    additionalInputs,
-    refreshCustomToken,
-  ]);
+  }, [customToken, selectedBank, selectedCard, selectedMcc, spentAmount, additionalInputs, refreshCustomToken]);
 
   const showSnackbar = (message, severity = "info") => {
     setSnackbar({ open: true, message, severity });
@@ -117,23 +108,15 @@ function EmbeddableCalculator() {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  if (apiKeyMissing) {
+  if (apiKeyInvalid) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          minHeight: "100vh",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', justifyContent: 'center', alignItems: 'center' }}>
         <Paper elevation={3} sx={{ p: 4, maxWidth: 400, textAlign: "center" }}>
           <Typography variant="h5" component="h1" gutterBottom>
-            API Key Missing
+            API Key Invalid
           </Typography>
           <Typography variant="body1" paragraph>
-            The API key is missing. If you feel you are lost here, please visit
+            The API key is invalid. If you feel you are lost here, please visit
             our main website for more information.
           </Typography>
           <Link
@@ -149,7 +132,7 @@ function EmbeddableCalculator() {
   }
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Paper elevation={3} sx={{ p: 3, mt: 2, mb: 4 }}>
         <Container maxWidth="md">
           <Typography variant="h4" component="h1" gutterBottom>
