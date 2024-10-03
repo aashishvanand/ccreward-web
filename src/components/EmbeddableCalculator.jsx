@@ -29,7 +29,7 @@ function EmbeddableCalculator() {
   const [calculationResult, setCalculationResult] = useState(null);
   const [calculationPerformed, setCalculationPerformed] = useState(false);
   const [customToken, setCustomToken] = useState(null);
-  const [apiKeyMissing, setApiKeyMissing] = useState(false);
+  const [apiKeyInvalid, setApiKeyInvalid] = useState(false);
 
   const {
     selectedBank,
@@ -46,14 +46,17 @@ function EmbeddableCalculator() {
   } = useCardSelection();
 
   const getApiKey = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get("apiKey");
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get("apiKey");
+    }
+    return null;
   };
 
   const refreshCustomToken = useCallback(async () => {
     const apiKey = getApiKey();
     if (!apiKey) {
-      setApiKeyMissing(true);
+      setApiKeyInvalid(true);
       return;
     }
     try {
@@ -62,7 +65,11 @@ function EmbeddableCalculator() {
       setAuthToken(token, true);
     } catch (error) {
       console.error("Error refreshing custom token:", error);
-      showSnackbar("Failed to authenticate. Please try again.", "error");
+      if (error.response && error.response.status === 401) {
+        setApiKeyInvalid(true);
+      } else {
+        showSnackbar("Failed to authenticate. Please try again.", "error");
+      }
     }
   }, []);
 
@@ -117,7 +124,7 @@ function EmbeddableCalculator() {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  if (apiKeyMissing) {
+  if (apiKeyInvalid) {
     return (
       <Box
         sx={{
@@ -130,10 +137,10 @@ function EmbeddableCalculator() {
       >
         <Paper elevation={3} sx={{ p: 4, maxWidth: 400, textAlign: "center" }}>
           <Typography variant="h5" component="h1" gutterBottom>
-            API Key Missing
+            API Key Invalid
           </Typography>
           <Typography variant="body1" paragraph>
-            The API key is missing. If you feel you are lost here, please visit
+            The API key is invalid. If you feel you are lost here, please visit
             our main website for more information.
           </Typography>
           <Link
