@@ -32,9 +32,9 @@ import { useAuth } from "../app/providers/AuthContext";
 import Header from "./Header";
 import Footer from "./Footer";
 import { getCardsForUser } from "../utils/firebaseUtils";
-import useCardImagesData from '../hooks/useCardImagesData';
-import bankImagesData from '../data/bankImages';
-import Image from 'next/image';
+import useCardImagesData from "../hooks/useCardImagesData";
+import bankImagesData from "../data/bankImages";
+import Image from "next/image";
 
 const BASE_URL = "https://ccreward.app";
 
@@ -157,7 +157,11 @@ export default function LandingPage() {
   const shuffledTweets = useMemo(() => {
     return [...tweets].sort(() => Math.random() - 0.5);
   }, []);
-  const { cardImagesData, isLoading: isLoadingCardImages, error: cardImagesError } = useCardImagesData();
+  const {
+    cardImagesData,
+    isLoading: isLoadingCardImages,
+    error: cardImagesError,
+  } = useCardImagesData();
   const tweetsPerPage = isMobile ? 1 : isTablet ? 2 : 3;
   const totalPages = Math.ceil(shuffledTweets.length / tweetsPerPage);
 
@@ -183,26 +187,33 @@ export default function LandingPage() {
 
   useEffect(() => {
     if (cardImagesData.length > 0) {
-      const horizontalCards = cardImagesData.filter(card => card.orientation === "horizontal");
+      const horizontalCards = cardImagesData.filter(
+        (card) => card.orientation === "horizontal"
+      );
       const shuffled = [...horizontalCards].sort(() => 0.5 - Math.random());
       setCardImages(shuffled.slice(0, 3));
     }
   }, [cardImagesData]);
 
   useEffect(() => {
-    const horizontalCards = cardImagesData.filter(card => card.orientation === "horizontal");
+    const horizontalCards = cardImagesData.filter(
+      (card) => card.orientation === "horizontal"
+    );
     const shuffled = [...horizontalCards].sort(() => 0.5 - Math.random());
     setCardImages(shuffled.slice(0, 3));
   }, []);
 
   const handleImageError = (failedCardId) => {
-    setCardImages(prevImages => {
-      const newImages = prevImages.filter(img => img.id !== failedCardId);
+    setCardImages((prevImages) => {
+      const newImages = prevImages.filter((img) => img.id !== failedCardId);
       if (newImages.length < 3) {
-        const horizontalCards = cardImagesData.filter(card => 
-          card.orientation === "horizontal" && !prevImages.some(img => img.id === card.id)
+        const horizontalCards = cardImagesData.filter(
+          (card) =>
+            card.orientation === "horizontal" &&
+            !prevImages.some((img) => img.id === card.id)
         );
-        const additionalCard = horizontalCards[Math.floor(Math.random() * horizontalCards.length)];
+        const additionalCard =
+          horizontalCards[Math.floor(Math.random() * horizontalCards.length)];
         newImages.push(additionalCard);
       }
       return newImages;
@@ -385,13 +396,13 @@ export default function LandingPage() {
                     }}
                   >
                     <Image
-                    src={card.id}
-                    alt={`${card.bank} ${card.cardName}`}
-                    layout="fill"
-                    objectFit="contain"
-                    sizes="(max-width: 600px) 240px, (max-width: 960px) 280px, 320px"
-                    onError={() => handleImageError(card.id)}
-                  />
+                      src={card.id}
+                      alt={`${card.bank} ${card.cardName}`}
+                      layout="fill"
+                      objectFit="contain"
+                      sizes="(max-width: 600px) 240px, (max-width: 960px) 280px, 320px"
+                      onError={() => handleImageError(card.id)}
+                    />
                   </Card>
                 ))}
               </Box>
@@ -482,7 +493,14 @@ export default function LandingPage() {
                   }}
                 >
                   <Box
-                    sx={{ width: 80, height: 80, display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 1 }}
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      mb: 1,
+                    }}
                   >
                     <Image
                       src={imageId}

@@ -25,14 +25,14 @@ const getFromCache = (key, isEmbedded = false) => {
         // Do not use cache in embedded context
         return null;
     }
-        const cached = localStorage.getItem(key);
-        if (cached) {
-            const { data, timestamp } = JSON.parse(cached);
-            if (Date.now() - timestamp < CACHE_DURATION) {
-                return data;
-            }
+    const cached = localStorage.getItem(key);
+    if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        if (Date.now() - timestamp < CACHE_DURATION) {
+            return data;
         }
-        return null;
+    }
+    return null;
 };
 
 // Helper function to set data to cache
@@ -47,14 +47,14 @@ const setToCache = (key, data, isEmbedded = false) => {
 // Function to get a custom token for embeddable calculator
 export const getCustomToken = async (apiKey) => {
     try {
-      const response = await embeddedApi.post(`/createCustomToken`, { apiKey });
-      return response.data.token;
+        const response = await embeddedApi.post(`/createCustomToken`, { apiKey });
+        return response.data.token;
     } catch (error) {
-      console.error('Error getting custom token:', error);
-      throw error;
+        console.error('Error getting custom token:', error);
+        throw error;
     }
-  };
-  
+};
+
 
 // Function to set the authentication token
 export const setAuthToken = (token, isCustomToken = false, isEmbedded = false) => {

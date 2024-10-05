@@ -61,6 +61,9 @@ const BestCardCalculator = () => {
   const [sortMethod, setSortMethod] = useState("points");
   const [lastCalculationParams, setLastCalculationParams] = useState(null);
   const [mccInputValue, setMccInputValue] = useState("");
+  const [pointsRanking, setPointsRanking] = useState([]);
+  const [valueRanking, setValueRanking] = useState([]);
+  const currentRanking = sortMethod === "points" ? pointsRanking : valueRanking;
 
   useEffect(() => {
     const fetchUserCards = async () => {
@@ -168,7 +171,8 @@ const BestCardCalculator = () => {
     setIsLoading(true);
     try {
       const response = await calculateBestCard(calculationParams);
-      setCardRewards(response.rankingByPoints);
+      setPointsRanking(response.rankingByPoints);
+      setValueRanking(response.rankingByValueINR);
       setIsCalculated(true);
       setLastCalculationParams(calculationParams);
 
@@ -251,32 +255,8 @@ const BestCardCalculator = () => {
   const handleSortMethodChange = (event, newMethod) => {
     if (newMethod !== null) {
       setSortMethod(newMethod);
-      sortRewards(newMethod);
     }
   };
-
-  const sortRewards = useCallback(
-    (method) => {
-      const sortedRewards = [...cardRewards].sort((a, b) => {
-        if (method === "points") {
-          return (b.points || b.cashback || 0) - (a.points || a.cashback || 0);
-        } else {
-          return (
-            (b.cashbackValue?.cashValue || b.cashback || 0) -
-            (a.cashbackValue?.cashValue || a.cashback || 0)
-          );
-        }
-      });
-      setCardRewards(sortedRewards);
-    },
-    [cardRewards]
-  );
-
-  useEffect(() => {
-    if (cardRewards.length > 0) {
-      sortRewards(sortMethod);
-    }
-  }, [sortMethod, cardRewards, sortRewards]);
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -406,13 +386,13 @@ const BestCardCalculator = () => {
               aria-label="sort method"
             >
               <ToggleButton value="points" aria-label="sort by points">
-                Sort by Points/Cashback
+                Ranking by Points/Cashback
               </ToggleButton>
               <ToggleButton
                 value="cashbackValue"
                 aria-label="sort by cashback value"
               >
-                Sort by Cashback INR
+                Ranking by Value (INR)
                 <Tooltip
                   title="For comparison purposes, we assume 1 mile = ₹1"
                   arrow
@@ -429,7 +409,7 @@ const BestCardCalculator = () => {
           <CardListRenderer
             isCardListLoading={isCardListLoading}
             isCalculated={isCalculated}
-            cardRewards={cardRewards}
+            cardRewards={currentRanking}
             userCards={userCards}
             failedImages={failedImages}
             handleImageError={handleImageError}
