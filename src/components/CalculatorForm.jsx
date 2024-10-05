@@ -76,10 +76,10 @@ const CalculatorForm = ({
             );
           }
         });
-      } else {
-        setCardQuestions(null);
-      }
-    }, [selectedBank, selectedCard, isEmbedded, tokenReady, onError]);
+    } else {
+      setCardQuestions(null);
+    }
+  }, [selectedBank, selectedCard, isEmbedded, tokenReady, onError]);
 
   const debouncedFetchMCC = useCallback(
     _.debounce(async (value) => {

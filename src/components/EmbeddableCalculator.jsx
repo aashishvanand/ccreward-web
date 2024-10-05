@@ -69,7 +69,7 @@ function EmbeddableCalculator() {
       setTokenReady(false);
       if (error.response && error.response.status === 401) {
         setApiKeyInvalid(true);
-      } else if (error.message.includes('Network Error')) {
+      } else if (error.message.includes("Network Error")) {
         showSnackbar("Network error. Please check your connection.", "error");
       } else {
         showSnackbar("Failed to authenticate. Please try again.", "error");
@@ -80,7 +80,6 @@ function EmbeddableCalculator() {
   useEffect(() => {
     refreshCustomToken();
   }, [refreshCustomToken]);
-
 
   const handleCalculate = useCallback(async () => {
     if (!customToken || isTokenExpired(customToken)) {
@@ -165,13 +164,13 @@ function EmbeddableCalculator() {
       <Paper elevation={3} sx={{ p: 3, mt: 2, mb: 4 }}>
         <Container maxWidth="md">
           <Typography variant="h4" component="h1" gutterBottom>
-          <Link
+            <Link
               href="https://ccreward.app"
               target="_blank"
               rel="noopener noreferrer"
               color="inherit"
               underline="hover"
-              sx={{ cursor: 'pointer' }}
+              sx={{ cursor: "pointer" }}
             >
               Rewards Calculator by ccreward.app
             </Link>

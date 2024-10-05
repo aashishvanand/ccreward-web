@@ -59,7 +59,13 @@ function CardList({ cards, onDeleteCard }) {
     <>
       <Grid container spacing={2}>
         {horizontalCards.map((card) => (
-          <Grid item xs={12} sm={6} md={3} key={`${card.bank}_${card.cardName}`}>
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            md={3}
+            key={`${card.bank}_${card.cardName}`}
+          >
             <CreditCardItem
               card={card}
               onDelete={() => onDeleteCard(card.bank, card.cardName)}
@@ -70,7 +76,13 @@ function CardList({ cards, onDeleteCard }) {
       {verticalCards.length > 0 && (
         <Grid container spacing={2} sx={{ mt: 4 }}>
           {verticalCards.map((card) => (
-            <Grid item xs={6} sm={4} md={2} key={`${card.bank}_${card.cardName}`}>
+            <Grid
+              item
+              xs={6}
+              sm={4}
+              md={2}
+              key={`${card.bank}_${card.cardName}`}
+            >
               <CreditCardItem
                 card={card}
                 onDelete={() => onDeleteCard(card.bank, card.cardName)}

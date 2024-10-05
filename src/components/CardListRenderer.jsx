@@ -13,7 +13,7 @@ import {
 import Image from "next/image";
 import { CreditCard as CreditCardIcon } from "@mui/icons-material";
 import { getBankColor } from "./colorPalette";
-import useCardImagesData from '../hooks/useCardImagesData';
+import useCardImagesData from "../hooks/useCardImagesData";
 
 const CardListRenderer = ({
   isCardListLoading,
@@ -21,14 +21,19 @@ const CardListRenderer = ({
   cardRewards,
   userCards,
   failedImages,
-  handleImageError
+  handleImageError,
 }) => {
-  const { cardImagesData, isLoading: isLoadingCardImages, error: cardImagesError } = useCardImagesData();
+  const {
+    cardImagesData,
+    isLoading: isLoadingCardImages,
+    error: cardImagesError,
+  } = useCardImagesData();
 
   const findCardDetails = (bank, cardName) => {
     return cardImagesData.find(
-      (item) => item.bank.toLowerCase() === bank.toLowerCase() && 
-                item.cardName.toLowerCase() === cardName.toLowerCase()
+      (item) =>
+        item.bank.toLowerCase() === bank.toLowerCase() &&
+        item.cardName.toLowerCase() === cardName.toLowerCase()
     );
   };
 
@@ -79,7 +84,9 @@ const CardListRenderer = ({
 
   if (cardImagesError) {
     return (
-      <Typography color="error">Error loading card images: {cardImagesError.message}</Typography>
+      <Typography color="error">
+        Error loading card images: {cardImagesError.message}
+      </Typography>
     );
   }
 
@@ -120,7 +127,8 @@ const CardListRenderer = ({
               </Typography>
             }
             secondary={
-              <Typography variant="body1"
+              <Typography
+                variant="body1"
                 sx={{
                   color:
                     index === 0 ? "success.contrastText" : "text.secondary",

@@ -103,7 +103,6 @@ function MyCardsPage() {
     }
   };
 
-
   const showSnackbar = (message, severity = "info") => {
     setSnackbar({ open: true, message, severity });
   };

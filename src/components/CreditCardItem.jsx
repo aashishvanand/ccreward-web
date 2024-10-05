@@ -8,8 +8,8 @@ import {
   Box,
 } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
-import Image from 'next/image';
-import useCardImagesData from '../hooks/useCardImagesData';
+import Image from "next/image";
+import useCardImagesData from "../hooks/useCardImagesData";
 import { getBankColor } from "./colorPalette";
 
 function CreditCardItem({ card, onDelete }) {
@@ -20,8 +20,9 @@ function CreditCardItem({ card, onDelete }) {
   useEffect(() => {
     if (cardImagesData.length > 0) {
       const details = cardImagesData.find(
-        (item) => item.bank.toLowerCase() === card.bank.toLowerCase() && 
-                  item.cardName.toLowerCase() === card.cardName.toLowerCase()
+        (item) =>
+          item.bank.toLowerCase() === card.bank.toLowerCase() &&
+          item.cardName.toLowerCase() === card.cardName.toLowerCase()
       );
       setCardDetails(details);
     }
@@ -58,7 +59,9 @@ function CreditCardItem({ card, onDelete }) {
         }}
       >
         {!hasFailedImage && (
-          <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+          <Box
+            sx={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
+          >
             <Image
               src={cardDetails.id}
               alt={`${cardDetails.bank} ${cardDetails.cardName}`}
