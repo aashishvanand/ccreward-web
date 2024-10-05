@@ -165,7 +165,16 @@ function EmbeddableCalculator() {
       <Paper elevation={3} sx={{ p: 3, mt: 2, mb: 4 }}>
         <Container maxWidth="md">
           <Typography variant="h4" component="h1" gutterBottom>
-            Credit Card Reward Calculator
+          <Link
+              href="https://ccreward.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              color="inherit"
+              underline="hover"
+              sx={{ cursor: 'pointer' }}
+            >
+              Rewards Calculator by ccreward.app
+            </Link>
           </Typography>
           <CalculatorForm
             selectedBank={selectedBank}
