@@ -1,0 +1,27 @@
+User-agent: *
+Allow: /
+
+# Disallow crawling of unnecessary files and directories
+Disallow: /_next/
+Disallow: /app/
+Disallow: /components/
+Disallow: /data/
+Disallow: /utils/
+Disallow: /node_modules/
+
+# Disallow crawling of protected pages
+Disallow: /best-card
+Disallow: /my-cards
+
+# Allow crawling of important public pages
+Allow: /calculator
+Allow: /privacy
+Allow: /terms
+
+# Allow crawling of public assets
+Allow: /card-images/
+Allow: /og.png
+Allow: /og1.png
+
+# Sitemap
+Sitemap: https://ccreward.app/sitemap.xml
