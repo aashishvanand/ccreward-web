@@ -14,6 +14,7 @@ import {
   FormGroup,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
+import _ from "lodash";
 
 const DynamicCardInputs = ({
   cardConfig,
@@ -25,13 +26,23 @@ const DynamicCardInputs = ({
   const prevInputsRef = useRef(dynamicInputs);
 
   useEffect(() => {
-    if (dynamicInputs !== prevInputsRef.current) {
+    if (!_.isEqual(dynamicInputs, prevInputsRef.current)) {
+      // Inputs have changed
       Object.keys(currentInputs).forEach((key) => {
         onChange(key, undefined);
       });
       prevInputsRef.current = dynamicInputs;
     }
   }, [dynamicInputs, currentInputs, onChange]);
+
+  // useEffect(() => {
+  //   if (dynamicInputs !== prevInputsRef.current) {
+  //     Object.keys(currentInputs).forEach((key) => {
+  //       onChange(key, undefined);
+  //     });
+  //     prevInputsRef.current = dynamicInputs;
+  //   }
+  // }, [dynamicInputs, currentInputs, onChange]);
 
   useEffect(() => {
     const mutuallyExclusiveInputs = dynamicInputs.filter(

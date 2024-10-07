@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -56,7 +56,7 @@ const BestCardCalculator = () => {
   const [mccOptions, setMccOptions] = useState([]);
   const { user } = useAuth();
   const [advancedMode, setAdvancedMode] = useState(false);
-  const [cardQuestions, setCardQuestions] = useState({});
+  const [cardQuestions, setCardQuestions] = useState([]);
   const [additionalInputs, setAdditionalInputs] = useState({});
   const [sortMethod, setSortMethod] = useState("points");
   const [lastCalculationParams, setLastCalculationParams] = useState(null);
@@ -208,6 +208,15 @@ const BestCardCalculator = () => {
     hasCalculated,
   ]);
 
+  const memoizedCardConfigs = useMemo(() => {
+    const configs = {};
+    cardQuestions.forEach((question) => {
+      const key = `${question.bank}-${question.cardName}-${question.name}`;
+      configs[key] = { dynamicInputs: [question] };
+    });
+    return configs;
+  }, [cardQuestions]);  
+
   const renderAdvancedModeContent = () => {
     if (!Array.isArray(cardQuestions) || cardQuestions.length === 0) {
       return (
@@ -216,7 +225,7 @@ const BestCardCalculator = () => {
         </Typography>
       );
     }
-
+  
     const groupedQuestions = cardQuestions.reduce((acc, question) => {
       const key = `${question.bank} - ${question.cardName}`;
       if (!acc[key]) {
@@ -225,17 +234,20 @@ const BestCardCalculator = () => {
       acc[key].push(question);
       return acc;
     }, {});
-
-    return Object.entries(groupedQuestions).map(
-      ([cardKey, questions], index) => (
-        <Box key={cardKey} sx={{ mb: 4 }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            {cardKey}
-          </Typography>
-          {questions.map((question, qIndex) => (
-            <Box key={qIndex} sx={{ mb: 2 }}>
+  
+    return Object.entries(groupedQuestions).map(([cardKey, questions], index) => (
+      <Box key={cardKey} sx={{ mb: 4 }}>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          {cardKey}
+        </Typography>
+        {questions.map((question) => {
+          const configKey = `${question.bank}-${question.cardName}-${question.name}`;
+          const memoizedCardConfig = memoizedCardConfigs[configKey];
+  
+          return (
+            <Box key={question.name} sx={{ mb: 2 }}>
               <DynamicCardInputs
-                cardConfig={{ dynamicInputs: [question] }}
+                cardConfig={memoizedCardConfig}
                 onChange={(inputKey, value) =>
                   handleAdditionalInputChange(cardKey, inputKey, value)
                 }
@@ -243,14 +255,15 @@ const BestCardCalculator = () => {
                 selectedMcc={selectedMcc}
               />
             </Box>
-          ))}
-          {index < Object.entries(groupedQuestions).length - 1 && (
-            <Divider sx={{ my: 2 }} />
-          )}
-        </Box>
-      )
-    );
+          );
+        })}
+        {index < Object.entries(groupedQuestions).length - 1 && (
+          <Divider sx={{ my: 2 }} />
+        )}
+      </Box>
+    ));
   };
+  
 
   const handleSortMethodChange = (event, newMethod) => {
     if (newMethod !== null) {
@@ -272,15 +285,18 @@ const BestCardCalculator = () => {
     }));
   };
 
-  const handleAdditionalInputChange = (cardKey, inputKey, value) => {
-    setAdditionalInputs((prevInputs) => ({
-      ...prevInputs,
-      [cardKey]: {
-        ...(prevInputs[cardKey] || {}),
-        [inputKey]: value,
-      },
-    }));
-  };
+  const handleAdditionalInputChange = useCallback(
+    (cardKey, inputKey, value) => {
+      setAdditionalInputs((prevInputs) => ({
+        ...prevInputs,
+        [cardKey]: {
+          ...(prevInputs[cardKey] || {}),
+          [inputKey]: value,
+        },
+      }));
+    },
+    []
+  );
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -328,7 +344,10 @@ const BestCardCalculator = () => {
         />
         <Accordion
           expanded={advancedMode}
-          onChange={() => setAdvancedMode(!advancedMode)}
+          onChange={(event, isExpanded) => {
+            console.log('Accordion onChange triggered:', event.target, isExpanded);
+            setAdvancedMode(isExpanded);
+          }}
           sx={{
             mt: 2,
             mb: 2,
