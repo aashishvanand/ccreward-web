@@ -4,7 +4,7 @@ import { jwtDecode } from "jwt-decode";
 const getApiInstance = (isEmbedded) => (isEmbedded ? embeddedApi : api);
 
 // Define the base URL for API calls
-const API_BASE_URL = 'https://api.ccreward.app';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // Create an axios instance with the base URL
 const api = axios.create({
