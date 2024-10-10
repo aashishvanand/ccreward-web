@@ -232,9 +232,10 @@ const CalculatorForm = ({
             (option) =>
               option.mcc.toLowerCase().includes(filterValue) ||
               option.name.toLowerCase().includes(filterValue) ||
-              option.knownMerchants.some((merchant) =>
-                merchant.toLowerCase().includes(filterValue)
-              )
+              (option.knownMerchants &&
+                option.knownMerchants.some((merchant) =>
+                  merchant.toLowerCase().includes(filterValue)
+                ))
           );
         }}
       />

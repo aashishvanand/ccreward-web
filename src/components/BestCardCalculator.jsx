@@ -215,7 +215,7 @@ const BestCardCalculator = () => {
       configs[key] = { dynamicInputs: [question] };
     });
     return configs;
-  }, [cardQuestions]);  
+  }, [cardQuestions]);
 
   const renderAdvancedModeContent = () => {
     if (!Array.isArray(cardQuestions) || cardQuestions.length === 0) {
@@ -225,7 +225,7 @@ const BestCardCalculator = () => {
         </Typography>
       );
     }
-  
+
     const groupedQuestions = cardQuestions.reduce((acc, question) => {
       const key = `${question.bank} - ${question.cardName}`;
       if (!acc[key]) {
@@ -234,36 +234,37 @@ const BestCardCalculator = () => {
       acc[key].push(question);
       return acc;
     }, {});
-  
-    return Object.entries(groupedQuestions).map(([cardKey, questions], index) => (
-      <Box key={cardKey} sx={{ mb: 4 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          {cardKey}
-        </Typography>
-        {questions.map((question) => {
-          const configKey = `${question.bank}-${question.cardName}-${question.name}`;
-          const memoizedCardConfig = memoizedCardConfigs[configKey];
-  
-          return (
-            <Box key={question.name} sx={{ mb: 2 }}>
-              <DynamicCardInputs
-                cardConfig={memoizedCardConfig}
-                onChange={(inputKey, value) =>
-                  handleAdditionalInputChange(cardKey, inputKey, value)
-                }
-                currentInputs={additionalInputs[cardKey] || {}}
-                selectedMcc={selectedMcc}
-              />
-            </Box>
-          );
-        })}
-        {index < Object.entries(groupedQuestions).length - 1 && (
-          <Divider sx={{ my: 2 }} />
-        )}
-      </Box>
-    ));
+
+    return Object.entries(groupedQuestions).map(
+      ([cardKey, questions], index) => (
+        <Box key={cardKey} sx={{ mb: 4 }}>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            {cardKey}
+          </Typography>
+          {questions.map((question) => {
+            const configKey = `${question.bank}-${question.cardName}-${question.name}`;
+            const memoizedCardConfig = memoizedCardConfigs[configKey];
+
+            return (
+              <Box key={question.name} sx={{ mb: 2 }}>
+                <DynamicCardInputs
+                  cardConfig={memoizedCardConfig}
+                  onChange={(inputKey, value) =>
+                    handleAdditionalInputChange(cardKey, inputKey, value)
+                  }
+                  currentInputs={additionalInputs[cardKey] || {}}
+                  selectedMcc={selectedMcc}
+                />
+              </Box>
+            );
+          })}
+          {index < Object.entries(groupedQuestions).length - 1 && (
+            <Divider sx={{ my: 2 }} />
+          )}
+        </Box>
+      )
+    );
   };
-  
 
   const handleSortMethodChange = (event, newMethod) => {
     if (newMethod !== null) {
@@ -298,6 +299,18 @@ const BestCardCalculator = () => {
     []
   );
 
+  const renderOption = (props, option) => (
+    <li {...props}>
+      {option.mcc} - {option.name}
+      {option.knownMerchants && option.knownMerchants.length > 0 && (
+        <span style={{ fontSize: "0.8em", color: "gray" }}>
+          {" "}
+          (e.g., {option.knownMerchants.join(", ")})
+        </span>
+      )}
+    </li>
+  );
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Header />
@@ -312,7 +325,7 @@ const BestCardCalculator = () => {
           renderOption={(props, option) => (
             <li {...props}>
               {option.mcc} - {option.name}
-              {option.knownMerchants.length > 0 && (
+              {option.knownMerchants && option.knownMerchants.length > 0 && (
                 <span style={{ fontSize: "0.8em", color: "gray" }}>
                   {" "}
                   (e.g., {option.knownMerchants.join(", ")})
@@ -331,7 +344,18 @@ const BestCardCalculator = () => {
           onInputChange={handleMccInputChange}
           onChange={(event, newValue) => setSelectedMcc(newValue)}
           value={selectedMcc}
-          filterOptions={(x) => x}
+          filterOptions={(options, { inputValue }) => {
+            const filterValue = inputValue.toLowerCase();
+            return options.filter(
+              (option) =>
+                option.mcc.toLowerCase().includes(filterValue) ||
+                option.name.toLowerCase().includes(filterValue) ||
+                (option.knownMerchants &&
+                  option.knownMerchants.some((merchant) =>
+                    merchant.toLowerCase().includes(filterValue)
+                  ))
+            );
+          }}
         />
         <TextField
           fullWidth
@@ -345,7 +369,11 @@ const BestCardCalculator = () => {
         <Accordion
           expanded={advancedMode}
           onChange={(event, isExpanded) => {
-            console.log('Accordion onChange triggered:', event.target, isExpanded);
+            console.log(
+              "Accordion onChange triggered:",
+              event.target,
+              isExpanded
+            );
             setAdvancedMode(isExpanded);
           }}
           sx={{
