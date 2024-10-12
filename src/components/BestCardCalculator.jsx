@@ -97,7 +97,7 @@ const BestCardCalculator = () => {
         cardName: card.cardName,
       }));
       const questions = await fetchBestCardQuestions(cardsData);
-      setCardQuestions(Array.isArray(questions) ? questions : []);
+      setCardQuestions(questions);
     } catch (error) {
       console.error("Error fetching card questions:", error);
       setSnackbar({
@@ -247,14 +247,26 @@ const BestCardCalculator = () => {
 
             return (
               <Box key={question.name} sx={{ mb: 2 }}>
-                <DynamicCardInputs
-                  cardConfig={memoizedCardConfig}
-                  onChange={(inputKey, value) =>
-                    handleAdditionalInputChange(cardKey, inputKey, value)
-                  }
-                  currentInputs={additionalInputs[cardKey] || {}}
-                  selectedMcc={selectedMcc}
-                />
+                {cardQuestions.map((cardQuestion, index) => (
+                  <DynamicCardInputs
+                    key={`${cardQuestion.bank}-${cardQuestion.cardName}`}
+                    cardConfig={cardQuestion}
+                    onChange={(inputKey, value) =>
+                      handleAdditionalInputChange(
+                        cardQuestion.bank,
+                        cardQuestion.cardName,
+                        inputKey,
+                        value
+                      )
+                    }
+                    currentInputs={
+                      additionalInputs[
+                        `${cardQuestion.bank}-${cardQuestion.cardName}`
+                      ] || {}
+                    }
+                    selectedMcc={selectedMcc}
+                  />
+                ))}
               </Box>
             );
           })}

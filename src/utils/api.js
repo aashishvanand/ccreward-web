@@ -92,29 +92,57 @@ export const initializeAuth = async () => {
     }
 };
 
-// Interceptor to add the token to each request
-api.interceptors.request.use(async (config) => {
-    // Check if Authorization header is already set
-    if (config.headers['Authorization']) {
-        // Do not override the existing token
-        return config;
-    }
+let isAuthenticating = false;
+let authPromise = null;
 
-    const auth = getAuth();
-    if (auth.currentUser) {
-        try {
-            const token = await getIdToken(auth.currentUser, true);
-            config.headers['Authorization'] = `Bearer ${token}`;
-        } catch (error) {
-            console.error('Error getting token:', error);
+// Interceptor to add the token to each request
+api.interceptors.request.use(
+    async (config) => {
+        // Check if Authorization header is already set
+        if (config.headers['Authorization']) {
+            return config;
         }
-    } else {
-        console.warn('No authenticated user found when making request');
+
+        const auth = getAuth();
+
+        // If we are already fetching the token, wait for it
+        if (isAuthenticating) {
+            await authPromise;
+        }
+
+        if (!auth.currentUser) {
+            isAuthenticating = true;
+            authPromise = new Promise((resolve) => {
+                const unsubscribe = auth.onAuthStateChanged(async (user) => {
+                    if (user) {
+                        const token = await getIdToken(user, true);
+                        config.headers['Authorization'] = `Bearer ${token}`;
+                        isAuthenticating = false;
+                        unsubscribe();
+                        resolve();
+                    } else {
+                        isAuthenticating = false;
+                        unsubscribe();
+                        resolve();
+                    }
+                });
+            });
+            await authPromise;
+        } else {
+            try {
+                const token = await getIdToken(auth.currentUser, true);
+                config.headers['Authorization'] = `Bearer ${token}`;
+            } catch (error) {
+                console.error('Error getting token:', error);
+            }
+        }
+
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
     }
-    return config;
-}, (error) => {
-    return Promise.reject(error);
-});
+);
 
 // Handle API errors
 const handleApiError = (error) => {

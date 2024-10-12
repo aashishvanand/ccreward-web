@@ -12,6 +12,7 @@ import {
   Tooltip,
   IconButton,
   FormGroup,
+  Typography,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import _ from "lodash";
@@ -22,7 +23,7 @@ const DynamicCardInputs = ({
   currentInputs,
   selectedMcc,
 }) => {
-  const dynamicInputs = cardConfig.dynamicInputs;
+  const dynamicInputs = cardConfig?.questions || [];
   const prevInputsRef = useRef(dynamicInputs);
 
   useEffect(() => {
@@ -34,15 +35,6 @@ const DynamicCardInputs = ({
       prevInputsRef.current = dynamicInputs;
     }
   }, [dynamicInputs, currentInputs, onChange]);
-
-  // useEffect(() => {
-  //   if (dynamicInputs !== prevInputsRef.current) {
-  //     Object.keys(currentInputs).forEach((key) => {
-  //       onChange(key, undefined);
-  //     });
-  //     prevInputsRef.current = dynamicInputs;
-  //   }
-  // }, [dynamicInputs, currentInputs, onChange]);
 
   useEffect(() => {
     const mutuallyExclusiveInputs = dynamicInputs.filter(
