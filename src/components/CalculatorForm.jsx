@@ -59,7 +59,7 @@ const CalculatorForm = ({
       setIsLoadingQuestions(true);
       fetchCardQuestions(selectedBank, selectedCard, isEmbedded)
         .then((response) => {
-          setCardQuestions(response); // Set the entire response
+          setCardQuestions(response);
           setIsLoadingQuestions(false);
         })
         .catch((error) => {

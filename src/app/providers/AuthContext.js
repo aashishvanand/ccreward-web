@@ -12,19 +12,16 @@ export function AuthProvider({ children }) {
   const [isNewUser, setIsNewUser] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         const isNew = user.metadata.creationTime === user.metadata.lastSignInTime;
         setUser({
           ...user,
           isAnonymous: user.isAnonymous,
         });
-        const token = await getIdToken(user);
-        setToken(token);
         setIsNewUser(isNew);
       } else {
         setUser(null);
-        setToken(null);
         setIsNewUser(false);
       }
       setLoading(false);
@@ -32,6 +29,7 @@ export function AuthProvider({ children }) {
 
     return () => unsubscribe();
   }, []);
+
 
   const signInWithGoogle = async () => {
     try {
@@ -85,7 +83,6 @@ export function AuthProvider({ children }) {
 
   const value = {
     user,
-    token,
     signInWithGoogle,
     signInAnonymously,
     logout,
