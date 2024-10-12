@@ -58,8 +58,8 @@ const CalculatorForm = ({
     if (selectedBank && selectedCard && tokenReady) {
       setIsLoadingQuestions(true);
       fetchCardQuestions(selectedBank, selectedCard, isEmbedded)
-        .then((questions) => {
-          setCardQuestions(questions);
+        .then((response) => {
+          setCardQuestions(response); // Set the entire response
           setIsLoadingQuestions(false);
         })
         .catch((error) => {
@@ -257,7 +257,7 @@ const CalculatorForm = ({
       ) : (
         cardQuestions && (
           <DynamicCardInputs
-            cardConfig={{ dynamicInputs: cardQuestions }}
+            cardConfig={cardQuestions}
             onChange={onAdditionalInputChange}
             currentInputs={additionalInputs}
             selectedMcc={selectedMcc}
