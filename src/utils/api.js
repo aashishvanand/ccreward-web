@@ -1,10 +1,14 @@
 import axios from 'axios';
 import { getAuth, getIdToken } from "firebase/auth";
 import { jwtDecode } from "jwt-decode";
+
 const getApiInstance = (isEmbedded) => (isEmbedded ? embeddedApi : api);
 
 // Define the base URL for API calls
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+// Set cache duration to 24 hours
+const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
 // Create an axios instance with the base URL
 const api = axios.create({
@@ -16,8 +20,42 @@ const embeddedApi = axios.create({
     baseURL: API_BASE_URL,
 });
 
-// Set cache duration to 24 hours
-const CACHE_DURATION = 24 * 60 * 60 * 1000;
+let currentToken = null;
+let tokenRefreshPromise = null;
+
+const getToken = async () => {
+    const auth = getAuth();
+    if (!auth.currentUser) {
+        throw new Error('No user is currently signed in');
+    }
+    if (currentToken && !isTokenExpired(currentToken)) {
+        return currentToken;
+    }
+    if (!tokenRefreshPromise) {
+        tokenRefreshPromise = getIdToken(auth.currentUser, true)
+            .then(token => {
+                currentToken = token;
+                tokenRefreshPromise = null;
+                return token;
+            })
+            .catch(error => {
+                tokenRefreshPromise = null;
+                throw error;
+            });
+    }
+    return tokenRefreshPromise;
+};
+
+// Function to check if a token is expired
+export const isTokenExpired = (token) => {
+    try {
+        const decodedToken = jwtDecode(token);
+        return decodedToken.exp * 1000 < Date.now();
+    } catch (error) {
+        console.error('Error decoding token:', error);
+        return true;
+    }
+};
 
 // Helper function to get data from cache
 const getFromCache = (key, isEmbedded = false) => {
@@ -66,18 +104,6 @@ export const setAuthToken = (token, isCustomToken = false, isEmbedded = false) =
     }
 };
 
-
-// Function to check if a token is expired
-export const isTokenExpired = (token) => {
-    try {
-        const decodedToken = jwtDecode(token);
-        return decodedToken.exp * 1000 < Date.now();
-    } catch (error) {
-        console.error('Error decoding token:', error);
-        return true;
-    }
-};
-
 // Initialize authentication
 export const initializeAuth = async () => {
     const auth = getAuth();
@@ -92,29 +118,18 @@ export const initializeAuth = async () => {
     }
 };
 
+let isAuthenticating = false;
+let authPromise = null;
+
 // Interceptor to add the token to each request
 api.interceptors.request.use(async (config) => {
-    // Check if Authorization header is already set
-    if (config.headers['Authorization']) {
-        // Do not override the existing token
-        return config;
-    }
-
-    const auth = getAuth();
-    if (auth.currentUser) {
-        try {
-            const token = await getIdToken(auth.currentUser, true);
-            config.headers['Authorization'] = `Bearer ${token}`;
-        } catch (error) {
-            console.error('Error getting token:', error);
-        }
-    } else {
-        console.warn('No authenticated user found when making request');
+    if (!config.headers['Authorization']) {
+        const token = await getToken();
+        config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
-}, (error) => {
-    return Promise.reject(error);
-});
+}, (error) => Promise.reject(error));
+
 
 // Handle API errors
 const handleApiError = (error) => {

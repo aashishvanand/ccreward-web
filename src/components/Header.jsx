@@ -126,8 +126,8 @@ function Header() {
           sx={{ display: "flex", alignItems: "center" }}
         >
           <Box sx={{ position: "relative", width: 40, height: 40, mr: 1 }}>
-            <Image
-              src="c68cca10-3860-4546-74e7-06ea7aa8e000"
+          <Image
+              src={mode === "dark" ? "f4bf16b1-527e-4d80-47b4-99989a1ded00" : "b6c3c6f1-a744-4e47-8c50-4c33c84c3900"}
               alt="CCReward Logo"
               width={40}
               height={40}

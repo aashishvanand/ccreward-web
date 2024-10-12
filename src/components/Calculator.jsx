@@ -91,28 +91,15 @@ function Calculator() {
         } finally {
           setIsFetchingUserData(false);
         }
-      }
-    };
-
-    const setupAuth = async () => {
-      if (!loading && isAuthenticated()) {
-        try {
-          const auth = getAuth();
-          const token = await getIdToken(auth.currentUser, true);
-          setAuthToken(token);
-          await fetchUserCards();
-        } catch (error) {
-          console.error("Error setting up authentication:", error);
-          setError("Failed to authenticate. Please try logging in again.");
-        }
       } else {
         setIsFetchingUserData(false);
       }
     };
 
-    setupAuth();
-    setHasCalculated(false);
-  }, [user, isAuthenticated, loading]);
+    if (isAuthenticated()) {
+      fetchUserCards();
+    }
+  }, [user, isAuthenticated]);
 
   const handleAddCard = useCallback(async () => {
     if (user) {
