@@ -14,17 +14,19 @@ function CardList({ cards, onDeleteCard }) {
       const vertical = [];
 
       cards.forEach((card) => {
-        const cardDetails = cardImagesData.find(
-          (item) =>
-            item.bank.toLowerCase() === card.bank.toLowerCase() &&
-            item.cardName.toLowerCase() === card.cardName.toLowerCase()
-        );
+        if (card && card.bank && card.cardName) {
+          const cardDetails = cardImagesData.find(
+            (item) =>
+              item.bank.toLowerCase() === card.bank.toLowerCase() &&
+              item.cardName.toLowerCase() === card.cardName.toLowerCase()
+          );
 
-        if (cardDetails) {
-          if (cardDetails.orientation === "horizontal") {
-            horizontal.push(card);
-          } else {
-            vertical.push(card);
+          if (cardDetails) {
+            if (cardDetails.orientation === "horizontal") {
+              horizontal.push(card);
+            } else {
+              vertical.push(card);
+            }
           }
         }
       });
@@ -33,6 +35,7 @@ function CardList({ cards, onDeleteCard }) {
       setVerticalCards(vertical);
     }
   }, [cards, cardImagesData]);
+
 
   if (isLoading) {
     return <CircularProgress />;
