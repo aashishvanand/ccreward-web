@@ -136,6 +136,8 @@ const BestCardCalculator = () => {
   };
 
   const handleCalculate = useCallback(async () => {
+    
+  
     if (!spentAmount || parseFloat(spentAmount) <= 0) {
       setSnackbar({
         open: true,
@@ -146,12 +148,26 @@ const BestCardCalculator = () => {
     }
   
     const answers = {};
-    const cards = userCards.map((card) => {
+  
+    const cards = userCards.filter(card => card.bank && card.cardName).map(card => {
       const cardKey = `${card.bank} - ${card.cardName}`;
+      
       const cardAnswers = additionalInputs[cardKey] || {};
+      
       if (Object.keys(cardAnswers).length > 0) {
-        answers[cardKey] = cardAnswers;
+        // Include all non-empty answers, including false boolean values
+        const nonEmptyAnswers = Object.entries(cardAnswers).reduce((acc, [key, value]) => {
+          if (value !== null && value !== undefined && value !== "") {
+            acc[key] = value;
+          }
+          return acc;
+        }, {});
+  
+        if (Object.keys(nonEmptyAnswers).length > 0) {
+          answers[cardKey] = nonEmptyAnswers;
+        }
       }
+      
       return { bank: card.bank, cardName: card.cardName };
     });
   
@@ -189,6 +205,7 @@ const BestCardCalculator = () => {
         setHasCalculated(true);
       }
     } catch (error) {
+      console.error("Error in calculateBestCard:", error);
       if (error.message.includes("too many requests")) {
         setSnackbar({
           open: true,
@@ -196,7 +213,6 @@ const BestCardCalculator = () => {
           severity: "warning",
         });
       } else {
-        console.error("Error calculating rewards:", error);
         setSnackbar({
           open: true,
           message: "Error calculating best card. Please try again.",
@@ -214,6 +230,7 @@ const BestCardCalculator = () => {
     lastCalculationParams,
     hasCalculated,
   ]);
+  
 
   const memoizedCardConfigs = useMemo(() => {
     const configs = {};
@@ -247,14 +264,14 @@ const BestCardCalculator = () => {
     return Object.entries(groupedQuestions).map(([cardKey, questions]) => (
       <Box key={cardKey} sx={{ mb: 4 }}>
         <Typography variant="h6" sx={{ mb: 2 }}>
-          {cardKey}
+          {cardKey.replace('-', ' - ')} {/* Ensure correct formatting */}
         </Typography>
         <DynamicCardInputs
           cardConfig={questions}
           onChange={(inputKey, value) =>
-            handleAdditionalInputChange(cardKey, inputKey, value)
+            handleAdditionalInputChange(cardKey.replace('-', ' - '), inputKey, value)
           }
-          currentInputs={additionalInputs[cardKey] || {}}
+          currentInputs={additionalInputs[cardKey.replace('-', ' - ')] || {}}
           selectedMcc={selectedMcc}
         />
         <Divider sx={{ my: 2 }} />
@@ -282,18 +299,15 @@ const BestCardCalculator = () => {
     }));
   };
 
-  const handleAdditionalInputChange = useCallback(
-    (cardKey, inputKey, value) => {
-      setAdditionalInputs((prevInputs) => ({
-        ...prevInputs,
-        [cardKey]: {
-          ...(prevInputs[cardKey] || {}),
-          [inputKey]: value,
-        },
-      }));
-    },
-    []
-  );
+  const handleAdditionalInputChange = useCallback((cardKey, inputKey, value) => {
+    setAdditionalInputs((prevInputs) => ({
+      ...prevInputs,
+      [cardKey]: {
+        ...(prevInputs[cardKey] || {}),
+        [inputKey]: value,
+      },
+    }));
+  }, []);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
