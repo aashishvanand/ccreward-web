@@ -186,25 +186,27 @@ function Calculator() {
           setTimeout(() => setShowConfetti(false), 5000);
           setHasCalculated(true);
         }
-      } catch (error) {
+      }catch (error) {
         console.error("Error calculating rewards:", error);
         let errorMessage = "Error calculating rewards. Please try again.";
         let severity = "error";
-
+      
         if (error.message && error.message.includes("too many requests")) {
-          errorMessage =
-            "You've made too many requests. Please take a coffee break and try again later.";
+          errorMessage = "You've made too many requests. Please take a coffee break and try again later.";
           severity = "warning";
         } else if (error.response) {
+          // Extract the error message properly
           errorMessage =
-            error.response.data.message || error.response.data || error.message;
+            error.response.data.error ||
+            error.response.data.message ||
+            error.response.data ||
+            error.message;
         } else if (error.request) {
-          errorMessage =
-            "No response received from server. Please check your internet connection.";
+          errorMessage = "No response received from server. Please check your internet connection.";
         } else {
           errorMessage = error.message;
         }
-
+      
         setSnackbar({
           open: true,
           message: errorMessage,
