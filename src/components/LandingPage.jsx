@@ -35,7 +35,7 @@ import { getCardsForUser } from "../utils/firebaseUtils";
 import useCardImagesData from "../hooks/useCardImagesData";
 import bankImagesData from "../data/bankImages";
 import Image from "next/image";
-import { Apple as AppleIcon } from "@mui/icons-material";
+import IOSAppBanner from './iosAppBanner'
 
 const BASE_URL = "https://ccreward.app";
 
@@ -287,6 +287,7 @@ export default function LandingPage() {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <IOSAppBanner />
       <Header />
 
       {/* Hero Section */}
