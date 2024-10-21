@@ -35,6 +35,7 @@ import { getCardsForUser } from "../utils/firebaseUtils";
 import useCardImagesData from "../hooks/useCardImagesData";
 import bankImagesData from "../data/bankImages";
 import Image from "next/image";
+import { Apple as AppleIcon } from "@mui/icons-material";
 
 const BASE_URL = "https://ccreward.app";
 
@@ -531,6 +532,96 @@ export default function LandingPage() {
           <Typography variant="h6" align="center" paragraph>
             Start comparing cards and maximizing your rewards today.
           </Typography>
+        </Container>
+      </Box>
+
+      {/* App Store Availability Section */}
+      <Box sx={{ bgcolor: "background.paper", py: 8 }}>
+        <Container maxWidth="md">
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textAlign: "center",
+            }}
+          >
+            <Typography variant="h3" align="center" gutterBottom>
+              Get CCReward App on Your Device
+            </Typography>
+            <Typography 
+              variant="h5" 
+              paragraph
+              sx={{
+                maxWidth: "600px",
+                mb: 6,
+                color: "text.secondary",
+              }}
+            >
+              Download the app to maximize your credit card rewards on the go!
+            </Typography>
+            <Box 
+              sx={{ 
+                display: "flex", 
+                flexDirection: isMobile ? "column" : "row", 
+                alignItems: "center", 
+                gap: 3,
+                mb: 4,
+              }}
+            >
+              <Box
+                component="a"
+                href="https://apps.apple.com/in/app/ccreward/id6736835206"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  transition: "transform 0.3s ease-in-out",
+                  "&:hover": {
+                    transform: "scale(1.05)",
+                  },
+                }}
+              >
+                <Image
+                  src={theme.palette.mode === "dark" ? "d6909a96-9073-4189-84ea-54475d93ac00" : "60ca24d3-0052-4177-4da7-ce7fc0d24a00"}
+                  alt="Download on the App Store"
+                  width={200}
+                  height={60}
+                />
+              </Box>
+              <Box 
+                sx={{ 
+                  display: "flex", 
+                  alignItems: "center", 
+                  gap: 1,
+                  opacity: 0.5,
+                  transition: "opacity 0.3s ease-in-out",
+                  "&:hover": {
+                    opacity: 0.7,
+                  },
+                }}
+              >
+                {/* <Image
+                  src={theme.palette.mode === "dark" ? "79a432ae-7b73-404e-8efc-9c963ce05400" : "79a432ae-7b73-404e-8efc-9c963ce05400"}
+                  alt="Get it on Google Play"
+                  width={174}
+                  height={60}
+                />
+                <Typography 
+                  variant="body2" 
+                  sx={{
+                    bgcolor: "background.paper",
+                    color: "text.primary",
+                    px: 1,
+                    py: 0.5,
+                    borderRadius: 1,
+                    fontWeight: 500,
+                  }}
+                >
+                  Coming Soon
+                </Typography> */}
+              </Box>
+            </Box>
+          </Box>
         </Container>
       </Box>
 
