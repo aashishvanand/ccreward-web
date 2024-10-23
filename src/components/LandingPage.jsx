@@ -129,6 +129,16 @@ const tweets = [
       "Credit Card Rewards Calculator 📱 💰Maximize Rewards & Save time Great work @aashishvanand 👏 Like ❤️ n Repost ♻️ if useful #CreditCard #ccgeek",
     url: "https://x.com/iSatishAgarwal/status/1830639440861040697",
   },
+  {
+    id: 8,
+    author: "Nebula World",
+    handle: "@nebula_world",
+    avatar:
+      "https://pbs.twimg.com/profile_images/1628247643855126529/MLXfPLCj_400x400.jpg",
+    content:
+      "This app can be your rewards buddy for credit cards optimisation.. Install and start using ⤵️",
+    url: "https://x.com/nebula_world/status/1848710824044417415",
+  },
 ];
 
 export default function LandingPage() {
