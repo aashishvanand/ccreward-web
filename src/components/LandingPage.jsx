@@ -23,7 +23,6 @@ import {
   Bolt as BoltIcon,
   CompareArrows as CompareArrowsIcon,
   TrendingUp as TrendingUpIcon,
-  Twitter as TwitterIcon,
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";
@@ -35,7 +34,8 @@ import { getCardsForUser } from "../utils/firebaseUtils";
 import useCardImagesData from "../hooks/useCardImagesData";
 import bankImagesData from "../data/bankImages";
 import Image from "next/image";
-import IOSAppBanner from './iosAppBanner'
+import IOSAppBanner from "./iosAppBanner";
+import XIcon from "@mui/icons-material/X";
 
 const BASE_URL = "https://ccreward.app";
 
@@ -550,8 +550,8 @@ export default function LandingPage() {
             <Typography variant="h3" align="center" gutterBottom>
               Get CCReward App on Your Device
             </Typography>
-            <Typography 
-              variant="h5" 
+            <Typography
+              variant="h5"
               paragraph
               sx={{
                 maxWidth: "600px",
@@ -561,11 +561,11 @@ export default function LandingPage() {
             >
               Download the app to maximize your credit card rewards on the go!
             </Typography>
-            <Box 
-              sx={{ 
-                display: "flex", 
-                flexDirection: isMobile ? "column" : "row", 
-                alignItems: "center", 
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: isMobile ? "column" : "row",
+                alignItems: "center",
                 gap: 3,
                 mb: 4,
               }}
@@ -583,16 +583,20 @@ export default function LandingPage() {
                 }}
               >
                 <Image
-                  src={theme.palette.mode === "dark" ? "d6909a96-9073-4189-84ea-54475d93ac00" : "60ca24d3-0052-4177-4da7-ce7fc0d24a00"}
+                  src={
+                    theme.palette.mode === "dark"
+                      ? "d6909a96-9073-4189-84ea-54475d93ac00"
+                      : "60ca24d3-0052-4177-4da7-ce7fc0d24a00"
+                  }
                   alt="Download on the App Store"
                   width={200}
                   height={60}
                 />
               </Box>
-              <Box 
-                sx={{ 
-                  display: "flex", 
-                  alignItems: "center", 
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
                   gap: 1,
                   opacity: 0.5,
                   transition: "opacity 0.3s ease-in-out",
@@ -687,14 +691,19 @@ export default function LandingPage() {
                       </Typography>
                       <Button
                         variant="outlined"
-                        startIcon={<TwitterIcon />}
                         href={tweet.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         fullWidth
-                        sx={{ mt: "auto" }}
+                        sx={{
+                          mt: "auto",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 0.5,
+                        }}
                       >
-                        View on X
+                        View on <XIcon sx={{ fontSize: 16 }} />{" "}
                       </Button>
                     </CardContent>
                   </Card>
