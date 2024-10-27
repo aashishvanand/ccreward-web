@@ -13,14 +13,15 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-let firebaseApp;
+let app;
 
 if (!getApps().length) {
-    firebaseApp = initializeApp(firebaseConfig);
+    app = initializeApp(firebaseConfig);
 } else {
-    firebaseApp = getApp(); // if already initialized, use that one
+    app = getApp(); // if already initialized, use that one
 }
 
-export const auth = getAuth(firebaseApp);
-export const db = getFirestore(firebaseApp);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
+export const firebaseApp = app;

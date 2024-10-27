@@ -20,9 +20,9 @@ import IncorrectRewardReportForm from "./IncorrectRewardReportForm";
 import { useCardSelection } from "./CalculatorHooks";
 import ReactConfetti from "react-confetti";
 import { AnonymousConversionPrompt } from "./AnonymousConversionPrompt";
-import { calculateRewards, setAuthToken } from "../utils/api";
-import { getAuth, getIdToken } from "firebase/auth";
+import { calculateRewards } from "../utils/api";
 import ErrorAlert from "./ErrorAlert";
+import { logCalculation } from '../firebase/analytics';
 
 function Calculator() {
   const { user, isAuthenticated, loading } = useAuth();
@@ -177,6 +177,12 @@ function Calculator() {
           mcc: selectedMcc ? selectedMcc.mcc : null,
           amount: parseFloat(spentAmount),
           answers: processedInputs,
+        });
+        logCalculation({
+          bank: selectedBank,
+          card: selectedCard,
+          mcc: selectedMcc?.mcc,
+          amount: parseFloat(spentAmount)
         });
         setCalculationResult(result);
         setCalculationPerformed(true);

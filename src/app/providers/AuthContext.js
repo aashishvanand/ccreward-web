@@ -1,7 +1,8 @@
 'use client';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { auth, googleProvider } from '../../../firebase';
+import { auth, googleProvider, firebaseApp } from '../../../firebase';
 import { onAuthStateChanged, signInWithPopup, signInAnonymously as firebaseSignInAnonymously, getIdToken, signOut } from 'firebase/auth';
+import { getAnalytics, logEvent } from "firebase/analytics";
 
 const AuthContext = createContext();
 
@@ -20,6 +21,13 @@ export function AuthProvider({ children }) {
           isAnonymous: user.isAnonymous,
         });
         setIsNewUser(isNew);
+        // Log sign_in event if it's a new user
+        if (isNew && typeof window !== 'undefined') {
+          const analytics = getAnalytics(firebaseApp);
+          logEvent(analytics, 'sign_up', {
+            method: user.isAnonymous ? 'anonymous' : 'google',
+          });
+        }
       } else {
         setUser(null);
         setIsNewUser(false);
@@ -34,9 +42,22 @@ export function AuthProvider({ children }) {
   const signInWithGoogle = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
+      if (typeof window !== 'undefined') {
+        const analytics = getAnalytics(firebaseApp);
+        logEvent(analytics, 'login', {
+          method: 'google',
+        });
+      }
       return result.user;
     } catch (error) {
       console.error("Error signing in with Google", error);
+      if (typeof window !== 'undefined') {
+        const analytics = getAnalytics(firebaseApp);
+        logEvent(analytics, 'error', {
+          error_code: error.code,
+          error_message: error.message,
+        });
+      }
       throw error;
     }
   };
@@ -44,9 +65,22 @@ export function AuthProvider({ children }) {
   const signInAnonymously = async () => {
     try {
       const result = await firebaseSignInAnonymously(auth);
+      if (typeof window !== 'undefined') {
+        const analytics = getAnalytics(firebaseApp);
+        logEvent(analytics, 'login', {
+          method: 'anonymous',
+        });
+      }
       return result.user;
     } catch (error) {
       console.error("Error signing in anonymously", error);
+      if (typeof window !== 'undefined') {
+        const analytics = getAnalytics(firebaseApp);
+        logEvent(analytics, 'error', {
+          error_code: error.code,
+          error_message: error.message,
+        });
+      }
       throw error;
     }
   };
@@ -54,6 +88,10 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await signOut(auth);
+      if (typeof window !== 'undefined') {
+        const analytics = getAnalytics(firebaseApp);
+        logEvent(analytics, 'logout');
+      }
       setUser(null);
       setToken(null);
       setIsNewUser(false);
@@ -69,6 +107,13 @@ export function AuthProvider({ children }) {
 
     } catch (error) {
       console.error("Error signing out", error);
+      if (typeof window !== 'undefined') {
+        const analytics = getAnalytics(firebaseApp);
+        logEvent(analytics, 'error', {
+          error_code: error.code,
+          error_message: error.message,
+        });
+      }
       throw error;
     }
   };
