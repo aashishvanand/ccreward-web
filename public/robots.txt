@@ -12,14 +12,13 @@ Disallow: /node_modules/
 # Disallow crawling of protected pages
 Disallow: /best-card
 Disallow: /my-cards
+Disallow: /calculator
 
 # Allow crawling of important public pages
-Allow: /calculator
 Allow: /privacy
 Allow: /terms
 
 # Allow crawling of public assets
-Allow: /card-images/
 Allow: /og.png
 Allow: /og1.png
 
