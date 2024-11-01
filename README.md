@@ -18,9 +18,12 @@ The Credit Card Rewards is a comprehensive tool designed to help users optimize 
 
 CCReward is available on both iOS and Android platforms:
 
-[![Download on the App Store](https://img.shields.io/badge/App_Store-0D96F6?logo=app-store&logoColor=white)](https://apps.apple.com/in/app/ccreward/id6736835206)
-
-[![Get it on Google Play](https://img.shields.io/badge/Google_Play-414141?logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=app.ccreward)
+<a href="https://apps.apple.com/in/app/ccreward/id6736835206">
+    <img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download on the App Store" height="40">
+</a>
+<a href="https://play.google.com/store/apps/details?id=app.ccreward">
+    <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="60">
+</a>
 
 ## How to Use
 
