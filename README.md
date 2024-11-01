@@ -14,6 +14,14 @@ The Credit Card Rewards is a comprehensive tool designed to help users optimize 
 - Real-time calculations: Instantly see reward points or cashback for your transactions.
 - International spend option: Calculate rewards for both local and international transactions.
 
+## Mobile Apps
+
+CCReward is available on both iOS and Android platforms:
+
+[![Download on the App Store](https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg)](https://apps.apple.com/in/app/ccreward/id6736835206)
+
+[![Get it on Google Play](https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png)](https://play.google.com/store/apps/details?id=app.ccreward)
+
 ## How to Use
 
 1. Select your bank from the dropdown menu.
@@ -34,10 +42,10 @@ The Credit Card Rewards is a comprehensive tool designed to help users optimize 
 
 ```bash
 # Clone the repository
-git clone https://github.com/aashishvanand/credit-card-rewards-web.git
+git clone https://github.com/aashishvanand/ccreward-web.git
 
 # Navigate to the project directory
-cd credit-card-rewards-web
+cd ccreward-web
 
 # Install dependencies
 npm install
@@ -48,15 +56,31 @@ npm run dev
 
 ## Firebase Setup
 
-To run this project locally, you need to set up a Firebase project and add the configuration to your local environment. Follow these steps:
+To run this project locally, you need to set up a Firebase project and configure it properly. Follow these steps:
 
 1. Go to the Firebase Console.
 2. Click on "Add project" and follow the setup wizard to create a new project.
 3. Once your project is created, click on the web icon (</>) to add a web app to your project.
 4. Register your app with a nickname (e.g., "credit-card-rewards-calculator").
 5. Copy the Firebase configuration object.
-6. In your project root, create a file named .env.local.
-7. Add the following environment variables to .env.local, replacing the xxx with your actual Firebase configuration values:
+
+### Important Firebase Configuration Steps:
+
+#### Enable Authentication:
+1. In the Firebase Console, go to "Authentication" > "Sign-in method"
+2. Enable the following authentication methods:
+   - Google Sign-in
+   - Anonymous Authentication
+3. Configure the OAuth consent screen if required
+
+#### Enable Firestore Database:
+1. Go to "Firestore Database" in the Firebase Console
+2. Click "Create Database"
+3. Choose your preferred location and start in production mode
+
+#### Environment Variables Setup:
+1. In your project root, create a file named `.env.local`
+2. Add the following environment variables, replacing the xxx with your actual Firebase configuration values:
 
 ```bash
 NEXT_PUBLIC_FIREBASE_API_KEY=xxx
@@ -68,8 +92,12 @@ NEXT_PUBLIC_FIREBASE_APP_ID=xxx
 NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=xxx
 ```
 
-8. Save the .env.local file.
-   Make sure to add .env.local to your .gitignore file to prevent sensitive information from being committed to your repository.
+3. Save the `.env.local` file and ensure it's added to your `.gitignore`
+
+#### Troubleshooting:
+- If you encounter authentication errors, ensure both Google Sign-in and Anonymous Authentication are enabled
+- For database access issues, verify that Firestore is enabled and the security rules are properly configured
+- Check that all environment variables are correctly set in your `.env.local` file
 
 ## Contributing
 
@@ -98,17 +126,17 @@ For any commercial use of this project, including but not limited to using it as
 Regardless of whether you are using the project under the open source or commercial license, if you use, modify, or distribute this project, please provide attribution by including the following:
 
 1. The name of the project: ccreward.app
-2. The project's GitHub repository URL: https://github.com/aashishvanand/credit-card-rewards-web
+2. The project's GitHub repository URL: https://github.com/aashishvanand/ccreward-web
 3. The name of the original author: Aashish Vivekanand
 
 Example attribution:
 
 ```
-This project is based on the Credit Card Rewards (https://github.com/aashishvanand/credit-card-rewards-web) by Aashish Vivekanand.
+This project is based on the Credit Card Rewards (https://github.com/aashishvanand/ccreward-web) by Aashish Vivekanand.
 ```
 
 ---
 
-Visit the live calculator: [Credit Card Rewards Calculator](https://ccreward.app)
+Visit the live calculator: [ccreward.app](https://ccreward.app)
 
 Optimize your rewards and make the most of your credit card benefits with our comprehensive Credit Card Rewards Calculator!
