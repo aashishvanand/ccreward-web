@@ -2,16 +2,45 @@
 /og.png
   Access-Control-Allow-Origin: *
 
+# Allow access to Logo image from any origin
+/ccreward_dark.png
+  Access-Control-Allow-Origin: *
+
+/ccreward_light.png
+  Access-Control-Allow-Origin: *
+
 # Allow framing for the embeddable calculator only from selected domains
 /embeddable-calculator
   X-Frame-Options: ALLOW-FROM https://www.professorcardz.com/
-  Content-Security-Policy: frame-ancestors 'self' https://www.professorcardz.com/
+  Content-Security-Policy: frame-ancestors 'self' https://www.professorcardz.com/ https://creditcardz.in/
+
+# Allow access to app-ads.txt and ads.txt
+/app-ads.txt
+  Content-Type: text/plain
+  Access-Control-Allow-Origin: *
+  X-Robots-Tag: all
+
+/ads.txt
+  Content-Type: text/plain
+  Access-Control-Allow-Origin: *
+  X-Robots-Tag: all
+
 
 # CORS headers for API endpoint
 /bank
   Access-Control-Allow-Origin: https://ccreward.app
   Access-Control-Allow-Methods: GET, POST, OPTIONS
   Access-Control-Allow-Headers: Origin, Content-Type, Accept
+
+# Block access to development domain
+https://dev.ccreward.app/*
+  X-Robots-Tag: noindex, nofollow
+  X-Frame-Options: DENY
+  Content-Security-Policy: frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Cache-Control: no-store, no-cache, must-revalidate
+  Access-Control-Allow-Origin: https://ccreward.app
 
 # Security headers for all other pages
 /*
