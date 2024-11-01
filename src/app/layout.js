@@ -185,6 +185,16 @@ export default function RootLayout({ children }) {
         <meta name="google-adsense-account" content="ca-pub-3745126880980552" />
         <meta name="apple-itunes-app" content="app-id=6736835206" />
 
+        <link rel="canonical" href="https://ccreward.app" />
+
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="manifest" href="/site.webmanifest" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <meta name="apple-mobile-web-app-title" content="CCReward" />
+        <meta name="application-name" content="CCReward" />
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

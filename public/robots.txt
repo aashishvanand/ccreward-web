@@ -1,26 +1,43 @@
 User-agent: *
 Allow: /
 
-# Disallow crawling of unnecessary files and directories
-Disallow: /_next/
-Disallow: /app/
-Disallow: /components/
-Disallow: /data/
-Disallow: /utils/
-Disallow: /node_modules/
-
-# Disallow crawling of protected pages
-Disallow: /best-card
-Disallow: /my-cards
-Disallow: /calculator
-
-# Allow crawling of important public pages
+# Essential pages
 Allow: /privacy
 Allow: /terms
+Allow: /sitemap.xml
+
+# Block utility files
+Disallow: /_next/static/
+Disallow: /favicon.ico
+Disallow: /*.ico$
+Disallow: /*.png$
+Disallow: /*.woff2$
+
+# Protected routes (intentionally blocked)
+Disallow: /my-cards
+Disallow: /calculator
+Disallow: /best-card
+
+# Block development environment
+User-agent: *
+Disallow: /
+Host: dev.ccreward.app
+
+# Block direct access to storage
+User-agent: *
+Disallow: /
+Host: files.ccreward.app
 
 # Allow crawling of public assets
 Allow: /og.png
 Allow: /og1.png
+Allow: /ccreward_light.png
+Allow: /ccreward_dark.png
+
+# Allow favicon files
+Allow: /*.png
+Allow: /*.ico
+Allow: /site.webmanifest
 
 # Sitemap
 Sitemap: https://ccreward.app/sitemap.xml
