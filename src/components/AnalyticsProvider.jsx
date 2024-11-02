@@ -1,16 +1,52 @@
 'use client';
 
-import { useEffect } from 'react';
-import { getAnalytics } from "firebase/analytics";
+import { useEffect, useRef } from 'react';
+import Script from 'next/script';
+import { getAnalytics, isSupported } from "firebase/analytics";
 import { firebaseApp } from '../../firebase';
 
 export function AnalyticsProvider({ children }) {
-  useEffect(() => {
-    // Only initialize analytics on client side and in production
-    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
-      getAnalytics(firebaseApp);
-    }
-  }, []);
+  const initialized = useRef(false);
 
-  return children;
+  const handleGtagLoad = () => {
+    if (!initialized.current) {
+      const initAnalytics = async () => {
+        try {
+          if (await isSupported()) {
+            getAnalytics(firebaseApp);
+            initialized.current = true;
+          }
+        } catch (error) {
+          console.error('Failed to initialize Firebase Analytics:', error);
+        }
+      };
+
+      initAnalytics();
+    }
+  };
+
+  return (
+    <>
+      {/* Load Firebase Analytics scripts */}
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?l=dataLayer&id=${process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID}`}
+        strategy="afterInteractive"
+        onLoad={handleGtagLoad}
+      />
+      <Script
+        id="firebase-analytics-init"
+        strategy="afterInteractive"
+      >
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID}', {
+            page_path: window.location.pathname,
+          });
+        `}
+      </Script>
+      {children}
+    </>
+  );
 }

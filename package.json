@@ -14,7 +14,7 @@
     "url": "https://github.com/aashishvanand/credit-card-rewards-india-calculator/issues"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -25,24 +25,30 @@
     "@emotion/cache": "^11.13.1",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
-    "@mui/icons-material": "^6.1.1",
-    "@mui/material": "^6.1.1",
-    "@mui/material-nextjs": "^6.1.1",
+    "@mui/icons-material": "^6.1.6",
+    "@mui/material": "^6.1.6",
+    "@mui/material-nextjs": "^6.1.6",
     "axios": "^1.7.7",
-    "firebase": "^10.13.2",
+    "firebase": "^11.0.1",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
-    "next": "14.2.13",
-    "react": "^18",
+    "next": "^15.0.2",
+    "react": "^19.0.0-rc-7c8e5e7a-20241101",
     "react-confetti": "^6.1.0",
-    "react-dom": "^18",
+    "react-dom": "^19.0.0-rc-7c8e5e7a-20241101",
     "sharp": "^0.33.5"
   },
   "devDependencies": {
-    "eslint": "^8",
-    "eslint-config-next": "14.2.5",
+    "eslint": "^9",
+    "eslint-config-next": "^15.0.2",
     "jest": "^29.7.0",
-    "typescript": "^5.5.4"
+    "typescript": "^5.6.3"
+  },
+  "resolutions": {
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "react": "^19.0.0-rc-7c8e5e7a-20241101",
+    "react-dom": "^19.0.0-rc-7c8e5e7a-20241101"
   },
   "keywords": [
     "credit card reward calculator",

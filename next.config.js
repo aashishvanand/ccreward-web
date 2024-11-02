@@ -5,13 +5,16 @@ const nextConfig = {
     loader: 'custom',
     loaderFile: './imageLoader.js',
   },
-  experimental: {
-    forceSwcTransforms: true,
-  },
   compiler:{
     removeConsole:{
       exclude:["error"]
     }
+  },
+  serverExternalPackages: ['sharp'], // Previously serverComponentsExternalPackages
+  bundlePagesRouterDependencies: true, // Previously bundlePagesExternals
+  typescript: {
+    // You can enable this if you want to use next.config.ts
+    // ignoreBuildErrors: false,
   }
 };
 

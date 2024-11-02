@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useMemo, createContext, useContext, useEffect } from 'react';
 import { ThemeProvider, createTheme, useTheme as useMuiTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
+import { CssBaseline } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import colorPalette from './colorPalette';
 
@@ -82,7 +82,7 @@ export function ThemeRegistry({ children }) {
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme }}>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
+        <CssBaseline enableColorScheme />
         {children}
       </ThemeProvider>
     </ThemeContext.Provider>

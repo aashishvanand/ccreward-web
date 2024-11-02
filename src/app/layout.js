@@ -200,18 +200,8 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
           key="jsonld"
         />
-
-        <Script id="microsoft-clarity" strategy="afterInteractive">
-          {`
-      (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-      })(window, document, "clarity", "script", "ngsrwjccm4");
-    `}
-        </Script>
       </head>
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <AppRouterCacheProvider>
           <ThemeRegistry>
             <AuthProvider>
@@ -221,6 +211,20 @@ export default function RootLayout({ children }) {
             </AuthProvider>
           </ThemeRegistry>
         </AppRouterCacheProvider>
+
+        {/* Load analytics script with proper strategy */}
+        <Script
+          id="microsoft-clarity"
+          strategy="lazyOnload"
+        >
+          {`
+            (function(c,l,a,r,i,t,y){
+              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "ngsrwjccm4");
+          `}
+        </Script>
       </body>
     </html>
   )
