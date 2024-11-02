@@ -6,6 +6,8 @@ import {
   Box,
   Typography,
   CircularProgress,
+  Stack,
+  useTheme,
 } from "@mui/material";
 import DynamicCardInputs from "./DynamicCardInputs";
 import {
@@ -32,23 +34,27 @@ const CalculatorForm = ({
   onError,
   isEmbedded = false,
   tokenReady = true,
+  isCalculating = false,
 }) => {
+  const theme = useTheme();
   const [banks, setBanks] = useState([]);
   const [cards, setCards] = useState([]);
   const [mccOptions, setMccOptions] = useState([]);
   const [cardQuestions, setCardQuestions] = useState(null);
   const [mccInputValue, setMccInputValue] = useState("");
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
+  const [isLoadingBanks, setIsLoadingBanks] = useState(false);
+  const [isLoadingCards, setIsLoadingCards] = useState(false);
 
   useEffect(() => {
     if (tokenReady) {
-      fetchBanks(isEmbedded).then(setBanks).catch(console.error);
+      loadBanks();
     }
   }, [isEmbedded, tokenReady]);
 
   useEffect(() => {
     if (selectedBank && tokenReady) {
-      fetchCards(selectedBank, isEmbedded).then(setCards).catch(console.error);
+      loadCards();
     } else {
       setCards([]);
     }
@@ -56,68 +62,84 @@ const CalculatorForm = ({
 
   useEffect(() => {
     if (selectedBank && selectedCard && tokenReady) {
-      setIsLoadingQuestions(true);
-      fetchCardQuestions(selectedBank, selectedCard, isEmbedded)
-        .then((response) => {
-          setCardQuestions(response);
-          setIsLoadingQuestions(false);
-        })
-        .catch((error) => {
-          if (error.message.includes("too many requests")) {
-            onError(error.message, "warning");
-          } else {
-            console.error("Error fetching card questions:", error);
-            setCardQuestions(null);
-            setIsLoadingQuestions(false);
-            onError(
-              error.response?.data?.error ||
-                error.message ||
-                "An error occurred while fetching card questions."
-            );
-          }
-        });
+      loadCardQuestions();
     } else {
       setCardQuestions(null);
     }
-  }, [selectedBank, selectedCard, isEmbedded, tokenReady, onError]);
+  }, [selectedBank, selectedCard, isEmbedded, tokenReady]);
+
+  const loadBanks = async () => {
+    setIsLoadingBanks(true);
+    try {
+      const fetchedBanks = await fetchBanks(isEmbedded);
+      setBanks(fetchedBanks);
+    } catch (error) {
+      console.error("Error fetching banks:", error);
+      onError?.("Failed to load banks. Please try again.");
+    } finally {
+      setIsLoadingBanks(false);
+    }
+  };
+
+  const loadCards = async () => {
+    setIsLoadingCards(true);
+    try {
+      const fetchedCards = await fetchCards(selectedBank, isEmbedded);
+      setCards(fetchedCards);
+    } catch (error) {
+      console.error("Error fetching cards:", error);
+      onError?.("Failed to load cards. Please try again.");
+    } finally {
+      setIsLoadingCards(false);
+    }
+  };
+
+  const loadCardQuestions = async () => {
+    setIsLoadingQuestions(true);
+    try {
+      const questions = await fetchCardQuestions(selectedBank, selectedCard, isEmbedded);
+      setCardQuestions(questions);
+    } catch (error) {
+      handleQuestionsFetchError(error);
+    } finally {
+      setIsLoadingQuestions(false);
+    }
+  };
+
+  const handleQuestionsFetchError = (error) => {
+    if (error.message?.includes("too many requests")) {
+      onError?.(error.message, "warning");
+    } else {
+      console.error("Error fetching card questions:", error);
+      setCardQuestions(null);
+      onError?.(
+        error.response?.data?.error ||
+          error.message ||
+          "An error occurred while fetching card questions."
+      );
+    }
+  };
 
   const debouncedFetchMCC = useCallback(
     _.debounce(async (value) => {
       if (value) {
         try {
           const mccData = await fetchMCC(value, isEmbedded);
-          return mccData;
+          setMccOptions(mccData || []);
         } catch (error) {
           console.error("Error fetching MCC data:", error);
-          return [];
+          setMccOptions([]);
         }
       } else {
-        return [];
+        setMccOptions([]);
       }
     }, 300),
     [isEmbedded]
   );
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const result = await debouncedFetchMCC(mccInputValue);
-        setMccOptions(result || []); // Ensure we always set an array
-      } catch (error) {
-        console.error("Error fetching MCC data:", error);
-        setMccOptions([]); // Set empty array in case of error
-      }
-    };
-
-    if (mccInputValue) {
-      fetchData();
-    } else {
-      setMccOptions([]); // Clear options if input is empty
-    }
-  }, [mccInputValue, debouncedFetchMCC]);
-
-  const handleMccInputChange = (event, newInputValue) => {
-    setMccInputValue(newInputValue);
+  const handleMccInputChange = (event, newValue) => {
+    setMccInputValue(newValue);
+    debouncedFetchMCC(newValue);
   };
 
   const isCalculateDisabled =
@@ -125,81 +147,67 @@ const CalculatorForm = ({
     !selectedCard ||
     !spentAmount ||
     parseFloat(spentAmount) <= 0 ||
-    isLoadingQuestions;
-
-  const getOptionLabel = (option) => {
-    if (typeof option === "string") return option;
-    return `${option.mcc} - ${option.name}`;
-  };
-
-  const renderOption = (props, option) => {
-    return (
-      <li {...props} key={option.mcc}>
-        <Box>
-          <Typography variant="body1">
-            {option.mcc} - {option.name}
-          </Typography>
-          {option.knownMerchants && option.knownMerchants.length > 0 && (
-            <Typography variant="body2" color="text.secondary">
-              Known merchants: {option.knownMerchants.join(", ")}
-            </Typography>
-          )}
-        </Box>
-      </li>
-    );
-  };
-
-  const filterOptions = (options, { inputValue }) => {
-    return options.filter((option) => {
-      const matchMcc = option.mcc
-        .toLowerCase()
-        .includes(inputValue.toLowerCase());
-      const matchName = option.name
-        .toLowerCase()
-        .includes(inputValue.toLowerCase());
-      const matchMerchants = option.knownMerchants.some((merchant) =>
-        merchant.toLowerCase().includes(inputValue.toLowerCase())
-      );
-      return matchMcc || matchName || matchMerchants;
-    });
-  };
+    isLoadingQuestions ||
+    isCalculating;
 
   return (
-    <>
+    <Stack spacing={3}>
       <Autocomplete
         fullWidth
         options={banks}
+        value={selectedBank}
+        onChange={(event, newValue) => onBankChange(newValue)}
+        loading={isLoadingBanks}
         renderInput={(params) => (
           <TextField
             {...params}
             label="Select a bank"
-            margin="normal"
             required
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {isLoadingBanks && <CircularProgress size={20} />}
+                  {params.InputProps.endAdornment}
+                </>
+              ),
+            }}
           />
         )}
-        value={selectedBank}
-        onChange={(event, newValue) => onBankChange(newValue)}
       />
 
       <Autocomplete
         fullWidth
         options={cards}
+        value={selectedCard}
+        onChange={(event, newValue) => onCardChange(newValue)}
+        disabled={!selectedBank || isLoadingCards}
+        loading={isLoadingCards}
         renderInput={(params) => (
           <TextField
             {...params}
             label="Select a card"
-            margin="normal"
             required
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {isLoadingCards && <CircularProgress size={20} />}
+                  {params.InputProps.endAdornment}
+                </>
+              ),
+            }}
           />
         )}
-        value={selectedCard}
-        onChange={(event, newValue) => onCardChange(newValue)}
-        disabled={!selectedBank}
       />
 
       <Autocomplete
         fullWidth
         options={mccOptions}
+        value={selectedMcc}
+        onChange={(event, newValue) => onMccChange(newValue)}
+        inputValue={mccInputValue}
+        onInputChange={handleMccInputChange}
         getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
         renderOption={(props, option) => (
           <li {...props}>
@@ -207,7 +215,7 @@ const CalculatorForm = ({
               <Typography variant="body1">
                 {option.mcc} - {option.name}
               </Typography>
-              {option.knownMerchants && option.knownMerchants.length > 0 && (
+              {option.knownMerchants?.length > 0 && (
                 <Typography variant="body2" color="text.secondary">
                   Known merchants: {option.knownMerchants.join(", ")}
                 </Typography>
@@ -219,39 +227,35 @@ const CalculatorForm = ({
           <TextField
             {...params}
             label="Search MCC, Merchant Category, or Known Merchants"
-            margin="normal"
           />
         )}
-        onInputChange={handleMccInputChange}
-        onChange={(event, newValue) => onMccChange(newValue)}
-        value={selectedMcc}
-        inputValue={mccInputValue}
         filterOptions={(options, { inputValue }) => {
           const filterValue = inputValue.toLowerCase();
           return options.filter(
             (option) =>
               option.mcc.toLowerCase().includes(filterValue) ||
               option.name.toLowerCase().includes(filterValue) ||
-              (option.knownMerchants &&
-                option.knownMerchants.some((merchant) =>
-                  merchant.toLowerCase().includes(filterValue)
-                ))
+              option.knownMerchants?.some((merchant) =>
+                merchant.toLowerCase().includes(filterValue)
+              )
           );
         }}
       />
 
       <TextField
         fullWidth
-        margin="normal"
         label="Enter spent amount (INR)"
         type="number"
         value={spentAmount}
         onChange={(e) => onSpentAmountChange(e.target.value)}
         required
+        InputProps={{
+          inputProps: { min: 0 }
+        }}
       />
 
       {isLoadingQuestions ? (
-        <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
           <CircularProgress />
         </Box>
       ) : (
@@ -265,33 +269,32 @@ const CalculatorForm = ({
         )
       )}
 
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          width: "100%",
-          mt: 2,
-        }}
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={2}
+        sx={{ mt: 2 }}
       >
         <Button
           variant="contained"
-          color="primary"
           onClick={onCalculate}
-          sx={{ width: "48%" }}
           disabled={isCalculateDisabled}
+          sx={{ flex: 1, height: 48 }}
         >
-          Calculate
+          {isCalculating ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            "Calculate"
+          )}
         </Button>
         <Button
           variant="outlined"
-          color="secondary"
           onClick={onClear}
-          sx={{ width: "48%" }}
+          sx={{ flex: 1, height: 48 }}
         >
           Clear
         </Button>
-      </Box>
-    </>
+      </Stack>
+    </Stack>
   );
 };
 

@@ -3,9 +3,10 @@ import {
   Box,
   Container,
   Typography,
-  CircularProgress,
-  Snackbar,
   Alert,
+  Stack,
+  useTheme,
+  CircularProgress
 } from "@mui/material";
 import { useAuth } from "../app/providers/AuthContext";
 import { getCardsForUser, addCardForUser } from "../utils/firebaseUtils";
@@ -25,12 +26,13 @@ import ErrorAlert from "./ErrorAlert";
 import { logCalculation } from '../firebase/analytics';
 
 function Calculator() {
+  const theme = useTheme();
   const { user, isAuthenticated, loading } = useAuth();
   const [userCards, setUserCards] = useState([]);
   const [isFetchingUserData, setIsFetchingUserData] = useState(true);
   const [isCalculating, setIsCalculating] = useState(false);
   const [error, setError] = useState(null);
-  const [snackbar, setSnackbar] = useState({
+  const [alert, setAlert] = useState({
     open: false,
     message: "",
     severity: "info",
@@ -38,8 +40,7 @@ function Calculator() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [hasCalculated, setHasCalculated] = useState(false);
   const [missingFormOpen, setMissingFormOpen] = useState(false);
-  const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] =
-    useState(false);
+  const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] = useState(false);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
   const {
@@ -59,23 +60,6 @@ function Calculator() {
   const [calculationResult, setCalculationResult] = useState(null);
   const [calculationPerformed, setCalculationPerformed] = useState(false);
   const [lastCalculationInputs, setLastCalculationInputs] = useState(null);
-
-  const handleError = useCallback(
-    (errorMessage) => {
-      setError(errorMessage);
-      resetAllFields();
-    },
-    [resetAllFields]
-  );
-
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
-
-  useEffect(() => {
-    setCalculationResult(null);
-    setCalculationPerformed(false);
-  }, [selectedBank, selectedCard]);
 
   useEffect(() => {
     const fetchUserCards = async () => {
@@ -109,126 +93,81 @@ function Calculator() {
           cardName: selectedCard,
         };
         const newCardId = await addCardForUser(user.uid, cardData);
-        setUserCards((prevCards) => [
-          ...prevCards,
-          { ...cardData, id: newCardId },
-        ]);
-        setSnackbar({
+        setUserCards((prevCards) => [...prevCards, { ...cardData, id: newCardId }]);
+        setAlert({
           open: true,
           message: "Card added to your collection successfully!",
           severity: "success",
         });
       } catch (error) {
         console.error("Error adding card:", error);
-        setSnackbar({
+        setAlert({
           open: true,
           message: error.message || "Failed to add card. Please try again.",
           severity: "error",
         });
       }
-    } else {
-      setSnackbar({
-        open: true,
-        message: "Please sign in to add cards to your collection.",
-        severity: "error",
-      });
     }
   }, [user, selectedBank, selectedCard]);
 
-  const handleClear = useCallback(() => {
-    resetAllFields();
-    setCalculationResult(null);
-    setCalculationPerformed(false);
-    setLastCalculationInputs(null);
-  }, [resetAllFields]);
-
   const handleCalculate = useCallback(async () => {
-    if (spentAmount && parseFloat(spentAmount) > 0) {
-      const currentInputs = {
-        bank: selectedBank,
-        card: selectedCard,
-        mcc: selectedMcc ? selectedMcc.mcc : null,
-        amount: parseFloat(spentAmount),
-        additionalInputs,
-      };
-
-      // Check if inputs haven't changed since last calculation
-      if (
-        lastCalculationInputs &&
-        JSON.stringify(currentInputs) === JSON.stringify(lastCalculationInputs)
-      ) {
-        return; // Use cached result, no need to recalculate
-      }
-
-      setIsCalculating(true);
-      try {
-        const processedInputs = Object.entries(additionalInputs).reduce(
-          (acc, [key, value]) => {
-            acc[key] =
-              value === "true" ? true : value === "false" ? false : value;
-            return acc;
-          },
-          {}
-        );
-
-        const result = await calculateRewards({
-          bank: selectedBank,
-          card: selectedCard,
-          mcc: selectedMcc ? selectedMcc.mcc : null,
-          amount: parseFloat(spentAmount),
-          answers: processedInputs,
-        });
-        logCalculation({
-          bank: selectedBank,
-          card: selectedCard,
-          mcc: selectedMcc?.mcc,
-          amount: parseFloat(spentAmount)
-        });
-        setCalculationResult(result);
-        setCalculationPerformed(true);
-        setLastCalculationInputs(currentInputs);
-        if (!hasCalculated) {
-          setShowConfetti(true);
-          setTimeout(() => setShowConfetti(false), 5000);
-          setHasCalculated(true);
-        }
-      }catch (error) {
-        console.error("Error calculating rewards:", error);
-        let errorMessage = "Error calculating rewards. Please try again.";
-        let severity = "error";
-      
-        if (error.message && error.message.includes("too many requests")) {
-          errorMessage = "You've made too many requests. Please take a coffee break and try again later.";
-          severity = "warning";
-        } else if (error.response) {
-          // Extract the error message properly
-          errorMessage =
-            error.response.data.error ||
-            error.response.data.message ||
-            error.response.data ||
-            error.message;
-        } else if (error.request) {
-          errorMessage = "No response received from server. Please check your internet connection.";
-        } else {
-          errorMessage = error.message;
-        }
-      
-        setSnackbar({
-          open: true,
-          message: errorMessage,
-          severity: severity,
-        });
-      } finally {
-        setIsCalculating(false);
-      }
-    } else {
-      setSnackbar({
+    if (!spentAmount || parseFloat(spentAmount) <= 0) {
+      setAlert({
         open: true,
         message: isLoadingQuestions
           ? "Please wait for questions to load before calculating."
           : "Please enter a valid spent amount",
         severity: "error",
       });
+      return;
+    }
+
+    const currentInputs = {
+      bank: selectedBank,
+      card: selectedCard,
+      mcc: selectedMcc ? selectedMcc.mcc : null,
+      amount: parseFloat(spentAmount),
+      additionalInputs,
+    };
+
+    if (
+      lastCalculationInputs &&
+      JSON.stringify(currentInputs) === JSON.stringify(lastCalculationInputs)
+    ) {
+      return;
+    }
+
+    setIsCalculating(true);
+    try {
+      const result = await calculateRewards({
+        bank: selectedBank,
+        card: selectedCard,
+        mcc: selectedMcc ? selectedMcc.mcc : null,
+        amount: parseFloat(spentAmount),
+        answers: additionalInputs,
+      });
+
+      logCalculation({
+        bank: selectedBank,
+        card: selectedCard,
+        mcc: selectedMcc?.mcc,
+        amount: parseFloat(spentAmount),
+      });
+
+      setCalculationResult(result);
+      setCalculationPerformed(true);
+      setLastCalculationInputs(currentInputs);
+
+      if (!hasCalculated) {
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 5000);
+        setHasCalculated(true);
+      }
+    } catch (error) {
+      console.error("Error calculating rewards:", error);
+      handleCalculationError(error);
+    } finally {
+      setIsCalculating(false);
     }
   }, [
     spentAmount,
@@ -238,75 +177,88 @@ function Calculator() {
     additionalInputs,
     hasCalculated,
     lastCalculationInputs,
-    isLoadingQuestions, // Add this to the dependency array
+    isLoadingQuestions,
   ]);
 
-  const memoizedCalculatorForm = useMemo(
-    () => (
-      <CalculatorForm
-        selectedBank={selectedBank}
-        selectedCard={selectedCard}
-        selectedMcc={selectedMcc}
-        spentAmount={spentAmount}
-        additionalInputs={additionalInputs}
-        onBankChange={handleBankChange}
-        onCardChange={handleCardChange}
-        onMccChange={handleMccChange}
-        onSpentAmountChange={handleSpentAmountChange}
-        onAdditionalInputChange={handleAdditionalInputChange}
-        onCalculate={handleCalculate}
-        onClear={handleClear}
-        onError={handleError}
-        isLoadingQuestions={isLoadingQuestions}
-        setIsLoadingQuestions={setIsLoadingQuestions}
-      />
-    ),
-    [
-      selectedBank,
-      selectedCard,
-      selectedMcc,
-      spentAmount,
-      additionalInputs,
-      handleBankChange,
-      handleCardChange,
-      handleMccChange,
-      handleSpentAmountChange,
-      handleAdditionalInputChange,
-      handleCalculate,
-      handleClear,
-      handleError,
-      isLoadingQuestions,
-    ]
-  );
+  const handleCalculationError = (error) => {
+    let errorMessage = "Error calculating rewards. Please try again.";
+    let severity = "error";
 
-  const handleCloseSnackbar = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
+    if (error.message?.includes("too many requests")) {
+      errorMessage = "You've made too many requests. Please take a break and try again later.";
+      severity = "warning";
+    } else if (error.response?.data) {
+      errorMessage = error.response.data.error || error.response.data.message || error.response.data;
+    } else if (!error.response) {
+      errorMessage = "Network error. Please check your connection.";
     }
-    setSnackbar({ ...snackbar, open: false });
+
+    setAlert({
+      open: true,
+      message: errorMessage,
+      severity,
+    });
   };
 
   return (
-    <>
-      <Box
-        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
-      >
-        <Header />
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        bgcolor: "background.default",
+      }}
+    >
+      <Header />
 
-        <Container component="main" sx={{ mt: 4, mb: 4 }}>
-          <ErrorAlert message={error} onClose={clearError} />
-          {showConfetti && <ReactConfetti />}
-          <Typography variant="h4" gutterBottom>
+      <Container
+        component="main"
+        maxWidth="lg"
+        sx={{
+          mt: 4,
+          mb: 4,
+          px: { xs: 2, sm: 3 },
+        }}
+      >
+        {showConfetti && <ReactConfetti />}
+        
+        <Stack spacing={4}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: "bold",
+              fontSize: { xs: "1.75rem", sm: "2.125rem" },
+              textAlign: { xs: "center", sm: "left" },
+            }}
+          >
             Credit Card Reward Calculator
           </Typography>
 
+          <ErrorAlert message={error} onClose={() => setError(null)} />
+
           {isFetchingUserData ? (
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
               <CircularProgress />
             </Box>
           ) : (
-            <>
-              {memoizedCalculatorForm}
+            <Stack spacing={3}>
+              <CalculatorForm
+                selectedBank={selectedBank}
+                selectedCard={selectedCard}
+                selectedMcc={selectedMcc}
+                spentAmount={spentAmount}
+                additionalInputs={additionalInputs}
+                onBankChange={handleBankChange}
+                onCardChange={handleCardChange}
+                onMccChange={handleMccChange}
+                onSpentAmountChange={handleSpentAmountChange}
+                onAdditionalInputChange={handleAdditionalInputChange}
+                onCalculate={handleCalculate}
+                onClear={resetAllFields}
+                isLoadingQuestions={isLoadingQuestions}
+                setIsLoadingQuestions={setIsLoadingQuestions}
+                isCalculating={isCalculating}
+              />
 
               <ReportButtons
                 calculationPerformed={calculationPerformed}
@@ -330,54 +282,60 @@ function Calculator() {
                   onAddCard={handleAddCard}
                 />
               )}
-            </>
+            </Stack>
           )}
-        </Container>
+        </Stack>
+      </Container>
 
-        <AnonymousConversionPrompt />
+      <AnonymousConversionPrompt />
 
-        <MissingBankCardForm
-          open={missingFormOpen}
-          onClose={() => setMissingFormOpen(false)}
-          onSubmitSuccess={(message) =>
-            setSnackbar({ open: true, message, severity: "success" })
-          }
-        />
+      <MissingBankCardForm
+        open={missingFormOpen}
+        onClose={() => setMissingFormOpen(false)}
+        onSubmitSuccess={(message) =>
+          setAlert({ open: true, message, severity: "success" })
+        }
+      />
 
-        <IncorrectRewardReportForm
-          open={incorrectRewardReportOpen}
-          onClose={() => setIncorrectRewardReportOpen(false)}
-          onSubmitSuccess={(message) =>
-            setSnackbar({ open: true, message, severity: "success" })
-          }
-          formData={{
-            bank: selectedBank,
-            card: selectedCard,
-            mcc: selectedMcc
-              ? `${selectedMcc.mcc} - ${selectedMcc.name}`
-              : "Not selected",
-            spentAmount,
-            additionalInputs,
-            calculationResult,
-          }}
-        />
+      <IncorrectRewardReportForm
+        open={incorrectRewardReportOpen}
+        onClose={() => setIncorrectRewardReportOpen(false)}
+        onSubmitSuccess={(message) =>
+          setAlert({ open: true, message, severity: "success" })
+        }
+        formData={{
+          bank: selectedBank,
+          card: selectedCard,
+          mcc: selectedMcc
+            ? `${selectedMcc.mcc} - ${selectedMcc.name}`
+            : "Not selected",
+          spentAmount,
+          additionalInputs,
+          calculationResult,
+        }}
+      />
 
-        <Footer />
-      </Box>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-      >
+      <Footer />
+
+      {alert.open && (
         <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}
+          severity={alert.severity}
+          onClose={() => setAlert({ ...alert, open: false })}
+          sx={{
+            position: "fixed",
+            bottom: 24,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: theme.zIndex.snackbar,
+            maxWidth: "90%",
+            width: "auto",
+            boxShadow: theme.shadows[8],
+          }}
         >
-          {snackbar.message}
+          {alert.message}
         </Alert>
-      </Snackbar>
-    </>
+      )}
+    </Box>
   );
 }
 

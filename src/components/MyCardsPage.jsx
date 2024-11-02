@@ -4,10 +4,11 @@ import {
   Container,
   Typography,
   Button,
-  Snackbar,
   Alert,
   CircularProgress,
   Paper,
+  Stack,
+  useTheme,
 } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
 import { useAuth } from "../app/providers/AuthContext";
@@ -23,16 +24,16 @@ import AddCardDialog from "./AddCardDialog";
 import Footer from "./Footer";
 
 function MyCardsPage() {
+  const theme = useTheme();
   const [cards, setCards] = useState([]);
   const [isAddCardDialogOpen, setIsAddCardDialogOpen] = useState(false);
-  const [snackbar, setSnackbar] = useState({
+  const [alert, setAlert] = useState({
     open: false,
     message: "",
     severity: "info",
   });
   const [isLoading, setIsLoading] = useState(true);
-  const { user, isAuthenticated, loading, isNewUser, markUserAsNotNew } =
-    useAuth();
+  const { user, isAuthenticated, loading, isNewUser, markUserAsNotNew } = useAuth();
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -56,6 +57,7 @@ function MyCardsPage() {
       setCards(fetchedCards);
     } catch (error) {
       console.error("Error fetching cards:", error);
+      showAlert("Error fetching cards. Please try again later.", "error");
     } finally {
       setIsLoading(false);
     }
@@ -68,20 +70,23 @@ function MyCardsPage() {
         (card) =>
           card.bank === newCard.bank && card.cardName === newCard.cardName
       );
+      
       if (isDuplicate) {
-        showSnackbar("This card is already in your collection.", "info");
+        showAlert("This card is already in your collection.", "info");
         return;
       }
+      
       await addCardForUser(user.uid, newCard);
       await fetchUserCards();
       notifyCardUpdate();
-      showSnackbar("Card added successfully", "success");
+      showAlert("Card added successfully", "success");
+      
       if (isNewUser) {
         markUserAsNotNew();
       }
     } catch (error) {
       console.error("Error adding card:", error);
-      showSnackbar("Failed to add card. Please try again.", "error");
+      showAlert("Failed to add card. Please try again.", "error");
     }
   };
 
@@ -89,75 +94,71 @@ function MyCardsPage() {
     try {
       const cardKey = `${bank}_${cardName}`;
       await deleteCardForUser(user.uid, cardKey);
-      // Update the local state immediately
       setCards((prevCards) =>
         prevCards.filter(
           (card) => card.bank !== bank || card.cardName !== cardName
         )
       );
       notifyCardUpdate();
-      showSnackbar("Card deleted successfully", "success");
+      showAlert("Card deleted successfully", "success");
     } catch (error) {
       console.error("Error deleting card:", error);
-      showSnackbar("Error deleting card. Please try again later.", "error");
+      showAlert("Error deleting card. Please try again later.", "error");
     }
   };
 
-  const showSnackbar = (message, severity = "info") => {
-    setSnackbar({ open: true, message, severity });
+  const showAlert = (message, severity = "info") => {
+    setAlert({ open: true, message, severity });
   };
 
-  if (isLoading || loading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
+  const renderContent = () => {
+    if (isLoading || loading) {
+      return (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+          <CircularProgress />
+        </Box>
+      );
+    }
 
-  return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <Header />
-      <Container sx={{ py: 4, flexGrow: 1 }} maxWidth="lg">
-        <Box
+    if (cards.length === 0) {
+      return (
+        <Paper
+          elevation={0}
           sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 4,
+            p: 4,
+            textAlign: "center",
+            bgcolor: "background.paper",
+            borderRadius: 2,
+            border: 1,
+            borderColor: "divider",
           }}
         >
-          <Typography variant="h4" component="h1">
-            My Cards
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Welcome! Let&apos;s start by adding your first credit card.
           </Typography>
           <Button
             variant="contained"
-            color="primary"
             startIcon={<AddIcon />}
             onClick={() => setIsAddCardDialogOpen(true)}
+            sx={{ mt: 2 }}
           >
-            Add New Card
+            Add Your First Card
           </Button>
-        </Box>
-        {cards.length === 0 ? (
-          <Typography variant="h6" sx={{ mb: 4, textAlign: "center" }}>
-            Welcome! Let&apos;s start by adding your first credit card.
-          </Typography>
-        ) : cards.length === 1 ? (
+        </Paper>
+      );
+    }
+
+    if (cards.length === 1) {
+      return (
+        <>
           <Paper
             elevation={3}
             sx={{
               p: 3,
               mb: 4,
-              bgcolor: "info.light",
-              color: "info.contrastText",
+              bgcolor: theme.vars.palette.info.softBg,
+              color: theme.vars.palette.info.softColor,
+              borderRadius: 2,
             }}
           >
             <Typography variant="h6" sx={{ mb: 2 }}>
@@ -168,28 +169,79 @@ function MyCardsPage() {
               start comparing rewards!
             </Typography>
           </Paper>
-        ) : null}
-        <CardList cards={cards} onDeleteCard={handleDeleteCard} />
+          <CardList cards={cards} onDeleteCard={handleDeleteCard} />
+        </>
+      );
+    }
+
+    return <CardList cards={cards} onDeleteCard={handleDeleteCard} />;
+  };
+
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <Header />
+      <Container sx={{ py: 4, flexGrow: 1 }} maxWidth="lg">
+        <Stack spacing={4}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              variant="h4"
+              component="h1"
+              sx={{
+                fontSize: { xs: "1.75rem", sm: "2.125rem" },
+                fontWeight: "bold",
+              }}
+            >
+              My Cards
+            </Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<AddIcon />}
+              onClick={() => setIsAddCardDialogOpen(true)}
+              sx={{
+                height: 48,
+                px: 3,
+              }}
+            >
+              Add New Card
+            </Button>
+          </Box>
+
+          {renderContent()}
+        </Stack>
       </Container>
+
       <AddCardDialog
         open={isAddCardDialogOpen}
         onClose={() => setIsAddCardDialogOpen(false)}
         onAddCard={handleAddCard}
       />
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
+
+      {alert.open && (
         <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}
+          severity={alert.severity}
+          onClose={() => setAlert({ ...alert, open: false })}
+          sx={{
+            position: "fixed",
+            bottom: 24,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: theme.zIndex.snackbar,
+            maxWidth: "90%",
+            width: "auto",
+            boxShadow: theme.shadows[8],
+          }}
         >
-          {snackbar.message}
+          {alert.message}
         </Alert>
-      </Snackbar>
+      )}
+
       <Footer />
     </Box>
   );

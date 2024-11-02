@@ -1,6 +1,6 @@
 {
   "name": "credit-card-rewards-india-calculator",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "A comprehensive tool to calculate and optimize credit card rewards across multiple banks in India",
   "author": "Aashish Vivekanand",
@@ -15,15 +15,14 @@
   },
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "npm install --legacy-peer-deps && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "npm install --include=optional sharp",
-    "generate-landing-images": "node scripts/generateLandingPageImages.js"
+    "postinstall": "npm install --include=optional sharp --legacy-peer-deps"
   },
   "dependencies": {
     "@emotion/cache": "^11.13.1",
-    "@emotion/react": "^11.13.0",
+    "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^6.1.6",
     "@mui/material": "^6.1.6",
@@ -45,7 +44,7 @@
     "typescript": "^5.6.3"
   },
   "resolutions": {
-    "@emotion/react": "^11.13.0",
+    "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "react": "^19.0.0-rc-7c8e5e7a-20241101",
     "react-dom": "^19.0.0-rc-7c8e5e7a-20241101"

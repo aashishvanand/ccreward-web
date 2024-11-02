@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Grid, Typography, CircularProgress } from "@mui/material";
+import {
+  Grid,
+  Typography,
+  CircularProgress,
+  Box,
+  useTheme,
+  Alert,
+} from "@mui/material";
 import CreditCardItem from "./CreditCardItem";
 import useCardImagesData from "../hooks/useCardImagesData";
 
-function CardList({ cards, onDeleteCard }) {
+const CardList = ({ cards, onDeleteCard }) => {
+  const theme = useTheme();
   const { cardImagesData, isLoading, error } = useCardImagesData();
   const [horizontalCards, setHorizontalCards] = useState([]);
   const [verticalCards, setVerticalCards] = useState([]);
@@ -36,48 +44,79 @@ function CardList({ cards, onDeleteCard }) {
     }
   }, [cards, cardImagesData]);
 
-
   if (isLoading) {
-    return <CircularProgress />;
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          py: 4
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
   if (error) {
     return (
-      <Typography color="error">
-        Error loading card data: {error.message}
-      </Typography>
+      <Alert severity="error" sx={{ my: 2 }}>
+        Error loading card data. Please try again later.
+      </Alert>
     );
   }
 
   if (cards.length === 0) {
     return (
-      <Typography variant="h6" align="center" sx={{ mt: 4 }}>
-        You haven&apos;t added any cards yet. Click &quot;Add New Card&quot; to
-        get started!
-      </Typography>
+      <Box
+        sx={{
+          textAlign: "center",
+          py: 6,
+          px: 2,
+          bgcolor: "background.paper",
+          borderRadius: 2,
+          border: 1,
+          borderColor: "divider",
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            color: "text.secondary",
+            fontWeight: "medium",
+          }}
+        >
+          You haven&apos;t added any cards yet. Click &quot;Add New Card&quot; to
+          get started!
+        </Typography>
+      </Box>
     );
   }
 
   return (
-    <>
-      <Grid container spacing={2}>
-        {horizontalCards.map((card) => (
-          <Grid
-            item
-            xs={12}
-            sm={6}
-            md={3}
-            key={`${card.bank}_${card.cardName}`}
-          >
-            <CreditCardItem
-              card={card}
-              onDelete={() => onDeleteCard(card.bank, card.cardName)}
-            />
-          </Grid>
-        ))}
-      </Grid>
+    <Box sx={{ mt: 2 }}>
+      {horizontalCards.length > 0 && (
+        <Grid container spacing={2}>
+          {horizontalCards.map((card) => (
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={3}
+              key={`${card.bank}_${card.cardName}`}
+            >
+              <CreditCardItem
+                card={card}
+                onDelete={() => onDeleteCard(card.bank, card.cardName)}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      )}
+
       {verticalCards.length > 0 && (
-        <Grid container spacing={2} sx={{ mt: 4 }}>
+        <Grid container spacing={2} sx={{ mt: horizontalCards.length ? 4 : 0 }}>
           {verticalCards.map((card) => (
             <Grid
               item
@@ -94,8 +133,8 @@ function CardList({ cards, onDeleteCard }) {
           ))}
         </Grid>
       )}
-    </>
+    </Box>
   );
-}
+};
 
 export default CardList;

@@ -8,7 +8,6 @@ import {
   Container,
   Autocomplete,
   List,
-  Snackbar,
   Alert,
   ToggleButton,
   ToggleButtonGroup,
@@ -18,9 +17,13 @@ import {
   AccordionSummary,
   AccordionDetails,
   Divider,
+  Stack,
+  useTheme,
 } from "@mui/material";
-import InfoIcon from "@mui/icons-material/Info";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import {
+  Info as InfoIcon,
+  ExpandMore as ExpandMoreIcon,
+} from "@mui/icons-material";
 import Header from "./Header";
 import Footer from "./Footer";
 import { useAuth } from "../app/providers/AuthContext";
@@ -28,27 +31,21 @@ import { getCardsForUser } from "../utils/firebaseUtils";
 import ReactConfetti from "react-confetti";
 import { CardListRenderer } from "./CardListRenderer";
 import DynamicCardInputs from "./DynamicCardInputs";
-import { useAppTheme } from "./ThemeRegistry";
-import {
-  fetchBestCardQuestions,
-  calculateBestCard,
-  fetchMCC,
-} from "../utils/api";
+import { fetchBestCardQuestions, calculateBestCard, fetchMCC } from "../utils/api";
 import _ from "lodash";
 
 const BestCardCalculator = () => {
-  const { theme } = useAppTheme();
+  const theme = useTheme();
   const [userCards, setUserCards] = useState([]);
   const [selectedMcc, setSelectedMcc] = useState(null);
   const [spentAmount, setSpentAmount] = useState("");
-  const [cardRewards, setCardRewards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isCalculated, setIsCalculated] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [isCardListLoading, setIsCardListLoading] = useState(true);
   const [hasCalculated, setHasCalculated] = useState(false);
   const [failedImages, setFailedImages] = useState({});
-  const [snackbar, setSnackbar] = useState({
+  const [alert, setAlert] = useState({
     open: false,
     message: "",
     severity: "info",
@@ -63,6 +60,7 @@ const BestCardCalculator = () => {
   const [mccInputValue, setMccInputValue] = useState("");
   const [pointsRanking, setPointsRanking] = useState([]);
   const [valueRanking, setValueRanking] = useState([]);
+
   const currentRanking = sortMethod === "points" ? pointsRanking : valueRanking;
 
   useEffect(() => {
@@ -75,7 +73,7 @@ const BestCardCalculator = () => {
           await fetchCardQuestions(fetchedCards);
         } catch (error) {
           console.error("Error fetching user cards:", error);
-          setSnackbar({
+          setAlert({
             open: true,
             message: "Error fetching user cards. Please try again.",
             severity: "error",
@@ -100,7 +98,7 @@ const BestCardCalculator = () => {
       setCardQuestions(questions);
     } catch (error) {
       console.error("Error fetching card questions:", error);
-      setSnackbar({
+      setAlert({
         open: true,
         message: "Error fetching card questions. Please try again.",
         severity: "error",
@@ -126,71 +124,58 @@ const BestCardCalculator = () => {
     []
   );
 
-  useEffect(() => {
-    debouncedFetchMCC(mccInputValue);
-    return () => debouncedFetchMCC.cancel();
-  }, [mccInputValue, debouncedFetchMCC]);
-
-  const handleMccInputChange = (event, newInputValue) => {
-    setMccInputValue(newInputValue);
-  };
-
   const handleCalculate = useCallback(async () => {
-    
-  
     if (!spentAmount || parseFloat(spentAmount) <= 0) {
-      setSnackbar({
+      setAlert({
         open: true,
         message: "Please enter a valid spent amount",
         severity: "error",
       });
       return;
     }
-  
+
     const answers = {};
-  
-    const cards = userCards.filter(card => card.bank && card.cardName).map(card => {
-      const cardKey = `${card.bank} - ${card.cardName}`;
-      
-      const cardAnswers = additionalInputs[cardKey] || {};
-      
-      if (Object.keys(cardAnswers).length > 0) {
-        // Include all non-empty answers, including false boolean values
-        const nonEmptyAnswers = Object.entries(cardAnswers).reduce((acc, [key, value]) => {
-          if (value !== null && value !== undefined && value !== "") {
-            acc[key] = value;
+    const cards = userCards
+      .filter(card => card.bank && card.cardName)
+      .map(card => {
+        const cardKey = `${card.bank} - ${card.cardName}`;
+        const cardAnswers = additionalInputs[cardKey] || {};
+        
+        if (Object.keys(cardAnswers).length > 0) {
+          const nonEmptyAnswers = Object.entries(cardAnswers).reduce((acc, [key, value]) => {
+            if (value !== null && value !== undefined && value !== "") {
+              acc[key] = value;
+            }
+            return acc;
+          }, {});
+          
+          if (Object.keys(nonEmptyAnswers).length > 0) {
+            answers[cardKey] = nonEmptyAnswers;
           }
-          return acc;
-        }, {});
-  
-        if (Object.keys(nonEmptyAnswers).length > 0) {
-          answers[cardKey] = nonEmptyAnswers;
         }
-      }
-      
-      return { bank: card.bank, cardName: card.cardName };
-    });
-  
+        
+        return { bank: card.bank, cardName: card.cardName };
+      });
+
     const calculationParams = {
       cards,
       mcc: selectedMcc ? selectedMcc.mcc : null,
       amount: parseFloat(spentAmount),
       answers,
     };
-  
+
     if (
       JSON.stringify(calculationParams) ===
       JSON.stringify(lastCalculationParams)
     ) {
-      setSnackbar({
+      setAlert({
         open: true,
-        message:
-          "Calculation parameters haven't changed. No need to recalculate.",
+        message: "Calculation parameters haven't changed. No need to recalculate.",
         severity: "info",
       });
       return;
     }
-  
+
     setIsLoading(true);
     try {
       const response = await calculateBestCard(calculationParams);
@@ -198,7 +183,7 @@ const BestCardCalculator = () => {
       setValueRanking(response.rankingByValueINR);
       setIsCalculated(true);
       setLastCalculationParams(calculationParams);
-  
+
       if (!hasCalculated) {
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 5000);
@@ -206,19 +191,7 @@ const BestCardCalculator = () => {
       }
     } catch (error) {
       console.error("Error in calculateBestCard:", error);
-      if (error.message.includes("too many requests")) {
-        setSnackbar({
-          open: true,
-          message: error.message,
-          severity: "warning",
-        });
-      } else {
-        setSnackbar({
-          open: true,
-          message: "Error calculating best card. Please try again.",
-          severity: "error",
-        });
-      }
+      handleCalculationError(error);
     } finally {
       setIsLoading(false);
     }
@@ -230,53 +203,21 @@ const BestCardCalculator = () => {
     lastCalculationParams,
     hasCalculated,
   ]);
-  
 
-  const memoizedCardConfigs = useMemo(() => {
-    const configs = {};
-    cardQuestions.forEach((question) => {
-      const key = `${question.bank}-${question.cardName}-${question.name}`;
-      configs[key] = { dynamicInputs: [question] };
-    });
-    return configs;
-  }, [cardQuestions]);
-
-  const groupedQuestions = useMemo(() => {
-    return cardQuestions.reduce((acc, question) => {
-      const key = `${question.bank}-${question.cardName}`;
-      if (!acc[key]) {
-        acc[key] = [];
-      }
-      acc[key].push(question);
-      return acc;
-    }, {});
-  }, [cardQuestions]);
-
-  const renderAdvancedModeContent = () => {
-    if (!Array.isArray(cardQuestions) || cardQuestions.length === 0) {
-      return (
-        <Typography>
-          No additional questions available for your cards.
-        </Typography>
-      );
+  const handleCalculationError = (error) => {
+    if (error.message.includes("too many requests")) {
+      setAlert({
+        open: true,
+        message: error.message,
+        severity: "warning",
+      });
+    } else {
+      setAlert({
+        open: true,
+        message: "Error calculating best card. Please try again.",
+        severity: "error",
+      });
     }
-  
-    return Object.entries(groupedQuestions).map(([cardKey, questions]) => (
-      <Box key={cardKey} sx={{ mb: 4 }}>
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          {cardKey.replace('-', ' - ')} {/* Ensure correct formatting */}
-        </Typography>
-        <DynamicCardInputs
-          cardConfig={questions}
-          onChange={(inputKey, value) =>
-            handleAdditionalInputChange(cardKey.replace('-', ' - '), inputKey, value)
-          }
-          currentInputs={additionalInputs[cardKey.replace('-', ' - ')] || {}}
-          selectedMcc={selectedMcc}
-        />
-        <Divider sx={{ my: 2 }} />
-      </Box>
-    ));
   };
 
   const handleSortMethodChange = (event, newMethod) => {
@@ -285,16 +226,9 @@ const BestCardCalculator = () => {
     }
   };
 
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSnackbar({ ...snackbar, open: false });
-  };
-
   const handleImageError = (cardId) => {
-    setFailedImages((prevFailedImages) => ({
-      ...prevFailedImages,
+    setFailedImages((prev) => ({
+      ...prev,
       [cardId]: true,
     }));
   };
@@ -314,101 +248,96 @@ const BestCardCalculator = () => {
       <Header />
       <Container component="main" sx={{ mt: 4, mb: 4 }}>
         {showConfetti && <ReactConfetti />}
-        <Typography variant="h4" gutterBottom>
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{
+            fontWeight: "bold",
+            fontSize: { xs: "1.75rem", sm: "2.125rem" },
+          }}
+        >
           Know Your Best Card
         </Typography>
-        <Autocomplete
-          options={mccOptions}
-          getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
-          renderOption={(props, option) => (
-            <li {...props}>
-              {option.mcc} - {option.name}
-              {option.knownMerchants && option.knownMerchants.length > 0 && (
-                <span style={{ fontSize: "0.8em", color: "gray" }}>
-                  {" "}
-                  (e.g., {option.knownMerchants.join(", ")})
-                </span>
+
+        <Stack spacing={3}>
+          <Autocomplete
+            options={mccOptions}
+            getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
+            renderOption={(props, option) => (
+              <li {...props}>
+                {option.mcc} - {option.name}
+                {option.knownMerchants && option.knownMerchants.length > 0 && (
+                  <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                    (e.g., {option.knownMerchants.join(", ")})
+                  </Typography>
+                )}
+              </li>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Search Merchant or MCC (Optional)"
+                fullWidth
+              />
+            )}
+            onInputChange={(event, newValue) => setMccInputValue(newValue)}
+            onChange={(event, newValue) => setSelectedMcc(newValue)}
+            value={selectedMcc}
+          />
+
+          <TextField
+            fullWidth
+            label="Enter spent amount (INR)"
+            type="number"
+            value={spentAmount}
+            onChange={(e) => setSpentAmount(e.target.value)}
+            required
+          />
+
+          <Accordion
+            expanded={advancedMode}
+            onChange={(event, isExpanded) => setAdvancedMode(isExpanded)}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography>Advanced Mode</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              {cardQuestions.length === 0 ? (
+                <Typography>No additional questions available.</Typography>
+              ) : (
+                Object.entries(
+                  _.groupBy(cardQuestions, (q) => `${q.bank}-${q.cardName}`)
+                ).map(([cardKey, questions]) => (
+                  <Box key={cardKey} sx={{ mb: 4 }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                      {cardKey.replace('-', ' - ')}
+                    </Typography>
+                    <DynamicCardInputs
+                      cardConfig={questions}
+                      onChange={(inputKey, value) =>
+                        handleAdditionalInputChange(
+                          cardKey.replace('-', ' - '),
+                          inputKey,
+                          value
+                        )
+                      }
+                      currentInputs={
+                        additionalInputs[cardKey.replace('-', ' - ')] || {}
+                      }
+                      selectedMcc={selectedMcc}
+                    />
+                    <Divider sx={{ my: 2 }} />
+                  </Box>
+                ))
               )}
-            </li>
-          )}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Search Merchant or MCC (Optional)"
-              margin="normal"
-              fullWidth
-            />
-          )}
-          onInputChange={handleMccInputChange}
-          onChange={(event, newValue) => setSelectedMcc(newValue)}
-          value={selectedMcc}
-          filterOptions={(options, { inputValue }) => {
-            const filterValue = inputValue.toLowerCase();
-            return options.filter(
-              (option) =>
-                option.mcc.toLowerCase().includes(filterValue) ||
-                option.name.toLowerCase().includes(filterValue) ||
-                (option.knownMerchants &&
-                  option.knownMerchants.some((merchant) =>
-                    merchant.toLowerCase().includes(filterValue)
-                  ))
-            );
-          }}
-        />
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Enter spent amount (INR)"
-          type="number"
-          value={spentAmount}
-          onChange={(e) => setSpentAmount(e.target.value)}
-          required
-        />
-        <Accordion
-          expanded={advancedMode}
-          onChange={(event, isExpanded) => {
-            setAdvancedMode(isExpanded);
-          }}
-          sx={{
-            mt: 2,
-            mb: 2,
-            backgroundColor: theme.palette.background.paper,
-            "& .MuiAccordionSummary-root": {
-              backgroundColor:
-                theme.palette.mode === "light"
-                  ? theme.palette.grey[200]
-                  : theme.palette.grey[800],
-              color: theme.palette.text.primary,
-            },
-            "& .MuiAccordionSummary-expandIconWrapper": {
-              color: theme.palette.text.secondary,
-            },
-            "& .MuiAccordionDetails-root": {
-              backgroundColor: theme.palette.background.paper,
-              borderTop: `1px solid ${theme.palette.divider}`,
-            },
-          }}
-        >
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>Advanced Mode</Typography>
-          </AccordionSummary>
-          <AccordionDetails>{renderAdvancedModeContent()}</AccordionDetails>
-        </Accordion>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            width: "100%",
-            mt: 2,
-            mb: 4,
-          }}
-        >
+            </AccordionDetails>
+          </Accordion>
+
           <Button
             variant="contained"
-            color="primary"
             onClick={handleCalculate}
             disabled={!spentAmount || parseFloat(spentAmount) <= 0 || isLoading}
-            sx={{ width: "100%" }}
+            sx={{ height: 48 }}
           >
             {isLoading ? (
               <CircularProgress size={24} color="inherit" />
@@ -416,60 +345,65 @@ const BestCardCalculator = () => {
               "Calculate Best Card"
             )}
           </Button>
-        </Box>
-        {isCalculated && (
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-            <ToggleButtonGroup
-              value={sortMethod}
-              exclusive
-              onChange={handleSortMethodChange}
-              aria-label="sort method"
-            >
-              <ToggleButton value="points" aria-label="sort by points">
-                Ranking by Points/Cashback
-              </ToggleButton>
-              <ToggleButton
-                value="cashbackValue"
-                aria-label="sort by cashback value"
+
+          {isCalculated && (
+            <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+              <ToggleButtonGroup
+                value={sortMethod}
+                exclusive
+                onChange={handleSortMethodChange}
+                aria-label="sort method"
               >
-                Ranking by Value (INR)
-                <Tooltip
-                  title="For comparison purposes, we assume 1 mile = ₹1"
-                  arrow
+                <ToggleButton value="points" aria-label="sort by points">
+                  Ranking by Points/Cashback
+                </ToggleButton>
+                <ToggleButton
+                  value="cashbackValue"
+                  aria-label="sort by cashback value"
                 >
-                  <IconButton size="small" sx={{ ml: 1 }}>
-                    <InfoIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Box>
-        )}
-        <List sx={{ width: "100%" }}>
-          <CardListRenderer
-            isCardListLoading={isCardListLoading}
-            isCalculated={isCalculated}
-            cardRewards={currentRanking}
-            userCards={userCards}
-            failedImages={failedImages}
-            handleImageError={handleImageError}
-          />
-        </List>
+                  Ranking by Value (INR)
+                  <Tooltip title="For comparison purposes, we assume 1 mile = ₹1">
+                    <IconButton size="small" sx={{ ml: 1 }}>
+                      <InfoIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
+          )}
+
+          <List sx={{ width: "100%" }}>
+            <CardListRenderer
+              isCardListLoading={isCardListLoading}
+              isCalculated={isCalculated}
+              cardRewards={currentRanking}
+              userCards={userCards}
+              failedImages={failedImages}
+              handleImageError={handleImageError}
+            />
+          </List>
+        </Stack>
       </Container>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
+
+      {alert.open && (
         <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}
+          severity={alert.severity}
+          onClose={() => setAlert({ ...alert, open: false })}
+          sx={{
+            position: "fixed",
+            bottom: 24,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: theme.zIndex.snackbar,
+            maxWidth: "90%",
+            width: "auto",
+            boxShadow: theme.shadows[8],
+          }}
         >
-          {snackbar.message}
+          {alert.message}
         </Alert>
-      </Snackbar>
+      )}
+
       <Footer />
     </Box>
   );
