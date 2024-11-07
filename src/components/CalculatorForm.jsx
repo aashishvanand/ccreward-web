@@ -168,14 +168,16 @@ const CalculatorForm = ({
             {...params}
             label="Select a bank"
             required
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  {isLoadingBanks && <CircularProgress size={20} />}
-                  {params.InputProps.endAdornment}
-                </>
-              ),
+            slotProps={{
+              input: {
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {isLoadingBanks && <CircularProgress size={20} />}
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              }
             }}
           />
         )}
@@ -192,14 +194,16 @@ const CalculatorForm = ({
             {...params}
             label="Select a card"
             required
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  {isLoadingCards && <CircularProgress size={20} />}
-                  {params.InputProps.endAdornment}
-                </>
-              ),
+            slotProps={{
+              input: {
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {isLoadingCards && <CircularProgress size={20} />}
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              }
             }}
           />
         )}
@@ -231,14 +235,16 @@ const CalculatorForm = ({
           <TextField
             {...params}
             label="Search MCC, Merchant Category, or Known Merchants"
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  {isLoadingMcc && <CircularProgress size={20} />}
-                  {params.InputProps.endAdornment}
-                </>
-              ),
+            slotProps={{
+              input: {
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {isLoadingMcc && <CircularProgress size={20} />}
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              }
             }}
           />
         )}

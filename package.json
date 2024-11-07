@@ -27,6 +27,8 @@
     "@mui/icons-material": "^6.1.6",
     "@mui/material": "^6.1.6",
     "@mui/material-nextjs": "^6.1.6",
+    "@pigment-css/nextjs-plugin": "^0.0.25",
+    "@pigment-css/react": "^0.0.25",
     "axios": "^1.7.7",
     "firebase": "^11.0.1",
     "jwt-decode": "^4.0.0",

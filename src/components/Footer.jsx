@@ -22,7 +22,6 @@ function Footer() {
           align="center"
           sx={{
             color: "text.secondary",
-
             '& > a': {
               ml: 2,
               color: 'inherit'
@@ -49,5 +48,4 @@ function Footer() {
     </Box>)
   );
 }
-
 export default Footer;

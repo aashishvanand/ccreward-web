@@ -10,7 +10,28 @@ import {
 import { Delete as DeleteIcon } from "@mui/icons-material";
 import Image from "next/image";
 import useCardImagesData from "../hooks/useCardImagesData";
-import { getBankColor } from "./colorPalette";
+
+const bankColors = {
+  HDFC: "#004C8F",
+  ICICI: "#B02A30",
+  SBI: "#22409A",
+  Axis: "#800000",
+  AMEX: "#006FCF",
+  YESBank: "#00518F",
+  SC: "#0072AA",
+  Kotak: "#ED1C24",
+  IDFCFirst: "#9C1D26",
+  HSBC: "#EE3524",
+  OneCard: "#000000",
+  RBL: "#21317D",
+  IndusInd: "#98272A",
+  IDBI: "#00836C",
+  Federal: "#F7A800",
+  BOB: "#F15A29",
+  AU: "#ec691f",
+};
+
+const getBankColor = (bankName) => bankColors[bankName] || "#000000";
 
 function CreditCardItem({ card, onDelete }) {
   const { cardImagesData } = useCardImagesData();
@@ -41,7 +62,7 @@ function CreditCardItem({ card, onDelete }) {
   const isHorizontal = cardDetails.orientation === "horizontal";
 
   return (
-    <Card
+    (<Card
       sx={{
         height: "100%",
         display: "flex",
@@ -55,11 +76,14 @@ function CreditCardItem({ card, onDelete }) {
     >
       <CardMedia
         component="div"
-        sx={{
-          paddingTop: isHorizontal ? "63%" : "158%",
+        sx={[{
           position: "relative",
-          background: `linear-gradient(45deg, ${startColor}, ${endColor})`,
-        }}
+          background: `linear-gradient(45deg, ${startColor}, ${endColor})`
+        }, isHorizontal ? {
+          paddingTop: "63%"
+        } : {
+          paddingTop: "158%"
+        }]}
       >
         {!hasFailedImage && (
           <Box
@@ -112,7 +136,7 @@ function CreditCardItem({ card, onDelete }) {
       >
         <DeleteIcon sx={{ color: "white", fontSize: "1rem" }} />
       </IconButton>
-    </Card>
+    </Card>)
   );
 }
 

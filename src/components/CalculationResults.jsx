@@ -51,16 +51,19 @@ const CalculationResults = ({ result, isLoading }) => {
 
   return (
     (<Paper
-      elevation={3}
-      sx={{
-        p: 2,
-        mt: 2,
-        width: "100%",
-        bgcolor: hasRewards ? "success.light" : "error.light",
-        borderRadius: 2,
-      }}
-      slots={{ root: "div" }}
-    >
+        elevation={3}
+        sx={[{
+          p: 2,
+          mt: 2,
+          width: "100%",
+          borderRadius: 2
+        }, hasRewards ? {
+          bgcolor: "success.light"
+        } : {
+          bgcolor: "error.light"
+        }]}
+        slots={{ root: "div" }}
+      >
       {isLoading ? (
         <Box
           sx={{ display: "flex", justifyContent: "center" }}
@@ -84,20 +87,16 @@ const CalculationResults = ({ result, isLoading }) => {
               align="center"
               color="textPrimary"
               onClick={toggleExpand}
-              sx={{
+              sx={[{
                 fontWeight: "bold",
                 fontSize: { xs: "1rem", sm: "1.25rem" },
                 cursor: "pointer",
-                maxWidth: "calc(100% - 40px)",
-
-                ...(expanded
-                  ? {}
-                  : {
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    })
-              }}>
+                maxWidth: "calc(100% - 40px)"
+              }, (expanded ? {} : {
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  })]}>
               {hasRewards ? (
                 <>🎉 {result.rewardText} 🎉</>
               ) : (

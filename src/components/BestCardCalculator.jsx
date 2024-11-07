@@ -258,7 +258,7 @@ const BestCardCalculator = () => {
   }, []);
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    (<Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Header />
       <Container component="main" sx={{ mt: 4, mb: 4 }}>
         {showConfetti && <ReactConfetti />}
@@ -287,14 +287,16 @@ const BestCardCalculator = () => {
                 {...params}
                 label="Search Merchant or MCC (Optional)"
                 fullWidth
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {isLoadingMcc ? <CircularProgress size={20} /> : null}
-                      {params.InputProps.endAdornment}
-                    </>
-                  ),
+                slotProps={{
+                  input: {
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {isLoadingMcc ? <CircularProgress size={20} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }
                 }}
               />
             )}
@@ -443,7 +445,7 @@ const BestCardCalculator = () => {
         </Alert>
       )}
       <Footer />
-    </Box>
+    </Box>)
   );
 };
 

@@ -284,7 +284,5 @@ const AnonymousConversionPrompt = forwardRef((props, ref) => {
     </Snackbar>
   </>);
 });
-
 AnonymousConversionPrompt.displayName = "AnonymousConversionPrompt";
-
 export { AnonymousConversionPrompt, CALCULATION_THRESHOLDS };

@@ -331,31 +331,45 @@ export default function LandingPage() {
                 <Card
                   key={card.id}
                   elevation={4}
-                  sx={{
+                  sx={[{
                     position: "absolute",
-                    top: isMobile
-                      ? `${index * 20}%`
-                      : isTablet
-                      ? `${index * 22}%`
-                      : `${index * 25}%`,
-                    left: isMobile
-                      ? "50%"
-                      : isLargeScreen
-                      ? `${index * 5}%`
-                      : `${index * 8}%`,
-                    transform: isMobile
-                      ? `translateX(-50%) rotate(${(index - 1) * 5}deg)`
-                      : `rotate(${(index - 1) * 5}deg)`,
-                    width: isMobile ? 240 : isTablet ? 280 : 320,
-                    height: isMobile ? 150 : isTablet ? 175 : 200,
                     transition: "all 0.3s ease-in-out",
                     "&:hover": {
-                      transform: isMobile
-                        ? "translateX(-50%) scale(1.05) rotate(0deg)"
-                        : "scale(1.05) rotate(0deg)",
-                      zIndex: 10,
-                    },
-                  }}
+                      zIndex: 10
+                    }
+                  }, isMobile ? {
+                    top: `${index * 20}%`
+                  } : {
+                    top: isTablet
+                      ? `${index * 22}%`
+                      : `${index * 25}%`
+                  }, isMobile ? {
+                    left: "50%"
+                  } : {
+                    left: isLargeScreen
+                      ? `${index * 5}%`
+                      : `${index * 8}%`
+                  }, isMobile ? {
+                    transform: `translateX(-50%) rotate(${(index - 1) * 5}deg)`
+                  } : {
+                    transform: `rotate(${(index - 1) * 5}deg)`
+                  }, isMobile ? {
+                    width: 240
+                  } : {
+                    width: isTablet ? 280 : 320
+                  }, isMobile ? {
+                    height: 150
+                  } : {
+                    height: isTablet ? 175 : 200
+                  }, isMobile ? {
+                    "&:hover": {
+                      transform: "translateX(-50%) scale(1.05) rotate(0deg)"
+                    }
+                  } : {
+                    "&:hover": {
+                      transform: "scale(1.05) rotate(0deg)"
+                    }
+                  }]}
                 >
                   <Image
                     src={card.id}
@@ -525,16 +539,16 @@ export default function LandingPage() {
               <Grid item xs={12} sm={6} md={4} key={tweet.id}>
                 <Card
                   elevation={2}
-                  sx={{
+                  sx={theme => ({
                     height: "100%",
                     display: "flex",
                     flexDirection: "column",
                     transition: "all 0.2s ease-in-out",
                     "&:hover": {
                       transform: "translateY(-4px)",
-                      boxShadow: (theme) => theme.shadows[4],
-                    },
-                  }}
+                      boxShadow: theme.shadows[4],
+                    }
+                  })}
                 >
                   <CardContent
                     sx={{
@@ -707,15 +721,18 @@ export default function LandingPage() {
             Download the app to maximize your credit card rewards on the go!
           </Typography>
           <Box
-            sx={{
+            sx={[{
               display: "flex",
-              flexDirection: isMobile ? "column" : "row",
               alignItems: "center",
               justifyContent: "center",
               gap: 3,
               mb: 4,
-              width: "100%",
-            }}
+              width: "100%"
+            }, isMobile ? {
+              flexDirection: "column"
+            } : {
+              flexDirection: "row"
+            }]}
           >
             {/* App Store Button */}
             <Box
@@ -776,7 +793,7 @@ export default function LandingPage() {
 
   // Main Return with Alert
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    (<Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Header />
       {renderHeroSection()}
       {renderFeaturesSection()}
@@ -785,7 +802,6 @@ export default function LandingPage() {
       {renderAppStoreSection()}
       {renderTestimonialsSection()}
       <Footer />
-
       {alert.open && (
         <Alert
           severity={alert.severity}
@@ -794,20 +810,20 @@ export default function LandingPage() {
             root: 'div',
             icon: 'span'
           }}
-          sx={{
+          sx={theme => ({
             position: "fixed",
             bottom: 24,
             left: "50%",
             transform: "translateX(-50%)",
-            zIndex: (theme) => theme.zIndex.snackbar,
+            zIndex: theme.zIndex.snackbar,
             maxWidth: "90%",
             width: "auto",
-            boxShadow: (theme) => theme.shadows[8],
-          }}
+            boxShadow: theme.shadows[8]
+          })}
         >
           {alert.message}
         </Alert>
       )}
-    </Box>
+    </Box>)
   );
 }

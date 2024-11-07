@@ -53,7 +53,9 @@ const IncorrectRewardReportForm = ({
   return (<>
     <Backdrop
       open={open}
-      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      sx={theme => ({
+        zIndex: theme.zIndex.drawer + 1
+      })}
       slots={{
         root: 'div'
       }}

@@ -1,4 +1,5 @@
 import './globals.css'
+import '@pigment-css/react/styles.css'
 import { Inter } from 'next/font/google'
 import Script from "next/script";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';

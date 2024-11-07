@@ -12,8 +12,29 @@ import {
 } from "@mui/material";
 import Image from "next/image";
 import { CreditCard as CreditCardIcon } from "@mui/icons-material";
-import { getBankColor } from "./colorPalette";
 import useCardImagesData from "../hooks/useCardImagesData";
+
+const bankColors = {
+  HDFC: "#004C8F",
+  ICICI: "#B02A30",
+  SBI: "#22409A",
+  Axis: "#800000",
+  AMEX: "#006FCF",
+  YESBank: "#00518F",
+  SC: "#0072AA",
+  Kotak: "#ED1C24",
+  IDFCFirst: "#9C1D26",
+  HSBC: "#EE3524",
+  OneCard: "#000000",
+  RBL: "#21317D",
+  IndusInd: "#98272A",
+  IDBI: "#00836C",
+  Federal: "#F7A800",
+  BOB: "#F15A29",
+  AU: "#ec691f",
+};
+
+const getBankColor = (bankName) => bankColors[bankName] || "#000000";
 
 const CardListRenderer = ({
   isCardListLoading,
@@ -96,10 +117,13 @@ const CardListRenderer = ({
   return cardRewards.map((card, index) => (
     <ListItem key={card.bank + card.cardName} sx={{ mb: 2, borderRadius: 1 }}>
       <Card
-        sx={{
-          width: "100%",
-          bgcolor: index === 0 ? "success.light" : "background.paper",
-        }}
+        sx={[{
+          width: "100%"
+        }, index === 0 ? {
+          bgcolor: "success.light"
+        } : {
+          bgcolor: "background.paper"
+        }]}
         slots={{ root: 'div' }}
       >
         <CardContent sx={{ display: "flex", alignItems: "center" }}>
@@ -124,9 +148,11 @@ const CardListRenderer = ({
               <Typography
                 variant="h6"
                 component="div"
-                sx={{
-                  color: index === 0 ? "success.contrastText" : "text.primary",
-                }}
+                sx={[index === 0 ? {
+                  color: "success.contrastText"
+                } : {
+                  color: "text.primary"
+                }]}
               >
                 {`${index + 1}. ${card.bank} - ${card.cardName}`}
               </Typography>
@@ -134,9 +160,11 @@ const CardListRenderer = ({
             secondary={
               <Typography
                 variant="body1"
-                sx={{
-                  color: index === 0 ? "success.contrastText" : "text.secondary",
-                }}
+                sx={[index === 0 ? {
+                  color: "success.contrastText"
+                } : {
+                  color: "text.secondary"
+                }]}
               >
                 {card.rewardText}
               </Typography>

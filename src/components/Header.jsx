@@ -23,7 +23,7 @@ import {
   Menu as MenuIcon,
   Stars as StarsIcon,
 } from "@mui/icons-material";
-import { useAppTheme } from "../components/ThemeRegistry";
+import { useAppTheme } from "./ThemeRegistry";
 import { useAuth } from "../app/providers/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
@@ -138,7 +138,7 @@ function Header() {
           sx={{ display: "flex", alignItems: "center" }}
         >
           <Box sx={{ position: "relative", width: 40, height: 40, mr: 1 }}>
-          <Image
+            <Image
               src={mode === "dark" ? "f4bf16b1-527e-4d80-47b4-99989a1ded00" : "b6c3c6f1-a744-4e47-8c50-4c33c84c3900"}
               alt="CCReward Logo"
               width={40}
@@ -150,7 +150,11 @@ function Header() {
         </Typography>
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton onClick={toggleTheme} color="inherit">
+          <IconButton
+            onClick={toggleTheme}
+            color="inherit"
+            aria-label="toggle theme"
+          >
             {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
           </IconButton>
 

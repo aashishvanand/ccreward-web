@@ -37,7 +37,6 @@ const AuthRedirectWrapper = ({ children }) => {
             color: "text.secondary",
             mt: 2,
             animation: 'fadeIn 0.5s ease-in',
-
             '@keyframes fadeIn': {
               '0%': {
                 opacity: 0,
@@ -52,8 +51,6 @@ const AuthRedirectWrapper = ({ children }) => {
       </Box>)
     );
   }
-
   return isAuthenticated() ? children : null;
 };
-
 export default AuthRedirectWrapper;

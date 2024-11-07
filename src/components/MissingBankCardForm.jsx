@@ -161,62 +161,62 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
     }
   };
 
-  return (
-    <>
-      <Backdrop
-        open={open}
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        slots={{ root: 'div' }}
-      />
-      <Dialog
-        open={open}
-        onClose={onClose}
-        slots={{
-          root: 'div',
-          backdrop: 'div',
-          paper: 'div'
-        }}
-        slotProps={{
-          paper: {
-            sx: { boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)" }
-          }
-        }}
-      >
-        <form onSubmit={handleSubmit}>
-          <DialogTitle>Report Missing Information</DialogTitle>
-          <DialogContent>
-            <Stepper activeStep={activeStep}>
-              {steps.map((label) => (
-                <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-            <Typography
-              variant="body2"
-              color="textSecondary"
-              paragraph
-              sx={{ mt: 2 }}
-            ></Typography>
-            {getStepContent(activeStep)}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={onClose}>Cancel</Button>
-            {activeStep > 0 && <Button onClick={handleBack}>Back</Button>}
-            {activeStep < steps.length - 1 ? (
-              <Button onClick={handleNext} disabled={!reportType}>
-                Next
-              </Button>
-            ) : (
-              <Button type="submit" variant="contained" color="primary">
-                Submit
-              </Button>
-            )}
-          </DialogActions>
-        </form>
-      </Dialog>
-    </>
-  );
+  return (<>
+    <Backdrop
+      open={open}
+      sx={theme => ({
+        zIndex: theme.zIndex.drawer + 1
+      })}
+      slots={{ root: 'div' }}
+    />
+    <Dialog
+      open={open}
+      onClose={onClose}
+      slots={{
+        root: 'div',
+        backdrop: 'div',
+        paper: 'div'
+      }}
+      slotProps={{
+        paper: {
+          sx: { boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)" }
+        }
+      }}
+    >
+      <form onSubmit={handleSubmit}>
+        <DialogTitle>Report Missing Information</DialogTitle>
+        <DialogContent>
+          <Stepper activeStep={activeStep}>
+            {steps.map((label) => (
+              <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+          <Typography
+            variant="body2"
+            color="textSecondary"
+            paragraph
+            sx={{ mt: 2 }}
+          ></Typography>
+          {getStepContent(activeStep)}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Cancel</Button>
+          {activeStep > 0 && <Button onClick={handleBack}>Back</Button>}
+          {activeStep < steps.length - 1 ? (
+            <Button onClick={handleNext} disabled={!reportType}>
+              Next
+            </Button>
+          ) : (
+            <Button type="submit" variant="contained" color="primary">
+              Submit
+            </Button>
+          )}
+        </DialogActions>
+      </form>
+    </Dialog>
+  </>);
 };
 
 export default MissingBankCardForm;
