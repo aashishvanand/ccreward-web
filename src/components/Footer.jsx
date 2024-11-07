@@ -5,15 +5,34 @@ function Footer() {
   return (
     <Box
       component="footer"
-      sx={{ py: 3, px: 2, mt: "auto", backgroundColor: "background.paper" }}
+      sx={{ 
+        py: 3, 
+        px: 2, 
+        mt: "auto", 
+        backgroundColor: "background.paper" 
+      }}
+      slots={{ root: 'footer' }}
     >
-      <Container maxWidth="sm">
-        <Typography variant="body2" color="text.secondary" align="center">
+      <Container 
+        maxWidth="sm"
+        slots={{ root: 'div' }}
+      >
+        <Typography 
+          variant="body2" 
+          color="text.secondary" 
+          align="center"
+          sx={{
+            '& > a': {
+              ml: 2,
+              color: 'inherit'
+            }
+          }}
+        >
           © {new Date().getFullYear()} CCReward. All rights reserved.
-          <Link color="inherit" href="/terms" sx={{ ml: 2 }}>
+          <Link color="inherit" href="/terms">
             Terms of Service
           </Link>
-          <Link color="inherit" href="/privacy" sx={{ ml: 2 }}>
+          <Link color="inherit" href="/privacy">
             Privacy Policy
           </Link>
         </Typography>

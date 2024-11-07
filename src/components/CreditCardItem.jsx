@@ -49,6 +49,9 @@ function CreditCardItem({ card, onDelete }) {
         position: "relative",
         "&:hover .deleteIcon": { opacity: 1 },
       }}
+      slots={{
+        root: 'div'
+      }}
     >
       <CardMedia
         component="div"

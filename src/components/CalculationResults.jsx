@@ -59,9 +59,13 @@ const CalculationResults = ({ result, isLoading }) => {
         bgcolor: hasRewards ? "success.light" : "error.light",
         borderRadius: 2,
       }}
+      slots={{ root: "div" }}
     >
       {isLoading ? (
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Box
+          sx={{ display: "flex", justifyContent: "center" }}
+          slots={{ root: "div" }}
+        >
           <CircularProgress />
         </Box>
       ) : (
@@ -72,6 +76,7 @@ const CalculationResults = ({ result, isLoading }) => {
               alignItems: "center",
               justifyContent: "center",
             }}
+            slots={{ root: "div" }}
           >
             <Typography
               ref={textRef}

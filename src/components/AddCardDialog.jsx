@@ -96,7 +96,20 @@ function AddCardDialog({ open, onClose, onAddCard }) {
 
   return (
     <>
-      <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <Dialog 
+      open={open} 
+      onClose={onClose} 
+      fullWidth 
+      maxWidth="sm"
+      slots={{
+        backdrop: 'div'
+      }}
+      slotProps={{
+        backdrop: {
+          sx: { backgroundColor: 'rgba(0, 0, 0, 0.5)' }
+        }
+      }}
+    >
         <DialogTitle>Add New Card</DialogTitle>
         <DialogContent>
           {loading && <CircularProgress />}

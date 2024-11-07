@@ -14,6 +14,7 @@ const ReportButtons = ({
           color="primary"
           onClick={onIncorrectRewardOpen}
           sx={{ mt: 2 }}
+          slots={{ root: 'button' }}
         >
           Report Incorrect Reward
         </Button>
@@ -23,6 +24,7 @@ const ReportButtons = ({
           color="primary"
           onClick={onMissingFormOpen}
           sx={{ mt: 2 }}
+          slots={{ root: 'button' }}
         >
           Bank or Card / MCC Missing?
         </Button>

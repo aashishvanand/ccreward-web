@@ -21,9 +21,13 @@ const AddToMyCardsButton = ({
     <Button
       variant="outlined"
       color="primary"
-      startIcon={<AddIcon />}
       onClick={onAddCard}
       sx={{ mt: 2, width: "100%" }}
+      slots={{
+        root: 'button',
+        startIcon: 'span'
+      }}
+      startIcon={<AddIcon />}
     >
       {user ? "Add to My Cards" : "Sign In & Add to My Cards"}
     </Button>

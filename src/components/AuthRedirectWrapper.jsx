@@ -17,16 +17,19 @@ const AuthRedirectWrapper = ({ children }) => {
   if (loading) {
     return (
       <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100vh',
-          gap: 2,
-          bgcolor: 'background.default'
-        }}
-      >
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        gap: 2,
+        bgcolor: 'background.default'
+      }}
+      slots={{
+        root: 'div'
+      }}
+    >
         <CircularProgress size={40} thickness={4} />
         <Typography 
           variant="body1" 

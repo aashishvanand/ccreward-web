@@ -5,9 +5,16 @@ import Footer from '../components/Footer';
 
 const PrivacyPolicyPage = () => {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box 
+      sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}
+      slots={{ root: 'div' }}
+    >
       <Header />
-      <Container component="main" sx={{ mt: 4, mb: 4, flexGrow: 1 }}>
+      <Container 
+        component="main" 
+        sx={{ mt: 4, mb: 4, flexGrow: 1 }}
+        slots={{ root: 'main' }}
+      >
         <Typography variant="h4" component="h1" gutterBottom>
           Privacy Policy
         </Typography>

@@ -113,6 +113,16 @@ const tweets = [
       "This app can be your rewards buddy for credit cards optimisation.. Install and start using ⤵️",
     url: "https://x.com/nebula_world/status/1848710824044417415",
   },
+  {
+    id: 9,
+    author: "CreditCardz",
+    handle: "@creditcardz_in",
+    avatar:
+      "https://pbs.twimg.com/profile_images/1596829502151090176/UasBtg1n_400x400.jpg",
+    content:
+      "💳 #CCGeeks, struggling to figure out your rewards based on merchant categories? Good news! I’ve just embedded @aashishvanand 's http://ccreward.app on my blog. Learn how this tool calculates points on-the-spot with your card & merchant info! Find out more & try the calculator right in my post! 🚀 Head over now and see how: https://creditcardz.in/credit-card-reward-calculator-by-ccreward-app/",
+    url: "https://x.com/creditcardz_in/status/1852987209840009540",
+  },
 ];
 
 const features = [
@@ -237,12 +247,12 @@ export default function LandingPage() {
 
   // Hero Section
   const renderHeroSection = () => (
-    <Box 
-      sx={{ 
-        bgcolor: "background.default", 
+    <Box
+      sx={{
+        bgcolor: "background.default",
         py: { xs: 4, md: 6, lg: 8 },
-        position: 'relative',
-        overflow: 'hidden',
+        position: "relative",
+        overflow: "hidden",
       }}
     >
       <Container maxWidth="lg">
@@ -365,12 +375,7 @@ export default function LandingPage() {
   const renderFeaturesSection = () => (
     <Box sx={{ bgcolor: "background.paper", py: 8 }}>
       <Container maxWidth="lg">
-        <Typography
-          variant="h3"
-          align="center"
-          gutterBottom
-          sx={{ mb: 6 }}
-        >
+        <Typography variant="h3" align="center" gutterBottom sx={{ mb: 6 }}>
           Key Features
         </Typography>
         <Grid container spacing={4}>
@@ -522,11 +527,24 @@ export default function LandingPage() {
                     },
                   }}
                 >
-                  <CardContent sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+                  <CardContent
+                    sx={{
+                      flexGrow: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
                     <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                      <Avatar src={tweet.avatar} alt={tweet.author} sx={{ mr: 2, width: 48, height: 48 }} />
+                      <Avatar
+                        src={tweet.avatar}
+                        alt={tweet.author}
+                        sx={{ mr: 2, width: 48, height: 48 }}
+                      />
                       <Box>
-                        <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ fontWeight: 600 }}
+                        >
                           {tweet.author}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
@@ -642,103 +660,103 @@ export default function LandingPage() {
 
   // App Store Section
   const renderAppStoreSection = () => (
-  <Box sx={{ bgcolor: "background.paper", py: 8 }}>
-    <Container maxWidth="md">
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          textAlign: "center",
-        }}
-      >
-        <Typography
-          variant="h3"
-          sx={{
-            mb: 2,
-            fontWeight: "bold",
-            fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
-          }}
-        >
-          Get CCReward App on Your Device
-        </Typography>
-        <Typography
-          variant="h5"
-          sx={{
-            maxWidth: "600px",
-            mb: 6,
-            color: "text.secondary",
-          }}
-        >
-          Download the app to maximize your credit card rewards on the go!
-        </Typography>
+    <Box sx={{ bgcolor: "background.paper", py: 8 }}>
+      <Container maxWidth="md">
         <Box
           sx={{
             display: "flex",
-            flexDirection: isMobile ? "column" : "row",
+            flexDirection: "column",
             alignItems: "center",
-            justifyContent: "center",
-            gap: 3,
-            mb: 4,
-            width: "100%",
+            textAlign: "center",
           }}
         >
-          {/* App Store Button */}
-          <Box
-            component="a"
-            href="https://apps.apple.com/in/app/ccreward/id6736835206"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Typography
+            variant="h3"
             sx={{
-              transition: "transform 0.3s ease-in-out",
-              "&:hover": {
-                transform: "scale(1.05)",
-              },
-              display: "flex",
-              alignItems: "center",
+              mb: 2,
+              fontWeight: "bold",
+              fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
             }}
           >
-            <Image
-              src={
-                theme.palette.mode === "dark"
-                  ? "d6909a96-9073-4189-84ea-54475d93ac00"
-                  : "60ca24d3-0052-4177-4da7-ce7fc0d24a00"
-              }
-              alt="Download on the App Store"
-              width={200}
-              height={60}
-              style={{ objectFit: "contain" }}
-            />
-          </Box>
+            Get CCReward App on Your Device
+          </Typography>
+          <Typography
+            variant="h5"
+            sx={{
+              maxWidth: "600px",
+              mb: 6,
+              color: "text.secondary",
+            }}
+          >
+            Download the app to maximize your credit card rewards on the go!
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: isMobile ? "column" : "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 3,
+              mb: 4,
+              width: "100%",
+            }}
+          >
+            {/* App Store Button */}
+            <Box
+              component="a"
+              href="https://apps.apple.com/in/app/ccreward/id6736835206"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                transition: "transform 0.3s ease-in-out",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                },
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Image
+                src={
+                  theme.palette.mode === "dark"
+                    ? "d6909a96-9073-4189-84ea-54475d93ac00"
+                    : "60ca24d3-0052-4177-4da7-ce7fc0d24a00"
+                }
+                alt="Download on the App Store"
+                width={200}
+                height={60}
+                style={{ objectFit: "contain" }}
+              />
+            </Box>
 
-          {/* Google Play Button */}
-          <Box
-            component="a"
-            href="https://play.google.com/store/apps/details?id=app.ccreward"
-            target="_blank"
-            rel="noopener noreferrer"
-            sx={{
-              transition: "transform 0.3s ease-in-out",
-              "&:hover": {
-                transform: "scale(1.05)",
-              },
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              src="9a793092-57c3-41e6-15d3-9801d75ae900"
-              alt="Get it on Google Play"
-              width={200}
-              height={60}
-              style={{ objectFit: "contain" }}
-            />
+            {/* Google Play Button */}
+            <Box
+              component="a"
+              href="https://play.google.com/store/apps/details?id=app.ccreward"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                transition: "transform 0.3s ease-in-out",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                },
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Image
+                src="9a793092-57c3-41e6-15d3-9801d75ae900"
+                alt="Get it on Google Play"
+                width={200}
+                height={60}
+                style={{ objectFit: "contain" }}
+              />
+            </Box>
           </Box>
         </Box>
-      </Box>
-    </Container>
-  </Box>
-);
+      </Container>
+    </Box>
+  );
 
   // Main Return with Alert
   return (
@@ -752,7 +770,7 @@ export default function LandingPage() {
       {renderAppStoreSection()}
       {renderTestimonialsSection()}
       <Footer />
-      
+
       {alert.open && (
         <Alert
           severity={alert.severity}

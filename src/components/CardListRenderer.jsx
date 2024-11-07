@@ -64,7 +64,10 @@ const CardListRenderer = ({
       .fill(0)
       .map((_, index) => (
         <ListItem key={index} sx={{ mb: 2 }}>
-          <Card sx={{ width: "100%" }}>
+          <Card 
+            sx={{ width: "100%" }}
+            slots={{ root: 'div' }}
+          >
             <CardContent sx={{ display: "flex", alignItems: "center" }}>
               <Skeleton
                 variant="rectangular"
@@ -97,6 +100,7 @@ const CardListRenderer = ({
           width: "100%",
           bgcolor: index === 0 ? "success.light" : "background.paper",
         }}
+        slots={{ root: 'div' }}
       >
         <CardContent sx={{ display: "flex", alignItems: "center" }}>
           <ListItemIcon>
@@ -110,6 +114,7 @@ const CardListRenderer = ({
                 justifyContent: "center",
                 alignItems: "center",
               }}
+              slots={{ root: 'div' }}
             >
               {renderCardImage(card)}
             </Box>
@@ -130,8 +135,7 @@ const CardListRenderer = ({
               <Typography
                 variant="body1"
                 sx={{
-                  color:
-                    index === 0 ? "success.contrastText" : "text.secondary",
+                  color: index === 0 ? "success.contrastText" : "text.secondary",
                 }}
               >
                 {card.rewardText}

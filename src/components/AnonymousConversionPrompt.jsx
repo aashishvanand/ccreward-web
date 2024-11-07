@@ -141,15 +141,25 @@ const AnonymousConversionPrompt = forwardRef((props, ref) => {
       <Dialog
         open={showPrompt}
         onClose={() => setShowPrompt(false)}
-        PaperProps={{
-          sx: {
-            width: "100%",
-            maxWidth: 400,
-            m: 2,
-          },
+        slots={{
+          root: 'div',
+          backdrop: 'div',
+          paper: 'div'
+        }}
+        slotProps={{
+          paper: {
+            sx: {
+              width: "100%",
+              maxWidth: 400,
+              m: 2,
+            }
+          }
         }}
       >
-        <Card sx={{ width: "100%" }}>
+         <Card 
+          sx={{ width: "100%" }}
+          slots={{ root: 'div' }}
+        >
           <CardContent>
             <Box
               display="flex"
@@ -221,8 +231,18 @@ const AnonymousConversionPrompt = forwardRef((props, ref) => {
         </Card>
       </Dialog>
 
-      <Dialog open={errorDialogOpen} onClose={() => setErrorDialogOpen(false)}>
-        <Card sx={{ width: "100%" }}>
+      <Dialog 
+        open={errorDialogOpen} 
+        onClose={() => setErrorDialogOpen(false)}
+        slots={{
+          root: 'div',
+          backdrop: 'div'
+        }}
+      >
+        <Card 
+          sx={{ width: "100%" }}
+          slots={{ root: 'div' }}
+        >
           <CardContent>
             <Typography variant="h6" component="div" gutterBottom>
               Account Already Exists
@@ -247,11 +267,16 @@ const AnonymousConversionPrompt = forwardRef((props, ref) => {
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        slots={{ root: 'div' }}
       >
         <Alert
           onClose={handleCloseSnackbar}
           severity={snackbar.severity}
           sx={{ width: "100%" }}
+          slots={{
+            root: 'div',
+            icon: 'span'
+          }}
         >
           {snackbar.message}
         </Alert>

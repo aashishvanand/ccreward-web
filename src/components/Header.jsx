@@ -119,7 +119,19 @@ function Header() {
 
   return (
     <AppBar position="static" color="default" elevation={0}>
-      <Toolbar sx={{ justifyContent: "space-between" }}>
+      <Toolbar
+        sx={{
+          justifyContent: "space-between",
+          '& .MuiButton-root': {
+            ml: 2,
+          },
+          '& .MuiAvatar-root': {
+            ml: 2,
+            width: 40,
+            height: 40,
+          }
+        }}
+      >
         <Typography
           variant="h6"
           component="div"

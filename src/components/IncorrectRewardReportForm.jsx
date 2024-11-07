@@ -55,14 +55,21 @@ const IncorrectRewardReportForm = ({
       <Backdrop
         open={open}
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        slots={{
+          root: 'div'
+        }}
       />
       <Dialog
         open={open}
         onClose={onClose}
-        sx={{
-          "& .MuiDialog-paper": {
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
-          },
+        slots={{
+          backdrop: 'div',
+          paper: 'div'
+        }}
+        slotProps={{
+          paper: {
+            sx: { boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)" }
+          }
         }}
       >
         <form onSubmit={handleSubmit}>

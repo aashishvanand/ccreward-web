@@ -17,6 +17,10 @@ const ErrorAlert = ({ message, onClose }) => {
     <Collapse in={Boolean(message)}>
       <Alert
         severity="error"
+        slots={{
+          root: 'div',
+          icon: 'span'
+        }}
         action={
           <IconButton
             aria-label="close"
