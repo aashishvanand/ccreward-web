@@ -50,58 +50,58 @@ const IncorrectRewardReportForm = ({
       });
   };
 
-  return (
-    <>
-      <Backdrop
-        open={open}
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        slots={{
-          root: 'div'
-        }}
-      />
-      <Dialog
-        open={open}
-        onClose={onClose}
-        slots={{
-          backdrop: 'div',
-          paper: 'div'
-        }}
-        slotProps={{
-          paper: {
-            sx: { boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)" }
-          }
-        }}
-      >
-        <form onSubmit={handleSubmit}>
-          <DialogTitle>Report Incorrect Reward Points</DialogTitle>
-          <DialogContent>
-            <Typography variant="body2" color="textSecondary" paragraph>
-              Please provide feedback about the issue with the reward point
-              calculation.
-            </Typography>
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Your Feedback"
-              multiline
-              rows={4}
-              value={userFeedback}
-              onChange={(e) => setUserFeedback(e.target.value)}
-              inputProps={{ maxLength: 500 }}
-              helperText={`${userFeedback.length}/500 characters`}
-              required
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={onClose}>Cancel</Button>
-            <Button type="submit" variant="contained" color="primary">
-              Submit Report
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
-    </>
-  );
+  return (<>
+    <Backdrop
+      open={open}
+      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      slots={{
+        root: 'div'
+      }}
+    />
+    <Dialog
+      open={open}
+      onClose={onClose}
+      slots={{
+        backdrop: 'div',
+        paper: 'div'
+      }}
+      slotProps={{
+        paper: {
+          sx: { boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)" }
+        }
+      }}
+    >
+      <form onSubmit={handleSubmit}>
+        <DialogTitle>Report Incorrect Reward Points</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="textSecondary" paragraph>
+            Please provide feedback about the issue with the reward point
+            calculation.
+          </Typography>
+          <TextField
+            fullWidth
+            margin="normal"
+            label="Your Feedback"
+            multiline
+            rows={4}
+            value={userFeedback}
+            onChange={(e) => setUserFeedback(e.target.value)}
+            helperText={`${userFeedback.length}/500 characters`}
+            required
+            slotProps={{
+              htmlInput: { maxLength: 500 }
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button type="submit" variant="contained" color="primary">
+            Submit Report
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
+  </>);
 };
 
 export default IncorrectRewardReportForm;

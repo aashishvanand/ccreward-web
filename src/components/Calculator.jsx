@@ -213,6 +213,7 @@ function Calculator() {
 
       <Container
         component="main"
+        slots={{ root: 'main' }}
         maxWidth="lg"
         sx={{
           mt: 4,
@@ -321,6 +322,12 @@ function Calculator() {
         <Alert
           severity={alert.severity}
           onClose={() => setAlert({ ...alert, open: false })}
+          slotProps={{ closeButton: { 'aria-label': 'Close' } }}
+          slots={{
+            root: 'div',
+            icon: 'span',
+            closeButton: 'button'
+          }}
           sx={{
             position: "fixed",
             bottom: 24,

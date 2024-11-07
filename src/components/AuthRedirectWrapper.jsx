@@ -16,7 +16,7 @@ const AuthRedirectWrapper = ({ children }) => {
 
   if (loading) {
     return (
-      <Box
+      (<Box
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -31,12 +31,13 @@ const AuthRedirectWrapper = ({ children }) => {
       }}
     >
         <CircularProgress size={40} thickness={4} />
-        <Typography 
-          variant="body1" 
-          color="text.secondary"
-          sx={{ 
+        <Typography
+          variant="body1"
+          sx={{
+            color: "text.secondary",
             mt: 2,
             animation: 'fadeIn 0.5s ease-in',
+
             '@keyframes fadeIn': {
               '0%': {
                 opacity: 0,
@@ -44,12 +45,11 @@ const AuthRedirectWrapper = ({ children }) => {
               '100%': {
                 opacity: 1,
               },
-            },
-          }}
-        >
+            }
+          }}>
           Just a moment...
         </Typography>
-      </Box>
+      </Box>)
     );
   }
 

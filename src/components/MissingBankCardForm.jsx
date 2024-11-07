@@ -130,30 +130,30 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
             </>
           );
         } else if (reportType === "mcc") {
-          return (
-            <>
-              <TextField
-                fullWidth
-                margin="normal"
-                label="MCC"
-                name="entry.2005151650"
-                value={mcc}
-                onChange={(e) => setMcc(e.target.value)}
-                required
-                type="number"
-                inputProps={{ min: "0700", max: "9999" }}
-              />
-              <TextField
-                fullWidth
-                margin="normal"
-                label="Merchant Name"
-                name="entry.60356500"
-                value={merchantName}
-                onChange={(e) => setMerchantName(e.target.value)}
-                required
-              />
-            </>
-          );
+          return (<>
+            <TextField
+              fullWidth
+              margin="normal"
+              label="MCC"
+              name="entry.2005151650"
+              value={mcc}
+              onChange={(e) => setMcc(e.target.value)}
+              required
+              type="number"
+              slotProps={{
+                htmlInput: { min: "0700", max: "9999" }
+              }}
+            />
+            <TextField
+              fullWidth
+              margin="normal"
+              label="Merchant Name"
+              name="entry.60356500"
+              value={merchantName}
+              onChange={(e) => setMerchantName(e.target.value)}
+              required
+            />
+          </>);
         }
         return null;
       default:

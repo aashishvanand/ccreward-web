@@ -77,12 +77,17 @@ const DynamicCardInputs = ({
     switch (input.type) {
       case "radio":
         return (
-          <FormControl
+          (<FormControl
             key={input.name}
             component="fieldset"
             sx={{ mt: 2, width: "100%" }}
+            slots={{ root: 'fieldset' }}
           >
-            <Box display="flex" alignItems="center">
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center"
+              }}>
               <FormLabel component="legend">{input.label}</FormLabel>
               {input.helperText && (
                 <Tooltip title={input.helperText}>
@@ -110,12 +115,16 @@ const DynamicCardInputs = ({
                 />
               ))}
             </RadioGroup>
-          </FormControl>
+          </FormControl>)
         );
       case "select":
         return (
-          <FormControl key={input.name} fullWidth sx={{ mt: 2 }}>
-            <Box display="flex" alignItems="center">
+          (<FormControl key={input.name} fullWidth sx={{ mt: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center"
+              }}>
               <FormLabel component="legend">{input.label}</FormLabel>
               {input.helperText && (
                 <Tooltip title={input.helperText}>
@@ -141,16 +150,21 @@ const DynamicCardInputs = ({
                 </MenuItem>
               ))}
             </Select>
-          </FormControl>
+          </FormControl>)
         );
       case "checkbox":
         return (
-          <FormControl
+          (<FormControl
             key={input.name}
             component="fieldset"
             sx={{ mt: 2, width: "100%" }}
+            slots={{ root: 'fieldset' }}
           >
-            <Box display="flex" alignItems="center">
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center"
+              }}>
               <FormLabel component="legend">{input.label}</FormLabel>
               {input.helperText && (
                 <Tooltip title={input.helperText}>
@@ -179,7 +193,7 @@ const DynamicCardInputs = ({
                 />
               ))}
             </FormGroup>
-          </FormControl>
+          </FormControl>)
         );
       default:
         return null;

@@ -60,6 +60,7 @@ const BestCardCalculator = () => {
   const [mccInputValue, setMccInputValue] = useState("");
   const [pointsRanking, setPointsRanking] = useState([]);
   const [valueRanking, setValueRanking] = useState([]);
+  const [isLoadingMcc, setIsLoadingMcc] = useState(false);
 
   const currentRanking = sortMethod === "points" ? pointsRanking : valueRanking;
 
@@ -88,6 +89,31 @@ const BestCardCalculator = () => {
     setHasCalculated(false);
   }, [user]);
 
+  const debouncedFetchMCC = useCallback(
+    _.debounce(async (value) => {
+      if (value && value.length >= 2) {
+        setIsLoadingMcc(true);
+        try {
+          const mccData = await fetchMCC(value);
+          setMccOptions(mccData || []);
+        } catch (error) {
+          console.error("Error fetching MCC data:", error);
+          setMccOptions([]);
+          setAlert({
+            open: true,
+            message: "Error fetching MCC data. Please try again.",
+            severity: "error",
+          });
+        } finally {
+          setIsLoadingMcc(false);
+        }
+      } else {
+        setMccOptions([]);
+      }
+    }, 300),
+    []
+  );
+
   const fetchCardQuestions = async (cards) => {
     try {
       const cardsData = cards.map((card) => ({
@@ -107,22 +133,10 @@ const BestCardCalculator = () => {
     }
   };
 
-  const debouncedFetchMCC = useCallback(
-    _.debounce(async (value) => {
-      if (value) {
-        try {
-          const mccData = await fetchMCC(value);
-          setMccOptions(mccData);
-        } catch (error) {
-          console.error("Error fetching MCC data:", error);
-          setMccOptions([]);
-        }
-      } else {
-        setMccOptions([]);
-      }
-    }, 300),
-    []
-  );
+  const handleMccInputChange = (event, newValue) => {
+    setMccInputValue(newValue);
+    debouncedFetchMCC(newValue);
+  };
 
   const handleCalculate = useCallback(async () => {
     if (!spentAmount || parseFloat(spentAmount) <= 0) {
@@ -260,29 +274,55 @@ const BestCardCalculator = () => {
         </Typography>
 
         <Stack spacing={3}>
-          <Autocomplete
+        <Autocomplete
             options={mccOptions}
+            value={selectedMcc}
+            onChange={(event, newValue) => setSelectedMcc(newValue)}
+            inputValue={mccInputValue}
+            onInputChange={handleMccInputChange}
             getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
-            renderOption={(props, option) => (
-              <li {...props}>
-                {option.mcc} - {option.name}
-                {option.knownMerchants && option.knownMerchants.length > 0 && (
-                  <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-                    (e.g., {option.knownMerchants.join(", ")})
-                  </Typography>
-                )}
-              </li>
-            )}
+            loading={isLoadingMcc}
             renderInput={(params) => (
               <TextField
                 {...params}
                 label="Search Merchant or MCC (Optional)"
                 fullWidth
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {isLoadingMcc ? <CircularProgress size={20} /> : null}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                }}
               />
             )}
-            onInputChange={(event, newValue) => setMccInputValue(newValue)}
-            onChange={(event, newValue) => setSelectedMcc(newValue)}
-            value={selectedMcc}
+            renderOption={(props, option) => (
+              <li {...props}>
+                <Box>
+                  <Typography variant="body1">
+                    {option.mcc} - {option.name}
+                  </Typography>
+                  {option.knownMerchants?.length > 0 && (
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "text.secondary",
+                      }}
+                    >
+                      Known merchants: {option.knownMerchants.join(", ")}
+                    </Typography>
+                  )}
+                </Box>
+              </li>
+            )}
+            filterOptions={(options) => options} // Disable client-side filtering
+            noOptionsText={
+              mccInputValue.length < 2
+                ? "Type at least 2 characters to search"
+                : "No options found"
+            }
           />
 
           <TextField
@@ -384,7 +424,6 @@ const BestCardCalculator = () => {
           </List>
         </Stack>
       </Container>
-
       {alert.open && (
         <Alert
           severity={alert.severity}
@@ -403,7 +442,6 @@ const BestCardCalculator = () => {
           {alert.message}
         </Alert>
       )}
-
       <Footer />
     </Box>
   );

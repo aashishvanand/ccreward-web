@@ -256,7 +256,9 @@ export default function LandingPage() {
       }}
     >
       <Container maxWidth="lg">
-        <Grid container spacing={{ xs: 4, md: 6, lg: 8 }} alignItems="center">
+        <Grid container spacing={{ xs: 4, md: 6, lg: 8 }} sx={{
+          alignItems: "center"
+        }}>
           <Grid item xs={12} md={6}>
             <Typography
               variant="h2"
@@ -383,6 +385,7 @@ export default function LandingPage() {
             <Grid item xs={12} md={4} key={index}>
               <Card
                 elevation={2}
+                slots={{ root: 'div' }}
                 sx={{
                   height: "100%",
                   display: "flex",
@@ -418,8 +421,10 @@ export default function LandingPage() {
                 </Typography>
                 <Typography
                   variant="body1"
-                  color="text.secondary"
                   align="center"
+                  sx={{
+                    color: "text.secondary"
+                  }}
                 >
                   {feature.description}
                 </Typography>
@@ -438,7 +443,9 @@ export default function LandingPage() {
         <Typography variant="h3" align="center" gutterBottom sx={{ mb: 6 }}>
           Supported Banks
         </Typography>
-        <Grid container spacing={2} justifyContent="center">
+        <Grid container spacing={2} sx={{
+          justifyContent: "center"
+        }}>
           {bankImagesData.map((bank) => (
             <Grid item xs={6} sm={4} md={3} lg={2} key={bank.id}>
               <Card
@@ -511,7 +518,9 @@ export default function LandingPage() {
             <ChevronLeftIcon />
           </IconButton>
 
-          <Grid container spacing={3} justifyContent="center">
+          <Grid container spacing={3} sx={{
+            justifyContent: "center"
+          }}>
             {visibleTweets.map((tweet) => (
               <Grid item xs={12} sm={6} md={4} key={tweet.id}>
                 <Card
@@ -547,7 +556,9 @@ export default function LandingPage() {
                         >
                           {tweet.author}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography variant="body2" sx={{
+                          color: "text.secondary"
+                        }}>
                           {tweet.handle}
                         </Typography>
                       </Box>
@@ -612,7 +623,12 @@ export default function LandingPage() {
       }}
     >
       <Container maxWidth="sm">
-        <Stack spacing={3} alignItems="center" textAlign="center">
+        <Stack
+          spacing={3}
+          sx={{
+            alignItems: "center",
+            textAlign: "center"
+          }}>
           <Typography
             variant="h3"
             sx={{
@@ -765,7 +781,6 @@ export default function LandingPage() {
       {renderHeroSection()}
       {renderFeaturesSection()}
       {renderBanksSection()}
-      {renderTestimonialsSection()}
       {renderCallToActionSection()}
       {renderAppStoreSection()}
       {renderTestimonialsSection()}
@@ -775,6 +790,10 @@ export default function LandingPage() {
         <Alert
           severity={alert.severity}
           onClose={() => setAlert({ ...alert, open: false })}
+          slots={{
+            root: 'div',
+            icon: 'span'
+          }}
           sx={{
             position: "fixed",
             bottom: 24,

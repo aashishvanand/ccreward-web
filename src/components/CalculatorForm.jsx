@@ -45,6 +45,7 @@ const CalculatorForm = ({
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
   const [isLoadingBanks, setIsLoadingBanks] = useState(false);
   const [isLoadingCards, setIsLoadingCards] = useState(false);
+  const [isLoadingMcc, setIsLoadingMcc] = useState(false);
 
   useEffect(() => {
     if (tokenReady) {
@@ -122,19 +123,23 @@ const CalculatorForm = ({
 
   const debouncedFetchMCC = useCallback(
     _.debounce(async (value) => {
-      if (value) {
+      if (value && value.length >= 2) {
+        setIsLoadingMcc(true);
         try {
           const mccData = await fetchMCC(value, isEmbedded);
           setMccOptions(mccData || []);
         } catch (error) {
           console.error("Error fetching MCC data:", error);
           setMccOptions([]);
+          onError?.("Failed to load MCC data. Please try again.");
+        } finally {
+          setIsLoadingMcc(false);
         }
       } else {
         setMccOptions([]);
       }
     }, 300),
-    [isEmbedded]
+    [isEmbedded, onError]
   );
 
   const handleMccInputChange = (event, newValue) => {
@@ -151,7 +156,7 @@ const CalculatorForm = ({
     isCalculating;
 
   return (
-    <Stack spacing={3}>
+    (<Stack spacing={3}>
       <Autocomplete
         fullWidth
         options={banks}
@@ -175,7 +180,6 @@ const CalculatorForm = ({
           />
         )}
       />
-
       <Autocomplete
         fullWidth
         options={cards}
@@ -200,7 +204,6 @@ const CalculatorForm = ({
           />
         )}
       />
-
       <Autocomplete
         fullWidth
         options={mccOptions}
@@ -208,6 +211,7 @@ const CalculatorForm = ({
         onChange={(event, newValue) => onMccChange(newValue)}
         inputValue={mccInputValue}
         onInputChange={handleMccInputChange}
+        loading={isLoadingMcc}
         getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
         renderOption={(props, option) => (
           <li {...props}>
@@ -216,7 +220,7 @@ const CalculatorForm = ({
                 {option.mcc} - {option.name}
               </Typography>
               {option.knownMerchants?.length > 0 && (
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
                   Known merchants: {option.knownMerchants.join(", ")}
                 </Typography>
               )}
@@ -227,21 +231,24 @@ const CalculatorForm = ({
           <TextField
             {...params}
             label="Search MCC, Merchant Category, or Known Merchants"
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {isLoadingMcc && <CircularProgress size={20} />}
+                  {params.InputProps.endAdornment}
+                </>
+              ),
+            }}
           />
         )}
-        filterOptions={(options, { inputValue }) => {
-          const filterValue = inputValue.toLowerCase();
-          return options.filter(
-            (option) =>
-              option.mcc.toLowerCase().includes(filterValue) ||
-              option.name.toLowerCase().includes(filterValue) ||
-              option.knownMerchants?.some((merchant) =>
-                merchant.toLowerCase().includes(filterValue)
-              )
-          );
-        }}
+        filterOptions={(options) => options} // Disable client-side filtering
+        noOptionsText={
+          mccInputValue.length < 2
+            ? "Type at least 2 characters to search"
+            : "No options found"
+        }
       />
-
       <TextField
         fullWidth
         label="Enter spent amount (INR)"
@@ -249,11 +256,12 @@ const CalculatorForm = ({
         value={spentAmount}
         onChange={(e) => onSpentAmountChange(e.target.value)}
         required
-        InputProps={{
-          inputProps: { min: 0 }
+        slotProps={{
+          input: {
+            inputProps: { min: 0 }
+          }
         }}
       />
-
       {isLoadingQuestions ? (
         <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
           <CircularProgress />
@@ -268,7 +276,6 @@ const CalculatorForm = ({
           />
         )
       )}
-
       <Stack
         direction={{ xs: "column", sm: "row" }}
         spacing={2}
@@ -294,7 +301,7 @@ const CalculatorForm = ({
           Clear
         </Button>
       </Stack>
-    </Stack>
+    </Stack>)
   );
 };
 

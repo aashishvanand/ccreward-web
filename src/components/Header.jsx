@@ -168,6 +168,10 @@ function Header() {
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
+                slots={{
+                  root: 'div',
+                  backdrop: 'div'
+                }}
               >
                 {renderMenuItems()}
                 {isAuthenticated() && (
@@ -217,7 +221,12 @@ function Header() {
             <Avatar
               src={user?.photoURL || ""}
               alt={user?.displayName || "User"}
-              sx={{ ml: 2, width: 40, height: 40 }}
+              slots={{ root: 'div' }}
+              slotProps={{
+                root: {
+                  sx: { ml: 2, width: 40, height: 40 }
+                }
+              }}
             />
           )}
         </Box>

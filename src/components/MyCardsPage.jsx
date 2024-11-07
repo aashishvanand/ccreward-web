@@ -221,12 +221,20 @@ function MyCardsPage() {
         open={isAddCardDialogOpen}
         onClose={() => setIsAddCardDialogOpen(false)}
         onAddCard={handleAddCard}
+        slots={{
+          backdrop: 'div',
+          paper: 'div'
+        }}
       />
 
       {alert.open && (
         <Alert
           severity={alert.severity}
           onClose={() => setAlert({ ...alert, open: false })}
+          slots={{
+            root: 'div',
+            icon: 'span'
+          }}
           sx={{
             position: "fixed",
             bottom: 24,

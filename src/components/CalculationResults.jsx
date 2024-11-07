@@ -50,7 +50,7 @@ const CalculationResults = ({ result, isLoading }) => {
     result && (result.points > 0 || result.cashback > 0 || result.miles > 0);
 
   return (
-    <Paper
+    (<Paper
       elevation={3}
       sx={{
         p: 2,
@@ -83,21 +83,21 @@ const CalculationResults = ({ result, isLoading }) => {
               variant="h6"
               align="center"
               color="textPrimary"
-              fontWeight="bold"
               onClick={toggleExpand}
               sx={{
+                fontWeight: "bold",
                 fontSize: { xs: "1rem", sm: "1.25rem" },
                 cursor: "pointer",
                 maxWidth: "calc(100% - 40px)",
+
                 ...(expanded
                   ? {}
                   : {
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
-                    }),
-              }}
-            >
+                    })
+              }}>
               {hasRewards ? (
                 <>🎉 {result.rewardText} 🎉</>
               ) : (
@@ -114,7 +114,7 @@ const CalculationResults = ({ result, isLoading }) => {
           </Box>
         </>
       )}
-    </Paper>
+    </Paper>)
   );
 };
 
