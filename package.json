@@ -1,5 +1,5 @@
 {
-  "name": "credit-card-rewards-india-calculator",
+  "name": "ccreward.app",
   "version": "0.3.0",
   "private": true,
   "description": "A comprehensive tool to calculate and optimize credit card rewards across multiple banks in India",
@@ -7,11 +7,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aashishvanand/credit-card-rewards-india-calculator.git"
+    "url": "https://github.com/aashishvanand/ccreward-web.git"
   },
   "homepage": "https://ccreward.app",
   "bugs": {
-    "url": "https://github.com/aashishvanand/credit-card-rewards-india-calculator/issues"
+    "url": "https://github.com/aashishvanand/ccreward-web/issues"
   },
   "scripts": {
     "dev": "next dev --turbopack",
@@ -48,6 +48,10 @@
     "@emotion/styled": "^11.13.0",
     "react": "^19.0.0-rc-7c8e5e7a-20241101",
     "react-dom": "^19.0.0-rc-7c8e5e7a-20241101"
+  },
+  "engines": {
+    "node": ">=18.18.0",
+    "npm": ">=9.0.0"
   },
   "keywords": [
     "credit card reward calculator",
