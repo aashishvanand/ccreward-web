@@ -23,16 +23,7 @@ const MobileAppPromotion = ({
   const screenshots = isAndroid ? androidScreenshots : iosScreenshots;
 
   return (
-    <Box
-      sx={{
-        py: 4,
-        bgcolor: "background.paper",
-        borderRadius: "24px 24px 0 0",
-        mt: -3,
-        position: "relative",
-        zIndex: 1,
-      }}
-    >
+    <Box sx={{ bgcolor: "background.default", py: 8 }}>
       <Container maxWidth="sm">
         <Box
           sx={{
@@ -40,10 +31,11 @@ const MobileAppPromotion = ({
             gap: 2,
             overflowX: "auto",
             pb: 2,
-            mb: 4,
-            px: 2,
+            mb: 3,
+            px: { xs: 1, sm: 2 },
             "&::-webkit-scrollbar": { display: "none" },
             scrollSnapType: "x mandatory",
+            "-webkit-overflow-scrolling": "touch",
           }}
         >
           {screenshots.map((screenshot, index) => (
@@ -51,11 +43,11 @@ const MobileAppPromotion = ({
               key={index}
               sx={{
                 flexShrink: 0,
-                width: "280px",
-                height: "560px",
+                width: { xs: "240px", sm: "280px" },
+                height: { xs: "480px", sm: "560px" },
                 position: "relative",
                 scrollSnapAlign: "center",
-                borderRadius: "24px",
+                borderRadius: { xs: "16px", sm: "24px" },
                 overflow: "hidden",
                 boxShadow: theme.shadows[4],
               }}
@@ -71,7 +63,13 @@ const MobileAppPromotion = ({
           ))}
         </Box>
 
-        <Box sx={{ textAlign: "center", px: 2 }}>
+        <Box
+          sx={{
+            textAlign: "center",
+            px: { xs: 2, sm: 3 },
+            mb: { xs: 1, sm: 2 },
+          }}
+        >
           <Button
             variant="contained"
             size="large"
@@ -79,19 +77,26 @@ const MobileAppPromotion = ({
             target="_blank"
             rel="noopener noreferrer"
             sx={{
-              height: 56,
+              height: { xs: 48, sm: 56 },
               width: "100%",
               maxWidth: 280,
-              fontSize: "1.1rem",
-              borderRadius: "28px",
+              fontSize: { xs: "1rem", sm: "1.1rem" },
+              borderRadius: { xs: "24px", sm: "28px" },
               mb: 2,
+              fontWeight: "medium",
             }}
           >
             {isAndroid ? "Get it on Google Play" : "Download on App Store"}
           </Button>
 
-          <Typography variant="body2" color="text.secondary">
-            Get the full experience with our app for{" "}
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              fontSize: { xs: "0.875rem", sm: "1rem" },
+            }}
+          >
+            Get the full experience with our native app for{" "}
             {isAndroid ? "Android" : "iOS"}
           </Typography>
         </Box>
