@@ -19,14 +19,14 @@ import MobileAppPromotion from "./MobileAppPromotion";
 import { tweets } from "../../../shared/constants/testimonials";
 
 const MobileView = ({
-  deviceInfo,
+  isAndroid,
   visibleTweets,
   handlePrevPage,
   handleNextPage,
   isMobile,
   theme,
   alert,
-  setAlert
+  setAlert,
 }) => (
   <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
     <Header />
@@ -36,7 +36,7 @@ const MobileView = ({
         flexGrow: 1,
         bgcolor: "background.default",
         position: "relative",
-        zIndex: 0
+        zIndex: 0,
       }}
     >
       <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
@@ -46,7 +46,7 @@ const MobileView = ({
           sx={{
             fontSize: { xs: "2rem", sm: "2.5rem" },
             fontWeight: "bold",
-            mb: 3
+            mb: 3,
           }}
         >
           Get the CCReward App
@@ -57,37 +57,24 @@ const MobileView = ({
           sx={{
             fontSize: { xs: "1.125rem", sm: "1.25rem" },
             color: "text.secondary",
-            mb: 4
+            mb: 4,
           }}
         >
           Download our app for the best credit card rewards experience
         </Typography>
       </Container>
 
-      <MobileAppPromotion
-        isAndroid={deviceInfo.isAndroid}
-        androidScreenshots={[
-          "f8cfbf48-0e82-4095-89d8-3dbbd9406700",
-          "e89a3c45-b747-4fc5-ae82-9afbc7112800",
-          "9c347c88-aff4-4d98-2e05-3b5271de9f00",
-          "0f7a22f5-00aa-457d-212f-2490e22ea900"
-        ]}
-        iosScreenshots={[
-          "439c672a-a623-4006-dbc0-147d773a6300",
-          "5efcffce-4ba7-46ce-54ca-2803b2291c00",
-          "f48ef214-901e-437d-5c5c-b7b8820e5900"
-        ]}
-      />
+      <MobileAppPromotion isAndroid={isAndroid} />
 
-      <Box sx={{ bgcolor: 'background.paper' }}>
+      <Box sx={{ bgcolor: "background.paper" }}>
         <BankSection />
       </Box>
 
-      <Box sx={{ bgcolor: 'background.default' }}>
+      <Box sx={{ bgcolor: "background.default" }}>
         <FeaturesSection />
       </Box>
 
-      <Box sx={{ bgcolor: 'background.default' }}>
+      <Box sx={{ bgcolor: "background.default" }}>
         <TestimonialsSection
           visibleTweets={visibleTweets}
           handlePrevPage={handlePrevPage}
@@ -135,7 +122,7 @@ const DesktopView = ({
   handleNextPage,
   theme,
   alert,
-  setAlert
+  setAlert,
 }) => (
   <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
     <Header />
@@ -153,11 +140,11 @@ const DesktopView = ({
       signInAnonymously={signInAnonymously}
     />
 
-    <Box sx={{ bgcolor: 'background.default' }}>
+    <Box sx={{ bgcolor: "background.default" }}>
       <FeaturesSection />
     </Box>
 
-    <Box sx={{ bgcolor: 'background.paper' }}>
+    <Box sx={{ bgcolor: "background.paper" }}>
       <BankSection />
     </Box>
 
@@ -167,11 +154,11 @@ const DesktopView = ({
       signInWithGoogle={signInWithGoogle}
     />
 
-    <Box sx={{ bgcolor: 'background.default' }}>
+    <Box sx={{ bgcolor: "background.default" }}>
       <AppStoreSection isMobile={isMobile} theme={theme} />
     </Box>
 
-    <Box sx={{ bgcolor: 'background.paper'}}>
+    <Box sx={{ bgcolor: "background.paper" }}>
       <TestimonialsSection
         visibleTweets={visibleTweets}
         handlePrevPage={handlePrevPage}
@@ -230,7 +217,7 @@ const LandingPage = () => {
     isMobile: false,
     isAndroid: false,
     isIOS: false,
-    isTablet: false
+    isTablet: false,
   });
 
   const { cardImagesData } = useCardImagesData();
@@ -239,10 +226,11 @@ const LandingPage = () => {
   const totalPages = Math.ceil(tweets.length / tweetsPerPage);
 
   const visibleTweets = useMemo(
-    () => tweets.slice(
-      currentPage * tweetsPerPage,
-      (currentPage + 1) * tweetsPerPage
-    ),
+    () =>
+      tweets.slice(
+        currentPage * tweetsPerPage,
+        (currentPage + 1) * tweetsPerPage
+      ),
     [currentPage, tweetsPerPage]
   );
 
@@ -301,7 +289,7 @@ const LandingPage = () => {
       setAlert({
         open: true,
         message: "Failed to sign in. Please try again.",
-        severity: "error"
+        severity: "error",
       });
     } finally {
       setIsLoading(false);
@@ -324,15 +312,12 @@ const LandingPage = () => {
     isMobile,
     theme,
     alert,
-    setAlert
+    setAlert,
   };
 
-  // Render based on device type
-  return deviceInfo.isAndroid || deviceInfo.isIOS ? (
-    <MobileView
-      {...commonProps}
-      deviceInfo={deviceInfo}
-    />
+  // Render based on screen size
+  return isMobile ? (
+    <MobileView {...commonProps} isAndroid={deviceInfo.isAndroid} />
   ) : (
     <DesktopView
       {...commonProps}

@@ -28,7 +28,6 @@ const MobileAppPromotion = ({
         py: 4,
         bgcolor: "background.default",
         borderRadius: "24px 24px 0 0",
-        mt: -3,
         position: "relative",
         zIndex: 1,
       }}
