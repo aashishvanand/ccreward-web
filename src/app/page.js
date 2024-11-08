@@ -2,12 +2,12 @@
 import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Box from '@mui/material/Box';
-import { ThemeRegistry } from '../components/ThemeRegistry';
-import { AuthProvider } from './providers/AuthContext';
+import { ThemeRegistry } from '../core/providers/ThemeRegistry';
+import { AuthProvider } from '../core/providers/AuthContext';
 
-const LandingPage = dynamic(() => import('../components/LandingPage'), { ssr: false });
-const MyCardsPage = dynamic(() => import('../components/MyCardsPage'), { ssr: false });
-const Calculator = dynamic(() => import('../components/Calculator'), { ssr: false });
+const LandingPage = dynamic(() => import('../features/landing/components/LandingPage'), { ssr: false });
+const MyCardsPage = dynamic(() => import('../features/cards/components/MyCardsPage'), { ssr: false });
+const Calculator = dynamic(() => import('../features/calculator/components/Calculator'), { ssr: false });
 
 function Home() {
   const pathname = usePathname();

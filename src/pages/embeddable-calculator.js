@@ -1,9 +1,9 @@
 "use client";
 import dynamic from 'next/dynamic';
-import { ThemeRegistry } from '../components/ThemeRegistry';
-import { AuthProvider } from '../app/providers/AuthContext';
+import { ThemeRegistry } from '../core/providers/ThemeRegistry';
+import { AuthProvider } from '../core/providers/AuthContext';
 
-const EmbeddableCalculator = dynamic(() => import('../components/EmbeddableCalculator'), { ssr: false });
+const EmbeddableCalculator = dynamic(() => import('../features/embedded/components/EmbeddableCalculator'), { ssr: false });
 
 export default function EmbeddableCalculatorPage() {
   return (

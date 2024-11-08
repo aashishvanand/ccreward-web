@@ -1,9 +1,9 @@
 import dynamic from 'next/dynamic';
-import { ThemeRegistry } from '../components/ThemeRegistry';
-import { AuthProvider } from '../app/providers/AuthContext';
-import AuthRedirectWrapper from '../components/AuthRedirectWrapper';
+import { ThemeRegistry } from '../core/providers/ThemeRegistry';
+import { AuthProvider } from '../core/providers/AuthContext';
+import AuthRedirectWrapper from '../shared/components/auth/AuthRedirectWrapper';
 
-const BestCardCalculator = dynamic(() => import('../components/BestCardCalculator'), { ssr: false });
+const BestCardCalculator = dynamic(() => import('../features/best-card/components/BestCardCalculator'), { ssr: false });
 
 export default function BestCardPage() {
   return (

@@ -1,11 +1,12 @@
 import './globals.css'
 import '@pigment-css/react/styles.css'
+import PropTypes from 'prop-types';
 import { Inter } from 'next/font/google'
 import Script from "next/script";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
-import { ThemeRegistry } from '../components/ThemeRegistry';
-import { AuthProvider } from './providers/AuthContext';
-import { AnalyticsProvider } from '../components/AnalyticsProvider';
+import { ThemeRegistry } from '../core/providers/ThemeRegistry';
+import { AuthProvider } from '../core/providers/AuthContext';
+import { AnalyticsProvider } from '../core/providers/AnalyticsProvider';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -163,7 +164,7 @@ const jsonLd = {
   ]
 }
 
-export default function RootLayout({ children }) {
+function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
@@ -230,3 +231,9 @@ export default function RootLayout({ children }) {
     </html>
   )
 }
+
+RootLayout.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+export default RootLayout;

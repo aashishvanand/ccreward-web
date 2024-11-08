@@ -1,8 +1,8 @@
 import dynamic from 'next/dynamic';
-import { AuthProvider } from '../app/providers/AuthContext';
-import { ThemeRegistry } from '../components/ThemeRegistry';
+import { AuthProvider } from '../core/providers/AuthContext';
+import { ThemeRegistry } from '../core/providers/ThemeRegistry';
 
-const PrivacyPolicyWrapper = dynamic(() => import('../components/PrivacyPolicyPage'), { ssr: false });
+const PrivacyPolicyWrapper = dynamic(() => import('../features/legal/components/PrivacyPolicyPage'), { ssr: false });
 
 export default function PrivacyPage() {
   return (
