@@ -29,6 +29,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { getCardsForUser } from "../../../core/services/firebaseUtils";
 import { onCardUpdate } from "../../../core/utils/events";
+import { detectDevice } from "../../../core/utils/deviceUtils";
 import Image from "next/image";
 
 function Header() {
@@ -38,8 +39,19 @@ function Header() {
   const pathname = usePathname();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [deviceInfo, setDeviceInfo] = useState({
+    isMobile: false,
+    isAndroid: false,
+    isIOS: false,
+    isTablet: false
+  });
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [userCardCount, setUserCardCount] = useState(0);
+
+  // Move all hooks before any conditional returns
+  useEffect(() => {
+    setDeviceInfo(detectDevice());
+  }, []);
 
   useEffect(() => {
     const fetchUserCardCount = async () => {
@@ -54,11 +66,7 @@ function Header() {
     };
 
     fetchUserCardCount();
-
-    // Add event listener for card updates
     const unsubscribe = onCardUpdate(fetchUserCardCount);
-
-    // Cleanup function
     return () => unsubscribe();
   }, [user]);
 
@@ -116,6 +124,43 @@ function Header() {
         )
     );
   };
+
+  // Now render based on device type
+  if (deviceInfo.isAndroid || deviceInfo.isIOS) {
+    return (
+      <AppBar position="static" color="default" elevation={0}>
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{ display: "flex", alignItems: "center" }}
+          >
+            <Box sx={{ position: "relative", width: 40, height: 40, mr: 1 }}>
+              <Image
+                src={mode === "dark"
+                  ? "f4bf16b1-527e-4d80-47b4-99989a1ded00"
+                  : "b6c3c6f1-a744-4e47-8c50-4c33c84c3900"
+                }
+                alt="CCReward Logo"
+                width={40}
+                height={40}
+                priority
+              />
+            </Box>
+            CCReward
+          </Typography>
+
+          <IconButton
+            onClick={toggleTheme}
+            color="inherit"
+            aria-label="toggle theme"
+          >
+            {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+    );
+  }
 
   return (
     <AppBar position="static" color="default" elevation={0}>
