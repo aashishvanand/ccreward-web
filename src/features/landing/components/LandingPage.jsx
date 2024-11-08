@@ -35,16 +35,18 @@ const MobileView = ({
       sx={{
         flexGrow: 1,
         bgcolor: "background.default",
+        position: "relative",
+        zIndex: 0
       }}
     >
-      <Container maxWidth="lg" sx={{ pt: { xs: 4, sm: 6 }, pb: 3 }}>
+      <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
         <Typography
           variant="h2"
           align="center"
           sx={{
             fontSize: { xs: "2rem", sm: "2.5rem" },
             fontWeight: "bold",
-            mb: 2
+            mb: 3
           }}
         >
           Get the CCReward App
@@ -55,7 +57,7 @@ const MobileView = ({
           sx={{
             fontSize: { xs: "1.125rem", sm: "1.25rem" },
             color: "text.secondary",
-            mb: 3
+            mb: 4
           }}
         >
           Download our app for the best credit card rewards experience
@@ -77,14 +79,22 @@ const MobileView = ({
         ]}
       />
 
-      <FeaturesSection />
-      <BankSection />
-      <TestimonialsSection
-        visibleTweets={visibleTweets}
-        handlePrevPage={handlePrevPage}
-        handleNextPage={handleNextPage}
-        isMobile={isMobile}
-      />
+      <Box sx={{ bgcolor: 'background.paper' }}>
+        <BankSection />
+      </Box>
+
+      <Box sx={{ bgcolor: 'background.default' }}>
+        <FeaturesSection />
+      </Box>
+
+      <Box sx={{ bgcolor: 'background.default' }}>
+        <TestimonialsSection
+          visibleTweets={visibleTweets}
+          handlePrevPage={handlePrevPage}
+          handleNextPage={handleNextPage}
+          isMobile={isMobile}
+        />
+      </Box>
     </Box>
     <Footer />
 
