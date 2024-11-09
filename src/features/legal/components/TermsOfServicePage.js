@@ -21,7 +21,7 @@ const TermsOfServicePage = () => {
           <p>3.1. CCReward utilizes multiple service providers to deliver its functionality:</p>
           <ul>
             <li>User authentication and data storage are handled through Firebase, a Google Cloud service</li>
-            <li>All reward calculations and computational operations are processed on Cloudflare's infrastructure</li>
+            <li>All reward calculations and computational operations are processed on Cloudflare&apos;s infrastructure</li>
           </ul>
           <p>3.2. By using the Service, you acknowledge and agree that your data may be processed through these infrastructure providers in accordance with their respective terms of service and our Privacy Policy.</p>
 

@@ -34,9 +34,9 @@ const PrivacyPolicyPage = () => {
 
           <h2>3. Data Storage and Processing</h2>
           <p>3.1. <strong>User Data Storage:</strong> Your account information and card details are stored in Firebase, a Google Cloud service. We implement appropriate data collection, storage, and processing practices and security measures to protect against unauthorized access, alteration, disclosure, or destruction of your personal information.</p>
-          <p>3.2. <strong>Computation and Processing:</strong> All reward calculations and computational operations are performed on Cloudflare's infrastructure. These calculations are performed in real-time and are not stored permanently.</p>
-          <p>3.3. We do not store users' data other than the single copy of your account and card information in the Firebase database.</p>
-          <p>3.4. <strong>Data Processing Locations:</strong> While user data is stored in Firebase, calculations are processed through Cloudflare's global network, ensuring fast and reliable service delivery.</p>
+          <p>3.2. <strong>Computation and Processing:</strong> All reward calculations and computational operations are performed on Cloudflare&apos;s infrastructure. These calculations are performed in real-time and are not stored permanently.</p>
+          <p>3.3. We do not store users&apos; data other than the single copy of your account and card information in the Firebase database.</p>
+          <p>3.4. <strong>Data Processing Locations:</strong> While user data is stored in Firebase, calculations are processed through Cloudflare&apos;s global network, ensuring fast and reliable service delivery.</p>
 
           <h2>4. Data Retention and Deletion</h2>
           <p>4.1. We retain your personal information only for as long as necessary to provide you with our Service and as described in this Privacy Policy.</p>
