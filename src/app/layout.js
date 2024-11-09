@@ -1,5 +1,4 @@
 import './globals.css'
-import '@pigment-css/react/styles.css'
 import PropTypes from 'prop-types';
 import { Inter } from 'next/font/google'
 import Script from "next/script";
