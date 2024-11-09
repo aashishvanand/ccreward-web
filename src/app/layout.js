@@ -3,6 +3,7 @@ import '@pigment-css/react/styles.css'
 import PropTypes from 'prop-types';
 import { Inter } from 'next/font/google'
 import Script from "next/script";
+import Providers from './providers'
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import { ThemeRegistry } from '../core/providers/ThemeRegistry';
 import { AuthProvider } from '../core/providers/AuthContext';
@@ -204,15 +205,9 @@ function RootLayout({ children }) {
         />
       </head>
       <body className={inter.className} suppressHydrationWarning>
-        <AppRouterCacheProvider>
-          <ThemeRegistry>
-            <AuthProvider>
-              <AnalyticsProvider>
-                {children}
-              </AnalyticsProvider>
-            </AuthProvider>
-          </ThemeRegistry>
-        </AppRouterCacheProvider>
+        <Providers>
+          {children}
+        </Providers>
 
         {/* Load analytics script with proper strategy */}
         <Script
