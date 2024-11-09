@@ -7,25 +7,20 @@ const nextConfig = {
     loader: 'custom',
     loaderFile: './imageLoader.js',
   },
-  transpilePackages: [
-    '@mui/material',
-    '@mui/system',
-    '@mui/icons-material',
-    '@emotion/react',
-    '@emotion/styled'
-  ],
-  experimental: {
-    optimizePackageImports: ['@mui/icons-material', '@mui/material']
-  },
-  compiler: {
-    emotion: true,
-    removeConsole: {
-      exclude: ["error"]
+  compiler:{
+    removeConsole:{
+      exclude:["error"]
     }
+  },
+  serverExternalPackages: ['sharp'],
+  bundlePagesRouterDependencies: true,
+  typescript: {
+    // You can enable this if you want to use next.config.ts
+    // ignoreBuildErrors: false,
   }
 };
 
-const pigmentConfig = {
+module.exports = withPigment(nextConfig, {
   theme: {
     spacing: (value) => `${value * 8}px`,
     breakpoints: {
@@ -44,6 +39,4 @@ const pigmentConfig = {
       borderRadius: '8px',
     }
   }
-};
-
-module.exports = withPigment(nextConfig, pigmentConfig);
+});
