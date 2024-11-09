@@ -81,7 +81,7 @@ const TermsOfServicePage = () => {
 
           <p>11.2. <strong>App Store Compliance:</strong></p>
           <ul>
-            <li>iOS users are also bound by Apple's App Store Terms of Service</li>
+            <li>iOS users are also bound by Apple&apos;s App Store Terms of Service</li>
             <li>Android users are also bound by Google Play Store Terms of Service</li>
             <li>Any in-app purchases or subscriptions will be processed by the respective app stores</li>
           </ul>

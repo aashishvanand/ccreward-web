@@ -53,7 +53,7 @@ const PrivacyPolicyPage = () => {
           <p>6.3. Users should verify reward calculations with their respective banks.</p>
 
           <h2>7. Children&apos;s Privacy</h2>
-          <p>Our Service does not address anyone under the age of 13. We do not knowingly collect personally identifiable information from children under 13.</p>
+          <p>7. Our Service does not address anyone under the age of 13. We do not knowingly collect personally identifiable information from children under 13.</p>
 
           <h2>8. Changes to This Privacy Policy</h2>
           <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the &quot;effective date&quot; at the top of this Privacy Policy.</p>
@@ -87,7 +87,7 @@ const PrivacyPolicyPage = () => {
           <ul>
             <li>App-specific data is stored locally on your device for offline access</li>
             <li>User account data is synchronized with our Firebase database</li>
-            <li>Cache data can be cleared through your device's settings</li>
+            <li>Cache data can be cleared through your device&apos;s settings</li>
           </ul>
 
           <p>10.5. <strong>Third-Party Services in Mobile Apps:</strong></p>
