@@ -1,0 +1,17 @@
+# This is a security.txt file for CCReward.app
+# More info: https://securitytxt.org/
+
+# Contact email for security issues
+Contact: mailto:security@ccreward.app
+
+# Alternate contact method
+Contact: mailto:support@ccreward.app
+
+# Our preferred languages for security reports
+Preferred-Languages: en
+
+# The date this security.txt was last updated
+Last-Updated: 10-Nov-2024
+
+# Expiration date for this security.txt
+Expires: 10-Nov-2025

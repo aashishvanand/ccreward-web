@@ -11,6 +11,7 @@ Allow: /
 Allow: /privacy
 Allow: /terms
 Allow: /sitemap.xml
+Allow: /security.txt
 
 # Block utility files
 Disallow: /_next/static/

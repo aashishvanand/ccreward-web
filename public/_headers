@@ -31,6 +31,13 @@
   Access-Control-Allow-Origin: *
   X-Robots-Tag: all
 
+# Allow access to security.txt
+/security.txt
+Content-Type: text/plain
+Cache-Control: no-cache
+Access-Control-Allow-Origin: *
+X-Robots-Tag: all
+
 
 # CORS headers for API endpoint
 /bank
