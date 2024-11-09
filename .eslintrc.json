@@ -4,7 +4,6 @@
     "eslint:recommended",
     "plugin:react/recommended"
   ],
-  "plugins": ["@typescript-eslint", "react", "react-hooks"],
   "parserOptions": {
     "ecmaVersion": 2021,
     "sourceType": "module",
@@ -24,49 +23,7 @@
   "rules": {
     "react/react-in-jsx-scope": "off",
     "react/jsx-uses-react": "off",
-    "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": ["warn", {
-      "argsIgnorePattern": "^_",
-      "varsIgnorePattern": "^_",
-      "ignoreRestSiblings": true,
-      "destructuredArrayIgnorePattern": "^_"
-    }],
-    "react/prop-types": ["warn", {
-      "ignore": ["children", "className", "style", "key", "theme", "ref"]
-    }],
-    "react/display-name": "off",
-    "react/function-component-definition": "off",
-    "react-hooks/exhaustive-deps": "warn",
-    "no-empty-function": ["warn", {
-      "allow": ["arrowFunctions"]
-    }],
-    "no-shadow": "warn",
-    "no-empty": "warn",
-    "react/forbid-prop-types": "off",
-    "react/jsx-no-bind": "off",
-    "no-console": ["warn", {
-      "allow": ["warn", "error", "info"]
-    }],
-    "react/jsx-props-no-spreading": "off",
-    "react/jsx-filename-extension": ["warn", {
-      "extensions": [".js", ".jsx", ".ts", ".tsx"]
-    }],
-    "react/no-unused-prop-types": "off",
-    "react/require-default-props": "off",
-    "react/jsx-no-constructed-context-values": "warn"
-  },
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
-  },
-  "overrides": [
-    {
-      "files": ["*.ts", "*.tsx", "*.d.ts"],
-      "parser": "@typescript-eslint/parser",
-      "extends": [
-        "plugin:@typescript-eslint/recommended"
-      ]
-    }
-  ]
+    "no-unused-vars": "warn",
+    "react/prop-types": "warn"
+  }
 }
