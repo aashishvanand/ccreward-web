@@ -6,7 +6,6 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { getCardsForUser } from "../../../core/services/firebaseUtils";
 import useCardImagesData from "../../../core/hooks/useCardImagesData";
-import { detectDevice } from "../../../core/utils/deviceUtils";
 import Header from "../../../shared/components/layout/Header";
 import Footer from "../../../shared/components/layout/Footer";
 import HeroSection from "./HeroSection";
@@ -17,94 +16,102 @@ import AppStoreSection from "./sections/AppStoreSection";
 import TestimonialsSection from "./sections/TestimonialsSection";
 import MobileAppPromotion from "./MobileAppPromotion";
 import { tweets } from "../../../shared/constants/testimonials";
+import { detectDevice } from "../../../core/utils/deviceUtils";
+
+// In LandingPage.jsx
 
 const MobileView = ({
-  isAndroid,
+  deviceInfo,  // Make sure deviceInfo is passed
   visibleTweets,
   handlePrevPage,
   handleNextPage,
   isMobile,
   theme,
   alert,
-  setAlert,
-}) => (
-  <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-    <Header />
-    <Box
-      component="main"
-      sx={{
-        flexGrow: 1,
-        bgcolor: "background.default",
-        position: "relative",
-        zIndex: 0,
-      }}
-    >
-      <Container maxWidth="lg" sx={{ pt: 4, pb: 8 }}>
-        <Typography
-          variant="h2"
-          align="center"
-          sx={{
-            fontSize: { xs: "2rem", sm: "2.5rem" },
-            fontWeight: "bold",
-            mb: 3,
-          }}
-        >
-          Get the CCReward App
-        </Typography>
-        <Typography
-          variant="h5"
-          align="center"
-          sx={{
-            fontSize: { xs: "1.125rem", sm: "1.25rem" },
-            color: "text.secondary",
-            mb: 4,
-          }}
-        >
-          Download our app for the best credit card rewards experience
-        </Typography>
-      </Container>
+  setAlert
+}) => {
+  if (!deviceInfo) {
+    return null;
+  }
 
-      <MobileAppPromotion isAndroid={isAndroid} />
-
-      <Box sx={{ bgcolor: "background.paper" }}>
-        <BankSection />
-      </Box>
-
-      <Box sx={{ bgcolor: "background.default" }}>
-        <FeaturesSection />
-      </Box>
-
-      <Box sx={{ bgcolor: "background.default" }}>
-        <TestimonialsSection
-          visibleTweets={visibleTweets}
-          handlePrevPage={handlePrevPage}
-          handleNextPage={handleNextPage}
-          isMobile={isMobile}
-        />
-      </Box>
-    </Box>
-    <Footer />
-
-    {alert.open && (
-      <Alert
-        severity={alert.severity}
-        onClose={() => setAlert({ ...alert, open: false })}
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <Header />
+      <Box
+        component="main"
         sx={{
-          position: "fixed",
-          bottom: 24,
-          left: "50%",
-          transform: "translateX(-50%)",
-          zIndex: theme.zIndex.snackbar,
-          maxWidth: "90%",
-          width: "auto",
-          boxShadow: theme.shadows[8],
+          flexGrow: 1,
+          bgcolor: "background.default",
         }}
       >
-        {alert.message}
-      </Alert>
-    )}
-  </Box>
-);
+        <Container maxWidth="lg" sx={{ pt: { xs: 4, sm: 6 }, pb: 3 }}>
+          <Typography
+            variant="h2"
+            align="center"
+            sx={{
+              fontSize: { xs: "2rem", sm: "2.5rem" },
+              fontWeight: "bold",
+              mb: 2
+            }}
+          >
+            Get the CCReward App
+          </Typography>
+          <Typography
+            variant="h5"
+            align="center"
+            sx={{
+              fontSize: { xs: "1.125rem", sm: "1.25rem" },
+              color: "text.secondary"
+            }}
+          >
+            Download our app for the best credit card rewards experience
+          </Typography>
+        </Container>
+
+        <Box component="section">
+          <MobileAppPromotion isAndroid={Boolean(deviceInfo.isAndroid)} />
+        </Box>
+
+        <Box component="section">
+          <FeaturesSection />
+        </Box>
+
+        <Box component="section">
+          <BankSection />
+        </Box>
+
+        <Box component="section">
+          <TestimonialsSection
+            visibleTweets={visibleTweets}
+            handlePrevPage={handlePrevPage}
+            handleNextPage={handleNextPage}
+            isMobile={isMobile}
+          />
+        </Box>
+      </Box>
+      <Footer />
+
+      {alert.open && (
+        <Alert
+          severity={alert.severity}
+          onClose={() => setAlert({ ...alert, open: false })}
+          sx={{
+            position: "fixed",
+            bottom: 24,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: theme.zIndex.snackbar,
+            maxWidth: "90%",
+            width: "auto",
+            boxShadow: theme.shadows[8],
+          }}
+        >
+          {alert.message}
+        </Alert>
+      )}
+    </Box>
+  );
+};
 
 const DesktopView = ({
   cardImages,
@@ -234,10 +241,22 @@ const LandingPage = () => {
     [currentPage, tweetsPerPage]
   );
 
-  // All useEffects
   useEffect(() => {
-    setDeviceInfo(detectDevice());
+    // Initial device detection
+    const initialDeviceInfo = detectDevice();
+    setDeviceInfo(initialDeviceInfo);
+
+    // Optional: Add resize listener for tablet/desktop switchover
+    const handleResize = () => {
+      const updatedDeviceInfo = detectDevice();
+      setDeviceInfo(updatedDeviceInfo);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  const isMobileDevice = Boolean(deviceInfo?.isMobile || deviceInfo?.isAndroid || deviceInfo?.isIOS);
 
   useEffect(() => {
     if (cardImagesData?.length > 0) {
@@ -313,11 +332,12 @@ const LandingPage = () => {
     theme,
     alert,
     setAlert,
+    deviceInfo // Make sure deviceInfo is included
   };
 
   // Render based on screen size
-  return isMobile ? (
-    <MobileView {...commonProps} isAndroid={deviceInfo.isAndroid} />
+  return isMobileDevice ? (
+    <MobileView {...commonProps} />
   ) : (
     <DesktopView
       {...commonProps}
