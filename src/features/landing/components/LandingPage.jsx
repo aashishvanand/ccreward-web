@@ -21,14 +21,14 @@ import { detectDevice } from "../../../core/utils/deviceUtils";
 // In LandingPage.jsx
 
 const MobileView = ({
-  deviceInfo,  // Make sure deviceInfo is passed
+  deviceInfo, // Make sure deviceInfo is passed
   visibleTweets,
   handlePrevPage,
   handleNextPage,
   isMobile,
   theme,
   alert,
-  setAlert
+  setAlert,
 }) => {
   if (!deviceInfo) {
     return null;
@@ -51,7 +51,7 @@ const MobileView = ({
             sx={{
               fontSize: { xs: "2rem", sm: "2.5rem" },
               fontWeight: "bold",
-              mb: 2
+              mb: 2,
             }}
           >
             Get the CCReward App
@@ -61,7 +61,7 @@ const MobileView = ({
             align="center"
             sx={{
               fontSize: { xs: "1.125rem", sm: "1.25rem" },
-              color: "text.secondary"
+              color: "text.secondary",
             }}
           >
             Download our app for the best credit card rewards experience
@@ -252,11 +252,13 @@ const LandingPage = () => {
       setDeviceInfo(updatedDeviceInfo);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const isMobileDevice = Boolean(deviceInfo?.isMobile || deviceInfo?.isAndroid || deviceInfo?.isIOS);
+  const isMobileDevice = Boolean(
+    deviceInfo?.isMobile || deviceInfo?.isAndroid || deviceInfo?.isIOS
+  );
 
   useEffect(() => {
     if (cardImagesData?.length > 0) {
@@ -332,7 +334,7 @@ const LandingPage = () => {
     theme,
     alert,
     setAlert,
-    deviceInfo // Make sure deviceInfo is included
+    deviceInfo, // Make sure deviceInfo is included
   };
 
   // Render based on screen size

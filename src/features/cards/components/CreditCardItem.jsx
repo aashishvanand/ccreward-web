@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import {
   Card,
   CardMedia,
@@ -9,7 +8,6 @@ import {
 } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 import Image from "next/image";
-import useCardImagesData from "../.././../core/hooks/useCardImagesData";
 
 const bankColors = {
   HDFC: "#004C8F",
@@ -31,105 +29,82 @@ const bankColors = {
   AU: "#ec691f",
 };
 
-function CreditCardItem(props) {
-  const { card, onDelete } = props;
-  const { cardImagesData } = useCardImagesData();
-  const [cardDetails, setCardDetails] = useState(null);
-  const [hasFailedImage, setHasFailedImage] = useState(false);
+function CreditCardItem({ card, onDelete }) {
+  if (!card) return null;
 
-  useEffect(() => {
-    if (cardImagesData && cardImagesData.length > 0 && card) {
-      const details = cardImagesData.find(
-        (item) =>
-          item.bank.toLowerCase() === card.bank.toLowerCase() &&
-          item.cardName.toLowerCase() === card.cardName.toLowerCase()
-      );
-      setCardDetails(details);
-    }
-  }, [card, cardImagesData]);
-
-  if (!cardDetails) {
-    return null;
-  }
-
-  const bankColor = bankColors[cardDetails.bank] || "#000000";
-  const isHorizontal = cardDetails.orientation === "horizontal";
-
-  const cardStyles = {
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    position: "relative",
-  };
-
-  const mediaStyles = {
-    position: "relative",
-    background: `linear-gradient(45deg, ${bankColor}, ${bankColor})`,
-    paddingTop: isHorizontal ? "63%" : "158%",
-  };
-
-  const imageContainerStyles = {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  };
-
-  const contentStyles = {
-    flexGrow: 1,
-    p: 1,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-  };
-
-  const deleteButtonStyles = {
-    position: "absolute",
-    top: 4,
-    right: 4,
-    opacity: 0,
-    transition: "opacity 0.3s",
-    backgroundColor: "rgba(0,0,0,0.5)",
-    padding: "4px",
-    "&:hover": {
-      backgroundColor: "rgba(0,0,0,0.7)",
-      opacity: 1,
-    },
-  };
+  const bankColor = bankColors[card.bank] || "#000000";
+  const isHorizontal = card.orientation === "horizontal";
 
   return (
-    <Card component="div" sx={cardStyles}>
-      <CardMedia component="div" sx={mediaStyles}>
-        {!hasFailedImage && (
-          <Box component="div" sx={imageContainerStyles}>
-            <Image
-              src={cardDetails.id}
-              alt={`${cardDetails.bank} ${cardDetails.cardName}`}
-              layout="fill"
-              objectFit="contain"
-              sizes={
-                isHorizontal
-                  ? "(max-width: 600px) 50vw, (max-width: 960px) 33vw, 25vw"
-                  : "(max-width: 600px) 33vw, (max-width: 960px) 25vw, 16vw"
-              }
-              onError={() => setHasFailedImage(true)}
-            />
-          </Box>
-        )}
+    <Card
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
+      }}
+    >
+      <CardMedia
+        sx={{
+          position: "relative",
+          background: `linear-gradient(45deg, ${bankColor}, ${bankColor})`,
+          paddingTop: isHorizontal ? "63%" : "158%",
+        }}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }}
+        >
+          <Image
+            src={card.imageId}
+            alt={`${card.bank} ${card.cardName}`}
+            layout="fill"
+            objectFit="contain"
+            sizes={
+              isHorizontal
+                ? "(max-width: 600px) 50vw, (max-width: 960px) 33vw, 25vw"
+                : "(max-width: 600px) 33vw, (max-width: 960px) 25vw, 16vw"
+            }
+          />
+        </Box>
       </CardMedia>
-      <CardContent component="div" sx={contentStyles}>
-        <Typography component="h2" variant="subtitle2" noWrap>
-          {cardDetails.bank}
+      <CardContent
+        sx={{
+          flexGrow: 1,
+          p: 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
+        <Typography variant="subtitle2" noWrap>
+          {card.bank}
         </Typography>
-        <Typography component="p" variant="caption" noWrap>
-          {cardDetails.cardName}
+        <Typography variant="caption" noWrap>
+          {card.cardName}
         </Typography>
       </CardContent>
       <IconButton
         aria-label="delete card"
-        onClick={() => onDelete(cardDetails.id)}
-        sx={deleteButtonStyles}
+        onClick={() => onDelete(card.id)}
+        sx={{
+          position: "absolute",
+          top: 4,
+          right: 4,
+          opacity: 0,
+          transition: "opacity 0.3s",
+          backgroundColor: "rgba(0,0,0,0.5)",
+          padding: "4px",
+          "&:hover": {
+            backgroundColor: "rgba(0,0,0,0.7)",
+            opacity: 1,
+          },
+        }}
       >
         <DeleteIcon sx={{ color: "white", fontSize: "1rem" }} />
       </IconButton>

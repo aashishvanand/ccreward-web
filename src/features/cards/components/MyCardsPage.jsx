@@ -3,21 +3,27 @@ import {
   Box,
   Container,
   Typography,
-  Button,
   Alert,
   CircularProgress,
   Paper,
   Stack,
   useTheme,
+  Fab,
+  Zoom,
+  useScrollTrigger,
 } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
-import { useAuth } from '../../../core/providers/AuthContext';
-import { getCardsForUser, addCardForUser, deleteCardForUser } from '../../../core/services/firebaseUtils';
-import { notifyCardUpdate } from '../../../core/utils/events';
-import Header from '../../../shared/components/layout/Header';
-import Footer from '../../../shared/components/layout/Footer';
-import CardList from './CardList';
-import AddCardDialog from './AddCardDialog';
+import { useAuth } from "../../../core/providers/AuthContext";
+import {
+  getCardsForUser,
+  addCardForUser,
+  deleteCardForUser,
+} from "../../../core/services/firebaseUtils";
+import { notifyCardUpdate } from "../../../core/utils/events";
+import Header from "../../../shared/components/layout/Header";
+import Footer from "../../../shared/components/layout/Footer";
+import CardList from "./CardList";
+import AddCardDialog from "./AddCardDialog";
 
 function MyCardsPage() {
   const theme = useTheme();
@@ -31,6 +37,12 @@ function MyCardsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const { user, isAuthenticated, loading, isNewUser, markUserAsNotNew } =
     useAuth();
+
+  // Add scroll trigger for FAB animation
+  const trigger = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 100,
+  });
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -133,14 +145,9 @@ function MyCardsPage() {
           <Typography variant="h6" sx={{ mb: 2 }}>
             Welcome! Let&apos;s start by adding your first credit card.
           </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => setIsAddCardDialogOpen(true)}
-            sx={{ mt: 2 }}
-          >
-            Add Your First Card
-          </Button>
+          <Typography color="text.secondary">
+            Click the + button below to add your first card
+          </Typography>
         </Paper>
       );
     }
@@ -177,61 +184,58 @@ function MyCardsPage() {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Header />
-      <Container sx={{ py: 4, flexGrow: 1 }} maxWidth="lg">
+      <Container
+        sx={{
+          py: 4,
+          flexGrow: 1,
+          // Add bottom padding to prevent FAB from covering content
+          pb: { xs: 10, sm: 12 },
+        }}
+        maxWidth="lg"
+      >
         <Stack spacing={4}>
-          <Box
+          <Typography
+            variant="h4"
+            component="h1"
             sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              fontSize: { xs: "1.75rem", sm: "2.125rem" },
+              fontWeight: "bold",
             }}
           >
-            <Typography
-              variant="h4"
-              component="h1"
-              sx={{
-                fontSize: { xs: "1.75rem", sm: "2.125rem" },
-                fontWeight: "bold",
-              }}
-            >
-              My Cards
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<AddIcon />}
-              onClick={() => setIsAddCardDialogOpen(true)}
-              sx={{
-                height: 48,
-                px: 3,
-              }}
-            >
-              Add New Card
-            </Button>
-          </Box>
+            My Cards
+          </Typography>
 
           {renderContent()}
         </Stack>
       </Container>
 
+      {/* Floating Action Button */}
+      <Zoom in={!trigger}>
+        <Fab
+          color="primary"
+          aria-label="add card"
+          onClick={() => setIsAddCardDialogOpen(true)}
+          sx={{
+            position: "fixed",
+            bottom: { xs: 80, sm: 100 }, // Increased bottom spacing
+            right: { xs: 16, sm: 24 },
+            zIndex: (theme) => theme.zIndex.speedDial,
+          }}
+        >
+          <AddIcon />
+        </Fab>
+      </Zoom>
+
       <AddCardDialog
         open={isAddCardDialogOpen}
         onClose={() => setIsAddCardDialogOpen(false)}
         onAddCard={handleAddCard}
-        slots={{
-          backdrop: "div",
-          paper: "div",
-        }}
       />
 
       {alert.open && (
         <Alert
           severity={alert.severity}
           onClose={() => setAlert({ ...alert, open: false })}
-          slots={{
-            root: "div",
-            icon: "span",
-          }}
           sx={{
             position: "fixed",
             bottom: 24,

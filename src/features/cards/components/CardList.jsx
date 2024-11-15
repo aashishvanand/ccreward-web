@@ -10,50 +10,51 @@ import {
 import CreditCardItem from "./CreditCardItem";
 import useCardImagesData from "../../../core/hooks/useCardImagesData";
 
-const CardList = ({ cards, onDeleteCard }) => {
+const FALLBACK_IMAGE = "d0d46719-2688-4084-4573-d0a65e6de900";
+
+const CardList = ({ cards = [], onDeleteCard }) => {
   const theme = useTheme();
   const { cardImagesData, isLoading, error } = useCardImagesData();
-  const [horizontalCards, setHorizontalCards] = useState([]);
-  const [verticalCards, setVerticalCards] = useState([]);
+  const [sortedCards, setSortedCards] = useState({
+    horizontal: [],
+    vertical: [],
+  });
 
   useEffect(() => {
-    if (cardImagesData.length > 0) {
+    if (cards && Array.isArray(cards)) {
       const horizontal = [];
       const vertical = [];
 
       cards.forEach((card) => {
-        if (card && card.bank && card.cardName) {
-          const cardDetails = cardImagesData.find(
-            (item) =>
-              item.bank.toLowerCase() === card.bank.toLowerCase() &&
-              item.cardName.toLowerCase() === card.cardName.toLowerCase()
-          );
+        const cardDetails = cardImagesData?.find(
+          (item) =>
+            item.bank.toLowerCase() === card.bank.toLowerCase() &&
+            item.cardName.toLowerCase() === card.cardName.toLowerCase()
+        );
 
-          if (cardDetails) {
-            if (cardDetails.orientation === "horizontal") {
-              horizontal.push(card);
-            } else {
-              vertical.push(card);
-            }
-          }
+        const processedCard = {
+          ...card,
+          imageId: cardDetails?.id || FALLBACK_IMAGE,
+          orientation: cardDetails?.orientation || "horizontal",
+        };
+
+        if (processedCard.orientation === "vertical") {
+          vertical.push(processedCard);
+        } else {
+          horizontal.push(processedCard);
         }
       });
 
-      setHorizontalCards(horizontal);
-      setVerticalCards(vertical);
+      setSortedCards({
+        horizontal,
+        vertical,
+      });
     }
   }, [cards, cardImagesData]);
 
   if (isLoading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          py: 4,
-        }}
-      >
+      <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
         <CircularProgress />
       </Box>
     );
@@ -67,7 +68,7 @@ const CardList = ({ cards, onDeleteCard }) => {
     );
   }
 
-  if (cards.length === 0) {
+  if (!Array.isArray(cards) || cards.length === 0) {
     return (
       <Box
         sx={{
@@ -82,10 +83,7 @@ const CardList = ({ cards, onDeleteCard }) => {
       >
         <Typography
           variant="h6"
-          sx={{
-            color: "text.secondary",
-            fontWeight: "medium",
-          }}
+          sx={{ color: "text.secondary", fontWeight: "medium" }}
         >
           You haven&apos;t added any cards yet. Click &quot;Add New Card&quot;
           to get started!
@@ -96,9 +94,10 @@ const CardList = ({ cards, onDeleteCard }) => {
 
   return (
     <Box sx={{ mt: 2 }}>
-      {horizontalCards.length > 0 && (
+      {/* Horizontal Cards */}
+      {sortedCards.horizontal.length > 0 && (
         <Grid container spacing={2}>
-          {horizontalCards.map((card) => (
+          {sortedCards.horizontal.map((card) => (
             <Grid
               item
               xs={12}
@@ -115,9 +114,16 @@ const CardList = ({ cards, onDeleteCard }) => {
         </Grid>
       )}
 
-      {verticalCards.length > 0 && (
-        <Grid container spacing={2} sx={{ mt: horizontalCards.length ? 4 : 0 }}>
-          {verticalCards.map((card) => (
+      {/* Vertical Cards */}
+      {sortedCards.vertical.length > 0 && (
+        <Grid
+          container
+          spacing={2}
+          sx={{
+            mt: sortedCards.horizontal.length > 0 ? 4 : 0,
+          }}
+        >
+          {sortedCards.vertical.map((card) => (
             <Grid
               item
               xs={6}
