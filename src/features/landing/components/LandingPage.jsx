@@ -15,6 +15,7 @@ import CallToActionSection from "./sections/CallToActionSection";
 import AppStoreSection from "./sections/AppStoreSection";
 import TestimonialsSection from "./sections/TestimonialsSection";
 import MobileAppPromotion from "./MobileAppPromotion";
+import TopCardsSection from "./sections/TopCardsSection";
 import { tweets } from "../../../shared/constants/testimonials";
 import { detectDevice } from "../../../core/utils/deviceUtils";
 
@@ -74,6 +75,10 @@ const MobileView = ({
 
         <Box component="section">
           <FeaturesSection />
+        </Box>
+
+        <Box component="section">
+          <TopCardsSection />
         </Box>
 
         <Box component="section">
@@ -150,6 +155,10 @@ const DesktopView = ({
     <Box sx={{ bgcolor: "background.default" }}>
       <FeaturesSection />
     </Box>
+
+    <Box component="section">
+          <TopCardsSection />
+        </Box>
 
     <Box sx={{ bgcolor: "background.paper" }}>
       <BankSection />

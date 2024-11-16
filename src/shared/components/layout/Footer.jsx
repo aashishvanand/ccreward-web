@@ -31,6 +31,9 @@ function Footer() {
           <Link color="inherit" href="/privacy">
             Privacy Policy
           </Link>
+          <Link color="inherit" href="/faq">
+            FAQs
+          </Link>
         </Typography>
         <Typography
           variant="body2"

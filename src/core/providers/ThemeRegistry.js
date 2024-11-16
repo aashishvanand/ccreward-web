@@ -3,7 +3,8 @@ import { useState, useMemo, createContext, useContext, useEffect, useCallback } 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { getInitColorSchemeScript } from '@mui/material/styles';
+import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
+// import { getInitColorSchemeScript } from '@mui/material/styles';
 
 const ThemeContext = createContext({
   mode: 'light',
@@ -190,7 +191,7 @@ export function ThemeRegistry({ children }) {
 
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme, setMode }}>
-      {getInitColorSchemeScript()}
+      <InitColorSchemeScript/>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         {children}
