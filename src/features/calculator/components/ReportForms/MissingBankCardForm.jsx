@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Button,
   Dialog,
@@ -6,8 +6,6 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  Typography,
-  Backdrop,
   Stepper,
   Step,
   StepLabel,
@@ -16,15 +14,15 @@ import {
   FormControlLabel,
   FormControl,
   FormLabel,
-} from "@mui/material";
+} from '@mui/material';
 
 const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
   const [activeStep, setActiveStep] = useState(0);
-  const [reportType, setReportType] = useState("");
-  const [bankName, setBankName] = useState("");
-  const [cardName, setCardName] = useState("");
-  const [mcc, setMcc] = useState("");
-  const [merchantName, setMerchantName] = useState("");
+  const [reportType, setReportType] = useState('');
+  const [bankName, setBankName] = useState('');
+  const [cardName, setCardName] = useState('');
+  const [mcc, setMcc] = useState('');
+  const [merchantName, setMerchantName] = useState('');
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -82,10 +80,8 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
     switch (step) {
       case 0:
         return (
-          <FormControl component="fieldset" slots={{ root: "fieldset" }}>
-            <FormLabel component="legend" slots={{ root: "legend" }}>
-              What would you like to report?
-            </FormLabel>
+          <FormControl component="fieldset">
+            <FormLabel component="legend">What would you like to report?</FormLabel>
             <RadioGroup
               aria-label="report-type"
               name="report-type"
@@ -94,19 +90,19 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
             >
               <FormControlLabel
                 value="bank_or_card"
-                control={<Radio slots={{ root: "input" }} />}
+                control={<Radio />}
                 label="Missing Bank or Card"
               />
               <FormControlLabel
                 value="mcc"
-                control={<Radio slots={{ root: "input" }} />}
+                control={<Radio />}
                 label="Missing MCC"
               />
             </RadioGroup>
           </FormControl>
         );
       case 1:
-        if (reportType === "bank_or_card") {
+        if (reportType === 'bank_or_card') {
           return (
             <>
               <TextField
@@ -117,7 +113,6 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
                 value={bankName}
                 onChange={(e) => setBankName(e.target.value)}
                 required
-                slots={{ root: "div", input: "input" }}
               />
               <TextField
                 fullWidth
@@ -127,11 +122,10 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
                 value={cardName}
                 onChange={(e) => setCardName(e.target.value)}
                 required
-                slots={{ root: "div", input: "input" }}
               />
             </>
           );
-        } else if (reportType === "mcc") {
+        } else if (reportType === 'mcc') {
           return (
             <>
               <TextField
@@ -143,12 +137,9 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
                 onChange={(e) => setMcc(e.target.value)}
                 required
                 type="number"
-                slots={{ root: "div", input: "input" }}
-                slotProps={{
-                  input: {
-                    min: "0700",
-                    max: "9999",
-                  },
+                inputProps={{
+                  min: '0700',
+                  max: '9999',
                 }}
               />
               <TextField
@@ -159,89 +150,57 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
                 value={merchantName}
                 onChange={(e) => setMerchantName(e.target.value)}
                 required
-                slots={{ root: "div", input: "input" }}
               />
             </>
           );
         }
         return null;
       default:
-        return "Unknown step";
+        return 'Unknown step';
     }
   };
 
   return (
-    <>
-      <Backdrop
-        open={open}
-        slots={{ root: "div" }}
-        sx={{ zIndex: (theme) => theme.zIndex.modal + 1 }}
-      />
-      <Dialog
-        open={open}
-        onClose={onClose}
-        slots={{
-          root: "div",
-          backdrop: "div",
-          paper: "div",
-        }}
-        slotProps={{
-          paper: {
-            sx: { width: "100%", maxWidth: 500, m: 2 },
-          },
-        }}
-      >
-        <form onSubmit={handleSubmit}>
-          <DialogTitle slots={{ root: "h2" }}>
-            Report Missing Information
-          </DialogTitle>
-          <DialogContent slots={{ root: "div" }} sx={{ pt: 2 }}>
-            <Stepper
-              activeStep={activeStep}
-              sx={{ mb: 3 }}
-              slots={{ root: "div" }}
-            >
-              {steps.map((label) => (
-                <Step key={label} slots={{ root: "div" }}>
-                  <StepLabel slots={{ root: "span", label: "span" }}>
-                    {label}
-                  </StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-            {getStepContent(activeStep)}
-          </DialogContent>
-          <DialogActions slots={{ root: "div" }} sx={{ px: 3, pb: 2 }}>
-            <Button onClick={onClose} slots={{ root: "button" }}>
-              Cancel
+    <Dialog
+      open={open}
+      onClose={onClose}
+      PaperProps={{
+        sx: { width: '100%', maxWidth: 500, m: 2 },
+      }}
+    >
+      <form onSubmit={handleSubmit}>
+        <DialogTitle>Report Missing Information</DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
+            {steps.map((label) => (
+              <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+          {getStepContent(activeStep)}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={onClose}>Cancel</Button>
+          {activeStep > 0 && (
+            <Button onClick={handleBack}>Back</Button>
+          )}
+          {activeStep < steps.length - 1 ? (
+            <Button onClick={handleNext} disabled={!reportType}>
+              Next
             </Button>
-            {activeStep > 0 && (
-              <Button onClick={handleBack} slots={{ root: "button" }}>
-                Back
-              </Button>
-            )}
-            {activeStep < steps.length - 1 ? (
-              <Button
-                onClick={handleNext}
-                disabled={!reportType}
-                slots={{ root: "button" }}
-              >
-                Next
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                slots={{ root: "button" }}
-              >
-                Submit
-              </Button>
-            )}
-          </DialogActions>
-        </form>
-      </Dialog>
-    </>
+          ) : (
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+            >
+              Submit
+            </Button>
+          )}
+        </DialogActions>
+      </form>
+    </Dialog>
   );
 };
 

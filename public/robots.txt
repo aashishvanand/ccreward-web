@@ -2,6 +2,7 @@
 User-agent: Google-adstxt
 Allow: /
 Allow: /app-ads.txt
+Allow: /ads.txt
 
 # General crawler rules
 User-agent: *

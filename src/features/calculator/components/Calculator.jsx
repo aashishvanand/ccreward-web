@@ -307,11 +307,12 @@ function Calculator() {
 
       <AnonymousConversionPrompt />
 
+      {/* Move the forms here, before the Footer */}
       <MissingBankCardForm
         open={missingFormOpen}
         onClose={() => setMissingFormOpen(false)}
         onSubmitSuccess={(message) =>
-          setAlert({ open: true, message, severity: "success" })
+          setAlert({ open: true, message, severity: 'success' })
         }
       />
 
@@ -319,14 +320,14 @@ function Calculator() {
         open={incorrectRewardReportOpen}
         onClose={() => setIncorrectRewardReportOpen(false)}
         onSubmitSuccess={(message) =>
-          setAlert({ open: true, message, severity: "success" })
+          setAlert({ open: true, message, severity: 'success' })
         }
         formData={{
           bank: selectedBank,
           card: selectedCard,
           mcc: selectedMcc
             ? `${selectedMcc.mcc} - ${selectedMcc.name}`
-            : "Not selected",
+            : 'Not selected',
           spentAmount,
           additionalInputs,
           calculationResult,
@@ -339,21 +340,15 @@ function Calculator() {
         <Alert
           severity={alert.severity}
           onClose={() => setAlert({ ...alert, open: false })}
-          slotProps={{ closeButton: { "aria-label": "Close" } }}
-          slots={{
-            root: "div",
-            icon: "span",
-            closeButton: "button",
-          }}
           sx={{
-            position: "fixed",
+            position: 'fixed',
             bottom: 24,
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: theme.zIndex.snackbar,
-            maxWidth: "90%",
-            width: "auto",
-            boxShadow: theme.shadows[8],
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: (theme) => theme.zIndex.snackbar,
+            maxWidth: '90%',
+            width: 'auto',
+            boxShadow: (theme) => theme.shadows[8],
           }}
         >
           {alert.message}

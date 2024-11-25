@@ -20,6 +20,11 @@ const faqs = [
         "Yes, CCReward is available on both Android and iOS platforms, as well as a web application.",
     },
     {
+      question: "What happens when I sign up using an anonymous account?",
+      answer:
+        "If you sign up anonymously, your account is automatically deleted after 30 days, irrespective of whether you’ve added cards or not. This ensures your privacy.",
+    },
+    {
       question: "Can CCReward track my reward points?",
       answer:
         "Not yet. At the moment, CCReward focuses on helping users find the best card for transactions and calculate rewards. Tracking accumulated reward points is a feature we may add in the future.",
@@ -68,6 +73,11 @@ const faqs = [
       question: "Does CCReward offer reminders for payment due dates?",
       answer:
         "Not currently. CCReward is focused on rewards optimization and does not include payment reminders. This feature may be considered in the future.",
+    },
+    {
+      question: "Can I manually add a card if it is not listed?",
+      answer:
+        "No, currently you cannot manually add cards. However, you can report missing cards, and we’ll prioritize adding them to the app.",
     },
   ];
 
