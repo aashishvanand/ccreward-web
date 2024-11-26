@@ -11,7 +11,7 @@
 
 # Allow framing for the embeddable calculator only from selected domains
 /embeddable-calculator
-  X-Frame-Options: ALLOW-FROM https://www.professorcardz.com/
+  X-Frame-Options: ALLOW-FROM https://www.professorcardz.com/ https://creditcardz.in/
   Content-Security-Policy: frame-ancestors 'self' https://www.professorcardz.com/ https://creditcardz.in/
 
 # Allow access to app-ads.txt and ads.txt

@@ -11,14 +11,13 @@ Allow: /
 # Essential pages
 Allow: /privacy
 Allow: /terms
+Allow: /faq
 Allow: /sitemap.xml
 Allow: /security.txt
 
 # Block utility files
 Disallow: /_next/static/
 Disallow: /favicon.ico
-Disallow: /*.ico$
-Disallow: /*.png$
 Disallow: /*.woff2$
 
 # Protected routes (intentionally blocked)
@@ -43,6 +42,7 @@ Allow: /ccreward_light.png
 Allow: /ccreward_dark.png
 
 # Allow favicon files
+Allow: /favicon.ico
 Allow: /*.png
 Allow: /*.ico
 Allow: /site.webmanifest
