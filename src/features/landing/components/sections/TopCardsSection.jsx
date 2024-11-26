@@ -10,40 +10,41 @@ import {
   IconButton,
   useTheme,
   useMediaQuery,
+  CircularProgress,
 } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
-import { categories } from "../../../../shared/constants/cardCategories";
+import useCardCategories from "../../../../core/hooks/useCardCategories";
+
+const categoryNames = [
+  "Education",
+  "Entertainment",
+  "Food & Dining",
+  "Government/Tax",
+  "Groceries",
+  "Healthcare & Medical",
+  "Insurance",
+  "International Spends",
+  "Jwellery",
+  "Offline Shopping",
+  "Online Shopping",
+  "Petrol",
+  "Travel & Transportation",
+  "Utility Bill",
+  "Wallet Loading",
+];
 
 const TopCardsSection = () => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
-
-  const featuredCategories = [
-    "Education",
-    "Entertainment",
-    "Food & Dining",
-    "Government/Tax",
-    "Groceries",
-    "Healthcare & Medical",
-    "Insurance",
-    "International Spends",
-    "Jwellery",
-    "Offline Shopping",
-    "Online Shopping",
-    "Petrol",
-    "Travel & Transportation",
-    "Utility Bill",
-    "Wallet Loading",
-  ];
+  const { categories, isLoading, error } = useCardCategories();
 
   const itemsPerPage = isMobile ? 1 : isTablet ? 2 : 4;
   const [currentPage, setCurrentPage] = useState(0);
-
-  const totalPages = Math.ceil(featuredCategories.length / itemsPerPage);
-  const visibleCategories = featuredCategories.slice(
+  const totalPages = Math.ceil(categoryNames.length / itemsPerPage);
+  const visibleCategories = categoryNames.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
   );
@@ -55,6 +56,22 @@ const TopCardsSection = () => {
   const handlePrev = () => {
     setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
   };
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 4 }}>
+        <Typography color="error">Error loading categories. Please try again later.</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ bgcolor: "background.paper", py: 8 }}>
@@ -119,7 +136,7 @@ const TopCardsSection = () => {
 
           <Grid container spacing={3}>
             {visibleCategories.map((categoryName) => {
-              const category = categories[categoryName];
+              const category = categories?.[categoryName];
               if (!category) return null;
 
               return (

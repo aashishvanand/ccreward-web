@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 const CACHE_KEY = 'cardImagesData';
-const CACHE_EXPIRATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+const CACHE_EXPIRATION = 24 * 60 * 60 * 1000;
 
 async function fetchCardImagesData() {
     const response = await fetch('https://files.ccreward.app/cardImages.json');

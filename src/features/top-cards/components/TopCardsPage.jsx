@@ -4,7 +4,7 @@ import { useAuth } from "../../../core/providers/AuthContext";
 import Header from "../../../shared/components/layout/Header";
 import Footer from "../../../shared/components/layout/Footer";
 import useCardImagesData from "../../../core/hooks/useCardImagesData";
-import { getCardsForCategory } from "../../../shared/constants/cardCategories";
+import useCardCategories, { getCardsForCategory } from "../../../core/hooks/useCardCategories";
 import TopCardsGrid from "./TopCardsGrid";
 import {
   Box,
@@ -20,6 +20,7 @@ import {
   Alert,
   useMediaQuery,
   useTheme,
+  CircularProgress,
 } from "@mui/material";
 
 const categories = [
@@ -54,7 +55,8 @@ const TopCardsPage = () => {
     message: "",
     severity: "success",
   });
-  const { cardImagesData, isLoading } = useCardImagesData();
+  const { cardImagesData, isLoading: isLoadingCardImages } = useCardImagesData();
+  const { categories: categoriesData, isLoading: isLoadingCategories, error: categoriesError } = useCardCategories();
   const [isValidating, setIsValidating] = useState(false);
   const searchParams = useSearchParams();
 
@@ -112,7 +114,8 @@ const TopCardsPage = () => {
   }, [category, router, isValidating]);
 
   const getCardsWithImages = (categoryName) => {
-    const categoryCards = getCardsForCategory(categoryName);
+    if (!categoriesData) return [];
+    const categoryCards = getCardsForCategory(categoryName, categoriesData);
     return categoryCards.map((card) => {
       const cardImage = cardImagesData.find(
         (img) =>
@@ -171,7 +174,22 @@ const TopCardsPage = () => {
     }
   };
 
+  const isLoading = isLoadingCategories || isLoadingCardImages || isValidating;
   const categoryCards = category ? getCardsWithImages(category) : [];
+
+  if (categoriesError) {
+    return (
+      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+        <Header />
+        <Container component="main" sx={{ py: 4, flexGrow: 1 }}>
+          <Alert severity="error">
+            Error loading categories. Please try again later.
+          </Alert>
+        </Container>
+        <Footer />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -206,29 +224,36 @@ const TopCardsPage = () => {
           ))}
         </Select>
 
-        {category && !isLoading && categoryCards.length > 0 && (
+        {isLoading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
           <>
-            <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-              Top Cards for {category}
-            </Typography>
+            {category && categoryCards.length > 0 && (
+              <>
+                <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
+                  Top Cards for {category}
+                </Typography>
 
-            <Box sx={{ width: "100%" }}>
-              <TopCardsGrid
-                cards={categoryCards}
-                isMobile={isMobile}
-                isTablet={isTablet}
-                handleCardClick={handleCardClick}
-                theme={theme}
-                isLoading={isValidating || isLoading}
-              />
-            </Box>
+                <Box sx={{ width: "100%" }}>
+                  <TopCardsGrid
+                    cards={categoryCards}
+                    isMobile={isMobile}
+                    isTablet={isTablet}
+                    handleCardClick={handleCardClick}
+                    theme={theme}
+                  />
+                </Box>
+              </>
+            )}
+
+            {category && categoryCards.length === 0 && (
+              <Alert severity="info" sx={{ mt: 2 }}>
+                No cards found for this category.
+              </Alert>
+            )}
           </>
-        )}
-
-        {category && !isLoading && categoryCards.length === 0 && (
-          <Alert severity="info" sx={{ mt: 2 }}>
-            No cards found for this category.
-          </Alert>
         )}
       </Container>
 
