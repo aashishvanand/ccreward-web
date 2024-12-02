@@ -23,12 +23,14 @@ const TermsOfServicePage = () => {
             <li>User authentication and data storage are handled through Firebase, a Google Cloud service</li>
             <li>All reward calculations and computational operations are processed on Cloudflare&apos;s infrastructure</li>
           </ul>
-          <p>3.2. By using the Service, you acknowledge and agree that your data may be processed through these infrastructure providers in accordance with their respective terms of service and our Privacy Policy.</p>
-
+          <p>3.3. <strong>Advertising:</strong> The Service integrates Google Ads to display relevant advertisements to users. By using the Service, you acknowledge that third-party providers such as Google may collect and process data for ad delivery and performance measurement in accordance with their respective privacy policies and terms of service.</p>
 
           <h2>4. User Content</h2>
           <p>4.1. You retain all rights to any content you submit, post or display on or through the Service.</p>
           <p>4.2. By submitting, posting or displaying content on or through the Service, you grant us a worldwide, non-exclusive, royalty-free license to use, copy, reproduce, process, adapt, modify, publish, transmit, display and distribute such content.</p>
+          <p>
+            4.3. By using the Service, you consent to the use of your data for personalized advertisements, where applicable. You may manage your advertising preferences through your device settings or Google&apos;s Ad Settings page.
+          </p>
 
           <h2>5. Intellectual Property</h2>
           <p>5.1. The Service and its original content, features, and functionality are owned by CCReward and are protected by international copyright, trademark, patent, trade secret, and other intellectual property or proprietary rights laws.</p>
@@ -64,7 +66,7 @@ const TermsOfServicePage = () => {
           <p>We may terminate or suspend your account and bar access to the Service immediately, without prior notice or liability, under our sole discretion, for any reason whatsoever and without limitation, including but not limited to a breach of the Terms.</p>
 
           <h2>8. Limitation of Liability</h2>
-          <p>In no event shall CCReward, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the Service.</p>
+          <p>In no event shall CCReward, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the Service. CCReward is not liable for any actions, inaccuracies, or data collection practices by third-party advertisers, including Google Ads. Users are encouraged to review the respective advertiser&apos;s privacy policies and terms of service.</p>
 
           <h2>9. Changes</h2>
           <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. By continuing to access or use our Service after any revisions become effective, you agree to be bound by the revised terms.</p>
@@ -126,6 +128,12 @@ const TermsOfServicePage = () => {
             <li>We reserve the right to terminate or restrict access to the mobile apps</li>
             <li>App store providers may also terminate access according to their policies</li>
             <li>Users can remove the apps from their devices at any time</li>
+          </ul>
+          <p>11.9. <strong>Advertising and Data Usage:</strong></p>
+          <ul>
+            <li>The mobile app integrates Google Ads to display relevant advertisements.</li>
+            <li>Data collected for ad purposes is processed by Google in compliance with their privacy policies.</li>
+            <li>Users can manage ad preferences or opt out of personalized ads via device settings or Google&apos;s Ad Settings.</li>
           </ul>
         </Typography>
       </Container>

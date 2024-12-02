@@ -22,6 +22,12 @@ const PrivacyPolicyPage = () => {
           <p>1.1. <strong>Personal Information:</strong> When you create an account, we collect information provided by Google Authentication, which may include your name and email address.</p>
           <p>1.2. <strong>User Content:</strong> We collect and store information about the credit cards you add to your account.</p>
           <p>1.3. <strong>Usage Data:</strong> We may collect information on how the Service is accessed and used, including your device&apos;s Internet Protocol address, browser type, browser version, the pages of our Service that you visit, the time and date of your visit, the time spent on those pages, and other diagnostic data.</p>
+          <p>1.4. <strong>Advertising Data:</strong> Our app integrates Google Ads to display advertisements. Google Ads may collect information such as:</p>
+          <ul>
+            <li>Device identifiers (e.g., advertising ID)</li>
+            <li>Interaction data with ads (e.g., clicks, impressions)</li>
+            <li>General demographic and interest data based on your app usage and ad interactions</li>
+          </ul>
 
           <h2>2. How We Use Your Information</h2>
           <p>We use the information we collect to:</p>
@@ -30,6 +36,7 @@ const PrivacyPolicyPage = () => {
             <li>Communicate with you about the Service</li>
             <li>Monitor the usage of the Service</li>
             <li>Detect, prevent, and address technical issues</li>
+            <li>Serve relevant advertisements through Google Ads and measure their effectiveness</li>
           </ul>
 
           <h2>3. Data Storage and Processing</h2>
@@ -46,6 +53,7 @@ const PrivacyPolicyPage = () => {
           <h2>5. Third-Party Services</h2>
           <p>5.1. Our Service uses Google Firebase for authentication and data storage. Please refer to Google&apos;s Privacy Policy for information on how they handle your data.</p>
           <p>5.2. Bank logos and card images displayed in our Service are the property of their respective financial institutions and are used for representational purposes only.</p>
+          <p>5.3. <strong>Advertising:</strong> Our app integrates Google Ads, a service provided by Google, to display ads within the app. Please refer to Google&apos;s Advertising Privacy Policy for more details on how they collect, use, and process data: <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">Google Advertising Privacy Policy</a>.</p>
 
           <h2>6. Accuracy of Information</h2>
           <p>6.1. The reward calculations provided by CCReward are based on publicly available information and are for reference purposes only.</p>
@@ -81,6 +89,8 @@ const PrivacyPolicyPage = () => {
             <li>Device-specific information such as operating system version and device model</li>
             <li>App performance and usage statistics</li>
             <li>Crash reports and diagnostic information</li>
+            <li>Our app uses Google Ads to display personalized advertisements. Google Ads may collect information such as your device&apos;s advertising ID and interaction with advertisements (e.g., clicks or impressions).</li>
+            <li>You can manage your ad preferences through your device settings or Google&apos;s Ad Settings page.</li>
           </ul>
 
           <p>10.4. <strong>Mobile Data Storage:</strong></p>
@@ -103,6 +113,13 @@ const PrivacyPolicyPage = () => {
             <li>Web browsers at https://ccreward.app</li>
             <li>iOS devices through the App Store (iOS 15.0 or later)</li>
             <li>Android devices through the Play Store (Android 10.0 or later)</li>
+          </ul>
+
+          <h2>11. Advertising Preferences</h2>
+          <p>Users can manage their advertising preferences and opt-out of personalized ads by:</p>
+          <ul>
+            <li>Adjusting the settings on their device (e.g., &quot;Limit Ad Tracking&quot; on iOS or &quot;Opt Out of Ads Personalization&quot; on Android)</li>
+            <li>Visiting Google&apos;s Ad Settings at <a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer">Google Ad Settings</a></li>
           </ul>
 
         </Typography>
