@@ -8,22 +8,26 @@ import {
   useTheme,
   CircularProgress,
 } from "@mui/material";
-import { useAuth } from '../../../core/providers/AuthContext';
-import { getCardsForUser, addCardForUser } from '../../../core/services/firebaseUtils';
-import Header from '../../../shared/components/layout/Header';
-import Footer from '../../../shared/components/layout/Footer';
-import CalculatorForm from './CalculatorForm';
-import AddToMyCardsButton from '../../cards/components/AddToMyCardsButton';
-import ReportButtons from '../../../shared/components/ui/ReportButtons';
-import MissingBankCardForm from './ReportForms/MissingBankCardForm';
-import IncorrectRewardReportForm from './ReportForms/IncorrectRewardReportForm';
-import { AnonymousConversionPrompt } from '../../../shared/components/ui/AnonymousConversionPrompt';
-import ErrorAlert from '../../../shared/components/ui/ErrorAlert';
-import { calculateRewards } from '../../../core/services/api';
-import { logCalculation } from '../../../core/services/analytics';
+import { useAuth } from "../../../core/providers/AuthContext";
+import {
+  getCardsForUser,
+  addCardForUser,
+} from "../../../core/services/firebaseUtils";
+import Header from "../../../shared/components/layout/Header";
+import Footer from "../../../shared/components/layout/Footer";
+import CalculatorForm from "./CalculatorForm";
+import AddToMyCardsButton from "../../cards/components/AddToMyCardsButton";
+import ReportButtons from "../../../shared/components/ui/ReportButtons";
+import MissingBankCardForm from "./ReportForms/MissingBankCardForm";
+import IncorrectRewardReportForm from "./ReportForms/IncorrectRewardReportForm";
+import { AnonymousConversionPrompt } from "../../../shared/components/ui/AnonymousConversionPrompt";
+import ErrorAlert from "../../../shared/components/ui/ErrorAlert";
+import { calculateRewards } from "../../../core/services/api";
+import { logCalculation } from "../../../core/services/analytics";
 import { useCardSelection } from "./CalculatorHooks";
 import CalculationResults from "./CalculationResults";
 import Confetti from "react-confetti";
+import ReferralButton from "./ReferralButton";
 
 function Calculator() {
   const theme = useTheme();
@@ -43,7 +47,6 @@ function Calculator() {
   const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] =
     useState(false);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
-  
 
   const {
     selectedBank,
@@ -121,7 +124,6 @@ function Calculator() {
     setCalculationPerformed(false);
     setLastCalculationInputs(null);
   }, [resetAllFields]);
-
 
   const handleCalculate = useCallback(async () => {
     if (!spentAmount || parseFloat(spentAmount) <= 0) {
@@ -284,21 +286,28 @@ function Calculator() {
                 onIncorrectRewardOpen={() => setIncorrectRewardReportOpen(true)}
               />
 
-              {calculationPerformed && (
-                <CalculationResults
-                  result={calculationResult}
-                  isLoading={isCalculating}
-                />
-              )}
-
-              {calculationPerformed && calculationResult && user && (
-                <AddToMyCardsButton
-                  user={user}
-                  selectedBank={selectedBank}
-                  selectedCard={selectedCard}
-                  userCards={userCards}
-                  onAddCard={handleAddCard}
-                />
+              {calculationPerformed && calculationResult && (
+                <>
+                  <CalculationResults
+                    result={calculationResult}
+                    isLoading={isCalculating}
+                  />
+                  <ReferralButton
+                    bank={selectedBank}
+                    cardName={selectedCard}
+                    userCards={userCards}
+                    calculationPerformed={calculationPerformed}
+                  />
+                  {user && (
+                    <AddToMyCardsButton
+                      user={user}
+                      selectedBank={selectedBank}
+                      selectedCard={selectedCard}
+                      userCards={userCards}
+                      onAddCard={handleAddCard}
+                    />
+                  )}
+                </>
               )}
             </Stack>
           )}
@@ -307,12 +316,11 @@ function Calculator() {
 
       <AnonymousConversionPrompt />
 
-      {/* Move the forms here, before the Footer */}
       <MissingBankCardForm
         open={missingFormOpen}
         onClose={() => setMissingFormOpen(false)}
         onSubmitSuccess={(message) =>
-          setAlert({ open: true, message, severity: 'success' })
+          setAlert({ open: true, message, severity: "success" })
         }
       />
 
@@ -320,14 +328,14 @@ function Calculator() {
         open={incorrectRewardReportOpen}
         onClose={() => setIncorrectRewardReportOpen(false)}
         onSubmitSuccess={(message) =>
-          setAlert({ open: true, message, severity: 'success' })
+          setAlert({ open: true, message, severity: "success" })
         }
         formData={{
           bank: selectedBank,
           card: selectedCard,
           mcc: selectedMcc
             ? `${selectedMcc.mcc} - ${selectedMcc.name}`
-            : 'Not selected',
+            : "Not selected",
           spentAmount,
           additionalInputs,
           calculationResult,
@@ -341,13 +349,13 @@ function Calculator() {
           severity={alert.severity}
           onClose={() => setAlert({ ...alert, open: false })}
           sx={{
-            position: 'fixed',
+            position: "fixed",
             bottom: 24,
-            left: '50%',
-            transform: 'translateX(-50%)',
+            left: "50%",
+            transform: "translateX(-50%)",
             zIndex: (theme) => theme.zIndex.snackbar,
-            maxWidth: '90%',
-            width: 'auto',
+            maxWidth: "90%",
+            width: "auto",
             boxShadow: (theme) => theme.shadows[8],
           }}
         >

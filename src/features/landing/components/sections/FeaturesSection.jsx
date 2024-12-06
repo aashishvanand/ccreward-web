@@ -34,7 +34,6 @@ const FeaturesSection = () => (
       display: "flex",
       alignItems: "center",
       py: { xs: 8, md: 0 }, // Remove padding on desktop
-      bgcolor: 'background.default',
       '&::before': {
         content: '""',
         position: 'absolute',

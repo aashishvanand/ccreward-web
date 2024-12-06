@@ -4,7 +4,7 @@ import bankImagesData from "../../../../shared/constants/bankImages";
 
 const BankSection = () => {
   return (
-    <Box sx={{ bgcolor: "background.default", py: 8 }}>
+    <Box sx={{ py: 8 }}>
       <Container maxWidth="lg">
         <Typography variant="h3" align="center" gutterBottom sx={{ mb: 6 }}>
           Supported Banks

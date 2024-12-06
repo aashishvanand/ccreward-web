@@ -18,11 +18,10 @@ import MobileAppPromotion from "./MobileAppPromotion";
 import TopCardsSection from "./sections/TopCardsSection";
 import { tweets } from "../../../shared/constants/testimonials";
 import { detectDevice } from "../../../core/utils/deviceUtils";
-
-// In LandingPage.jsx
+import TopSearchs from "./sections/TopSearchs";
 
 const MobileView = ({
-  deviceInfo, // Make sure deviceInfo is passed
+  deviceInfo,
   visibleTweets,
   handlePrevPage,
   handleNextPage,
@@ -77,15 +76,19 @@ const MobileView = ({
           <FeaturesSection />
         </Box>
 
-        <Box component="section">
+        <Box component="section" sx={{ bgcolor: "background.paper" }}>
           <TopCardsSection />
         </Box>
 
-        <Box component="section">
+        <Box sx={{ bgcolor: "background.deafult" }}>
+          <TopSearchs />
+        </Box>
+
+        <Box component="section" sx={{ bgcolor: "background.paper" }}>
           <BankSection />
         </Box>
 
-        <Box component="section">
+        <Box component="section" sx={{ bgcolor: "background.deafult" }}>
           <TestimonialsSection
             visibleTweets={visibleTweets}
             handlePrevPage={handlePrevPage}
@@ -156,9 +159,13 @@ const DesktopView = ({
       <FeaturesSection />
     </Box>
 
-    <Box component="section">
-          <TopCardsSection />
-        </Box>
+    <Box sx={{ bgcolor: "background.paper" }}>
+      <TopCardsSection />
+    </Box>
+
+    <Box sx={{ bgcolor: "background.deafult" }}>
+      <TopSearchs />
+    </Box>
 
     <Box sx={{ bgcolor: "background.paper" }}>
       <BankSection />
@@ -316,11 +323,39 @@ const LandingPage = () => {
       setHasCheckedCards(false);
     } catch (error) {
       console.error("Error signing in:", error);
-      setAlert({
-        open: true,
-        message: "Failed to sign in. Please try again.",
-        severity: "error",
-      });
+
+      // Handle specific Firebase auth errors
+      if (error.code === "auth/popup-closed-by-user") {
+        // User closed the popup, no need to show an error
+        setAlert({
+          open: false,
+          message: "",
+          severity: "info",
+        });
+      } else if (error.code === "auth/cancelled-popup-request") {
+        // Another popup is already open
+        setAlert({
+          open: true,
+          message:
+            "Another sign-in window is already open. Please close it and try again.",
+          severity: "warning",
+        });
+      } else if (error.code === "auth/popup-blocked") {
+        // Browser blocked the popup
+        setAlert({
+          open: true,
+          message:
+            "Pop-up was blocked by your browser. Please enable pop-ups and try again.",
+          severity: "warning",
+        });
+      } else {
+        // Handle any other errors
+        setAlert({
+          open: true,
+          message: "Failed to sign in. Please try again.",
+          severity: "error",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
