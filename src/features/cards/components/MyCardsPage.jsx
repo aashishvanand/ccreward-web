@@ -189,8 +189,8 @@ function MyCardsPage() {
             sx={{
               p: 3,
               mb: 4,
-              bgcolor: theme.vars.palette.info.softBg,
-              color: theme.vars.palette.info.softColor,
+              bgcolor: theme.palette.info.light,
+              color: theme.palette.info.contrastText,
               borderRadius: 2,
             }}
           >

@@ -67,15 +67,10 @@ export const getCardsForUser = async (userId) => {
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
 
+    // If document doesn't exist, this is a new user
     if (!userDoc.exists()) {
-      try {
-        await setDoc(userRef, { createdAt: serverTimestamp(), cards: {} });
-      } catch (error) {
-        console.error('Error creating user document:', error);
-        // If we can't create the document, return an empty array
-        return [];
-      }
-      return []; // New user, no cards yet
+      // Don't try to create document here - let this happen naturally when they add their first card
+      return []; // Return empty array for new users
     }
 
     const userData = userDoc.data();
@@ -91,8 +86,7 @@ export const getCardsForUser = async (userId) => {
 
     return cardList;
   } catch (error) {
-    console.error("Error fetching cards:", error);
-    // Instead of throwing the error, return an empty array
+    // Silently handle any errors and return empty array
     return [];
   }
 };
