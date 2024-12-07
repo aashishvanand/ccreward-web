@@ -31,6 +31,7 @@ import { getCardsForUser } from "../../../core/services/firebaseUtils";
 import { onCardUpdate } from "../../../core/utils/events";
 import { detectDevice } from "../../../core/utils/deviceUtils";
 import Image from "next/image";
+import ProfileMenu from './ProfileMenu';
 
 function Header() {
   const { mode, toggleTheme } = useAppTheme();
@@ -48,7 +49,6 @@ function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [userCardCount, setUserCardCount] = useState(0);
 
-  // Move all hooks before any conditional returns
   useEffect(() => {
     setDeviceInfo(detectDevice());
   }, []);
@@ -257,30 +257,8 @@ function Header() {
                   )
               )}
 
-              {isAuthenticated() && (
-                <Button
-                  color="inherit"
-                  onClick={handleLogout}
-                  startIcon={<LogoutIcon />}
-                  sx={{ ml: 2 }}
-                >
-                  Logout
-                </Button>
-              )}
+              {user && <ProfileMenu user={user} onLogout={handleLogout} />}
             </>
-          )}
-
-          {isAuthenticated() && (
-            <Avatar
-              src={user?.photoURL || ""}
-              alt={user?.displayName || "User"}
-              slots={{ root: "div" }}
-              slotProps={{
-                root: {
-                  sx: { ml: 2, width: 40, height: 40 },
-                },
-              }}
-            />
           )}
         </Box>
       </Toolbar>

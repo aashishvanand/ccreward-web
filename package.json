@@ -36,6 +36,7 @@
     "react": "19.0.0",
     "react-confetti": "^6.1.0",
     "react-dom": "19.0.0",
+    "react-share": "^5.1.1",
     "react-tweet": "^3.2.1",
     "sharp": "^0.33.5"
   },

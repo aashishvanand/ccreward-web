@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Box,
   Container,
@@ -8,8 +8,6 @@ import {
   Paper,
   Stack,
   useTheme,
-  Fab,
-  Zoom,
   useScrollTrigger,
 } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
@@ -24,6 +22,14 @@ import Header from "../../../shared/components/layout/Header";
 import Footer from "../../../shared/components/layout/Footer";
 import CardList from "./CardList";
 import AddCardDialog from "./AddCardDialog";
+import {
+  Share as ShareIcon
+} from "@mui/icons-material";
+import PortfolioShare from "./PortfolioShare";
+import { SpeedDial, SpeedDialAction, SpeedDialIcon, Divider } from "@mui/material";
+import ShareDialog from "./ShareDialog";
+
+
 
 function MyCardsPage() {
   const theme = useTheme();
@@ -35,6 +41,28 @@ function MyCardsPage() {
     severity: "info",
   });
   const [isLoading, setIsLoading] = useState(true);
+  const portfolioRef = useRef(null);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+
+  const handleShare = async (platform) => {
+    setIsGeneratingImage(true);
+    try {
+      if (platform === 'generate') {
+        // Use generateAndShare but with a special 'generate' flag
+        // that only generates without sharing
+        await portfolioRef.current?.generateAndShare('preview');
+      } else {
+        await portfolioRef.current?.generateAndShare(platform);
+      }
+    } catch (error) {
+      console.error('Error handling share action:', error);
+      // You might want to show an error message to the user here
+    } finally {
+      setIsGeneratingImage(false);
+    }
+  };
+
   const { user, isAuthenticated, loading, isNewUser, markUserAsNotNew } =
     useAuth();
 
@@ -152,9 +180,9 @@ function MyCardsPage() {
       );
     }
 
-    if (cards.length === 1) {
-      return (
-        <>
+    return (
+      <>
+        {cards.length === 1 && (
           <Paper
             elevation={3}
             sx={{
@@ -173,12 +201,13 @@ function MyCardsPage() {
               start comparing rewards!
             </Typography>
           </Paper>
-          <CardList cards={cards} onDeleteCard={handleDeleteCard} />
-        </>
-      );
-    }
-
-    return <CardList cards={cards} onDeleteCard={handleDeleteCard} />;
+        )}
+        {cards.length > 0 && (
+          <PortfolioShare ref={portfolioRef} cards={cards} />
+        )}
+        <CardList cards={cards} onDeleteCard={handleDeleteCard} />
+      </>
+    );
   };
 
   return (
@@ -194,42 +223,67 @@ function MyCardsPage() {
         maxWidth="lg"
       >
         <Stack spacing={4}>
-          <Typography
-            variant="h4"
-            component="h1"
+          <Box
             sx={{
-              fontSize: { xs: "1.75rem", sm: "2.125rem" },
-              fontWeight: "bold",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 4,
             }}
           >
-            My Cards
-          </Typography>
+            <Typography
+              variant="h4"
+              component="h1"
+              sx={{
+                fontSize: { xs: "1.75rem", sm: "2.125rem" },
+                fontWeight: "bold",
+              }}
+            >
+              My Cards
+            </Typography>
+          </Box>
 
           {renderContent()}
         </Stack>
       </Container>
 
       {/* Floating Action Button */}
-      <Zoom in={!trigger}>
-        <Fab
-          color="primary"
-          aria-label="add card"
+      <SpeedDial
+        ariaLabel="Card Actions"
+        sx={{
+          position: "fixed",
+          bottom: { xs: 80, sm: 100 },
+          right: { xs: 16, sm: 24 },
+        }}
+        icon={<SpeedDialIcon openIcon={<AddIcon />} />}
+      >
+        <SpeedDialAction
+          key="add"
+          icon={<AddIcon />}
+          tooltipTitle="Add New Card"
           onClick={() => setIsAddCardDialogOpen(true)}
-          sx={{
-            position: "fixed",
-            bottom: { xs: 80, sm: 100 }, // Increased bottom spacing
-            right: { xs: 16, sm: 24 },
-            zIndex: (theme) => theme.zIndex.speedDial,
-          }}
-        >
-          <AddIcon />
-        </Fab>
-      </Zoom>
+        />
+        {cards.length > 0 && (
+          <SpeedDialAction
+            key="share"
+            icon={<ShareIcon />}
+            tooltipTitle="Share Collection"
+            onClick={() => setShareDialogOpen(true)}
+          />
+        )}
+      </SpeedDial>
 
       <AddCardDialog
         open={isAddCardDialogOpen}
         onClose={() => setIsAddCardDialogOpen(false)}
         onAddCard={handleAddCard}
+      />
+
+      <ShareDialog
+        open={shareDialogOpen}
+        onClose={() => setShareDialogOpen(false)}
+        onShare={handleShare}
+        isGenerating={isGeneratingImage}
       />
 
       {alert.open && (
