@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -10,7 +10,7 @@ import {
   Typography,
   Divider,
   CircularProgress,
-} from '@mui/material';
+} from "@mui/material";
 import {
   Twitter as TwitterIcon,
   Facebook as FacebookIcon,
@@ -19,7 +19,7 @@ import {
   Telegram as TelegramIcon,
   Download as DownloadIcon,
   CheckCircle as CheckCircleIcon,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 
 const ShareDialog = ({ open, onClose, onShare, isGenerating }) => {
   const [imageGenerated, setImageGenerated] = useState(false);
@@ -28,10 +28,10 @@ const ShareDialog = ({ open, onClose, onShare, isGenerating }) => {
   // Only generate the image when dialog opens
   useEffect(() => {
     if (open && !isGenerating && !imageGenerated) {
-      onShare('generate'); // New action type that only generates without downloading
+      onShare("generate"); // New action type that only generates without downloading
       setImageGenerated(true);
     }
-    
+
     // Reset states when dialog closes
     if (!open) {
       setImageGenerated(false);
@@ -42,7 +42,7 @@ const ShareDialog = ({ open, onClose, onShare, isGenerating }) => {
   // Handle download with success state
   const handleDownload = async () => {
     if (!imageDownloaded) {
-      await onShare('download');
+      await onShare("download");
       setImageDownloaded(true);
     }
   };
@@ -52,7 +52,7 @@ const ShareDialog = ({ open, onClose, onShare, isGenerating }) => {
       <DialogTitle>Share Your Card Collection</DialogTitle>
       <DialogContent>
         <Stack spacing={3} sx={{ mt: 1 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Typography variant="h6" sx={{ flex: 1 }}>
               Step 1: Download your collection as image
             </Typography>
@@ -62,24 +62,26 @@ const ShareDialog = ({ open, onClose, onShare, isGenerating }) => {
           </Box>
           <Button
             variant="contained"
-            startIcon={isGenerating ? <CircularProgress size={20} /> : <DownloadIcon />}
+            startIcon={
+              isGenerating ? <CircularProgress size={20} /> : <DownloadIcon />
+            }
             onClick={handleDownload}
             disabled={isGenerating || !imageGenerated}
             fullWidth
             color={imageDownloaded ? "success" : "primary"}
           >
-            {isGenerating 
-              ? "Generating Image..." 
+            {isGenerating
+              ? "Generating Image..."
               : !imageGenerated
               ? "Preparing Image..."
-              : imageDownloaded 
-                ? "Image Downloaded ✓"
-                : "Download Collection"}
+              : imageDownloaded
+              ? "Image Downloaded ✓"
+              : "Download Collection"}
           </Button>
 
           <Divider sx={{ my: 2 }} />
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Typography variant="h6" sx={{ flex: 1 }}>
               Step 2: Choose where to share
             </Typography>
@@ -123,25 +125,23 @@ const ShareDialog = ({ open, onClose, onShare, isGenerating }) => {
             ))}
           </Box>
 
-          <Typography 
-            variant="body2" 
-            color="text.secondary" 
+          <Typography
+            variant="body2"
+            color="text.secondary"
             align="center"
-            sx={{ 
+            sx={{
               opacity: imageDownloaded ? 1 : 0.7,
-              fontStyle: 'italic'
+              fontStyle: "italic",
             }}
           >
-            {imageDownloaded 
+            {imageDownloaded
               ? "Upload the downloaded collection when sharing!"
               : "Complete Step 1 to enable sharing options"}
           </Typography>
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>
-          Close
-        </Button>
+        <Button onClick={onClose}>Close</Button>
       </DialogActions>
     </Dialog>
   );

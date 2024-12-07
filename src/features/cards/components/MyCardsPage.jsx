@@ -22,14 +22,15 @@ import Header from "../../../shared/components/layout/Header";
 import Footer from "../../../shared/components/layout/Footer";
 import CardList from "./CardList";
 import AddCardDialog from "./AddCardDialog";
-import {
-  Share as ShareIcon
-} from "@mui/icons-material";
+import { Share as ShareIcon } from "@mui/icons-material";
 import PortfolioShare from "./PortfolioShare";
-import { SpeedDial, SpeedDialAction, SpeedDialIcon, Divider } from "@mui/material";
+import {
+  SpeedDial,
+  SpeedDialAction,
+  SpeedDialIcon,
+  Divider,
+} from "@mui/material";
 import ShareDialog from "./ShareDialog";
-
-
 
 function MyCardsPage() {
   const theme = useTheme();
@@ -48,15 +49,15 @@ function MyCardsPage() {
   const handleShare = async (platform) => {
     setIsGeneratingImage(true);
     try {
-      if (platform === 'generate') {
+      if (platform === "generate") {
         // Use generateAndShare but with a special 'generate' flag
         // that only generates without sharing
-        await portfolioRef.current?.generateAndShare('preview');
+        await portfolioRef.current?.generateAndShare("preview");
       } else {
         await portfolioRef.current?.generateAndShare(platform);
       }
     } catch (error) {
-      console.error('Error handling share action:', error);
+      console.error("Error handling share action:", error);
       // You might want to show an error message to the user here
     } finally {
       setIsGeneratingImage(false);

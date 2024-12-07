@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Button,
   Dialog,
@@ -14,15 +14,15 @@ import {
   FormControlLabel,
   FormControl,
   FormLabel,
-} from '@mui/material';
+} from "@mui/material";
 
 const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
   const [activeStep, setActiveStep] = useState(0);
-  const [reportType, setReportType] = useState('');
-  const [bankName, setBankName] = useState('');
-  const [cardName, setCardName] = useState('');
-  const [mcc, setMcc] = useState('');
-  const [merchantName, setMerchantName] = useState('');
+  const [reportType, setReportType] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [cardName, setCardName] = useState("");
+  const [mcc, setMcc] = useState("");
+  const [merchantName, setMerchantName] = useState("");
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -81,7 +81,9 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
       case 0:
         return (
           <FormControl component="fieldset">
-            <FormLabel component="legend">What would you like to report?</FormLabel>
+            <FormLabel component="legend">
+              What would you like to report?
+            </FormLabel>
             <RadioGroup
               aria-label="report-type"
               name="report-type"
@@ -102,7 +104,7 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
           </FormControl>
         );
       case 1:
-        if (reportType === 'bank_or_card') {
+        if (reportType === "bank_or_card") {
           return (
             <>
               <TextField
@@ -125,7 +127,7 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
               />
             </>
           );
-        } else if (reportType === 'mcc') {
+        } else if (reportType === "mcc") {
           return (
             <>
               <TextField
@@ -138,8 +140,8 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
                 required
                 type="number"
                 inputProps={{
-                  min: '0700',
-                  max: '9999',
+                  min: "0700",
+                  max: "9999",
                 }}
               />
               <TextField
@@ -156,7 +158,7 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
         }
         return null;
       default:
-        return 'Unknown step';
+        return "Unknown step";
     }
   };
 
@@ -165,7 +167,7 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
       open={open}
       onClose={onClose}
       PaperProps={{
-        sx: { width: '100%', maxWidth: 500, m: 2 },
+        sx: { width: "100%", maxWidth: 500, m: 2 },
       }}
     >
       <form onSubmit={handleSubmit}>
@@ -182,19 +184,13 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={onClose}>Cancel</Button>
-          {activeStep > 0 && (
-            <Button onClick={handleBack}>Back</Button>
-          )}
+          {activeStep > 0 && <Button onClick={handleBack}>Back</Button>}
           {activeStep < steps.length - 1 ? (
             <Button onClick={handleNext} disabled={!reportType}>
               Next
             </Button>
           ) : (
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-            >
+            <Button type="submit" variant="contained" color="primary">
               Submit
             </Button>
           )}

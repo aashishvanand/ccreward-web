@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
-import { 
-  IconButton, 
-  Menu, 
-  MenuItem, 
-  ListItemIcon, 
+import { useState } from "react";
+import {
+  IconButton,
+  Menu,
+  MenuItem,
+  ListItemIcon,
   ListItemText,
-  Avatar, 
+  Avatar,
   Divider,
   Box,
   Typography,
-  Paper
-} from '@mui/material';
-import { AccountCircle, Logout } from '@mui/icons-material';
+} from "@mui/material";
+import { AccountCircle, Logout } from "@mui/icons-material";
 
 const ProfileMenu = ({ user, onLogout }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -37,26 +36,26 @@ const ProfileMenu = ({ user, onLogout }) => {
         size="small"
         edge="end"
         aria-label="account menu"
-        aria-controls={open ? 'account-menu' : undefined}
+        aria-controls={open ? "account-menu" : undefined}
         aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
+        aria-expanded={open ? "true" : undefined}
         color="inherit"
         sx={{
           p: 0,
           width: 32,
           height: 32,
-          '&:hover': {
-            bgcolor: 'rgba(255, 255, 255, 0.1)'
-          }
+          "&:hover": {
+            bgcolor: "rgba(255, 255, 255, 0.1)",
+          },
         }}
       >
         {user?.photoURL ? (
-          <Avatar 
-            src={user.photoURL} 
+          <Avatar
+            src={user.photoURL}
             alt={user.displayName || user.email}
-            sx={{ 
-              width: 32, 
-              height: 32
+            sx={{
+              width: 32,
+              height: 32,
             }}
           />
         ) : (
@@ -69,27 +68,27 @@ const ProfileMenu = ({ user, onLogout }) => {
         open={open}
         onClose={handleClose}
         onClick={handleClose}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         slotProps={{
           paper: {
             elevation: 4,
             sx: {
               mt: 1.5,
               minWidth: 320,
-              maxWidth: '90vw',
+              maxWidth: "90vw",
               borderRadius: 2,
-              overflow: 'visible',
-              '&:before': {
+              overflow: "visible",
+              "&:before": {
                 content: '""',
-                display: 'block',
-                position: 'absolute',
+                display: "block",
+                position: "absolute",
                 top: 0,
                 right: 14,
                 width: 10,
                 height: 10,
-                bgcolor: 'background.paper',
-                transform: 'translateY(-50%) rotate(45deg)',
+                bgcolor: "background.paper",
+                transform: "translateY(-50%) rotate(45deg)",
                 zIndex: 0,
               },
             },
@@ -97,13 +96,15 @@ const ProfileMenu = ({ user, onLogout }) => {
         }}
       >
         <Box sx={{ p: 2 }}>
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center',
-            textAlign: 'center',
-            mb: 2 
-          }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textAlign: "center",
+              mb: 2,
+            }}
+          >
             <Avatar
               src={user?.photoURL}
               alt={user?.displayName || user?.email}
@@ -112,21 +113,21 @@ const ProfileMenu = ({ user, onLogout }) => {
                 height: 80,
                 mb: 1,
                 border: 1,
-                borderColor: 'divider'
+                borderColor: "divider",
               }}
             />
             <Typography variant="h6" sx={{ fontWeight: 500 }}>
-              {user?.displayName || 'User'}
+              {user?.displayName || "User"}
             </Typography>
-            <Typography 
-              variant="body2" 
-              color="text.secondary" 
-              sx={{ 
-                wordBreak: 'break-all',
-                maxWidth: '100%'
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                wordBreak: "break-all",
+                maxWidth: "100%",
               }}
             >
-              {user?.email || ''}
+              {user?.email || ""}
             </Typography>
           </Box>
         </Box>

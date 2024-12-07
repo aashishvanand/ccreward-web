@@ -6,7 +6,7 @@ import {
   Skeleton,
   ListItemIcon,
   ListItemText,
-  Typography
+  Typography,
 } from "@mui/material";
 import Image from "next/image";
 import { CreditCard as CreditCardIcon } from "@mui/icons-material";

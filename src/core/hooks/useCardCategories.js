@@ -33,13 +33,13 @@ function useCardCategories() {
                 // Fetch fresh data if cache is expired or missing
                 const freshData = await fetchCardCategories();
                 setCategories(freshData);
-                
+
                 // Update cache
                 localStorage.setItem(CACHE_KEY, JSON.stringify({
                     data: freshData,
                     timestamp: Date.now()
                 }));
-                
+
             } catch (err) {
                 setError(err);
                 console.error('Error fetching card categories:', err);

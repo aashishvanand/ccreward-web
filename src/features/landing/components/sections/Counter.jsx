@@ -7,15 +7,15 @@ const Counter = ({ value, animate = true, suffix = "" }) => {
   const hasStartedRef = useRef(false);
 
   useEffect(() => {
-    console.log('Counter props:', { value, animate, suffix }); // Debug prop values
-    console.log('Counter refs:', { 
-      hasStarted: hasStartedRef.current, 
-      currentValue: currentValueRef.current 
+    console.log("Counter props:", { value, animate, suffix }); // Debug prop values
+    console.log("Counter refs:", {
+      hasStarted: hasStartedRef.current,
+      currentValue: currentValueRef.current,
     }); // Debug ref values
 
     // Reset if animation prop changes to false
     if (!animate) {
-      console.log('Animation disabled, resetting counter');
+      console.log("Animation disabled, resetting counter");
       hasStartedRef.current = false;
       currentValueRef.current = 0;
       if (countRef.current) {
@@ -26,15 +26,15 @@ const Counter = ({ value, animate = true, suffix = "" }) => {
 
     // Only start animation if animate is true and hasn't started yet
     if (!hasStartedRef.current && animate) {
-      console.log('Starting animation'); // Debug animation start
+      console.log("Starting animation"); // Debug animation start
       hasStartedRef.current = true;
-      
+
       const duration = 2000;
       const startTime = Date.now();
       const startValue = 0;
       const endValue = value;
 
-      console.log('Animation values:', { startValue, endValue, duration }); // Debug animation values
+      console.log("Animation values:", { startValue, endValue, duration }); // Debug animation values
 
       const updateCount = () => {
         const now = Date.now();
@@ -44,7 +44,7 @@ const Counter = ({ value, animate = true, suffix = "" }) => {
           startValue + (endValue - startValue) * easeOutQuart
         );
 
-        console.log('Animation frame:', { progress, currentValue }); // Debug each frame
+        console.log("Animation frame:", { progress, currentValue }); // Debug each frame
 
         if (countRef.current) {
           countRef.current.textContent = `${currentValue}${suffix}`;
@@ -55,7 +55,7 @@ const Counter = ({ value, animate = true, suffix = "" }) => {
         if (progress < 1) {
           rafRef.current = requestAnimationFrame(updateCount);
         } else {
-          console.log('Animation completed'); // Debug animation completion
+          console.log("Animation completed"); // Debug animation completion
         }
       };
 

@@ -4,7 +4,9 @@ import { useAuth } from "../../../core/providers/AuthContext";
 import Header from "../../../shared/components/layout/Header";
 import Footer from "../../../shared/components/layout/Footer";
 import useCardImagesData from "../../../core/hooks/useCardImagesData";
-import useCardCategories, { getCardsForCategory } from "../../../core/hooks/useCardCategories";
+import useCardCategories, {
+  getCardsForCategory,
+} from "../../../core/hooks/useCardCategories";
 import TopCardsGrid from "./TopCardsGrid";
 import {
   Box,
@@ -55,8 +57,13 @@ const TopCardsPage = () => {
     message: "",
     severity: "success",
   });
-  const { cardImagesData, isLoading: isLoadingCardImages } = useCardImagesData();
-  const { categories: categoriesData, isLoading: isLoadingCategories, error: categoriesError } = useCardCategories();
+  const { cardImagesData, isLoading: isLoadingCardImages } =
+    useCardImagesData();
+  const {
+    categories: categoriesData,
+    isLoading: isLoadingCategories,
+    error: categoriesError,
+  } = useCardCategories();
   const [isValidating, setIsValidating] = useState(false);
   const searchParams = useSearchParams();
 
@@ -179,7 +186,9 @@ const TopCardsPage = () => {
 
   if (categoriesError) {
     return (
-      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <Box
+        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+      >
         <Header />
         <Container component="main" sx={{ py: 4, flexGrow: 1 }}>
           <Alert severity="error">

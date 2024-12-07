@@ -27,32 +27,33 @@ const features = [
 ];
 
 const FeaturesSection = () => (
-  <Box 
-    sx={{ 
-      position: 'relative',
+  <Box
+    sx={{
+      position: "relative",
       minHeight: { md: "40vh" }, // Set minimum height for desktop
       display: "flex",
       alignItems: "center",
       py: { xs: 8, md: 0 }, // Remove padding on desktop
-      '&::before': {
+      "&::before": {
         content: '""',
-        position: 'absolute',
+        position: "absolute",
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        background: (theme) => `linear-gradient(0deg, ${theme.palette.primary.main}15 0%, ${theme.palette.background.default} 100%)`,
+        background: (theme) =>
+          `linear-gradient(0deg, ${theme.palette.primary.main}15 0%, ${theme.palette.background.default} 100%)`,
         opacity: 0.8,
-        zIndex: 0
-      }
+        zIndex: 0,
+      },
     }}
   >
-    <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-      <Typography 
-        variant="h3" 
-        align="center" 
-        gutterBottom 
-        sx={{ 
+    <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
+      <Typography
+        variant="h3"
+        align="center"
+        gutterBottom
+        sx={{
           mb: { xs: 6, md: 4 },
           fontSize: { xs: "2rem", md: "2.5rem" },
         }}
@@ -69,11 +70,12 @@ const FeaturesSection = () => (
                 flexDirection: "column",
                 alignItems: "center",
                 p: 4,
-                bgcolor: 'background.paper',
+                bgcolor: "background.paper",
                 transition: "all 0.3s ease-in-out",
                 "&:hover": {
                   transform: "translateY(-8px)",
-                  boxShadow: (theme) => `0 8px 24px ${theme.palette.primary.main}15`
+                  boxShadow: (theme) =>
+                    `0 8px 24px ${theme.palette.primary.main}15`,
                 },
               }}
             >

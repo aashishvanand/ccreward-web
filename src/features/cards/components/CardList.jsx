@@ -36,7 +36,7 @@ const CardList = ({ cards = [], onDeleteCard }) => {
         return {
           ...card,
           image: cardDetails?.id,
-          orientation: cardDetails?.orientation || 'horizontal'
+          orientation: cardDetails?.orientation || "horizontal",
         };
       });
       setProcessedCards(processed);
@@ -76,7 +76,8 @@ const CardList = ({ cards = [], onDeleteCard }) => {
           variant="h6"
           sx={{ color: "text.secondary", fontWeight: "medium" }}
         >
-          You haven't added any cards yet. Click "Add New Card" to get started!
+          You haven&apos;t added any cards yet. Click &quot;Add New Card&quot;
+          to get started!
         </Typography>
       </Box>
     );
@@ -109,10 +110,13 @@ const CardList = ({ cards = [], onDeleteCard }) => {
       }}
     >
       {processedCards.map((card) => (
-        <ImageListItem key={`${card.bank}-${card.cardName}`} sx={{ width: "100%" }}>
-          <Paper 
-            elevation={0} 
-            sx={{ 
+        <ImageListItem
+          key={`${card.bank}-${card.cardName}`}
+          sx={{ width: "100%" }}
+        >
+          <Paper
+            elevation={0}
+            sx={{
               overflow: "hidden",
               position: "relative",
             }}
@@ -121,7 +125,8 @@ const CardList = ({ cards = [], onDeleteCard }) => {
               sx={{
                 position: "relative",
                 width: "100%",
-                aspectRatio: card.orientation === "vertical" ? "0.63/1" : "1.59/1",
+                aspectRatio:
+                  card.orientation === "vertical" ? "0.63/1" : "1.59/1",
                 marginBottom: 0,
               }}
             >
@@ -167,7 +172,8 @@ const CardList = ({ cards = [], onDeleteCard }) => {
                 <Typography
                   variant="subtitle2"
                   sx={{
-                    fontSize: card.orientation === "vertical" ? "0.75rem" : "0.875rem",
+                    fontSize:
+                      card.orientation === "vertical" ? "0.75rem" : "0.875rem",
                     fontWeight: 600,
                     lineHeight: 1.2,
                   }}
@@ -179,7 +185,8 @@ const CardList = ({ cards = [], onDeleteCard }) => {
                   variant="caption"
                   color="text.secondary"
                   sx={{
-                    fontSize: card.orientation === "vertical" ? "0.7rem" : "0.75rem",
+                    fontSize:
+                      card.orientation === "vertical" ? "0.7rem" : "0.75rem",
                     lineHeight: 1.2,
                     display: "block",
                   }}

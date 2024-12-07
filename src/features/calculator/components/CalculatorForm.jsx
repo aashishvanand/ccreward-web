@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Autocomplete,
   TextField,
@@ -18,7 +18,7 @@ import {
 } from "../../../core/services/api";
 import _ from "lodash";
 import PropTypes from "prop-types";
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from "next/navigation";
 
 const CalculatorForm = ({
   selectedBank,
@@ -75,8 +75,8 @@ const CalculatorForm = ({
 
   useEffect(() => {
     const validateAndSetBankCard = async () => {
-      const bank = searchParams.get('bank');
-      const card = searchParams.get('card');
+      const bank = searchParams.get("bank");
+      const card = searchParams.get("card");
 
       if (!bank || !card) return;
       if (selectedBank && selectedCard) return; // Don't revalidate if already set
@@ -85,32 +85,38 @@ const CalculatorForm = ({
       try {
         // Fetch valid cards for the bank
         const validCards = await fetchCards(bank);
-        
+
         // Check if the provided card exists for this bank
         const isValidCard = validCards.includes(card);
-        
+
         if (isValidCard) {
           onBankChange(bank);
           onCardChange(card);
         } else {
-          onError?.('Invalid bank or card combination. Please try again.');
+          onError?.("Invalid bank or card combination. Please try again.");
           // Clear invalid params from URL without refresh
           const url = new URL(window.location.href);
-          url.searchParams.delete('bank');
-          url.searchParams.delete('card');
-          window.history.replaceState({}, '', url);
+          url.searchParams.delete("bank");
+          url.searchParams.delete("card");
+          window.history.replaceState({}, "", url);
         }
       } catch (error) {
-        console.error('Error validating bank and card:', error);
-        onError?.('Error validating card details. Please try again.');
+        console.error("Error validating bank and card:", error);
+        onError?.("Error validating card details. Please try again.");
       } finally {
         setIsValidating(false);
       }
     };
 
     validateAndSetBankCard();
-  }, [searchParams, selectedBank, selectedCard, onBankChange, onCardChange, onError]);
-
+  }, [
+    searchParams,
+    selectedBank,
+    selectedCard,
+    onBankChange,
+    onCardChange,
+    onError,
+  ]);
 
   const loadBanks = async () => {
     setIsLoadingBanks(true);

@@ -164,8 +164,7 @@ const DesktopView = ({
       position: "relative",
     }}
   >
-    <Box className="absolute inset-0 z-0 overflow-hidden">
-    </Box>
+    <Box className="absolute inset-0 z-0 overflow-hidden"></Box>
     {/* Main Content with higher z-index */}
     <Box className="relative z-10">
       <Header />

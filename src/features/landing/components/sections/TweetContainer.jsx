@@ -1,8 +1,6 @@
-import React from "react";
 import { Tweet } from "react-tweet";
 import { Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { tweets } from "../../../../shared/constants/testimonials";
 
 const TweetContainer = ({ tweetUrl }) => {
   const theme = useTheme();

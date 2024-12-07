@@ -59,7 +59,14 @@ const TopCardsSection = () => {
 
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "400px",
+        }}
+      >
         <CircularProgress />
       </Box>
     );
@@ -67,8 +74,10 @@ const TopCardsSection = () => {
 
   if (error) {
     return (
-      <Box sx={{ textAlign: 'center', py: 4 }}>
-        <Typography color="error">Error loading categories. Please try again later.</Typography>
+      <Box sx={{ textAlign: "center", py: 4 }}>
+        <Typography color="error">
+          Error loading categories. Please try again later.
+        </Typography>
       </Box>
     );
   }
@@ -127,7 +136,8 @@ const TopCardsSection = () => {
               "&:hover": {
                 bgcolor: "background.paper",
                 opacity: 0.9,
-                boxShadow: (theme) => `0 8px 16px ${theme.palette.primary.main}15`,
+                boxShadow: (theme) =>
+                  `0 8px 16px ${theme.palette.primary.main}15`,
               },
             }}
           >
@@ -192,7 +202,7 @@ const TopCardsSection = () => {
                           )
                         }
                         className="MuiButton-root"
-                        sx={{ 
+                        sx={{
                           transition: "all 0.3s ease-in-out",
                         }}
                       >
@@ -218,7 +228,8 @@ const TopCardsSection = () => {
               "&:hover": {
                 bgcolor: "background.paper",
                 opacity: 0.9,
-                boxShadow: (theme) => `0 8px 16px ${theme.palette.primary.main}15`,
+                boxShadow: (theme) =>
+                  `0 8px 16px ${theme.palette.primary.main}15`,
               },
             }}
           >

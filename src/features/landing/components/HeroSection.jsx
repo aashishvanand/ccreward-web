@@ -1,5 +1,12 @@
-import React from 'react';
-import { Box, Container, Grid, Typography, Button, Stack, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Container,
+  Grid,
+  Typography,
+  Button,
+  Stack,
+  CircularProgress,
+} from "@mui/material";
 import HeroCard from "./HeroCard";
 
 const HeroSection = ({
@@ -27,9 +34,9 @@ const HeroSection = ({
     }}
   >
     <Container maxWidth="lg" sx={{ width: "100%" }}>
-      <Grid 
-        container 
-        spacing={{ xs: 4, md: 6, lg: 8 }} 
+      <Grid
+        container
+        spacing={{ xs: 4, md: 6, lg: 8 }}
         alignItems="center"
         sx={{ minHeight: { md: "60vh" } }} // Ensure grid takes full height
       >

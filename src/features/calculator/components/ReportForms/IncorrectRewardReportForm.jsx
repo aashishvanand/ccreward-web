@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Button,
   Dialog,
@@ -7,7 +7,7 @@ import {
   DialogActions,
   TextField,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 
 const IncorrectRewardReportForm = ({
   open,
@@ -15,33 +15,33 @@ const IncorrectRewardReportForm = ({
   onSubmitSuccess,
   formData,
 }) => {
-  const [userFeedback, setUserFeedback] = useState('');
+  const [userFeedback, setUserFeedback] = useState("");
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const consoleLog = JSON.stringify(formData);
     const submissionData = new FormData();
-    submissionData.append('entry.1871812572', consoleLog);
-    submissionData.append('entry.507295039', userFeedback);
+    submissionData.append("entry.1871812572", consoleLog);
+    submissionData.append("entry.507295039", userFeedback);
 
     fetch(
-      'https://docs.google.com/forms/u/0/d/e/1FAIpQLSeW-n8et15bE8wajTKTVXi39dn_sJ4LFzPy9K2BOjlaeSul5A/formResponse',
+      "https://docs.google.com/forms/u/0/d/e/1FAIpQLSeW-n8et15bE8wajTKTVXi39dn_sJ4LFzPy9K2BOjlaeSul5A/formResponse",
       {
-        method: 'POST',
+        method: "POST",
         body: submissionData,
-        mode: 'no-cors',
+        mode: "no-cors",
       }
     )
       .then(() => {
-        onSubmitSuccess('Report submitted successfully!');
-        setUserFeedback('');
+        onSubmitSuccess("Report submitted successfully!");
+        setUserFeedback("");
         onClose();
       })
       .catch((error) => {
-        console.error('Error:', error);
+        console.error("Error:", error);
         onSubmitSuccess(
-          'There was an error submitting the report. Please try again.',
-          'error'
+          "There was an error submitting the report. Please try again.",
+          "error"
         );
       });
   };
@@ -51,14 +51,15 @@ const IncorrectRewardReportForm = ({
       open={open}
       onClose={onClose}
       PaperProps={{
-        sx: { width: '100%', maxWidth: 500, m: 2 },
+        sx: { width: "100%", maxWidth: 500, m: 2 },
       }}
     >
       <form onSubmit={handleSubmit}>
         <DialogTitle>Report Incorrect Reward Points</DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
           <Typography variant="body2" color="textSecondary" paragraph>
-            Please provide feedback about the issue with the reward point calculation.
+            Please provide feedback about the issue with the reward point
+            calculation.
           </Typography>
           <TextField
             fullWidth

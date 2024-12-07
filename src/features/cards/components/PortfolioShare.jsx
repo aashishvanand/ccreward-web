@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
-import {
-  useTheme
-} from "@mui/material";
+import { useTheme } from "@mui/material";
 import useCardImagesData from "../../../core/hooks/useCardImagesData";
-import { forwardRef, useImperativeHandle } from 'react';
+import { forwardRef, useImperativeHandle } from "react";
 
 const PortfolioShare = forwardRef(({ cards }, ref) => {
   const theme = useTheme();
@@ -36,20 +34,30 @@ const PortfolioShare = forwardRef(({ cards }, ref) => {
   const handleSocialShare = (platform) => {
     const shareText = "Check out my credit card collection on CCReward! 💳";
     const url = "https://ccreward.app";
-    
+
     const shareUrls = {
-      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(url)}`,
-      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-      reddit: `https://reddit.com/submit?url=${encodeURIComponent(url)}&title=${encodeURIComponent(shareText)}`,
-      telegram: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(shareText)}`,
-      whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' ' + url)}`,
-      download: 'download'
+      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+        shareText
+      )}&url=${encodeURIComponent(url)}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+        url
+      )}`,
+      reddit: `https://reddit.com/submit?url=${encodeURIComponent(
+        url
+      )}&title=${encodeURIComponent(shareText)}`,
+      telegram: `https://t.me/share/url?url=${encodeURIComponent(
+        url
+      )}&text=${encodeURIComponent(shareText)}`,
+      whatsapp: `https://api.whatsapp.com/send?text=${encodeURIComponent(
+        shareText + " " + url
+      )}`,
+      download: "download",
     };
 
-    if (platform === 'download') {
+    if (platform === "download") {
       handleDownload();
     } else {
-      window.open(shareUrls[platform], '_blank', 'noopener,noreferrer');
+      window.open(shareUrls[platform], "_blank", "noopener,noreferrer");
     }
   };
 
@@ -247,22 +255,26 @@ const PortfolioShare = forwardRef(({ cards }, ref) => {
         setIsGenerating(false);
       }
     }
-    
+
     // If action is 'preview', just generate the image without sharing
-    if (action === 'preview') {
+    if (action === "preview") {
       return;
     }
-    
+
     // Execute the sharing action if we have a URL and it's not a preview
-    if (shareUrl && action !== 'preview') {
+    if (shareUrl && action !== "preview") {
       handleSocialShare(action);
     }
   };
 
-  useImperativeHandle(ref, () => ({
-    generateAndShare,
-    generateImage
-  }), [generateImage, generateAndShare]);
+  useImperativeHandle(
+    ref,
+    () => ({
+      generateAndShare,
+      generateImage,
+    }),
+    [generateImage, generateAndShare]
+  );
 
   useEffect(() => {
     if (cards && cardImagesData) {
@@ -287,6 +299,6 @@ const PortfolioShare = forwardRef(({ cards }, ref) => {
   return null;
 });
 
-PortfolioShare.displayName = 'PortfolioShare';
+PortfolioShare.displayName = "PortfolioShare";
 
 export default PortfolioShare;
