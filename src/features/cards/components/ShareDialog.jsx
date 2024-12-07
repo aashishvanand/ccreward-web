@@ -10,6 +10,7 @@ import {
   Typography,
   Divider,
   CircularProgress,
+  Alert,
 } from "@mui/material";
 import {
   Twitter as TwitterIcon,
@@ -24,33 +25,88 @@ import {
 const ShareDialog = ({ open, onClose, onShare, isGenerating }) => {
   const [imageGenerated, setImageGenerated] = useState(false);
   const [imageDownloaded, setImageDownloaded] = useState(false);
+  const [error, setError] = useState(null);
+  const [generationTimeout, setGenerationTimeout] = useState(false);
+
+  // Reset states when dialog opens/closes
+  useEffect(() => {
+    if (open) {
+      setImageGenerated(false);
+      setImageDownloaded(false);
+      setError(null);
+      setGenerationTimeout(false);
+    }
+  }, [open]);
+
+  // Handle generation timeout
+  useEffect(() => {
+    let timeoutId;
+    if (open && isGenerating) {
+      timeoutId = setTimeout(() => {
+        setGenerationTimeout(true);
+        setError("Image generation is taking longer than expected. Please try again.");
+      }, 30000); // 30 second timeout
+    }
+    return () => clearTimeout(timeoutId);
+  }, [open, isGenerating]);
 
   // Only generate the image when dialog opens
   useEffect(() => {
-    if (open && !isGenerating && !imageGenerated) {
-      onShare("generate"); // New action type that only generates without downloading
-      setImageGenerated(true);
+    if (open && !isGenerating && !imageGenerated && !error) {
+      const generateImage = async () => {
+        try {
+          await onShare("generate");
+          setImageGenerated(true);
+          setError(null);
+        } catch (err) {
+          console.error("Error generating image:", err);
+          setError("Failed to generate image. Please try again.");
+        }
+      };
+      generateImage();
     }
+  }, [open, isGenerating, imageGenerated, error]);
 
-    // Reset states when dialog closes
-    if (!open) {
-      setImageGenerated(false);
-      setImageDownloaded(false);
-    }
-  }, [open, isGenerating]);
-
-  // Handle download with success state
+  // Handle download with error handling
   const handleDownload = async () => {
     if (!imageDownloaded) {
-      await onShare("download");
-      setImageDownloaded(true);
+      try {
+        await onShare("download");
+        setImageDownloaded(true);
+        setError(null);
+      } catch (err) {
+        console.error("Error downloading image:", err);
+        setError("Failed to download image. Please try again.");
+      }
     }
+  };
+
+  // Handle retry
+  const handleRetry = () => {
+    setImageGenerated(false);
+    setImageDownloaded(false);
+    setError(null);
+    setGenerationTimeout(false);
   };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Share Your Card Collection</DialogTitle>
       <DialogContent>
+        {error ? (
+          <Alert 
+            severity="error" 
+            sx={{ mb: 2 }}
+            action={
+              <Button color="inherit" size="small" onClick={handleRetry}>
+                Retry
+              </Button>
+            }
+          >
+            {error}
+          </Alert>
+        ) : null}
+
         <Stack spacing={3} sx={{ mt: 1 }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Typography variant="h6" sx={{ flex: 1 }}>
@@ -66,12 +122,14 @@ const ShareDialog = ({ open, onClose, onShare, isGenerating }) => {
               isGenerating ? <CircularProgress size={20} /> : <DownloadIcon />
             }
             onClick={handleDownload}
-            disabled={isGenerating || !imageGenerated}
+            disabled={isGenerating || !imageGenerated || Boolean(error)}
             fullWidth
             color={imageDownloaded ? "success" : "primary"}
           >
             {isGenerating
-              ? "Generating Image..."
+              ? generationTimeout 
+                ? "Generation Taking Long..."
+                : "Generating Image..."
               : !imageGenerated
               ? "Preparing Image..."
               : imageDownloaded

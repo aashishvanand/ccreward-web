@@ -11,23 +11,17 @@ const StatsSection = () => {
 
   const roundToNearestFifty = (num) => {
     const rounded = Math.floor(num / 50) * 50;
-    console.log("Rounding calculation:", { original: num, rounded });
     return rounded;
   };
 
   // Data fetching effect
   useEffect(() => {
     const fetchStats = async () => {
-      console.log("Starting to fetch stats...");
       try {
         const cachedData = localStorage.getItem("cardImagesData");
         if (cachedData) {
           const cardData = JSON.parse(cachedData).data;
           const uniqueBanks = new Set(cardData.map((card) => card.bank));
-          console.log("Stats from cache:", {
-            cardsCount: cardData.length,
-            banksCount: uniqueBanks.size,
-          });
           setStats({
             cards: cardData.length,
             banks: uniqueBanks.size,
@@ -55,12 +49,9 @@ const StatsSection = () => {
 
   // Setup and cleanup intersection observer
   useEffect(() => {
-    console.log("Setting up new observer effect");
 
     const setupObserver = () => {
       if (!sectionRef.current || observerRef.current) return;
-
-      console.log("Creating new IntersectionObserver");
       observerRef.current = new IntersectionObserver(
         (entries) => {
           console.log("Intersection callback triggered:", {
@@ -69,7 +60,6 @@ const StatsSection = () => {
           });
 
           if (entries[0].isIntersecting && !hasAnimated) {
-            console.log("Element is intersecting, starting animation");
             setHasAnimated(true);
           }
         },
@@ -78,8 +68,6 @@ const StatsSection = () => {
           rootMargin: "50px",
         }
       );
-
-      console.log("Observing section");
       observerRef.current.observe(sectionRef.current);
     };
 
@@ -89,7 +77,6 @@ const StatsSection = () => {
     return () => {
       clearTimeout(timeoutId);
       if (observerRef.current) {
-        console.log("Cleaning up observer");
         observerRef.current.disconnect();
         observerRef.current = null;
       }
