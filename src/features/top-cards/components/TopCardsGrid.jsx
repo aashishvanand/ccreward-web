@@ -7,11 +7,28 @@ import {
   Button,
   Stack,
   Paper,
+  Chip,
+  Divider,
 } from "@mui/material";
+import {
+  RestaurantMenu as RestaurantMenuIcon,
+  LocalMovies as LocalMoviesIcon,
+  Flight as FlightIcon,
+  LocalGasStation as LocalGasStationIcon,
+  ShoppingBag as ShoppingBagIcon,
+} from "@mui/icons-material";
 import Image from "next/image";
 
 const CACHE_KEY = "referralData";
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
+
+const categoryIcons = {
+  Dining: <RestaurantMenuIcon sx={{ fontSize: 16 }} />,
+  Movies: <LocalMoviesIcon sx={{ fontSize: 16 }} />,
+  Travel: <FlightIcon sx={{ fontSize: 16 }} />,
+  Fuel: <LocalGasStationIcon sx={{ fontSize: 16 }} />,
+  Shopping: <ShoppingBagIcon sx={{ fontSize: 16 }} />,
+};
 
 const TopCardsGrid = ({
   cards,
@@ -31,9 +48,7 @@ const TopCardsGrid = ({
           const { data, timestamp } = JSON.parse(cachedData);
           if (Date.now() - timestamp < CACHE_DURATION) {
             const mappedData = data.reduce((acc, item) => {
-              if (item.link) {
-                acc[`${item.bank}-${item.cardName}`] = item.link;
-              }
+              acc[`${item.bank}-${item.cardName}`] = item;
               return acc;
             }, {});
             setReferralData(mappedData);
@@ -41,9 +56,7 @@ const TopCardsGrid = ({
           }
         }
 
-        const response = await fetch(
-          "https://files.ccreward.app/referral.json"
-        );
+        const response = await fetch("https://files.ccreward.app/referral.json");
         const data = await response.json();
 
         localStorage.setItem(
@@ -55,9 +68,7 @@ const TopCardsGrid = ({
         );
 
         const mappedData = data.reduce((acc, item) => {
-          if (item.link) {
-            acc[`${item.bank}-${item.cardName}`] = item.link;
-          }
+          acc[`${item.bank}-${item.cardName}`] = item;
           return acc;
         }, {});
         setReferralData(mappedData);
@@ -68,6 +79,124 @@ const TopCardsGrid = ({
 
     fetchReferralData();
   }, []);
+
+  const renderFees = (cardKey) => {
+    const referralInfo = referralData[cardKey];
+    if (!referralInfo) return null;
+
+    const joiningFees = parseInt(referralInfo.JoiningFees || "0");
+    const renewalFees = parseInt(referralInfo.RenewalFees || "0");
+    const isLtf = referralInfo.ltf;
+
+    if (!joiningFees && !renewalFees) return null;
+
+    return (
+      <Box sx={{ mt: 1.5 }}>
+        <Typography
+          variant="caption"
+          sx={{
+            color: "text.secondary",
+            fontWeight: 500,
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+          }}
+        >
+          Card Fees {isLtf && <Chip label="Lifetime Free" size="small" color="success" sx={{ height: 16, fontSize: "0.6rem" }} />}
+        </Typography>
+        <Stack 
+          spacing={0.5} 
+          sx={{ 
+            mt: 0.5,
+            px: 1.5,
+            py: 1,
+            bgcolor: "background.default",
+            borderRadius: 1,
+          }}
+        >
+          {joiningFees > 0 && (
+            <Box sx={{ 
+              display: "flex", 
+              justifyContent: "space-between",
+              textDecoration: isLtf ? "line-through" : "none",
+            }}>
+              <Typography variant="caption" color="text.secondary">
+                Joining Fee:
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                ₹{joiningFees} + GST
+              </Typography>
+            </Box>
+          )}
+          {renewalFees > 0 && (
+            <Box sx={{ 
+              display: "flex", 
+              justifyContent: "space-between",
+              textDecoration: isLtf ? "line-through" : "none",
+            }}>
+              <Typography variant="caption" color="text.secondary">
+                Annual Fee:
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                ₹{renewalFees} + GST
+              </Typography>
+            </Box>
+          )}
+        </Stack>
+      </Box>
+    );
+  };
+
+  const renderCategories = (cardKey) => {
+    const referralInfo = referralData[cardKey];
+    if (!referralInfo?.bestSuitedFor?.length) return null;
+
+    return (
+      <Box sx={{ mt: 1.5 }}>
+        <Typography
+          variant="caption"
+          sx={{
+            color: "text.secondary",
+            fontWeight: 500,
+            mb: 0.5,
+            display: "block",
+          }}
+        >
+          Best For
+        </Typography>
+        <Stack 
+          direction="row" 
+          spacing={0.5} 
+          sx={{ 
+            flexWrap: "wrap",
+            gap: 0.5,
+          }}
+        >
+          {referralInfo.bestSuitedFor.map((category) => (
+            <Chip
+              key={category}
+              icon={categoryIcons[category]}
+              label={category}
+              size="small"
+              variant="outlined"
+              sx={{ 
+                height: 20,
+                bgcolor: "background.default",
+                "& .MuiChip-icon": { 
+                  marginLeft: "4px",
+                  marginRight: "-4px"
+                },
+                "& .MuiChip-label": {
+                  fontSize: "0.65rem",
+                  padding: "0 8px"
+                }
+              }}
+            />
+          ))}
+        </Stack>
+      </Box>
+    );
+  };
 
   return (
     <ImageList
@@ -95,7 +224,7 @@ const TopCardsGrid = ({
     >
       {cards.map((card) => {
         const cardKey = `${card.bank}-${card.cardName}`;
-        const referralLink = referralData[cardKey];
+        const referralInfo = referralData[cardKey];
 
         return (
           <ImageListItem
@@ -134,45 +263,35 @@ const TopCardsGrid = ({
                 }}
               >
                 <Stack spacing={1}>
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    spacing={1}
-                  >
-                    <Box sx={{ minWidth: 0, flex: 1 }}>
-                      <Typography
-                        variant="subtitle2"
-                        sx={{
-                          fontSize:
-                            card.orientation === "vertical"
-                              ? "0.75rem"
-                              : "0.875rem",
-                          fontWeight: 600,
-                          lineHeight: 1.2,
-                        }}
-                        noWrap
-                      >
-                        {card.cardName}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{
-                          fontSize:
-                            card.orientation === "vertical"
-                              ? "0.7rem"
-                              : "0.75rem",
-                          lineHeight: 1.2,
-                          display: "block",
-                        }}
-                        noWrap
-                      >
-                        {card.bank}
-                      </Typography>
-                    </Box>
+                  <Stack spacing={0.5}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        fontSize: card.orientation === "vertical" ? "0.75rem" : "0.875rem",
+                        fontWeight: 600,
+                        lineHeight: 1.2,
+                      }}
+                      noWrap
+                    >
+                      {card.cardName}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{
+                        fontSize: card.orientation === "vertical" ? "0.7rem" : "0.75rem",
+                        lineHeight: 1.2,
+                      }}
+                      noWrap
+                    >
+                      {card.bank}
+                    </Typography>
                   </Stack>
-                  <Stack direction="row" spacing={1}>
+
+                  {renderFees(cardKey)}
+                  {renderCategories(cardKey)}
+
+                  <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
                     {!isMobile && (
                       <Button
                         variant="contained"
@@ -183,29 +302,23 @@ const TopCardsGrid = ({
                         }}
                         sx={{
                           flex: 1,
-                          fontSize:
-                            card.orientation === "vertical"
-                              ? "0.7rem"
-                              : "0.75rem",
+                          fontSize: card.orientation === "vertical" ? "0.7rem" : "0.75rem",
                         }}
                       >
                         Calculate Rewards
                       </Button>
                     )}
-                    {referralLink && (
+                    {referralInfo?.link && (
                       <Button
                         variant="outlined"
                         size="small"
-                        href={referralLink}
+                        href={referralInfo.link}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
                         sx={{
                           flex: 1,
-                          fontSize:
-                            card.orientation === "vertical"
-                              ? "0.7rem"
-                              : "0.75rem",
+                          fontSize: card.orientation === "vertical" ? "0.7rem" : "0.75rem",
                         }}
                       >
                         Apply Now
