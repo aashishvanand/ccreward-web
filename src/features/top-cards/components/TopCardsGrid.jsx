@@ -8,14 +8,23 @@ import {
   Stack,
   Paper,
   Chip,
-  Divider,
 } from "@mui/material";
 import {
-  RestaurantMenu as RestaurantMenuIcon,
-  LocalMovies as LocalMoviesIcon,
-  Flight as FlightIcon,
+  School as SchoolIcon,
+  Theaters as TheatersIcon,
+  Restaurant as RestaurantIcon,
+  AccountBalance as AccountBalanceIcon,
+  LocalGroceryStore as LocalGroceryStoreIcon,
+  LocalHospital as LocalHospitalIcon,
+  Security as SecurityIcon,
+  Public as PublicIcon,
+  Diamond as DiamondIcon,
+  Store as StoreIcon,
+  ShoppingCart as ShoppingCartIcon,
   LocalGasStation as LocalGasStationIcon,
-  ShoppingBag as ShoppingBagIcon,
+  DirectionsBus as DirectionsBusIcon,
+  Receipt as ReceiptIcon,
+  AccountBalanceWallet as AccountBalanceWalletIcon,
 } from "@mui/icons-material";
 import Image from "next/image";
 
@@ -23,11 +32,21 @@ const CACHE_KEY = "referralData";
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
 const categoryIcons = {
-  Dining: <RestaurantMenuIcon sx={{ fontSize: 16 }} />,
-  Movies: <LocalMoviesIcon sx={{ fontSize: 16 }} />,
-  Travel: <FlightIcon sx={{ fontSize: 16 }} />,
-  Fuel: <LocalGasStationIcon sx={{ fontSize: 16 }} />,
-  Shopping: <ShoppingBagIcon sx={{ fontSize: 16 }} />,
+  "Education": <SchoolIcon sx={{ fontSize: 16 }} />,
+  "Entertainment": <TheatersIcon sx={{ fontSize: 16 }} />,
+  "Food & Dining": <RestaurantIcon sx={{ fontSize: 16 }} />,
+  "Government/Tax": <AccountBalanceIcon sx={{ fontSize: 16 }} />,
+  "Groceries": <LocalGroceryStoreIcon sx={{ fontSize: 16 }} />,
+  "Healthcare & Medical": <LocalHospitalIcon sx={{ fontSize: 16 }} />,
+  "Insurance": <SecurityIcon sx={{ fontSize: 16 }} />,
+  "International Spends": <PublicIcon sx={{ fontSize: 16 }} />,
+  "Jwellery": <DiamondIcon sx={{ fontSize: 16 }} />,
+  "Offline Shopping": <StoreIcon sx={{ fontSize: 16 }} />,
+  "Online Shopping": <ShoppingCartIcon sx={{ fontSize: 16 }} />,
+  "Petrol": <LocalGasStationIcon sx={{ fontSize: 16 }} />,
+  "Travel & Transportation": <DirectionsBusIcon sx={{ fontSize: 16 }} />,
+  "Utility Bill": <ReceiptIcon sx={{ fontSize: 16 }} />,
+  "Wallet Loading": <AccountBalanceWalletIcon sx={{ fontSize: 16 }} />,
 };
 
 const TopCardsGrid = ({
@@ -84,8 +103,8 @@ const TopCardsGrid = ({
     const referralInfo = referralData[cardKey];
     if (!referralInfo) return null;
 
-    const joiningFees = parseInt(referralInfo.JoiningFees || "0");
-    const renewalFees = parseInt(referralInfo.RenewalFees || "0");
+    const joiningFees = referralInfo.JoiningFees;
+    const renewalFees = referralInfo.RenewalFees;
     const isLtf = referralInfo.ltf;
 
     if (!joiningFees && !renewalFees) return null;
@@ -114,7 +133,7 @@ const TopCardsGrid = ({
             borderRadius: 1,
           }}
         >
-          {joiningFees > 0 && (
+          {joiningFees && (
             <Box sx={{ 
               display: "flex", 
               justifyContent: "space-between",
@@ -124,11 +143,11 @@ const TopCardsGrid = ({
                 Joining Fee:
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                ₹{joiningFees} + GST
+                {joiningFees === "Nil" ? "Nil" : `₹${joiningFees} + GST`}
               </Typography>
             </Box>
           )}
-          {renewalFees > 0 && (
+          {renewalFees && (
             <Box sx={{ 
               display: "flex", 
               justifyContent: "space-between",
@@ -138,7 +157,7 @@ const TopCardsGrid = ({
                 Annual Fee:
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                ₹{renewalFees} + GST
+                {renewalFees === "Nil" ? "Nil" : `₹${renewalFees} + GST`}
               </Typography>
             </Box>
           )}
