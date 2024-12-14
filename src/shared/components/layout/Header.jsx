@@ -47,6 +47,7 @@ function Header() {
   });
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [userCardCount, setUserCardCount] = useState(0);
+  const isHomePage = pathname === "/";
 
   useEffect(() => {
     setDeviceInfo(detectDevice());
@@ -162,6 +163,33 @@ function Header() {
     );
   }
 
+  const LogoContent = () => (
+    <>
+      <Box sx={{ position: "relative", width: 40, height: 40, mr: 1 }}>
+        <Image
+          src={
+            mode === "dark"
+              ? "f4bf16b1-527e-4d80-47b4-99989a1ded00"
+              : "b6c3c6f1-a744-4e47-8c50-4c33c84c3900"
+          }
+          alt="CCReward Logo"
+          width={40}
+          height={40}
+          priority
+        />
+      </Box>
+      <Typography
+        variant="h6"
+        component="div"
+        sx={{
+          fontWeight: 500,
+        }}
+      >
+        CCReward
+      </Typography>
+    </>
+  );
+
   return (
     <AppBar position="static" color="default" elevation={0}>
       <Toolbar
@@ -177,26 +205,28 @@ function Header() {
           },
         }}
       >
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{ display: "flex", alignItems: "center" }}
-        >
-          <Box sx={{ position: "relative", width: 40, height: 40, mr: 1 }}>
-            <Image
-              src={
-                mode === "dark"
-                  ? "f4bf16b1-527e-4d80-47b4-99989a1ded00"
-                  : "b6c3c6f1-a744-4e47-8c50-4c33c84c3900"
-              }
-              alt="CCReward Logo"
-              width={40}
-              height={40}
-              priority
-            />
+        {isHomePage ? (
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <LogoContent />
           </Box>
-          CCReward
-        </Typography>
+        ) : (
+          <Box 
+            component={Link} 
+            href="/"
+            sx={{ 
+              display: 'flex', 
+              alignItems: 'center',
+              textDecoration: 'none',
+              color: 'inherit',
+              cursor: 'pointer',
+              '&:hover': {
+                opacity: 0.8
+              }
+            }}
+          >
+            <LogoContent />
+          </Box>
+        )}
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <IconButton
