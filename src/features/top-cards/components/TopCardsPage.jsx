@@ -34,7 +34,7 @@ const categories = [
   "Healthcare & Medical",
   "Insurance",
   "International Spends",
-  "Jwellery",
+  "Jewellery",
   "Offline Shopping",
   "Online Shopping",
   "Petrol",
