@@ -32,7 +32,7 @@
     "firebase": "^11.1.0",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
-    "next": "^15.1.2",
+    "next": "^15.1.4",
     "prop-types": "^15.8.1",
     "react": "19.0.0",
     "react-confetti": "^6.1.0",
