@@ -1,14 +1,21 @@
 import dynamic from 'next/dynamic';
+import { generateMetadata, pageMetadata } from '../shared/components/seo';
 import { AuthProvider } from '../core/providers/AuthContext';
 import { ThemeRegistry } from '../core/providers/ThemeRegistry';
 
-const TermsOfServiceyWrapper = dynamic(() => import('../features/legal/components/TermsOfServicePage'), { ssr: false });
+const TermsOfServiceWrapper = dynamic(() => import('../features/legal/components/TermsOfServicePage'), { ssr: false });
 
-export default function PrivacyPage() {
+export const metadata = generateMetadata({
+  title: "Terms of Service - CCReward",
+  description: "Read CCReward's terms of service and user agreement for our credit card rewards calculator and comparison tools.",
+  path: '/terms'
+});
+
+export default function TermsPage() {
   return (
     <ThemeRegistry>
       <AuthProvider>
-        <TermsOfServiceyWrapper />
+        <TermsOfServiceWrapper />
       </AuthProvider>
     </ThemeRegistry>
   );

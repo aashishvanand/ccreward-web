@@ -1,5 +1,6 @@
 import { Box, Container, Typography, Grid, Card } from "@mui/material";
 import Image from "next/image";
+import Link from "next/link";
 import bankImagesData from "../../../../shared/constants/bankImages";
 
 const BankSection = () => {
@@ -12,42 +13,48 @@ const BankSection = () => {
         <Grid container spacing={2} sx={{ justifyContent: "center" }}>
           {bankImagesData.map((bank) => (
             <Grid item xs={6} sm={4} md={3} lg={2} key={bank.id}>
-              <Card
-                sx={{
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  p: 2,
-                  transition: "transform 0.2s ease-in-out",
-                  "&:hover": {
-                    transform: "scale(1.05)",
-                  },
-                }}
+              <Link 
+                href={`/bank/${bank.bank.toLowerCase()}`}
+                style={{ textDecoration: 'none' }}
               >
-                <Box
+                <Card
                   sx={{
-                    width: 80,
-                    height: 80,
+                    height: "100%",
                     display: "flex",
-                    justifyContent: "center",
+                    flexDirection: "column",
                     alignItems: "center",
-                    mb: 1,
+                    justifyContent: "center",
+                    p: 2,
+                    transition: "transform 0.2s ease-in-out",
+                    "&:hover": {
+                      transform: "scale(1.05)",
+                    },
+                    cursor: "pointer",
                   }}
                 >
-                  <Image
-                    src={bank.id}
-                    alt={`${bank.bank.toUpperCase()} logo`}
-                    width={80}
-                    height={80}
-                    style={{ objectFit: "contain" }}
-                  />
-                </Box>
-                <Typography variant="subtitle2" align="center">
-                  {bank.bank.toUpperCase()}
-                </Typography>
-              </Card>
+                  <Box
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      mb: 1,
+                    }}
+                  >
+                    <Image
+                      src={bank.id}
+                      alt={`${bank.bank.toUpperCase()} logo`}
+                      width={80}
+                      height={80}
+                      style={{ objectFit: "contain" }}
+                    />
+                  </Box>
+                  <Typography variant="subtitle2" align="center">
+                    {bank.bank.toUpperCase()}
+                  </Typography>
+                </Card>
+              </Link>
             </Grid>
           ))}
         </Grid>
