@@ -14,11 +14,11 @@ const bankImagesData = [
         "filename": "bob.webp",
         "bank": "bob"
     },
-    {
-        "id": "e14d8b7b-6375-4b99-bb4f-674a0d00df00",
-        "filename": "union.webp",
-        "bank": "union"
-    },
+    // {
+    //     "id": "e14d8b7b-6375-4b99-bb4f-674a0d00df00",
+    //     "filename": "union.webp",
+    //     "bank": "union"
+    // },
     {
         "id": "abdbc7ce-6479-46cb-73f6-65ebd82ae500",
         "filename": "pnb.webp",
@@ -29,11 +29,11 @@ const bankImagesData = [
         "filename": "sbi.webp",
         "bank": "sbi"
     },
-    {
-        "id": "3e5a159b-3730-44ea-b222-b266d8d87800",
-        "filename": "kvb.webp",
-        "bank": "kvb"
-    },
+    // {
+    //     "id": "3e5a159b-3730-44ea-b222-b266d8d87800",
+    //     "filename": "kvb.webp",
+    //     "bank": "kvb"
+    // },
     {
         "id": "1b98f6ed-3d6d-4b38-6672-ff5bcca30a00",
         "filename": "au.webp",
