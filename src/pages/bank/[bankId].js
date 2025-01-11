@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import dynamic from 'next/dynamic';
 import { ThemeRegistry } from '../../core/providers/ThemeRegistry';
@@ -10,7 +10,7 @@ import { Box, CircularProgress } from '@mui/material';
 const BankPage = dynamic(() => import('../../features/bank/components/BankPage'), { ssr: false });
 
 const CACHE_KEY = 'cardsData';
-const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000;
+const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
 const BANK_NAME_MAPPING = {
     'amex': 'AMEX',
@@ -73,9 +73,7 @@ const fetchCardsData = async () => {
 
     const response = await fetch('https://files.ccreward.app/cards.json');
     const data = await response.json();
-    
     setToCache(data);
-    
     return data;
 };
 
@@ -83,27 +81,26 @@ function BankRoute() {
     const router = useRouter();
     const [bankData, setBankData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         async function fetchData() {
             try {
-                // Get bankId from URL
-                const bankId = window.location.pathname.split('/').pop();
-                if (!bankId) {
+                const pathname = window.location.pathname;
+                const bankId = pathname.split('/').pop().toLowerCase();
+                
+                if (!bankId || !BANK_NAME_MAPPING[bankId]) {
+                    setError('Invalid bank');
                     router.push('/');
                     return;
                 }
 
-                const mappedBankName = BANK_NAME_MAPPING[bankId.toLowerCase()];
-                if (!mappedBankName) {
-                    router.push('/');
-                    return;
-                }
-
+                const mappedBankName = BANK_NAME_MAPPING[bankId];
                 const data = await fetchCardsData();
                 const cards = data.issuers[mappedBankName]?.cards || [];
 
                 if (!cards.length) {
+                    setError('No cards found');
                     router.push('/');
                     return;
                 }
@@ -114,13 +111,16 @@ function BankRoute() {
                 });
             } catch (error) {
                 console.error('Error fetching bank data:', error);
+                setError(error.message);
                 router.push('/');
             } finally {
                 setIsLoading(false);
             }
         }
 
-        fetchData();
+        if (typeof window !== 'undefined') {
+            fetchData();
+        }
     }, [router]);
 
     if (isLoading) {
@@ -140,7 +140,7 @@ function BankRoute() {
         );
     }
 
-    if (!bankData) {
+    if (error || !bankData) {
         return null;
     }
 
@@ -153,6 +153,23 @@ function BankRoute() {
     );
 }
 
-BankRoute.displayName = 'BankRoute';
+// Enable static generation for all bank routes
+export async function getStaticPaths() {
+    const paths = Object.keys(BANK_NAME_MAPPING).map(bank => ({
+        params: { bankId: bank }
+    }));
+
+    return {
+        paths,
+        fallback: true // Enable fallback for client-side rendering
+    };
+}
+
+// Provide minimal props for static generation
+export async function getStaticProps() {
+    return {
+        props: {}
+    };
+}
 
 export default BankRoute;
