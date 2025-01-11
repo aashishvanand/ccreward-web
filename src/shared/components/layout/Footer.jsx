@@ -37,7 +37,7 @@ function Footer() {
               <Twitter />
             </IconButton>
             <IconButton 
-              href="https://www.instagram.com/ccreward.app/" 
+              href="https://www.instagram.com/ccrewardapp/" 
               target="_blank"
               rel="noopener noreferrer"
               size="small"
