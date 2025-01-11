@@ -14,6 +14,11 @@ const StatsSection = () => {
     return rounded;
   };
 
+  const roundToNearestTen = (num) => {
+    const rounded = Math.floor(num / 10) * 10;
+    return rounded;
+  };
+
   // Data fetching effect
   useEffect(() => {
     const fetchStats = async () => {
@@ -163,7 +168,11 @@ const StatsSection = () => {
                   justifyContent: "center",
                 }}
               >
-                <Counter value={stats.banks} animate={hasAnimated} suffix="+" />
+                <Counter
+                  value={roundToNearestTen(stats.banks)}
+                  animate={hasAnimated}
+                  suffix="+"
+                />
               </Typography>
               <Typography
                 variant="h6"

@@ -9,6 +9,7 @@ const nextConfig = {
       exclude:["error"]
     }
   },
+  trailingSlash: false,
   serverExternalPackages: ['sharp'], // Previously serverComponentsExternalPackages
   bundlePagesRouterDependencies: true, // Previously bundlePagesExternals
   typescript: {
