@@ -28,7 +28,7 @@
     "@mui/icons-material": "^6.3.1",
     "@mui/material": "^6.3.1",
     "@mui/material-nextjs": "^6.3.1",
-    "axios": "^1.7.9",
+    "axios": "^1.8.2",
     "firebase": "^11.1.0",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
