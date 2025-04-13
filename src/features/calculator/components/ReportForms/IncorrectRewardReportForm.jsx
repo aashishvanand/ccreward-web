@@ -57,7 +57,9 @@ const IncorrectRewardReportForm = ({
       <form onSubmit={handleSubmit}>
         <DialogTitle>Report Incorrect Reward Points</DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
-          <Typography variant="body2" color="textSecondary" paragraph>
+          <Typography variant="body2" color="textSecondary" sx={{
+            marginBottom: "16px"
+          }}>
             Please provide feedback about the issue with the reward point
             calculation.
           </Typography>
@@ -70,10 +72,12 @@ const IncorrectRewardReportForm = ({
             value={userFeedback}
             onChange={(e) => setUserFeedback(e.target.value)}
             required
-            inputProps={{
-              maxLength: 500,
-            }}
             helperText={`${userFeedback.length}/500 characters`}
+            slotProps={{
+              htmlInput: {
+                maxLength: 500,
+              }
+            }}
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>

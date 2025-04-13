@@ -82,8 +82,10 @@ const RegionSelector = () => {
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
-        MenuListProps={{
-          "aria-labelledby": "region-button",
+        slotProps={{
+          list: {
+            "aria-labelledby": "region-button",
+          }
         }}
       >
         {Object.entries(REGIONS).map(([code, name]) => (
