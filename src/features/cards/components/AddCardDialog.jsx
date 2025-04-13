@@ -23,15 +23,8 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CardNetworkSelector from "./CardNetworkSelector";
-
-const cardNetworks = [
-  { name: "Visa", id: "76167935-fcfc-4098-f3e4-b9d4369f6800" },
-  { name: "Mastercard", id: "40969bf0-5dcf-48cd-a617-df61631df000" },
-  { name: "RuPay", id: "24b3f814-0f9a-4639-ce66-43c5128c7300" },
-  { name: "DinersClub", id: "452de32e-ea1e-46b4-eec8-01f0ebf32c00" },
-  { name: "AmEx", id: "55c9ee86-66b6-4540-17f5-0cebd2ae6700" },
-  { name: "UnionPay", id: "55c9ee86-66b6-4540-17f5-0cebd2ae6701" },
-];
+import { fetchBanks, fetchCards } from "../../../core/services/api";
+import { useRegion } from "../../../core/providers/RegionContext";
 
 const BILLING_DATES = Array.from({ length: 31 }, (_, i) => i + 1);
 const months = [
@@ -84,14 +77,17 @@ const limitConfig = {
 export default function AddCardDialog({ open, onClose, onAddCard }) {
   const theme = useTheme();
   // Get region from localStorage directly if needed or fallback to 'IN'
-  const region =
-    typeof localStorage !== "undefined"
-      ? localStorage.getItem("app-region") || "IN"
-      : "IN";
+  const [region, setRegion] = useState(() => {
+    // Check if we're on the client side before accessing localStorage
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("app-region");
+    }
+    return "IN"; // Default fallback
+  });
 
   const currentYear = new Date().getFullYear();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [banks, setBanks] = useState([]);
   const [cards, setCards] = useState([]);
   const [expanded, setExpanded] = useState(false);
@@ -103,9 +99,6 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
   const [newCard, setNewCard] = useState({
     bank: "",
     cardName: "",
-    network: region === "SG" ? "Mastercard" : "Visa",
-    billingDate: 1,
-    limit: region === "SG" ? 500 : 100000,
   });
 
   // Safe access to limit config based on region
@@ -114,40 +107,65 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
   };
 
   useEffect(() => {
-    // Fetch banks
-    const fetchBanks = async () => {
-      setIsLoading(true);
-      // Mock data for demonstration
-      setTimeout(() => {
-        setBanks(["HDFC", "ICICI", "SBI", "Axis", "AMEX", "YesBank"]);
-        setIsLoading(false);
-      }, 500);
-    };
-
-    fetchBanks();
+    if (typeof window !== "undefined") {
+      const storedRegion = localStorage.getItem("app-region").toLowerCase();
+      setRegion(storedRegion);
+    }
   }, [region]);
 
-  const handleBankChange = (event, value) => {
-    setNewCard((prev) => ({ ...prev, bank: value, cardName: "" }));
+  useEffect(() => {
+    if (open) {
+      fetchBankList();
+    }
+  }, [open]);
 
-    // Fetch cards for selected bank
-    if (value) {
-      setIsLoading(true);
-      // Mock data for demonstration
-      setTimeout(() => {
-        const mockCards = {
-          HDFC: ["Regalia", "Diners Black", "Infinia", "Millennia"],
-          ICICI: ["Amazon Pay", "Emeralde", "Rubyx", "Sapphiro"],
-          SBI: ["Elite", "SimplyCLICK", "BPCL", "Prime"],
-          Axis: ["Ace", "Atlas", "Magnus", "Vistara"],
-          AMEX: ["Platinum", "Gold", "Membership Rewards"],
-          YesBank: ["Prosperity", "Premia", "Exclusive"],
-        };
-        setCards(mockCards[value] || []);
-        setIsLoading(false);
-      }, 500);
+  const fetchBankList = async () => {
+    setLoading(true);
+    try {
+      const bankList = await fetchBanks();
+      setBanks(bankList);
+    } catch (error) {
+      handleError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCardList = async (bank) => {
+    setLoading(true);
+    try {
+      const cardList = await fetchCards(bank);
+      setCards(cardList);
+    } catch (error) {
+      handleError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBankChange = (e) => {
+    const selectedBank = e.target.value;
+    setNewCard({ bank: selectedBank, cardName: "" });
+    if (selectedBank) {
+      fetchCardList(selectedBank);
     } else {
       setCards([]);
+    }
+  };
+
+  const handleError = (error) => {
+    if (error.message.includes("too many requests")) {
+      setSnackbar({
+        open: true,
+        message: error.message,
+        severity: "warning",
+      });
+    } else {
+      setSnackbar({
+        open: true,
+        message: "An error occurred. Please try again.",
+        severity: "error",
+      });
     }
   };
 
@@ -205,41 +223,47 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
           </Box>
         ) : (
           <>
-            <Autocomplete
-              options={banks}
+            <TextField
+              select
+              label="Bank"
               value={newCard.bank}
-              onChange={handleBankChange}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Bank"
-                  required
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                />
-              )}
-            />
-
-            <Autocomplete
-              options={cards}
+              onChange={(e) => {
+                const selectedBank = e.target.value;
+                setNewCard({ bank: selectedBank, cardName: "" });
+                if (selectedBank) {
+                  fetchCardList(selectedBank);
+                } else {
+                  setCards([]);
+                }
+              }}
+              fullWidth
+              margin="normal"
+            >
+              <MenuItem value="">Select a bank</MenuItem>
+              {banks.map((bank) => (
+                <MenuItem key={bank} value={bank}>
+                  {bank}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              select
+              label="Card Name"
               value={newCard.cardName}
-              onChange={(event, value) =>
-                setNewCard((prev) => ({ ...prev, cardName: value }))
+              onChange={(e) =>
+                setNewCard((prev) => ({ ...prev, cardName: e.target.value }))
               }
+              fullWidth
+              margin="normal"
               disabled={!newCard.bank || isLoading}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Card Name"
-                  required
-                  fullWidth
-                  margin="normal"
-                  variant="outlined"
-                />
-              )}
-            />
-
+            >
+              <MenuItem value="">Select a card</MenuItem>
+              {cards.map((card) => (
+                <MenuItem key={card} value={card}>
+                  {card}
+                </MenuItem>
+              ))}
+            </TextField>
             <Accordion
               expanded={expanded}
               onChange={() => setExpanded(!expanded)}

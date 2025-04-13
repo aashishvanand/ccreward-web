@@ -39,17 +39,25 @@ export const addCardForUser = async (userId, cardData) => {
     // Get country from region context or local storage
     const country = localStorage.getItem('app-region')?.toLowerCase() || 'in';
     
+    // Create a new object with only essential and provided fields
+    const cardToAdd = {
+      bank: cardData.bank,
+      cardName: cardData.cardName,
+      country: country
+    };
+
+    // Conditionally add optional fields only if they exist
+    if (cardData.network) cardToAdd.network = cardData.network;
+    if (cardData.billingDate) cardToAdd.billingDate = cardData.billingDate;
+    if (cardData.limit) cardToAdd.limit = cardData.limit;
+    if (cardData.since) cardToAdd.since = cardData.since;
+
+    // Add server timestamp
+    cardToAdd.addedAt = serverTimestamp();
+
     const cardKey = `${cardData.bank}_${cardData.cardName}`;
     await updateDoc(userRef, {
-      [`cards.${cardKey}`]: {
-        ...cardData,
-        country: cardData.country || country, // Use provided country or default
-        network: cardData.network || 'Visa', // Default to Visa if not provided
-        billingDate: cardData.billingDate || 1, // Default to 1st
-        limit: cardData.limit || 100000, // Default limit
-        since: cardData.since || 'January, 2025', // Default date
-        addedAt: serverTimestamp()
-      }
+      [`cards.${cardKey}`]: cardToAdd
     });
 
     // Clear cache to force a fresh fetch next time
@@ -137,13 +145,19 @@ export const updateCardForUser = async (userId, cardData) => {
   try {
     const userRef = doc(db, 'users', userId);
     
-    // Prepare updated card data
-    const { id, ...cardDetails } = cardData;
+    // Destructure and remove unwanted fields
+    const { 
+      id, 
+      image, 
+      orientation, 
+      updatedAt, 
+      addedAt, 
+      ...cardDetails 
+    } = cardData;
     
     await updateDoc(userRef, {
       [`cards.${id}`]: {
-        ...cardDetails,
-        updatedAt: serverTimestamp()
+        ...cardDetails
       }
     });
     
