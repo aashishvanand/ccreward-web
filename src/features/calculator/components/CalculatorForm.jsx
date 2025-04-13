@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   Autocomplete,
   TextField,
@@ -36,12 +36,11 @@ const CalculatorForm = ({
   onCalculate,
   onClear,
   onError,
-  isEmbedded = false,
-  tokenReady = true,
   isCalculating = false,
 }) => {
   const theme = useTheme();
   const { region } = useRegion();
+  const isFirstRender = useRef(true);
   const [banks, setBanks] = useState([]);
   const [cards, setCards] = useState([]);
   const [mccOptions, setMccOptions] = useState([]);
@@ -54,27 +53,46 @@ const CalculatorForm = ({
   const searchParams = useSearchParams();
   const [isValidating, setIsValidating] = useState(false);
 
-  useEffect(() => {
-    if (tokenReady) {
-      loadBanks();
+  const handleRegionChange = useCallback(async () => {
+    // Reset all form states
+    onBankChange("");
+    onCardChange("");
+    setCards([]);
+    setCardQuestions(null);
+    setMccOptions([]);
+    setMccInputValue("");
+
+    try {
+      setIsLoadingBanks(true);
+      const fetchedBanks = await fetchBanks();
+      setBanks(fetchedBanks);
+    } catch (error) {
+      console.error("Error fetching banks after region change:", error);
+      onError?.("Failed to load banks for the new region. Please try again.");
+    } finally {
+      setIsLoadingBanks(false);
     }
-  }, [tokenReady, region]);
+  }, [onBankChange, onCardChange, onError]);
 
   useEffect(() => {
-    if (selectedBank && tokenReady) {
+      loadBanks();
+  }, [region]);
+
+  useEffect(() => {
+    if (selectedBank) {
       loadCards();
     } else {
       setCards([]);
     }
-  }, [selectedBank, isEmbedded, tokenReady]);
+  }, [selectedBank]);
 
   useEffect(() => {
-    if (selectedBank && selectedCard && tokenReady) {
+    if (selectedBank && selectedCard) {
       loadCardQuestions();
     } else {
       setCardQuestions(null);
     }
-  }, [selectedBank, selectedCard, isEmbedded, tokenReady]);
+  }, [selectedBank, selectedCard]);
 
   useEffect(() => {
     const validateAndSetBankCard = async () => {
@@ -121,6 +139,19 @@ const CalculatorForm = ({
     onError,
   ]);
 
+
+  // Add event listener for region changes
+  useEffect(() => {
+    // Skip the first render to prevent unnecessary initial load
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    // Trigger region change handling
+    handleRegionChange();
+  }, [region, handleRegionChange]);
+
   const loadBanks = async () => {
     setIsLoadingBanks(true);
     try {
@@ -152,8 +183,7 @@ const CalculatorForm = ({
     try {
       const questions = await fetchCardQuestions(
         selectedBank,
-        selectedCard,
-        isEmbedded
+        selectedCard
       );
       setCardQuestions(questions);
     } catch (error) {
@@ -183,6 +213,8 @@ const CalculatorForm = ({
         return "S$";
       case "IN":
         return "₹";
+      default:
+        return "$";
     }
   };
 
@@ -191,7 +223,7 @@ const CalculatorForm = ({
       if (value && value.length >= 2) {
         setIsLoadingMcc(true);
         try {
-          const mccData = await fetchMCC(value, isEmbedded);
+          const mccData = await fetchMCC(value);
           setMccOptions(mccData || []);
         } catch (error) {
           console.error("Error fetching MCC data:", error);
@@ -204,7 +236,7 @@ const CalculatorForm = ({
         setMccOptions([]);
       }
     }, 300),
-    [isEmbedded, onError]
+    [onError]
   );
 
   const handleMccInputChange = (event, newValue) => {
@@ -401,8 +433,6 @@ CalculatorForm.propTypes = {
   onCalculate: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
   onError: PropTypes.func,
-  isEmbedded: PropTypes.bool,
-  tokenReady: PropTypes.bool,
   isCalculating: PropTypes.bool,
 };
 
