@@ -256,7 +256,7 @@ function MyCardsPage() {
               Great start! You've added your first card.
             </Typography>
             <Typography>
-              Add one more card to use our "Best Card" feature and
+              Add one more card to use our &quot;Best Card&quot; feature and
               start comparing rewards!
             </Typography>
           </Paper>
