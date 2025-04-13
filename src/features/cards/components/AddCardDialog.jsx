@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -10,12 +10,24 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
+  Typography,
+  Box,
+  Chip,
 } from "@mui/material";
-import { useRegion } from "../../../core/providers/RegionContext";
+import { Public as PublicIcon } from "@mui/icons-material";
+import { useRegion, REGIONS } from "../../../core/providers/RegionContext";
 import { fetchBanks, fetchCards } from "../../../core/services/api";
 
 function AddCardDialog({ open, onClose, onAddCard }) {
-  const { region } = useRegion();
+  // Get region from context
+  const { region: contextRegion, regionName: contextRegionName } = useRegion();
+  
+  // Use state to track the active region in the dialog
+  const [activeRegion, setActiveRegion] = useState({
+    code: contextRegion,
+    name: contextRegionName
+  });
+  
   const [newCard, setNewCard] = useState({ bank: "", cardName: "" });
   const [banks, setBanks] = useState([]);
   const [cards, setCards] = useState([]);
@@ -27,18 +39,86 @@ function AddCardDialog({ open, onClose, onAddCard }) {
     severity: "error",
   });
 
+  // Reset dialog state when opened
   useEffect(() => {
     if (open) {
-      fetchBankList();
+      // Read directly from localStorage to ensure we have the most current value
+      const currentRegion = localStorage.getItem('app-region') || 'IN';
+      const currentRegionName = REGIONS[currentRegion] || 'India';
+      
+      console.log(`Dialog opened with region: ${currentRegion} (${currentRegionName})`);
+      
+      // Reset all state
+      setNewCard({ bank: "", cardName: "" });
+      setBanks([]);
+      setCards([]);
+      setActiveRegion({
+        code: currentRegion,
+        name: currentRegionName
+      });
+      
+      // Fetch banks for this region
+      fetchBankList(currentRegion);
     }
-  }, [open, region]);
+  }, [open]);
 
-  const fetchBankList = async () => {
+  // Function to update everything when region changes
+  const updateForRegion = (newRegion) => {
+    const regionName = REGIONS[newRegion] || 'India';
+    
+    console.log(`Updating dialog for region change: ${newRegion} (${regionName})`);
+    
+    // Update state
+    setActiveRegion({
+      code: newRegion,
+      name: regionName
+    });
+    
+    // Reset selections
+    setNewCard({ bank: "", cardName: "" });
+    setCards([]);
+    
+    // Fetch banks for new region
+    fetchBankList(newRegion);
+  };
+
+  // Listen for region changes
+  useEffect(() => {
+    const handleRegionChanged = (event) => {
+      if (!open) return;
+      
+      // Get new region from event or localStorage
+      const newRegion = event?.detail?.region || 
+                        localStorage.getItem('app-region') || 
+                        'IN';
+                        
+      updateForRegion(newRegion);
+    };
+
+    // Listen for our custom event
+    window.addEventListener('region-changed', handleRegionChanged);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('region-changed', handleRegionChanged);
+    };
+  }, [open]);
+
+  // Watch for context region changes too
+  useEffect(() => {
+    if (open && contextRegion !== activeRegion.code) {
+      updateForRegion(contextRegion);
+    }
+  }, [contextRegion, activeRegion.code, open]);
+
+  const fetchBankList = async (regionCode) => {
     setLoading(true);
     try {
-      const bankList = await fetchBanks();
+      console.log(`Fetching banks for region: ${regionCode}`);
+      const bankList = await fetchBanks(regionCode);
       setBanks(bankList);
     } catch (error) {
+      console.error("Error fetching banks:", error);
       handleError(error);
     } finally {
       setLoading(false);
@@ -48,9 +128,11 @@ function AddCardDialog({ open, onClose, onAddCard }) {
   const fetchCardList = async (bank) => {
     setLoading(true);
     try {
-      const cardList = await fetchCards(bank);
+      console.log(`Fetching cards for bank ${bank} in region ${activeRegion.code}`);
+      const cardList = await fetchCards(bank, activeRegion.code);
       setCards(cardList);
     } catch (error) {
+      console.error("Error fetching cards:", error);
       handleError(error);
     } finally {
       setLoading(false);
@@ -58,7 +140,7 @@ function AddCardDialog({ open, onClose, onAddCard }) {
   };
 
   const handleError = (error) => {
-    if (error.message.includes("too many requests")) {
+    if (error?.message?.includes("too many requests")) {
       setSnackbar({
         open: true,
         message: error.message,
@@ -84,20 +166,22 @@ function AddCardDialog({ open, onClose, onAddCard }) {
   };
 
   const handleAddCard = () => {
-    // Add the country code to the new card data
+    // Add region information
     const cardWithCountry = {
       ...newCard,
-      country: region.toLowerCase() // Ensure lowercase for consistency
+      country: (cardData.country || country).toLowerCase(),
     };
+    
+    console.log(`Adding card with region: ${activeRegion.code.toLowerCase()}`);
     onAddCard(cardWithCountry);
+    
+    // Reset and close
     setNewCard({ bank: "", cardName: "" });
     onClose();
   };
 
   const handleCloseSnackbar = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
+    if (reason === "clickaway") return;
     setSnackbar({ ...snackbar, open: false });
   };
 
@@ -117,43 +201,59 @@ function AddCardDialog({ open, onClose, onAddCard }) {
           },
         }}
       >
-        <DialogTitle>Add New Card</DialogTitle>
+        <DialogTitle>
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            Add New Card
+          </Box>
+         
+        </DialogTitle>
         <DialogContent>
-          {loading && <CircularProgress />}
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          <TextField
-            select
-            label="Bank"
-            value={newCard.bank}
-            onChange={handleBankChange}
-            fullWidth
-            margin="normal"
-          >
-            <MenuItem value="">Select a bank</MenuItem>
-            {banks.map((bank) => (
-              <MenuItem key={bank} value={bank}>
-                {bank}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            select
-            label="Card Name"
-            value={newCard.cardName}
-            onChange={(e) =>
-              setNewCard({ ...newCard, cardName: e.target.value })
-            }
-            fullWidth
-            margin="normal"
-            disabled={!newCard.bank || loading}
-          >
-            <MenuItem value="">Select a card</MenuItem>
-            {cards.map((card) => (
-              <MenuItem key={card} value={card}>
-                {card}
-              </MenuItem>
-            ))}
-          </TextField>
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', my: 3 }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <>
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
+              <TextField
+                select
+                label="Bank"
+                value={newCard.bank}
+                onChange={handleBankChange}
+                fullWidth
+                margin="normal"
+              >
+                <MenuItem value="">Select a bank</MenuItem>
+                {banks.map((bank) => (
+                  <MenuItem key={bank} value={bank}>
+                    {bank}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TextField
+                select
+                label="Card Name"
+                value={newCard.cardName}
+                onChange={(e) =>
+                  setNewCard({ ...newCard, cardName: e.target.value })
+                }
+                fullWidth
+                margin="normal"
+                disabled={!newCard.bank || loading}
+              >
+                <MenuItem value="">Select a card</MenuItem>
+                {cards.map((card) => (
+                  <MenuItem key={card} value={card}>
+                    {card}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>

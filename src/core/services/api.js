@@ -151,28 +151,54 @@ const authenticatedRequest = async (method, url, data = null) => {
 };
 
 // Fetch banks
-export const fetchBanks = async () => {
-    const cacheKey = 'banks';
+export const fetchBanks = async (regionCode) => {
+    // Get region from parameter or from localStorage as fallback
+    const region = regionCode || 
+                  (typeof localStorage !== 'undefined' ? 
+                   localStorage.getItem('app-region')?.toLowerCase() : 'in');
+    
+    // Create a region-specific cache key
+    const cacheKey = `banks_${region}`;
+    
+    console.log(`Fetching banks for region: ${region} (Cache key: ${cacheKey})`);
+    
     const cachedData = getFromCache(cacheKey);
-    if (cachedData) return cachedData;
+    if (cachedData) {
+        console.log(`Using cached banks for region ${region}`);
+        return cachedData;
+    }
 
     try {
-        const response = await api.get('/bank');
-        setToCache(cacheKey, response.data);
-        return response.data;
+        // Explicitly include region in request
+        const response = await api.get(`/bank?country=${region}`);
+        const data = response.data;
+        
+        // Store with region-specific cache key
+        setToCache(cacheKey, data);
+        
+        return data;
     } catch (error) {
         return handleApiError(error);
     }
 };
 
 // Fetch cards for a specific bank
-export const fetchCards = async (bank) => {
-    const cacheKey = `cards_${bank}`;
+export const fetchCards = async (bank, regionCode) => {
+    // Get region from parameter or from localStorage as fallback
+    const region = regionCode || 
+                  (typeof localStorage !== 'undefined' ? 
+                   localStorage.getItem('app-region')?.toLowerCase() : 'in');
+    
+    // Create a region-specific cache key for this bank
+    const cacheKey = `cards_${region}_${bank}`;
+    
+    console.log(`Fetching cards for bank: ${bank} in region: ${region}`);
+    
     const cachedData = getFromCache(cacheKey);
     if (cachedData) return cachedData;
 
     try {
-        const response = await api.get(`/card?bank=${bank}`);
+        const response = await api.get(`/card?bank=${bank}&country=${region}`);
         setToCache(cacheKey, response.data);
         return response.data;
     } catch (error) {
