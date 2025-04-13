@@ -6,6 +6,7 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { getCardsForUser } from "../../../core/services/firebaseUtils";
 import useCardImagesData from "../../../core/hooks/useCardImagesData";
+import { useRegion } from "../../../core/providers/RegionContext"; 
 import Header from "../../../shared/components/layout/Header";
 import Footer from "../../../shared/components/layout/Footer";
 import HeroSection from "./HeroSection";
@@ -30,6 +31,7 @@ const MobileView = ({
   theme,
   alert,
   setAlert,
+  region
 }) => {
   if (!deviceInfo) {
     return null;
@@ -92,13 +94,17 @@ const MobileView = ({
             <StatsSection />
           </Box>
 
-          <Box component="section" sx={{ bgcolor: "background.default" }}>
-            <TopCardsSection />
-          </Box>
+          {region === 'IN' && (
+            <>
+              <Box component="section" sx={{ bgcolor: "background.default" }}>
+                <TopCardsSection />
+              </Box>
 
-          <Box sx={{ bgcolor: "background.paper" }}>
-            <TopSearchs />
-          </Box>
+              <Box sx={{ bgcolor: "background.paper" }}>
+                <TopSearchs />
+              </Box>
+            </>
+          )}
 
           <Box component="section" sx={{ bgcolor: "background.default" }}>
             <BankSection />
@@ -155,6 +161,7 @@ const DesktopView = ({
   theme,
   alert,
   setAlert,
+  region,
 }) => (
   <Box
     sx={{
@@ -190,13 +197,17 @@ const DesktopView = ({
         <StatsSection />
       </Box>
 
-      <Box sx={{ bgcolor: "background.default" }}>
-        <TopCardsSection />
-      </Box>
+      {region === 'IN' && (
+        <>
+          <Box sx={{ bgcolor: "background.default" }}>
+            <TopCardsSection />
+          </Box>
 
-      <Box sx={{ bgcolor: "background.paper" }}>
-        <TopSearchs />
-      </Box>
+          <Box sx={{ bgcolor: "background.paper" }}>
+            <TopSearchs />
+          </Box>
+        </>
+      )}
 
       <Box sx={{ bgcolor: "background.default" }}>
         <BankSection />
@@ -255,6 +266,7 @@ const LandingPage = () => {
     loading,
   } = useAuth();
   const theme = useTheme();
+  const { region } = useRegion(); 
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
@@ -307,13 +319,32 @@ const LandingPage = () => {
 
   useEffect(() => {
     if (cardImagesData?.length > 0) {
-      const horizontalCards = cardImagesData.filter(
+      // Filter cards based on region
+      const regionCards = cardImagesData.filter(card => {
+        // For India region
+        if (region === 'IN') {
+          return ['HDFC', 'ICICI', 'SBI', 'Axis', 'AMEX', 'YESBank', 'SC', 'Kotak', 
+                 'IDFCFirst', 'HSBC', 'OneCard', 'RBL', 'IndusInd', 'IDBI', 'Federal', 
+                 'BOB', 'AU'].includes(card.bank);
+        }
+        // For Singapore region
+        else if (region === 'SG') {
+          return ['DBS', 'POSB', 'UOB', 'OCBC', 'Maybank', 'CIMB', 'AMEX', 'Citi', 
+                 'HSBC', 'SC', 'BOC', 'Trust'].includes(card.bank);
+        }
+        return true; // Fallback
+      });
+      
+      // Get horizontal cards for the selected region
+      const horizontalCards = regionCards.filter(
         (card) => card.orientation === "horizontal"
       );
+      
+      // Shuffle and get 3 cards to display
       const shuffled = [...horizontalCards].sort(() => Math.random() - 0.5);
       setCardImages(shuffled.slice(0, 3));
     }
-  }, [cardImagesData]);
+  }, [cardImagesData, region]);
 
   useEffect(() => {
     const authenticated = isAuthenticated();
@@ -400,6 +431,7 @@ const LandingPage = () => {
     alert,
     setAlert,
     deviceInfo,
+    region
   };
 
   return isMobileDevice ? (
