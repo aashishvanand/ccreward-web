@@ -19,6 +19,7 @@ import {
 import _ from "lodash";
 import PropTypes from "prop-types";
 import { useSearchParams } from "next/navigation";
+import { useRegion } from "../../../core/providers/RegionContext";
 
 const CalculatorForm = ({
   selectedBank,
@@ -39,6 +40,7 @@ const CalculatorForm = ({
   isCalculating = false,
 }) => {
   const theme = useTheme();
+  const { region } = useRegion();
   const [banks, setBanks] = useState([]);
   const [cards, setCards] = useState([]);
   const [mccOptions, setMccOptions] = useState([]);
@@ -55,7 +57,7 @@ const CalculatorForm = ({
     if (tokenReady) {
       loadBanks();
     }
-  }, [isEmbedded, tokenReady]);
+  }, [tokenReady, region]);
 
   useEffect(() => {
     if (selectedBank && tokenReady) {
@@ -121,7 +123,7 @@ const CalculatorForm = ({
   const loadBanks = async () => {
     setIsLoadingBanks(true);
     try {
-      const fetchedBanks = await fetchBanks(isEmbedded);
+      const fetchedBanks = await fetchBanks();
       setBanks(fetchedBanks);
     } catch (error) {
       console.error("Error fetching banks:", error);

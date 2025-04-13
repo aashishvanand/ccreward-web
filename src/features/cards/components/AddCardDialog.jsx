@@ -11,9 +11,11 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import { useRegion } from "../../../core/providers/RegionContext";
 import { fetchBanks, fetchCards } from "../../../core/services/api";
 
 function AddCardDialog({ open, onClose, onAddCard }) {
+  const { region } = useRegion();
   const [newCard, setNewCard] = useState({ bank: "", cardName: "" });
   const [banks, setBanks] = useState([]);
   const [cards, setCards] = useState([]);
@@ -29,7 +31,7 @@ function AddCardDialog({ open, onClose, onAddCard }) {
     if (open) {
       fetchBankList();
     }
-  }, [open]);
+  }, [open, region]);
 
   const fetchBankList = async () => {
     setLoading(true);
@@ -82,7 +84,12 @@ function AddCardDialog({ open, onClose, onAddCard }) {
   };
 
   const handleAddCard = () => {
-    onAddCard(newCard);
+    // Add the country code to the new card data
+    const cardWithCountry = {
+      ...newCard,
+      country: region.toLowerCase() // Ensure lowercase for consistency
+    };
+    onAddCard(cardWithCountry);
     setNewCard({ bank: "", cardName: "" });
     onClose();
   };

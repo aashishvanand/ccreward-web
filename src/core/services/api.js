@@ -2,8 +2,6 @@ import axios from 'axios';
 import { getAuth, getIdToken } from "firebase/auth";
 import { jwtDecode } from "jwt-decode";
 
-const getApiInstance = (isEmbedded) => (isEmbedded ? embeddedApi : api);
-
 // Define the base URL for API calls
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -12,11 +10,6 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
 // Create an axios instance with the base URL
 const api = axios.create({
-    baseURL: API_BASE_URL,
-});
-
-// Create a separate instance for the embedded calculator
-const embeddedApi = axios.create({
     baseURL: API_BASE_URL,
 });
 
@@ -58,9 +51,8 @@ export const isTokenExpired = (token) => {
 };
 
 // Helper function to get data from cache
-const getFromCache = (key, isEmbedded = false) => {
-    if (isEmbedded || typeof localStorage === 'undefined') {
-        // Do not use cache in embedded context
+const getFromCache = (key) => {
+    if (typeof localStorage === 'undefined') {
         return null;
     }
     const cached = localStorage.getItem(key);
@@ -74,33 +66,29 @@ const getFromCache = (key, isEmbedded = false) => {
 };
 
 // Helper function to set data to cache
-const setToCache = (key, data, isEmbedded = false) => {
-    if (isEmbedded || typeof localStorage === 'undefined') {
-        // Do not set cache in embedded context
+const setToCache = (key, data) => {
+    if (typeof localStorage === 'undefined') {
         return;
     }
     localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
 };
 
-// Function to get a custom token for embeddable calculator
-export const getCustomToken = async (apiKey) => {
-    try {
-        const response = await embeddedApi.post(`/createCustomToken`, { apiKey });
-        return response.data.token;
-    } catch (error) {
-        console.error('Error getting custom token:', error);
-        throw error;
+// Helper function to get the current region/country code
+const getCountryCode = () => {
+    if (typeof localStorage === 'undefined') {
+        return 'in'; // Default to India during SSR
     }
+    
+    const region = localStorage.getItem('app-region');
+    return region ? region.toLowerCase() : 'in';
 };
 
-
 // Function to set the authentication token
-export const setAuthToken = (token, isCustomToken = false, isEmbedded = false) => {
-    const targetApi = isEmbedded ? embeddedApi : api;
+export const setAuthToken = (token) => {
     if (token) {
-        targetApi.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     } else {
-        delete targetApi.defaults.headers.common['Authorization'];
+        delete api.defaults.headers.common['Authorization'];
     }
 };
 
@@ -118,18 +106,26 @@ export const initializeAuth = async () => {
     }
 };
 
-let isAuthenticating = false;
-let authPromise = null;
-
 // Interceptor to add the token to each request
 api.interceptors.request.use(async (config) => {
     if (!config.headers['Authorization']) {
         const token = await getToken();
         config.headers['Authorization'] = `Bearer ${token}`;
     }
+    
+    // Add country parameter to each request if not already present
+    if (!config.url.includes('country=')) {
+        const separator = config.url.includes('?') ? '&' : '?';
+        config.url = `${config.url}${separator}country=${getCountryCode()}`;
+    }
+    
+    // Ensure URL has versioning
+    if (!config.url.startsWith('/v1/')) {
+        config.url = `/v1${config.url}`;
+    }
+    
     return config;
 }, (error) => Promise.reject(error));
-
 
 // Handle API errors
 const handleApiError = (error) => {
@@ -155,29 +151,28 @@ const authenticatedRequest = async (method, url, data = null) => {
 };
 
 // Fetch banks
-export const fetchBanks = async (isEmbedded = false) => {
+export const fetchBanks = async () => {
     const cacheKey = 'banks';
-    const cachedData = getFromCache(cacheKey, isEmbedded);
+    const cachedData = getFromCache(cacheKey);
     if (cachedData) return cachedData;
 
     try {
-        const response = await getApiInstance(isEmbedded).get('/bank');
-        setToCache(cacheKey, response.data, isEmbedded);
+        const response = await api.get('/bank');
+        setToCache(cacheKey, response.data);
         return response.data;
     } catch (error) {
         return handleApiError(error);
     }
 };
 
-
 // Fetch cards for a specific bank
-export const fetchCards = async (bank, isEmbedded = false) => {
+export const fetchCards = async (bank) => {
     const cacheKey = `cards_${bank}`;
     const cachedData = getFromCache(cacheKey);
     if (cachedData) return cachedData;
 
     try {
-        const response = await getApiInstance(isEmbedded).get(`/card?bank=${bank}`);
+        const response = await api.get(`/card?bank=${bank}`);
         setToCache(cacheKey, response.data);
         return response.data;
     } catch (error) {
@@ -189,7 +184,7 @@ export const fetchCards = async (bank, isEmbedded = false) => {
 let mccCancelToken = null;
 
 // Fetch MCC (Merchant Category Code) data
-export const fetchMCC = async (search, isEmbedded = false) => {
+export const fetchMCC = async (search) => {
     if (mccCancelToken) {
         mccCancelToken.cancel('Operation canceled due to new request.');
     }
@@ -197,7 +192,7 @@ export const fetchMCC = async (search, isEmbedded = false) => {
     mccCancelToken = axios.CancelToken.source();
 
     try {
-        const response = await getApiInstance(isEmbedded).get(`/mcc?search=${search}`, {
+        const response = await api.get(`/mcc?search=${search}`, {
             cancelToken: mccCancelToken.token,
         });
         return response.data;
@@ -212,7 +207,7 @@ export const fetchMCC = async (search, isEmbedded = false) => {
 };
 
 // Fetch card questions for a specific bank and card
-export const fetchCardQuestions = async (bank, card, isEmbedded = false) => {
+export const fetchCardQuestions = async (bank, card) => {
     const encodedBank = encodeURIComponent(bank);
     const encodedCard = encodeURIComponent(card);
     const cacheKey = `questions_${bank}_${card}`;
@@ -220,7 +215,7 @@ export const fetchCardQuestions = async (bank, card, isEmbedded = false) => {
     if (cachedData) return cachedData;
 
     try {
-        const response = await getApiInstance(isEmbedded).get(`/cardQuestions?bank=${encodedBank}&card=${encodedCard}`);
+        const response = await api.get(`/cardQuestions?bank=${encodedBank}&card=${encodedCard}`);
         setToCache(cacheKey, response.data);
         return response.data;
     } catch (error) {
@@ -228,11 +223,10 @@ export const fetchCardQuestions = async (bank, card, isEmbedded = false) => {
     }
 };
 
-
 // Calculate rewards based on provided data
-export const calculateRewards = async (data, isEmbedded = false) => {
+export const calculateRewards = async (data) => {
     try {
-        const response = await getApiInstance(isEmbedded).post('/calculateRewards', data);
+        const response = await api.post('/calculateRewards', data);
         return response.data;
     } catch (error) {
         return handleApiError(error);
@@ -259,5 +253,5 @@ export const calculateBestCard = async (data) => {
     }
 };
 
-// Export both instances
-export { api, embeddedApi };
+// Export the API instance
+export { api };

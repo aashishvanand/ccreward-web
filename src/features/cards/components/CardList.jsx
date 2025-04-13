@@ -16,6 +16,7 @@ import Image from "next/image";
 import useCardImagesData from "../../../core/hooks/useCardImagesData";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
+import CardDetailsModal from "./CardDetailsModal";
 
 const CardList = ({ cards = [], onDeleteCard }) => {
   const theme = useTheme();
@@ -24,6 +25,8 @@ const CardList = ({ cards = [], onDeleteCard }) => {
   const { cardImagesData, isLoading, error } = useCardImagesData();
   const [processedCards, setProcessedCards] = useState([]);
   const cols = isMobile ? 2 : isTablet ? 3 : 4;
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
 
   useEffect(() => {
     if (cards && Array.isArray(cards) && cardImagesData) {
@@ -42,6 +45,17 @@ const CardList = ({ cards = [], onDeleteCard }) => {
       setProcessedCards(processed);
     }
   }, [cards, cardImagesData]);
+
+  const handleCardClick = (card) => {
+    setSelectedCard(card);
+    setDetailsModalOpen(true);
+  };
+
+  const handleUpdateCard = (updatedCard) => {
+    if (onUpdateCard) {
+      onUpdateCard(updatedCard);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -84,35 +98,38 @@ const CardList = ({ cards = [], onDeleteCard }) => {
   }
 
   return (
-    <ImageList
-      variant="masonry"
-      cols={cols}
-      gap={16}
-      sx={{
-        width: "100%",
-        margin: 0,
-        "& .MuiImageListItem-root": {
-          display: "block",
-          overflow: "hidden",
-          borderRadius: 1,
-          bgcolor: "background.paper",
-          boxShadow: 1,
-          mb: 2,
-          transition: "transform 0.2s, box-shadow 0.2s",
-          "&:hover": {
-            transform: "translateY(-4px)",
-            boxShadow: 4,
-            "& .delete-button": {
-              opacity: 1,
+    <>
+      <ImageList
+        variant="masonry"
+        cols={cols}
+        gap={16}
+        sx={{
+          width: "100%",
+          margin: 0,
+          "& .MuiImageListItem-root": {
+            display: "block",
+            overflow: "hidden",
+            borderRadius: 1,
+            bgcolor: "background.paper",
+            boxShadow: 1,
+            mb: 2,
+            transition: "transform 0.2s, box-shadow 0.2s",
+            "&:hover": {
+              transform: "translateY(-4px)",
+              boxShadow: 4,
+              "& .delete-button": {
+                opacity: 1,
+              },
             },
+            cursor: "pointer", // Add cursor pointer for clickable cards
           },
-        },
-      }}
-    >
+        }}
+      >
       {processedCards.map((card) => (
         <ImageListItem
           key={`${card.bank}-${card.cardName}`}
           sx={{ width: "100%" }}
+          onClick={() => handleCardClick(card)}
         >
           <Paper
             elevation={0}
@@ -200,6 +217,14 @@ const CardList = ({ cards = [], onDeleteCard }) => {
         </ImageListItem>
       ))}
     </ImageList>
+
+    <CardDetailsModal
+        open={detailsModalOpen}
+        onClose={() => setDetailsModalOpen(false)}
+        card={selectedCard}
+        onSave={handleUpdateCard}
+      />
+    </>
   );
 };
 
