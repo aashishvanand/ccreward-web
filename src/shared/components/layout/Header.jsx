@@ -1,3 +1,4 @@
+// src/shared/components/layout/Header.jsx
 import React, { useState, useEffect } from "react";
 import {
   AppBar,
@@ -15,8 +16,8 @@ import {
 } from "@mui/material";
 import {
   CreditCard,
-  Brightness4,
-  Brightness7,
+  DarkMode,
+  LightMode,
   Logout as LogoutIcon,
   Home as HomeIcon,
   Calculate as CalculateIcon,
@@ -160,7 +161,7 @@ function Header() {
               color="inherit"
               aria-label="toggle theme"
             >
-              {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
+              {mode === "dark" ? <LightMode /> : <DarkMode />}
             </IconButton>
           </Box>
         </Toolbar>
@@ -240,7 +241,7 @@ function Header() {
             color="inherit"
             aria-label="toggle theme"
           >
-            {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
+            {mode === "dark" ? <LightMode /> : <DarkMode />}
           </IconButton>
 
           {isMobile ? (

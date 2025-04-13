@@ -25,17 +25,17 @@ const bankImagesData = [
         "bank": "maybank"
     },
     {
-        "id": "6e2279ff-7561-4c3d-cb1b-412c5c956600",
+        "id": "0e665c13-277e-40f6-07bf-58bf020fb300",
         "filename": "dcs.webp",
         "bank": "dcs"
     },
     {
-        "id": "56e797af-4a08-4aa2-a2ad-6c85dfbd8f00",
+        "id": "06512233-8d05-4dc6-44ac-a2ec3d767100",
         "filename": "posb.webp",
         "bank": "posb"
     },
     {
-        "id": "da49c10d-7124-4338-f151-b36a7ad12100",
+        "id": "143d396a-be4e-426c-09ed-35d6b439dc00",
         "filename": "citi.webp",
         "bank": "citi"
     },
@@ -45,7 +45,7 @@ const bankImagesData = [
         "bank": "boc"
     },
     {
-        "id": "38622309-6a1a-401d-8e87-16f3097e8200",
+        "id": "26d44933-ccbd-4dbc-e02a-379b09bb8500",
         "filename": "trust.webp",
         "bank": "trust"
     },

@@ -1,20 +1,17 @@
+// src/app/layout.js
 import './globals.css'
 import PropTypes from 'prop-types';
 import { Inter } from 'next/font/google'
 import Script from "next/script";
 import Providers from './providers'
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
-import { ThemeRegistry } from '../core/providers/ThemeRegistry';
-import { AuthProvider } from '../core/providers/AuthContext';
-import { AnalyticsProvider } from '../core/providers/AnalyticsProvider';
 import { baseJsonLd } from '../shared/constants/jsonLd';
 
 const inter = Inter({ subsets: ['latin'] })
 
-
 function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta property="og:title" content="Credit Card Rewards Calculator - Maximize Your Benefits" />
         <meta name="description" content="Compare, calculate, and choose the best credit card rewards with CCReward." />
@@ -52,7 +49,7 @@ function RootLayout({ children }) {
         />
       </head>
       <body className={inter.className} suppressHydrationWarning>
-        <AppRouterCacheProvider enableCssLayer>
+        <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <Providers>
             {children}
           </Providers>
