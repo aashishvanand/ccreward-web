@@ -1,4 +1,3 @@
-// src/shared/components/layout/RegionSelector.jsx
 import { useState, useEffect } from "react";
 import {
   IconButton,
@@ -15,11 +14,22 @@ const RegionSelector = () => {
   const { region, setRegion, regionName, hasUserSetRegion } = useRegion();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const [currentRegion, setCurrentRegion] = useState(region);
+  
+  // Read directly from localStorage first to prevent any flicker
+  const [displayRegion, setDisplayRegion] = useState(() => {
+    // Get from localStorage if possible
+    if (typeof window !== 'undefined') {
+      const savedRegion = localStorage.getItem("app-region")?.toUpperCase();
+      if (savedRegion && Object.keys(REGIONS).includes(savedRegion)) {
+        return savedRegion;
+      }
+    }
+    return region; // Fall back to context value
+  });
 
-  // Sync with the context whenever region changes
+  // Then sync with context
   useEffect(() => {
-    setCurrentRegion(region);
+    setDisplayRegion(region);
   }, [region]);
 
   const handleClick = (event) => {
@@ -38,26 +48,19 @@ const RegionSelector = () => {
     handleClose();
     
     // Skip if trying to set the same region (compare case-insensitive)
-    if (regionCode.toUpperCase() === currentRegion.toUpperCase()) {
-      console.log(`Preventing unnecessary region change - already using ${regionCode}`);
+    if (regionCode === displayRegion) {
       return;
     }
     
-    console.log(`Changing region from "${currentRegion}" to "${regionCode}"`);
+    // Update immediately for responsive UI
+    setDisplayRegion(regionCode);
     
-    // Call the context's setRegion function to handle all the state updates
-    setRegion(regionCode);
-    
-    // Directly update localStorage as a fallback (the context should do this too)
+    // Update localStorage directly
     localStorage.setItem('app-region', regionCode);
     localStorage.setItem('user-set-region', 'true');
     
-    // Dispatch a custom event for other components to listen for
-    window.dispatchEvent(
-      new CustomEvent("region-changed", {
-        detail: { region: regionCode },
-      })
-    );
+    // Call context method which will handle dispatching events
+    setRegion(regionCode);
   };
 
   // Add a visual indicator if using IP-detected region vs user-selected
@@ -65,7 +68,7 @@ const RegionSelector = () => {
 
   return (
     <>
-      <Tooltip title={`Region: ${regionName}${regionIndicator}`}>
+      <Tooltip title={`Region: ${REGIONS[displayRegion] || "Unknown"}${regionIndicator}`}>
         <IconButton
           onClick={handleClick}
           color="inherit"
@@ -82,7 +85,7 @@ const RegionSelector = () => {
             variant="caption"
             sx={{ display: { xs: "none", sm: "inline" } }}
           >
-            {currentRegion}
+            {displayRegion}
           </Typography>
         </IconButton>
       </Tooltip>
@@ -101,8 +104,8 @@ const RegionSelector = () => {
           <MenuItem
             key={code}
             onClick={() => handleRegionChange(code)}
-            selected={currentRegion === code}
-            disabled={currentRegion === code} // Disable the currently selected region
+            selected={displayRegion === code}
+            disabled={displayRegion === code} // Disable the currently selected region
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               {code === "IN" ? "🇮🇳" : "🇸🇬"} {name}
