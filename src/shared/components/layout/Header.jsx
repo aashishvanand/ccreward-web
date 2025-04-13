@@ -53,6 +53,32 @@ function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [userCardCount, setUserCardCount] = useState(0);
   const isHomePage = pathname === "/";
+  const [currentRegion, setCurrentRegion] = useState(() =>
+    typeof localStorage !== "undefined"
+      ? localStorage.getItem("app-region") || "IN"
+      : "IN"
+  );
+
+  useEffect(() => {
+    const updateRegionFromStorage = () => {
+      const storedRegion = localStorage.getItem("app-region") || "IN";
+      setCurrentRegion(storedRegion);
+    };
+
+    // Listen for storage events (if another tab changes localStorage)
+    window.addEventListener("storage", updateRegionFromStorage);
+
+    // Listen for our custom event
+    const handleRegionChanged = () => {
+      updateRegionFromStorage();
+    };
+    window.addEventListener("region-changed", handleRegionChanged);
+
+    return () => {
+      window.removeEventListener("storage", updateRegionFromStorage);
+      window.removeEventListener("region-changed", handleRegionChanged);
+    };
+  }, []);
 
   useEffect(() => {
     setDeviceInfo(detectDevice());
@@ -157,7 +183,7 @@ function Header() {
           </Typography>
 
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <RegionSelector />
+            <RegionSelector currentRegion={currentRegion} />
             <IconButton
               onClick={toggleTheme}
               color="inherit"
@@ -214,22 +240,22 @@ function Header() {
         }}
       >
         {isHomePage ? (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
             <LogoContent />
           </Box>
         ) : (
-          <Box 
-            component={Link} 
+          <Box
+            component={Link}
             href="/"
-            sx={{ 
-              display: 'flex', 
-              alignItems: 'center',
-              textDecoration: 'none',
-              color: 'inherit',
-              cursor: 'pointer',
-              '&:hover': {
-                opacity: 0.8
-              }
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+              color: "inherit",
+              cursor: "pointer",
+              "&:hover": {
+                opacity: 0.8,
+              },
             }}
           >
             <LogoContent />

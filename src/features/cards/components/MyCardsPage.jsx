@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Box,
   Container,
@@ -29,7 +29,6 @@ import {
   SpeedDial,
   SpeedDialAction,
   SpeedDialIcon,
-  Divider,
 } from "@mui/material";
 import ShareDialog from "./ShareDialog";
 import { useRegion } from "../../../core/providers/RegionContext";
@@ -48,20 +47,94 @@ function MyCardsPage() {
   const portfolioRef = useRef(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  // Keep track of current region for comparison
+  const regionRef = useRef(region);
+
+  const { user, isAuthenticated, loading, isNewUser, markUserAsNotNew } =
+    useAuth();
+
+  // Add scroll trigger for FAB animation
+  const trigger = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 100,
+  });
+
+  // Define fetchUserCards - doesn't need to depend on region, we'll handle that separately
+  const fetchUserCards = useCallback(async () => {
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      
+      // Get region directly from localStorage for most up-to-date value
+      const currentRegion = localStorage.getItem('app-region') || 'IN';
+      console.log(`🔄 Fetching cards for user ${user.uid} in region ${currentRegion}`);
+      
+      // Clear any cached data to ensure fresh fetch with current region
+      localStorage.removeItem(`userCardsCache_${user.uid}`);
+      localStorage.removeItem(`userCardsCacheTimestamp_${user.uid}`);
+      
+      const fetchedCards = await getCardsForUser(user.uid);
+      console.log(`✅ Fetched ${fetchedCards.length} cards for region ${currentRegion}`);
+      
+      // Only update state if component is still mounted and region matches current
+      setCards(fetchedCards);
+      regionRef.current = currentRegion;
+      
+    } catch (error) {
+      console.error("❌ Error fetching cards:", error);
+      showAlert("Error fetching cards. Please try again later.", "error");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [user]); // Only depend on user, not region
+
+  // Initial load and auth state changes
+  useEffect(() => {
+    if (isAuthenticated()) {
+      fetchUserCards();
+    }
+  }, [isAuthenticated, fetchUserCards]);
+
+  // Handle region changes via context
+  useEffect(() => {
+    if (region !== regionRef.current && isAuthenticated()) {
+      console.log(`🔄 Region changed from ${regionRef.current} to ${region} - refreshing cards`);
+      fetchUserCards();
+    }
+  }, [region, isAuthenticated, fetchUserCards]);
+
+  // Also listen for direct region-changed events (more immediate)
+  useEffect(() => {
+    const handleRegionChanged = (event) => {
+      const newRegion = event.detail?.region;
+      console.log(`📣 Region changed event detected: ${newRegion} (current: ${regionRef.current})`);
+      
+      if (newRegion && newRegion !== regionRef.current && isAuthenticated()) {
+        console.log(`🔄 Refreshing cards due to region event`);
+        fetchUserCards();
+      }
+    };
+
+    window.addEventListener('region-changed', handleRegionChanged);
+    return () => {
+      window.removeEventListener('region-changed', handleRegionChanged);
+    };
+  }, [isAuthenticated, fetchUserCards]);
 
   const handleShare = async (platform) => {
     setIsGeneratingImage(true);
     try {
       if (platform === "generate") {
-        // Use generateAndShare but with a special 'generate' flag
-        // that only generates without sharing
         await portfolioRef.current?.generateAndShare("preview");
       } else {
         await portfolioRef.current?.generateAndShare(platform);
       }
     } catch (error) {
       console.error("Error handling share action:", error);
-      // You might want to show an error message to the user here
     } finally {
       setIsGeneratingImage(false);
     }
@@ -70,7 +143,6 @@ function MyCardsPage() {
   const handleUpdateCard = async (updatedCard) => {
     try {
       await updateCardForUser(user.uid, updatedCard);
-      // Update the cards state to reflect the changes
       setCards((prevCards) =>
         prevCards.map((card) =>
           card.id === updatedCard.id ? updatedCard : card
@@ -83,38 +155,6 @@ function MyCardsPage() {
       showAlert("Error updating card. Please try again later.", "error");
     }
   };
-
-  const { user, isAuthenticated, loading, isNewUser, markUserAsNotNew } =
-    useAuth();
-
-  // Add scroll trigger for FAB animation
-  const trigger = useScrollTrigger({
-    disableHysteresis: true,
-    threshold: 100,
-  });
-
-  useEffect(() => {
-    if (isAuthenticated()) {
-      fetchUserCards();
-    }
-  }, [isAuthenticated, fetchUserCards]);
-
-  const fetchUserCards = useCallback(async () => {
-    if (!user) {
-      setIsLoading(false);
-      return;
-    }
-    try {
-      setIsLoading(true);
-      const fetchedCards = await getCardsForUser(user.uid);
-      setCards(fetchedCards);
-    } catch (error) {
-      console.error("Error fetching cards:", error);
-      showAlert("Error fetching cards. Please try again later.", "error");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user, region]);
 
   const handleAddCard = async (newCard) => {
     try {
@@ -187,7 +227,10 @@ function MyCardsPage() {
           }}
         >
           <Typography variant="h6" sx={{ mb: 2 }}>
-            Welcome! Let&apos;s start by adding your first credit card.
+            {region === 'IN' ? 
+              "Welcome! Let's start by adding your first credit card." :
+              `No cards available in the ${region} region. Switch to IN region or add cards for ${region}.`
+            }
           </Typography>
           <Typography color="text.secondary">
             Click the + button below to add your first card
@@ -210,10 +253,10 @@ function MyCardsPage() {
             }}
           >
             <Typography variant="h6" sx={{ mb: 2 }}>
-              Great start! You&apos;ve added your first card.
+              Great start! You've added your first card.
             </Typography>
             <Typography>
-              Add one more card to use our &quot;Best Card&quot; feature and
+              Add one more card to use our "Best Card" feature and
               start comparing rewards!
             </Typography>
           </Paper>
@@ -222,10 +265,10 @@ function MyCardsPage() {
           <PortfolioShare ref={portfolioRef} cards={cards} />
         )}
         <CardList 
-      cards={cards} 
-      onDeleteCard={handleDeleteCard} 
-      onUpdateCard={handleUpdateCard} 
-    />
+          cards={cards} 
+          onDeleteCard={handleDeleteCard} 
+          onUpdateCard={handleUpdateCard} 
+        />
       </>
     );
   };
@@ -237,7 +280,6 @@ function MyCardsPage() {
         sx={{
           py: 4,
           flexGrow: 1,
-          // Add bottom padding to prevent FAB from covering content
           pb: { xs: 10, sm: 12 },
         }}
         maxWidth="lg"
@@ -259,7 +301,7 @@ function MyCardsPage() {
                 fontWeight: "bold",
               }}
             >
-              My Cards
+              My Cards {region && `(${region})`}
             </Typography>
           </Box>
 
@@ -267,7 +309,6 @@ function MyCardsPage() {
         </Stack>
       </Container>
 
-      {/* Floating Action Button */}
       <SpeedDial
         ariaLabel="Card Actions"
         sx={{

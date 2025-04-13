@@ -7,13 +7,12 @@ import {
   Typography,
   Box,
   Tooltip,
-  Badge,
 } from "@mui/material";
 import { Public as PublicIcon } from "@mui/icons-material";
 import { useRegion, REGIONS } from "../../../core/providers/RegionContext";
 
 const RegionSelector = () => {
-  const { region, setRegion, regionName } = useRegion();
+  const { region, setRegion, regionName, hasUserSetRegion } = useRegion();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
@@ -26,15 +25,29 @@ const RegionSelector = () => {
   };
 
   const handleRegionChange = (newRegion) => {
+    // Skip if trying to set the same region
+    if (newRegion === region) {
+      console.log(`🚫 Preventing unnecessary region change: ${region} to ${newRegion}`);
+      handleClose();
+      return;
+    }
+    
+    console.log(`🌎 Region selector changing from ${region} to ${newRegion}`);
+    
+    // Use the context's setRegion function to handle the change
+    // This will update localStorage, mark as user choice, and trigger reload
     setRegion(newRegion);
+    
+    // Close the menu
     handleClose();
-    // Reload the page to refresh all components
-    window.location.reload();
   };
+
+  // Add a visual indicator if using IP-detected region vs user-selected
+  const regionIndicator = hasUserSetRegion ? "" : " (Auto)";
 
   return (
     <>
-      <Tooltip title={`Region: ${regionName}`}>
+      <Tooltip title={`Region: ${regionName}${regionIndicator}`}>
         <IconButton
           onClick={handleClick}
           color="inherit"
@@ -69,6 +82,7 @@ const RegionSelector = () => {
             key={code}
             onClick={() => handleRegionChange(code)}
             selected={region === code}
+            disabled={region === code} // Disable the currently selected region
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               {code === "IN" ? "🇮🇳" : "🇸🇬"} {name}
