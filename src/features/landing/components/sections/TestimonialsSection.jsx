@@ -38,12 +38,12 @@ const TestimonialsSection = ({
               const tweetId = tweet.url.split("/").pop();
               return (
                 <Grid
-                  item
-                  xs={12}
-                  sm={6}
-                  md={4}
                   key={tweetId || `tweet-${index}`}
-                >
+                  size={{
+                    xs: 12,
+                    sm: 6,
+                    md: 4
+                  }}>
                   <TweetContainer tweetUrl={tweet.url} />
                 </Grid>
               );

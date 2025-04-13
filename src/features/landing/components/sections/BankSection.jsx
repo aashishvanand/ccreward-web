@@ -12,7 +12,14 @@ const BankSection = () => {
         </Typography>
         <Grid container spacing={2} sx={{ justifyContent: "center" }}>
           {bankImagesData.map((bank) => (
-            <Grid item xs={6} sm={4} md={3} lg={2} key={bank.id}>
+            <Grid
+              key={bank.id}
+              size={{
+                xs: 6,
+                sm: 4,
+                md: 3,
+                lg: 2
+              }}>
               <Link 
                 href={`/bank/${bank.bank.toLowerCase()}`}
                 style={{ textDecoration: 'none' }}

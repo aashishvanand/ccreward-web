@@ -151,16 +151,16 @@ const TopCardsSection = () => {
 
               return (
                 <Grid
-                  item
-                  xs={12}
-                  sm={6}
-                  md={3}
                   key={categoryName}
                   sx={{
                     display: "flex",
                     transition: "all 0.3s ease-in-out",
                   }}
-                >
+                  size={{
+                    xs: 12,
+                    sm: 6,
+                    md: 3
+                  }}>
                   <Card
                     sx={{
                       flex: 1,
