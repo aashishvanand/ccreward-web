@@ -66,7 +66,7 @@ function MyCardsPage() {
       setIsLoading(true);
 
       // Get region directly from localStorage for most up-to-date value
-      const currentRegion = localStorage.getItem("app-region") || "IN";
+      const currentRegion = localStorage.getItem("app-region");
       console.log(
         `🔄 Fetching cards for user ${user.uid} in region ${currentRegion}`
       );
@@ -76,9 +76,7 @@ function MyCardsPage() {
       localStorage.removeItem(`userCardsCacheTimestamp_${user.uid}`);
 
       const fetchedCards = await getCardsForUser(user.uid);
-      console.log(
-        `✅ Fetched ${fetchedCards.length} cards for region ${currentRegion}`
-      );
+      console.log(`🔄 Fetching cards for user ${user.uid} in region ${region}`);
 
       // Only update state if component is still mounted and region matches current
       setCards(fetchedCards);
@@ -89,7 +87,7 @@ function MyCardsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [user]); // Only depend on user, not region
+  }, [user, region]);
 
   // Initial load and auth state changes
   useEffect(() => {

@@ -25,18 +25,27 @@ const RegionSelector = () => {
   };
 
   const handleRegionChange = (newRegion) => {
-    // Skip if trying to set the same region
-    if (newRegion === region) {
-      console.log(`🚫 Preventing unnecessary region change: ${region} to ${newRegion}`);
+    // Always uppercase the region code for consistency
+    const regionCode = newRegion.toUpperCase();
+    
+    // Get current value directly
+    const currentRegion = localStorage.getItem('app-region');
+    
+    // Skip if trying to set the same region (compare case-insensitive)
+    if (currentRegion && regionCode.toUpperCase() === currentRegion.toUpperCase()) {
+      console.log(`Preventing unnecessary region change`);
       handleClose();
       return;
     }
     
-    console.log(`🌎 Region selector changing from ${region} to ${newRegion}`);
+    console.log(`Changing region from "${currentRegion}" to "${regionCode}"`);
     
-    // Use the context's setRegion function to handle the change
-    // This will update localStorage, mark as user choice, and trigger reload
-    setRegion(newRegion);
+    // IMPORTANT: Save both the region and user choice flag
+    localStorage.setItem('app-region', regionCode);
+    localStorage.setItem('user-set-region', 'true'); // Set to string 'true'
+    
+    // Call context setRegion function
+    setRegion(regionCode);
     
     // Close the menu
     handleClose();
