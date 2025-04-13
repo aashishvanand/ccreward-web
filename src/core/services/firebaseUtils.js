@@ -52,11 +52,11 @@ export const addCardForUser = async (userId, cardData) => {
       }
     });
 
-    // Update local cache
-    const cachedCards = getCachedData(userId) || [];
-    cachedCards.push({ id: cardKey, ...cardData });
-    setCachedData(userId, cachedCards);
+    // Clear cache to force a fresh fetch next time
+    localStorage.removeItem(`${CACHE_KEY}_${userId}`);
+    localStorage.removeItem(`${CACHE_TIMESTAMP_KEY}_${userId}`);
 
+    // Return the card key
     return cardKey;
   } catch (error) {
     console.error("Error adding card:", error);
@@ -67,42 +67,67 @@ export const addCardForUser = async (userId, cardData) => {
 // Function to get all cards for a user
 export const getCardsForUser = async (userId) => {
   try {
-    // Get current region/country
+    // Get current region/country directly from localStorage (don't use cached value)
     const selectedCountry = localStorage.getItem('app-region')?.toLowerCase() || 'in';
+    console.log("📍 Selected country/region:", selectedCountry);
     
-    // Check cache first
-    const cachedCards = getCachedData(userId);
-    if (cachedCards) {
-      // Filter cached cards by country
-      return cachedCards.filter(card => !card.country || card.country === selectedCountry);
-    }
-
+    // Skip cache temporarily for debugging
+    localStorage.removeItem(`${CACHE_KEY}_${userId}`);
+    localStorage.removeItem(`${CACHE_TIMESTAMP_KEY}_${userId}`);
+    
     // If not in cache, fetch from Firebase
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
 
     // If document doesn't exist, this is a new user
     if (!userDoc.exists()) {
+      console.log("⚠️ User document doesn't exist, returning empty array");
       return []; // Return empty array for new users
     }
 
     const userData = userDoc.data();
     const cards = userData.cards || {};
+    console.log("🔥 Raw Firebase data - cards object:", cards);
 
-    const cardList = Object.entries(cards)
-      .map(([key, value]) => ({
-        id: key,
-        ...value
-      }))
-      // Filter cards by country
-      .filter(card => !card.country || card.country === selectedCountry);
+    // Convert to array for easier processing
+    const cardList = Object.entries(cards).map(([key, value]) => ({
+      id: key,
+      ...value
+    }));
+    
+    console.log("📊 ALL CARDS (unfiltered):", cardList);
+    
+    // Log each card's properties in detail
+    cardList.forEach((card, index) => {
+      console.log(`📌 Card ${index + 1}: ${card.bank} ${card.cardName}`);
+      console.log(`   Country: ${card.country || 'undefined'} (type: ${typeof card.country})`);
+      
+      // Convert card country to lowercase for case-insensitive comparison
+      const cardCountry = (card.country || '').toLowerCase();
+      const shouldInclude = !card.country || cardCountry === selectedCountry;
+      
+      console.log(`   Will be included for ${selectedCountry}? ${shouldInclude}`);
+    });
+    
+    // Filter cards by country - using case-insensitive comparison
+    const filteredCardList = cardList.filter(card => {
+      // If card has no country, include it in all regions
+      if (!card.country) return true;
+      
+      // Otherwise do case-insensitive comparison
+      return card.country.toLowerCase() === selectedCountry;
+    });
+    
+    console.log(`🔍 FILTERED CARDS for region '${selectedCountry}':`, filteredCardList);
+    console.log(`📊 Stats: ${filteredCardList.length} of ${cardList.length} cards matched the current region`);
 
-    // Update cache
+    // Update cache with unfiltered list
     setCachedData(userId, cardList);
 
-    return cardList;
+    return filteredCardList;
   } catch (error) {
-    // Silently handle any errors and return empty array
+    console.error("❌ Error fetching cards:", error);
+    // Return empty array on error
     return [];
   }
 };
@@ -122,12 +147,9 @@ export const updateCardForUser = async (userId, cardData) => {
       }
     });
     
-    // Update local cache
-    const cachedCards = getCachedData(userId) || [];
-    const updatedCache = cachedCards.map(card => 
-      card.id === id ? { ...card, ...cardDetails } : card
-    );
-    setCachedData(userId, updatedCache);
+    // Clear cache to force a fresh fetch next time
+    localStorage.removeItem(`${CACHE_KEY}_${userId}`);
+    localStorage.removeItem(`${CACHE_TIMESTAMP_KEY}_${userId}`);
     
     return id;
   } catch (error) {
@@ -144,10 +166,9 @@ export const deleteCardForUser = async (userId, cardKey) => {
       [`cards.${cardKey}`]: deleteField()
     });
 
-    // Update local cache
-    const cachedCards = getCachedData(userId) || [];
-    const updatedCards = cachedCards.filter(card => card.id !== cardKey);
-    setCachedData(userId, updatedCards);
+    // Clear cache to force a fresh fetch next time
+    localStorage.removeItem(`${CACHE_KEY}_${userId}`);
+    localStorage.removeItem(`${CACHE_TIMESTAMP_KEY}_${userId}`);
   } catch (error) {
     console.error("Error deleting card:", error);
     throw error;
@@ -157,11 +178,14 @@ export const deleteCardForUser = async (userId, cardKey) => {
 // Function to force refresh the cache
 export const refreshCardCache = async (userId) => {
   try {
+    // Clear cache
+    localStorage.removeItem(`${CACHE_KEY}_${userId}`);
+    localStorage.removeItem(`${CACHE_TIMESTAMP_KEY}_${userId}`);
+    
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
 
     if (!userDoc.exists()) {
-      setCachedData(userId, []);
       return [];
     }
 
@@ -173,7 +197,6 @@ export const refreshCardCache = async (userId) => {
       ...value
     }));
 
-    setCachedData(userId, cardList);
     return cardList;
   } catch (error) {
     console.error("Error refreshing card cache:", error);

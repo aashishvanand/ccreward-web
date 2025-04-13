@@ -4,11 +4,11 @@ const nextConfig = {
     loader: 'custom',
     loaderFile: './imageLoader.js',
   },
-  compiler:{
-    removeConsole:{
-      exclude:["error"]
-    }
-  },
+  // compiler:{
+  //   removeConsole:{
+  //     exclude:["error"]
+  //   }
+  // },
   trailingSlash: false,
   serverExternalPackages: ['sharp'], // Previously serverComponentsExternalPackages
   bundlePagesRouterDependencies: true, // Previously bundlePagesExternals
