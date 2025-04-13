@@ -111,7 +111,7 @@ function getInitialMode() {
   return 'light';
 }
 
-export function ThemeRegistry({ children }) {
+export function ThemeRegistry({ children, forceThemeRerender = false }) {
   const [mounted, setMounted] = useState(false);
   const [mode, setMode] = useState(getInitialMode);
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -173,6 +173,14 @@ export function ThemeRegistry({ children }) {
           },
         },
       },
+      // Add CSS variables support
+      cssVariables: {
+        colorSchemeSelector: 'class',
+      },
+      colorSchemes: {
+        light: true,
+        dark: true,
+      },
     };
 
     return createTheme(themeOptions);
@@ -191,9 +199,9 @@ export function ThemeRegistry({ children }) {
 
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme, setMode }}>
-      <InitColorSchemeScript/>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
+      <InitColorSchemeScript />
+      <ThemeProvider theme={theme} forceThemeRerender={forceThemeRerender}>
+        <CssBaseline enableColorScheme />
         {children}
       </ThemeProvider>
     </ThemeContext.Provider>

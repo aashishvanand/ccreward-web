@@ -40,7 +40,11 @@ const HeroSection = ({
         alignItems="center"
         sx={{ minHeight: { md: "60vh" } }} // Ensure grid takes full height
       >
-        <Grid item xs={12} md={6}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 6
+          }}>
           <Typography
             variant="h2"
             sx={{
@@ -100,7 +104,11 @@ const HeroSection = ({
             </Stack>
           )}
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 6
+          }}>
           <Box
             sx={{
               position: "relative",

@@ -11,6 +11,7 @@ import { baseJsonLd } from '../shared/constants/jsonLd';
 
 const inter = Inter({ subsets: ['latin'] })
 
+
 function RootLayout({ children }) {
   return (
     <html lang="en">
@@ -51,9 +52,11 @@ function RootLayout({ children }) {
         />
       </head>
       <body className={inter.className} suppressHydrationWarning>
-        <Providers>
-          {children}
-        </Providers>
+        <AppRouterCacheProvider enableCssLayer>
+          <Providers>
+            {children}
+          </Providers>
+        </AppRouterCacheProvider>
 
         {/* Load analytics script with proper strategy */}
         <Script

@@ -122,7 +122,11 @@ const StatsSection = () => {
         </Typography>
 
         <Grid container spacing={4} justifyContent="center">
-          <Grid item xs={6} md={4}>
+          <Grid
+            size={{
+              xs: 6,
+              md: 4
+            }}>
             <Box sx={{ textAlign: "center" }}>
               <Typography
                 variant="h2"
@@ -154,7 +158,11 @@ const StatsSection = () => {
               </Typography>
             </Box>
           </Grid>
-          <Grid item xs={6} md={4}>
+          <Grid
+            size={{
+              xs: 6,
+              md: 4
+            }}>
             <Box sx={{ textAlign: "center" }}>
               <Typography
                 variant="h2"

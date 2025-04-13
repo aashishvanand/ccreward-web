@@ -62,7 +62,12 @@ const FeaturesSection = () => (
       </Typography>
       <Grid container spacing={4}>
         {features.map((feature, index) => (
-          <Grid item xs={12} md={4} key={index}>
+          <Grid
+            key={index}
+            size={{
+              xs: 12,
+              md: 4
+            }}>
             <Card
               sx={{
                 height: "100%",
