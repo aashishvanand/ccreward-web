@@ -52,24 +52,13 @@ const HeroCard = ({ card, index, isMobile, isTablet, isLargeScreen }) => {
       <Image
         src={card.id}
         alt={`${card.bank} ${card.cardName}`}
-        layout="fill"
-        objectFit="contain"
+        fill
+        style={{ objectFit: "contain" }}
         sizes="(max-width: 600px) 240px, (max-width: 960px) 280px, 320px"
+        priority={index === 0}
       />
     </Card>
   );
-};
-
-HeroCard.propTypes = {
-  card: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    bank: PropTypes.string.isRequired,
-    cardName: PropTypes.string.isRequired,
-  }).isRequired,
-  index: PropTypes.number.isRequired,
-  isMobile: PropTypes.bool.isRequired,
-  isTablet: PropTypes.bool.isRequired,
-  isLargeScreen: PropTypes.bool.isRequired,
 };
 
 HeroCard.propTypes = {
