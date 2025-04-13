@@ -1,3 +1,4 @@
+// src/app/providers.jsx
 "use client";
 
 import { memo } from "react";

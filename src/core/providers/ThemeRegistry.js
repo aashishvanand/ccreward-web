@@ -1,10 +1,9 @@
+// src/core/providers/ThemeRegistry.js
 'use client';
 import { useState, useMemo, createContext, useContext, useEffect, useCallback } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
-// import { getInitColorSchemeScript } from '@mui/material/styles';
 
 const ThemeContext = createContext({
   mode: 'light',
@@ -102,38 +101,49 @@ const colorPalette = {
 };
 
 function getInitialMode() {
-  if (typeof window !== 'undefined') {
-    const savedMode = localStorage.getItem(STORAGE_KEY);
-    if (savedMode) {
-      return savedMode;
-    }
+  // Only return a default mode during server-side rendering to avoid hydration mismatch
+  if (typeof window === 'undefined') {
+    return 'light';
+  }
+  
+  const savedMode = localStorage.getItem(STORAGE_KEY);
+  if (savedMode) {
+    return savedMode;
   }
   return 'light';
 }
 
-export function ThemeRegistry({ children, forceThemeRerender = false }) {
+export function ThemeRegistry({ children }) {
+  // Initialize with null to avoid hydration mismatch
+  const [mode, setMode] = useState(null);
   const [mounted, setMounted] = useState(false);
-  const [mode, setMode] = useState(getInitialMode);
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
+  // Only run once the component is mounted on client
   useEffect(() => {
     setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!localStorage.getItem(STORAGE_KEY)) {
-      setMode(prefersDarkMode ? 'dark' : 'light');
+    // Set the actual mode once we're on the client
+    const initialMode = getInitialMode();
+    setMode(initialMode);
+    
+    // If no saved preference, use system preference
+    if (!localStorage.getItem(STORAGE_KEY) && prefersDarkMode) {
+      setMode('dark');
+      localStorage.setItem(STORAGE_KEY, 'dark');
     }
   }, [prefersDarkMode]);
 
   const toggleTheme = useCallback(() => {
+    if (!mode) return;
     const newMode = mode === 'light' ? 'dark' : 'light';
     setMode(newMode);
     localStorage.setItem(STORAGE_KEY, newMode);
   }, [mode]);
 
   const theme = useMemo(() => {
-    const themeOptions = {
+    if (!mode) return createTheme({ palette: { mode: 'light' } });
+    
+    return createTheme({
       palette: {
         mode,
         ...colorPalette[mode],
@@ -173,35 +183,31 @@ export function ThemeRegistry({ children, forceThemeRerender = false }) {
           },
         },
       },
-      // Add CSS variables support
-      cssVariables: {
-        colorSchemeSelector: 'class',
-      },
-      colorSchemes: {
-        light: true,
-        dark: true,
-      },
-    };
-
-    return createTheme(themeOptions);
+    });
   }, [mode]);
 
-  // Prevent flash of wrong theme
   useEffect(() => {
     if (mounted && mode) {
-      document.documentElement.setAttribute('data-theme', mode);
+      // Set a proper data attribute for theme
+      document.documentElement.setAttribute('data-mui-color-scheme', mode);
     }
-  }, [mounted, mode]);
+  }, [mode, mounted]);
 
+  // Render a "blank" theme on server so hydration works properly
   if (!mounted) {
-    return null;
+    return (
+      <ThemeContext.Provider value={{ mode: 'light', toggleTheme, setMode }}>
+        <ThemeProvider theme={createTheme()}>
+          {children}
+        </ThemeProvider>
+      </ThemeContext.Provider>
+    );
   }
 
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme, setMode }}>
-      <InitColorSchemeScript />
-      <ThemeProvider theme={theme} forceThemeRerender={forceThemeRerender}>
-        <CssBaseline enableColorScheme />
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
         {children}
       </ThemeProvider>
     </ThemeContext.Provider>
