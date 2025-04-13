@@ -35,31 +35,25 @@ const RegionSelector = () => {
   return (
     <>
       <Tooltip title={`Region: ${regionName}`}>
-        <Badge
-          color="primary"
-          variant="dot"
-          invisible={region === 'IN'} // Show indicator if not default
+        <IconButton
+          onClick={handleClick}
+          color="inherit"
+          aria-label="select region"
+          size="small"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+          }}
         >
-          <IconButton
-            onClick={handleClick}
-            color="inherit"
-            aria-label="select region"
-            size="small"
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 0.5,
-            }}
+          <PublicIcon />
+          <Typography
+            variant="caption"
+            sx={{ display: { xs: "none", sm: "inline" } }}
           >
-            <PublicIcon />
-            <Typography
-              variant="caption"
-              sx={{ display: { xs: "none", sm: "inline" } }}
-            >
-              {region}
-            </Typography>
-          </IconButton>
-        </Badge>
+            {region}
+          </Typography>
+        </IconButton>
       </Tooltip>
       <Menu
         id="region-menu"

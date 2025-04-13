@@ -21,7 +21,7 @@ function useCardImagesData() {
     const [error, setError] = useState(null);
 
     // Create a region-specific cache key
-    const cacheKey = `${CACHE_KEY_PREFIX}${region}`;
+    const cacheKey = `${CACHE_KEY_PREFIX}${region.toLowerCase()}`;
 
     useEffect(() => {
         async function loadCardImagesData() {
