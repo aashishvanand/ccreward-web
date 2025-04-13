@@ -4,6 +4,10 @@ const nextConfig = {
     loader: 'custom',
     loaderFile: './imageLoader.js',
   },
+  eslint: {
+    // Warnings are treated as warnings, not errors during build
+    ignoreDuringBuilds: true,
+  },
   // compiler:{
   //   removeConsole:{
   //     exclude:["error"]

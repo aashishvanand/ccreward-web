@@ -18,7 +18,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import CardDetailsModal from "./CardDetailsModal";
 
-const CardList = ({ cards = [], onDeleteCard }) => {
+const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));

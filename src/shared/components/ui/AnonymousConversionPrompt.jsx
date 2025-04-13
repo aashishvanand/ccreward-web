@@ -245,7 +245,7 @@ const AnonymousConversionPrompt = forwardRef((props, ref) => {
                 color: "text.secondary",
               }}
             >
-              The Google account youre trying to link is already associated with
+              you&apos;re trying to link is already associated with
               another account. Would you like to sign in to that account
               instead?
             </Typography>
