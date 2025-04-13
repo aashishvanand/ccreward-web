@@ -1,127 +1,166 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 
-// Define supported regions
+// --- Configuration ---
+// Define supported regions statically
 export const REGIONS = {
   IN: "India",
   SG: "Singapore",
 };
+// Fallback region if detection/loading fails or yields unsupported region
+const DEFAULT_REGION_CODE = "SG"; // Default to Singapore
+const IP_DETECTION_API = "https://ipapi.co/json/"; // API for IP-based region detection
 
-// Create context with default values
+// Helper: Validate region code against our static list
+const isValidRegion = (regionCode) => {
+    return regionCode && Object.keys(REGIONS).includes(regionCode.toUpperCase());
+}
+
+// --- Context Definition ---
 const RegionContext = createContext({
-  region: "IN",
-  setRegion: () => {},
-  regionName: REGIONS.IN,
+  region: DEFAULT_REGION_CODE,
+  setRegion: (newRegion) => {},
+  regionName: REGIONS[DEFAULT_REGION_CODE],
+  isLoading: true, // True while determining initial region
+  hasUserSetRegion: false,
 });
 
+// --- Provider Component ---
 export function RegionProvider({ children }) {
-  const [region, setRegion] = useState("IN"); // Default to India
-  const [isLoading, setIsLoading] = useState(true);
+  const [currentRegion, setCurrentRegion] = useState(DEFAULT_REGION_CODE);
+  const [isLoading, setIsLoading] = useState(true); // Loading state for initial determination
   const [hasUserSetRegion, setHasUserSetRegion] = useState(false);
 
-  // This effect runs once on component mount to initialize from localStorage
-  useEffect(() => {
-    // Try to load from localStorage first (user's previous choice)
-    const savedRegion = localStorage.getItem("app-region");
+  // --- Function to Detect Region via IP ---
+  const detectRegionViaIP = useCallback(async () => {
+    console.log("🔍 Detecting region via IP...");
+    try {
+      const response = await fetch(IP_DETECTION_API);
+      if (!response.ok) throw new Error(`IP detection failed: ${response.status}`);
+      const data = await response.json();
+      const detectedCode = data?.country_code?.toUpperCase();
 
-    // Check user choice - explicitly compare with string 'true'
-    const userHasChosen = localStorage.getItem("user-set-region") === "true";
-    setHasUserSetRegion(userHasChosen);
-
-    console.log("💼 Initial region from localStorage:", savedRegion);
-    console.log("👤 User has chosen region:", userHasChosen);
-
-    // If we have a valid saved region, use it
-    if (
-      savedRegion &&
-      Object.keys(REGIONS).includes(savedRegion.toUpperCase())
-    ) {
-      setRegion(savedRegion.toUpperCase());
-    } else if (!userHasChosen) {
-      // Only attempt IP detection if we haven't loaded a valid region from storage
-      detectRegion();
+      // Validate against the static REGIONS list
+      if (isValidRegion(detectedCode)) {
+        console.log(`✅ Region detected via IP: ${detectedCode}`);
+        return detectedCode;
+      } else {
+        console.warn(`⚠️ IP detected region '${detectedCode || 'N/A'}' not in supported list [${Object.keys(REGIONS).join(', ')}].`);
+        return null; // Detected region is not supported
+      }
+    } catch (error) {
+      console.error("❌ Error detecting region via IP:", error);
+      return null; // Indicate detection failed
     }
+  }, []); // No dependencies needed as REGIONS is static
 
-    setIsLoading(false);
-  }, []);
-
-  // This effect synchronizes region with localStorage on every region change
+  // --- Effect 1: Determine Initial Region on Mount ---
   useEffect(() => {
+    const determineInitialRegion = async () => {
+      let initialRegionCode = DEFAULT_REGION_CODE;
+      let userHasChosen = localStorage.getItem("user-set-region") === "true";
+      setHasUserSetRegion(userHasChosen);
+
+      console.log("🚀 Determining initial region...");
+      console.log("👤 User has previously chosen:", userHasChosen);
+
+      // 1. Try loading user's previously saved choice
+      const savedRegion = localStorage.getItem("app-region")?.toUpperCase();
+      if (isValidRegion(savedRegion)) {
+          console.log(`💾 Using saved region from localStorage: ${savedRegion}`);
+          initialRegionCode = savedRegion;
+      }
+      // 2. If no valid saved region AND user hasn't explicitly chosen before, try IP detection
+      else if (!userHasChosen) {
+          console.log("🤔 No valid saved region or user hasn't chosen, attempting IP detection...");
+          const detectedRegion = await detectRegionViaIP();
+          if (detectedRegion) { // Already validated inside detectRegionViaIP
+              initialRegionCode = detectedRegion;
+          } else {
+              console.warn(`⚠️ IP detection failed or yielded unsupported region. Falling back to default: ${DEFAULT_REGION_CODE}`);
+              // Keep the initialRegionCode as DEFAULT_REGION_CODE (already set)
+          }
+      } else {
+           console.log(`🤔 User chose previously, but saved region '${savedRegion}' is invalid/unsupported. Falling back to default: ${DEFAULT_REGION_CODE}`);
+           // Keep the initialRegionCode as DEFAULT_REGION_CODE (already set)
+      }
+
+      console.log(`🏁 Initial region set to: ${initialRegionCode}`);
+      setCurrentRegion(initialRegionCode); // Update state
+
+      // Pre-populate localStorage if it wasn't set correctly
+      if (localStorage.getItem("app-region")?.toUpperCase() !== initialRegionCode) {
+           localStorage.setItem("app-region", initialRegionCode);
+      }
+
+      setIsLoading(false); // Mark initial determination as complete
+    };
+
+    determineInitialRegion();
+  }, [detectRegionViaIP]); // Only depends on the memoized detection function
+
+  // --- Effect 2: Synchronize `currentRegion` State with localStorage ---
+  useEffect(() => {
+    // Only synchronize after initial load is complete
     if (!isLoading) {
       const currentStoredRegion = localStorage.getItem("app-region");
-      if (currentStoredRegion !== region) {
+      if (currentStoredRegion !== currentRegion) {
         console.log(
-          `💼 Synchronizing localStorage with current region: ${region}`
+          `🔄 Synchronizing localStorage: ${currentStoredRegion} -> ${currentRegion}`
         );
-        localStorage.setItem("app-region", region);
+        localStorage.setItem("app-region", currentRegion);
 
-        // Dispatch custom event to notify other components
+        // Optional: Dispatch custom event
         window.dispatchEvent(
           new CustomEvent("region-changed", {
-            detail: { region },
+            detail: { region: currentRegion },
           })
         );
       }
     }
-  }, [region, isLoading]);
+  }, [currentRegion, isLoading]);
 
-  const detectRegion = async () => {
-    try {
-      const response = await fetch("https://ipapi.co/json/");
-      const data = await response.json();
+  // --- Function to Update Region (called by components) ---
+  const updateRegion = useCallback((newRegion) => {
+    const upperCaseRegion = newRegion?.toUpperCase();
 
-      // Set region based on country code
-      if (data.country_code === "SG") {
-        console.log("🌍 IP detection suggests region: SG");
-        setRegion("SG");
-      } else {
-        // Default to India for all other regions for now
-        console.log("🌍 IP detection suggests default region: IN");
-        setRegion("IN");
-      }
-    } catch (error) {
-      console.error("Error detecting region:", error);
-      // Default to India if detection fails
-      setRegion("IN");
-    }
-  };
-
-  const updateRegion = (newRegion) => {
-    // Validate the region
-    if (!Object.keys(REGIONS).includes(newRegion.toUpperCase())) {
-      console.error("Invalid region:", newRegion);
+    // Validate against the static REGIONS list
+    if (!isValidRegion(upperCaseRegion)) {
+      console.error(`❌ Invalid or unsupported region selected: ${newRegion}`);
       return;
     }
-    
-    // Mark this as a user choice
+
+    console.log(`➡️ User updating region: ${currentRegion} -> ${upperCaseRegion}`);
+
+    // Mark that the user has made an explicit choice
     localStorage.setItem('user-set-region', 'true');
-    setHasUserSetRegion(true); // Update state immediately
-    
-    // Store region in localStorage - ALWAYS STORE UPPERCASE for consistency
-    localStorage.setItem('app-region', newRegion.toUpperCase());
-    
-    // Update state
-    console.log(`💼 Setting region: ${region} -> ${newRegion}`);
-    setRegion(newRegion.toUpperCase());
+    setHasUserSetRegion(true); // Update state
+
+    // Update the region state (triggers Effect 2 for localStorage sync)
+    setCurrentRegion(upperCaseRegion);
+
+  }, [currentRegion]); // Depends on currentRegion for logging comparison
+
+
+  // --- Context Value ---
+  const contextValue = {
+    region: currentRegion,
+    setRegion: updateRegion,
+    regionName: REGIONS[currentRegion] || REGIONS[DEFAULT_REGION_CODE], // Get name from static list
+    isLoading: isLoading,
+    hasUserSetRegion: hasUserSetRegion,
+    // No need to expose supportedRegions or error if they are static/internal
   };
 
   return (
-    <RegionContext.Provider
-      value={{
-        region,
-        setRegion: updateRegion,
-        regionName: REGIONS[region],
-        isLoading,
-        hasUserSetRegion,
-      }}
-    >
+    <RegionContext.Provider value={contextValue}>
       {children}
     </RegionContext.Provider>
   );
 }
 
-// Custom hook for using the region context
+// --- Custom Hook ---
 export function useRegion() {
   const context = useContext(RegionContext);
   if (!context) {

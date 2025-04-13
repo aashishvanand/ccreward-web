@@ -8,6 +8,7 @@ import {
   CircularProgress,
   Stack,
   useTheme,
+  InputAdornment,
 } from "@mui/material";
 import DynamicCardInputs from "../../../shared/components/ui/DynamicCardInputs";
 import {
@@ -176,6 +177,15 @@ const CalculatorForm = ({
     }
   };
 
+  const getCurrencySymbol = () => {
+    switch (region) {
+      case "SG":
+        return "S$";
+      case "IN":
+        return "₹";
+    }
+  };
+
   const debouncedFetchMCC = useCallback(
     _.debounce(async (value) => {
       if (value && value.length >= 2) {
@@ -312,15 +322,27 @@ const CalculatorForm = ({
       />
       <TextField
         fullWidth
-        label="Enter spent amount (INR)"
+        label="Spent Amount"
         type="number"
         value={spentAmount}
-        onChange={(e) => onSpentAmountChange(e.target.value)}
+        onChange={(e) => {
+          // Prevent negative numbers and ensure minimum of 1
+          const value = Math.max(1, Number(e.target.value));
+          onSpentAmountChange(value.toString());
+        }}
         required
         slotProps={{
           input: {
-            inputProps: { min: 0 },
-          },
+            startAdornment: (
+              <InputAdornment position="start">
+                {getCurrencySymbol()}
+              </InputAdornment>
+            ),
+            inputProps: {
+              min: 1,
+              step: 1,
+            },
+          }
         }}
       />
       {isLoadingQuestions ? (

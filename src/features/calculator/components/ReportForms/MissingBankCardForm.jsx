@@ -139,9 +139,11 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
                 onChange={(e) => setMcc(e.target.value)}
                 required
                 type="number"
-                inputProps={{
-                  min: "0700",
-                  max: "9999",
+                slotProps={{
+                  htmlInput: {
+                    min: "0700",
+                    max: "9999",
+                  }
                 }}
               />
               <TextField

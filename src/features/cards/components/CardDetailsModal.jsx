@@ -17,110 +17,106 @@ import {
   ToggleButton,
   Grid,
 } from "@mui/material";
+import { useRegion } from "../../../core/providers/RegionContext";
 
-const networks = ["Visa", "Mastercard", "Rupay", "Diners Club", "AmEx"];
-const billingDates = [1, 5, 10, 15, 18, 20, 25, 28];
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
+const NETWORK_OPTIONS = {
+  IN: ["Visa", "Mastercard", "RuPay", "DinersClub", "AmEx"],
+  SG: ["Visa", "Mastercard", "DinersClub", "AmEx", "UnionPay"]
+};
+
+const BILLING_DATES = Array.from({length: 31}, (_, i) => i + 1);
 
 const CardDetailsModal = ({ open, onClose, card, onSave }) => {
+  const { region } = useRegion();
+  const currentYear = new Date().getFullYear();
   const [cardDetails, setCardDetails] = useState({
-    network: "Visa",
+    network: region === 'IN' ? "Visa" : "Mastercard",
     billingDate: 1,
-    limit: 100000,
-    since: "January, 2025",
+    limit: region === 'IN' ? 100000 : 500,
+    since: `${new Date().toLocaleString('default', { month: 'long' })}, ${currentYear}`,
   });
 
-  const [selectedMonth, setSelectedMonth] = useState("January");
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(new Date().toLocaleString('default', { month: 'long' }));
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+
+  const limitConfig = {
+    IN: {
+      min: 1000,
+      max: 500000,
+      steps: [
+        { label: '1-50k', min: 1000, max: 50000 },
+        { label: '50k-2L', min: 50000, max: 200000 },
+        { label: '2L-5L', min: 200000, max: 500000 }
+      ]
+    },
+    SG: {
+      min: 500,
+      max: 50000,
+      steps: [
+        { label: '500-10k', min: 500, max: 10000 },
+        { label: '10k-25k', min: 10000, max: 25000 },
+        { label: '25k-50k', min: 25000, max: 50000 }
+      ]
+    }
+  };
 
   useEffect(() => {
     if (card) {
-      setCardDetails({
-        network: card.network || "Visa",
-        billingDate: card.billingDate || 1,
-        limit: card.limit || 100000,
-        since: card.since || "January, 2025",
-      });
-
-      // Parse existing since value if available
-      if (card.since) {
-        const [month, year] = card.since.split(", ");
-        setSelectedMonth(month || "January");
-        setSelectedYear(parseInt(year) || new Date().getFullYear());
+      const { network, billingDate, limit, since } = card;
+      if (since) {
+        const [month, year] = since.split(', ');
+        setSelectedMonth(month);
+        setSelectedYear(parseInt(year));
       }
-    }
-  }, [card]);
-
-  const handleNetworkChange = (event) => {
-    setCardDetails({
-      ...cardDetails,
-      network: event.target.value,
-    });
-  };
-
-  const handleBillingDateChange = (event, newValue) => {
-    if (newValue !== null) {
+      
       setCardDetails({
-        ...cardDetails,
-        billingDate: newValue,
+        network: network || (region === 'IN' ? "Visa" : "Mastercard"),
+        billingDate: billingDate || 1,
+        limit: limit || (region === 'IN' ? 100000 : 500),
+        since: since || `${selectedMonth}, ${selectedYear}`
       });
     }
-  };
-
-  const handleLimitChange = (event, newValue) => {
-    setCardDetails({
-      ...cardDetails,
-      limit: newValue,
-    });
-  };
-
-  const handleMonthChange = (event) => {
-    setSelectedMonth(event.target.value);
-    setCardDetails({
-      ...cardDetails,
-      since: `${event.target.value}, ${selectedYear}`,
-    });
-  };
-
-  const handleYearChange = (event) => {
-    setSelectedYear(event.target.value);
-    setCardDetails({
-      ...cardDetails,
-      since: `${selectedMonth}, ${event.target.value}`,
-    });
-  };
+  }, [card, region]);
 
   const handleSave = () => {
-    onSave({
+    const updatedCard = {
       ...card,
-      ...cardDetails,
-    });
+      network: cardDetails.network,
+      billingDate: cardDetails.billingDate,
+      limit: cardDetails.limit,
+      since: `${selectedMonth}, ${selectedYear}`
+    };
+    
+    onSave(updatedCard);
     onClose();
   };
 
+  const generateYearOptions = () => {
+    return Array.from(
+      { length: 10 },
+      (_, i) => currentYear - i
+    );
+  };
+
+  const months = [
+    "January", "February", "March", "April", "May", "June", 
+    "July", "August", "September", "October", "November", "December"
+  ];
+
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      fullWidth 
+      maxWidth="sm"
+    >
       <DialogTitle>Card Details</DialogTitle>
       <DialogContent>
         <Box sx={{ py: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Card Network
-          </Typography>
+          {/* Card Network */}
+          <Typography variant="h6" gutterBottom>Card Network</Typography>
           <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
-            {networks.map((network) => (
+            {NETWORK_OPTIONS[region].map((network) => (
               <Box
                 key={network}
                 onClick={() => setCardDetails({ ...cardDetails, network })}
@@ -128,10 +124,7 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
                   p: 2,
                   borderRadius: "50%",
                   border: "2px solid",
-                  borderColor:
-                    cardDetails.network === network
-                      ? "primary.main"
-                      : "divider",
+                  borderColor: cardDetails.network === network ? "primary.main" : "divider",
                   textAlign: "center",
                   cursor: "pointer",
                   width: 80,
@@ -147,77 +140,57 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
             ))}
           </Box>
 
-          <Typography variant="h6" gutterBottom>
-            Billing Date
-          </Typography>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Monthly Statement Date
-          </Typography>
+          {/* Billing Date */}
+          <Typography variant="h6" gutterBottom>Billing Date</Typography>
           <ToggleButtonGroup
             value={cardDetails.billingDate}
             exclusive
-            onChange={handleBillingDateChange}
-            aria-label="billing date"
+            onChange={(e, newValue) => {
+              if (newValue !== null) {
+                setCardDetails({ ...cardDetails, billingDate: newValue });
+              }
+            }}
             fullWidth
-            sx={{ mb: 2 }}
+            sx={{ flexWrap: 'wrap', mb: 2 }}
           >
-            {billingDates.map((date) => (
-              <ToggleButton
-                key={date}
+            {BILLING_DATES.map((date) => (
+              <ToggleButton 
+                key={date} 
                 value={date}
                 sx={{
+                  flexBasis: `${100/7}%`,
                   borderRadius: 1,
-                  "&.Mui-selected": {
-                    bgcolor: "primary.main",
-                    color: "primary.contrastText",
-                    "&:hover": {
-                      bgcolor: "primary.dark",
+                  '&.Mui-selected': {
+                    bgcolor: 'primary.main',
+                    color: 'primary.contrastText',
+                    '&:hover': {
+                      bgcolor: 'primary.dark',
                     },
                   },
                 }}
               >
                 {date}
-                {date === 1
-                  ? "st"
-                  : date === 5
-                  ? "th"
-                  : date === 15
-                  ? "th"
-                  : "th"}
               </ToggleButton>
             ))}
           </ToggleButtonGroup>
 
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Next Statement Date:{" "}
-            {new Date(
-              new Date().setMonth(new Date().getMonth() + 1)
-            ).toLocaleDateString("en-US", { month: "short" })}{" "}
-            {cardDetails.billingDate}, {new Date().getFullYear()}
-          </Typography>
+          {/* Credit Limit */}
+          <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>Credit Limit</Typography>
+          <Box sx={{ px: 2 }}>
+            <Slider
+              value={cardDetails.limit}
+              min={limitConfig[region].min}
+              max={limitConfig[region].max}
+              step={1000}
+              valueLabelDisplay="auto"
+              valueLabelFormat={(value) => `${region === 'IN' ? '₹' : '$'}${value.toLocaleString()}`}
+              onChange={(e, newValue) => setCardDetails({ ...cardDetails, limit: newValue })}
+              marks={limitConfig[region].steps}
+            />
+          </Box>
 
-          <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
-            Credit Limit
-          </Typography>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            Select Range: ₹1,00,000 - ₹5,00,000
-          </Typography>
-          <Slider
-            value={cardDetails.limit}
-            onChange={handleLimitChange}
-            min={100000}
-            max={500000}
-            step={10000}
-            aria-labelledby="credit-limit-slider"
-            sx={{ mb: 2 }}
-          />
-          <Typography variant="body2" color="text.secondary">
-            Current limit: ₹{cardDetails.limit.toLocaleString()}
-          </Typography>
-
-          <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
-            Card Member Since
-          </Typography>
+          {/* Card Member Since */}
+          <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>Card Member Since</Typography>
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <FormControl fullWidth>
@@ -225,7 +198,7 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
                 <Select
                   value={selectedMonth}
                   label="Month"
-                  onChange={handleMonthChange}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
                 >
                   {months.map((month) => (
                     <MenuItem key={month} value={month}>
@@ -241,12 +214,9 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
                 <Select
                   value={selectedYear}
                   label="Year"
-                  onChange={handleYearChange}
+                  onChange={(e) => setSelectedYear(e.target.value)}
                 >
-                  {Array.from(
-                    { length: 10 },
-                    (_, i) => new Date().getFullYear() - i
-                  ).map((year) => (
+                  {generateYearOptions().map((year) => (
                     <MenuItem key={year} value={year}>
                       {year}
                     </MenuItem>

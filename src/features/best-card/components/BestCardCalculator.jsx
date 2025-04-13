@@ -37,9 +37,11 @@ import {
   fetchMCC,
 } from "../../../core/services/api";
 import _ from "lodash";
+import { useRegion } from "../../../core/providers/RegionContext";
 
 const BestCardCalculator = () => {
   const theme = useTheme();
+  const { region } = useRegion();
   const [userCards, setUserCards] = useState([]);
   const [selectedMcc, setSelectedMcc] = useState(null);
   const [spentAmount, setSpentAmount] = useState("");
@@ -92,6 +94,15 @@ const BestCardCalculator = () => {
     fetchUserCards();
     setHasCalculated(false);
   }, [user]);
+
+  const getCurrencySymbol = () => {
+    switch (region) {
+      case "SG":
+        return "S$";
+      case "IN":
+        return "₹";
+    }
+  };
 
   const debouncedFetchMCC = useCallback(
     _.debounce(async (value) => {
@@ -338,14 +349,31 @@ const BestCardCalculator = () => {
             }
           />
 
-          <TextField
-            fullWidth
-            label="Enter spent amount (INR)"
-            type="number"
-            value={spentAmount}
-            onChange={(e) => setSpentAmount(e.target.value)}
-            required
-          />
+<TextField
+        fullWidth
+        label="Spent Amount"
+        type="number"
+        value={spentAmount}
+        onChange={(e) => {
+          // Prevent negative numbers and ensure minimum of 1
+          const value = Math.max(1, Number(e.target.value));
+          onSpentAmountChange(value.toString());
+        }}
+        required
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                {getCurrencySymbol()}
+              </InputAdornment>
+            ),
+            inputProps: {
+              min: 1,
+              step: 1,
+            },
+          }
+        }}
+      />
 
           <Accordion
             expanded={advancedMode}
