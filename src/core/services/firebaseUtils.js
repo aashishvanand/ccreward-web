@@ -115,7 +115,7 @@ export const getCardsForUser = async (userId) => {
       if (!card.country) return true;
       
       // Otherwise do case-insensitive comparison
-      return card.country.toLowerCase() === selectedCountry;
+      return card.country.toLowerCase() === selectedCountry.toLowerCase();
     });
     
     console.log(`🔍 FILTERED CARDS for region '${selectedCountry}':`, filteredCardList);

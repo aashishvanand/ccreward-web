@@ -25,11 +25,7 @@ import CardList from "./CardList";
 import AddCardDialog from "./AddCardDialog";
 import { Share as ShareIcon } from "@mui/icons-material";
 import PortfolioShare from "./PortfolioShare";
-import {
-  SpeedDial,
-  SpeedDialAction,
-  SpeedDialIcon,
-} from "@mui/material";
+import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
 import ShareDialog from "./ShareDialog";
 import { useRegion } from "../../../core/providers/RegionContext";
 
@@ -65,25 +61,28 @@ function MyCardsPage() {
       setIsLoading(false);
       return;
     }
-    
+
     try {
       setIsLoading(true);
-      
+
       // Get region directly from localStorage for most up-to-date value
-      const currentRegion = localStorage.getItem('app-region') || 'IN';
-      console.log(`🔄 Fetching cards for user ${user.uid} in region ${currentRegion}`);
-      
+      const currentRegion = localStorage.getItem("app-region") || "IN";
+      console.log(
+        `🔄 Fetching cards for user ${user.uid} in region ${currentRegion}`
+      );
+
       // Clear any cached data to ensure fresh fetch with current region
       localStorage.removeItem(`userCardsCache_${user.uid}`);
       localStorage.removeItem(`userCardsCacheTimestamp_${user.uid}`);
-      
+
       const fetchedCards = await getCardsForUser(user.uid);
-      console.log(`✅ Fetched ${fetchedCards.length} cards for region ${currentRegion}`);
-      
+      console.log(
+        `✅ Fetched ${fetchedCards.length} cards for region ${currentRegion}`
+      );
+
       // Only update state if component is still mounted and region matches current
       setCards(fetchedCards);
       regionRef.current = currentRegion;
-      
     } catch (error) {
       console.error("❌ Error fetching cards:", error);
       showAlert("Error fetching cards. Please try again later.", "error");
@@ -102,7 +101,9 @@ function MyCardsPage() {
   // Handle region changes via context
   useEffect(() => {
     if (region !== regionRef.current && isAuthenticated()) {
-      console.log(`🔄 Region changed from ${regionRef.current} to ${region} - refreshing cards`);
+      console.log(
+        `🔄 Region changed from ${regionRef.current} to ${region} - refreshing cards`
+      );
       fetchUserCards();
     }
   }, [region, isAuthenticated, fetchUserCards]);
@@ -111,17 +112,19 @@ function MyCardsPage() {
   useEffect(() => {
     const handleRegionChanged = (event) => {
       const newRegion = event.detail?.region;
-      console.log(`📣 Region changed event detected: ${newRegion} (current: ${regionRef.current})`);
-      
+      console.log(
+        `📣 Region changed event detected: ${newRegion} (current: ${regionRef.current})`
+      );
+
       if (newRegion && newRegion !== regionRef.current && isAuthenticated()) {
         console.log(`🔄 Refreshing cards due to region event`);
         fetchUserCards();
       }
     };
 
-    window.addEventListener('region-changed', handleRegionChanged);
+    window.addEventListener("region-changed", handleRegionChanged);
     return () => {
-      window.removeEventListener('region-changed', handleRegionChanged);
+      window.removeEventListener("region-changed", handleRegionChanged);
     };
   }, [isAuthenticated, fetchUserCards]);
 
@@ -227,10 +230,8 @@ function MyCardsPage() {
           }}
         >
           <Typography variant="h6" sx={{ mb: 2 }}>
-            {region === 'IN' ? 
-              "Welcome! Let's start by adding your first credit card." :
-              `No cards available in the ${region} region. Switch to IN region or add cards for ${region}.`
-            }
+              Welcome! Let's start by adding your first credit card for the{" "}
+              {region} region.
           </Typography>
           <Typography color="text.secondary">
             Click the + button below to add your first card
@@ -264,10 +265,10 @@ function MyCardsPage() {
         {cards.length > 0 && (
           <PortfolioShare ref={portfolioRef} cards={cards} />
         )}
-        <CardList 
-          cards={cards} 
-          onDeleteCard={handleDeleteCard} 
-          onUpdateCard={handleUpdateCard} 
+        <CardList
+          cards={cards}
+          onDeleteCard={handleDeleteCard}
+          onUpdateCard={handleUpdateCard}
         />
       </>
     );
@@ -301,7 +302,7 @@ function MyCardsPage() {
                 fontWeight: "bold",
               }}
             >
-              My Cards {region && `(${region})`}
+              My Cards
             </Typography>
           </Box>
 
