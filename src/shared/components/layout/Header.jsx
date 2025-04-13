@@ -53,15 +53,12 @@ function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [userCardCount, setUserCardCount] = useState(0);
   const isHomePage = pathname === "/";
-  const [currentRegion, setCurrentRegion] = useState(() =>
-    typeof localStorage !== "undefined"
-      ? localStorage.getItem("app-region") || "IN"
-      : "IN"
+  const [currentRegion, setCurrentRegion] = useState(() => localStorage.getItem("app-region")
   );
 
   useEffect(() => {
     const updateRegionFromStorage = () => {
-      const storedRegion = localStorage.getItem("app-region") || "IN";
+      const storedRegion = localStorage.getItem("app-region");
       setCurrentRegion(storedRegion);
     };
 

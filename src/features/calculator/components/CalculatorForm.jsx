@@ -136,7 +136,7 @@ const CalculatorForm = ({
   const loadCards = async () => {
     setIsLoadingCards(true);
     try {
-      const fetchedCards = await fetchCards(selectedBank, isEmbedded);
+      const fetchedCards = await fetchCards(selectedBank);
       setCards(fetchedCards);
     } catch (error) {
       console.error("Error fetching cards:", error);

@@ -114,7 +114,6 @@ function AddCardDialog({ open, onClose, onAddCard }) {
   const fetchBankList = async (regionCode) => {
     setLoading(true);
     try {
-      console.log(`Fetching banks for region: ${regionCode}`);
       const bankList = await fetchBanks(regionCode);
       setBanks(bankList);
     } catch (error) {
@@ -129,7 +128,7 @@ function AddCardDialog({ open, onClose, onAddCard }) {
     setLoading(true);
     try {
       console.log(`Fetching cards for bank ${bank} in region ${activeRegion.code}`);
-      const cardList = await fetchCards(bank, activeRegion.code);
+      const cardList = await fetchCards(bank);
       setCards(cardList);
     } catch (error) {
       console.error("Error fetching cards:", error);

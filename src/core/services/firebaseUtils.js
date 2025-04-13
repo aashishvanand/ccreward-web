@@ -95,12 +95,12 @@ export const getCardsForUser = async (userId) => {
       ...value
     }));
     
-    console.log("📊 ALL CARDS (unfiltered):", cardList);
+    // console.log("📊 ALL CARDS (unfiltered):", cardList);
     
     // Log each card's properties in detail
     cardList.forEach((card, index) => {
-      console.log(`📌 Card ${index + 1}: ${card.bank} ${card.cardName}`);
-      console.log(`   Country: ${card.country || 'undefined'} (type: ${typeof card.country})`);
+      // console.log(`📌 Card ${index + 1}: ${card.bank} ${card.cardName}`);
+      // console.log(`   Country: ${card.country || 'undefined'} (type: ${typeof card.country})`);
       
       // Convert card country to lowercase for case-insensitive comparison
       const cardCountry = (card.country || '').toLowerCase();

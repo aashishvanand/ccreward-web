@@ -80,7 +80,9 @@ const getCountryCode = () => {
     }
     
     const region = localStorage.getItem('app-region');
-    return region ? region.toLowerCase() : 'in';
+    
+    return region.toLowerCase();
+    
 };
 
 // Function to set the authentication token
@@ -151,11 +153,9 @@ const authenticatedRequest = async (method, url, data = null) => {
 };
 
 // Fetch banks
-export const fetchBanks = async (regionCode) => {
+export const fetchBanks = async () => {
     // Get region from parameter or from localStorage as fallback
-    const region = regionCode || 
-                  (typeof localStorage !== 'undefined' ? 
-                   localStorage.getItem('app-region')?.toLowerCase() : 'in');
+    const region = localStorage.getItem('app-region')?.toLowerCase();
     
     // Create a region-specific cache key
     const cacheKey = `banks_${region}`;
@@ -185,9 +185,7 @@ export const fetchBanks = async (regionCode) => {
 // Fetch cards for a specific bank
 export const fetchCards = async (bank, regionCode) => {
     // Get region from parameter or from localStorage as fallback
-    const region = regionCode || 
-                  (typeof localStorage !== 'undefined' ? 
-                   localStorage.getItem('app-region')?.toLowerCase() : 'in');
+    const region = localStorage.getItem('app-region')?.toLowerCase();
     
     // Create a region-specific cache key for this bank
     const cacheKey = `cards_${region}_${bank}`;
