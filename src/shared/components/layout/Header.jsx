@@ -11,6 +11,7 @@ import {
   useMediaQuery,
   useTheme,
   Tooltip,
+  Divider,
 } from "@mui/material";
 import {
   CreditCard,
@@ -31,6 +32,7 @@ import { onCardUpdate } from "../../../core/utils/events";
 import { detectDevice } from "../../../core/utils/deviceUtils";
 import Image from "next/image";
 import ProfileMenu from "./ProfileMenu";
+import RegionSelector from "./RegionSelector";
 
 function Header() {
   const { mode, toggleTheme } = useAppTheme();
@@ -151,13 +153,16 @@ function Header() {
             CCReward
           </Typography>
 
-          <IconButton
-            onClick={toggleTheme}
-            color="inherit"
-            aria-label="toggle theme"
-          >
-            {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
-          </IconButton>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <RegionSelector />
+            <IconButton
+              onClick={toggleTheme}
+              color="inherit"
+              aria-label="toggle theme"
+            >
+              {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
+            </IconButton>
+          </Box>
         </Toolbar>
       </AppBar>
     );
@@ -229,6 +234,7 @@ function Header() {
         )}
 
         <Box sx={{ display: "flex", alignItems: "center" }}>
+          <RegionSelector />
           <IconButton
             onClick={toggleTheme}
             color="inherit"

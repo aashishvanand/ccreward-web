@@ -1,25 +1,32 @@
 import { Box, Container, Typography, Grid, Card } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import bankImagesData from "../../../../shared/constants/bankImages";
+import bankImagesDataIN from "../../../../shared/constants/bankImagesIN";
+import bankImagesSGData from "../../../../shared/constants/bankImagesSG";
+import { useRegion } from "../../../../core/providers/RegionContext";
 
 const BankSection = () => {
+  const { region } = useRegion();
+  
+  // Select bank data based on region
+  const bankData = region === 'SG' ? bankImagesSGData : bankImagesDataIN;
+
   return (
     <Box sx={{ py: 8 }}>
       <Container maxWidth="lg">
         <Typography variant="h3" align="center" gutterBottom sx={{ mb: 6 }}>
-          Supported Banks
+          Supported Banks {region === 'SG' ? 'in Singapore' : 'in India'}
         </Typography>
         <Grid container spacing={2} sx={{ justifyContent: "center" }}>
-          {bankImagesData.map((bank) => (
+          {bankData.map((bank) => (
             <Grid
               key={bank.id}
-              size={{
-                xs: 6,
-                sm: 4,
-                md: 3,
-                lg: 2
-              }}>
+              item
+              xs={6}
+              sm={4}
+              md={3}
+              lg={2}
+            >
               <Link 
                 href={`/bank/${bank.bank.toLowerCase()}`}
                 style={{ textDecoration: 'none' }}

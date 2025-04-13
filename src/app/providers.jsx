@@ -4,13 +4,16 @@ import { memo } from "react";
 import { ThemeRegistry } from "../core/providers/ThemeRegistry";
 import { AuthProvider } from "../core/providers/AuthContext";
 import { AnalyticsProvider } from "../core/providers/AnalyticsProvider";
+import { RegionProvider } from "../core/providers/RegionContext";
 
 const Providers = memo(({ children }) => {
   return (
     <ThemeRegistry>
-      <AuthProvider>
-        <AnalyticsProvider>{children}</AnalyticsProvider>
-      </AuthProvider>
+      <RegionProvider>
+        <AuthProvider>
+          <AnalyticsProvider>{children}</AnalyticsProvider>
+        </AuthProvider>
+      </RegionProvider>
     </ThemeRegistry>
   );
 });
