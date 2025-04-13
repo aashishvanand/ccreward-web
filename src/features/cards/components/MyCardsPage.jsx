@@ -16,6 +16,7 @@ import {
   getCardsForUser,
   addCardForUser,
   deleteCardForUser,
+  updateCardForUser,
 } from "../../../core/services/firebaseUtils";
 import { notifyCardUpdate } from "../../../core/utils/events";
 import Header from "../../../shared/components/layout/Header";
@@ -31,8 +32,10 @@ import {
   Divider,
 } from "@mui/material";
 import ShareDialog from "./ShareDialog";
+import { useRegion } from "../../../core/providers/RegionContext";
 
 function MyCardsPage() {
+  const { region } = useRegion();
   const theme = useTheme();
   const [cards, setCards] = useState([]);
   const [isAddCardDialogOpen, setIsAddCardDialogOpen] = useState(false);
@@ -64,6 +67,23 @@ function MyCardsPage() {
     }
   };
 
+  const handleUpdateCard = async (updatedCard) => {
+    try {
+      await updateCardForUser(user.uid, updatedCard);
+      // Update the cards state to reflect the changes
+      setCards((prevCards) =>
+        prevCards.map((card) =>
+          card.id === updatedCard.id ? updatedCard : card
+        )
+      );
+      notifyCardUpdate();
+      showAlert("Card updated successfully", "success");
+    } catch (error) {
+      console.error("Error updating card:", error);
+      showAlert("Error updating card. Please try again later.", "error");
+    }
+  };
+
   const { user, isAuthenticated, loading, isNewUser, markUserAsNotNew } =
     useAuth();
 
@@ -74,23 +94,18 @@ function MyCardsPage() {
   });
 
   useEffect(() => {
-    const fetchCards = async () => {
-      if (loading) return;
-      if (!isAuthenticated()) {
-        setIsLoading(false);
-        return;
-      }
-      await fetchUserCards();
-    };
-    fetchCards();
-  }, [isAuthenticated, user, loading]);
+    if (isAuthenticated()) {
+      fetchUserCards();
+    }
+  }, [isAuthenticated, fetchUserCards]);
 
-  const fetchUserCards = async () => {
+  const fetchUserCards = useCallback(async () => {
     if (!user) {
       setIsLoading(false);
       return;
     }
     try {
+      setIsLoading(true);
       const fetchedCards = await getCardsForUser(user.uid);
       setCards(fetchedCards);
     } catch (error) {
@@ -99,7 +114,7 @@ function MyCardsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user, region]);
 
   const handleAddCard = async (newCard) => {
     try {
@@ -206,7 +221,11 @@ function MyCardsPage() {
         {cards.length > 0 && (
           <PortfolioShare ref={portfolioRef} cards={cards} />
         )}
-        <CardList cards={cards} onDeleteCard={handleDeleteCard} />
+        <CardList 
+      cards={cards} 
+      onDeleteCard={handleDeleteCard} 
+      onUpdateCard={handleUpdateCard} 
+    />
       </>
     );
   };

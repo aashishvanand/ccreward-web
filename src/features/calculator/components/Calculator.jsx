@@ -28,9 +28,11 @@ import { useCardSelection } from "./CalculatorHooks";
 import CalculationResults from "./CalculationResults";
 import Confetti from "react-confetti";
 import ReferralButton from "./ReferralButton";
+import { useRegion } from "../../../core/providers/RegionContext";
 
 function Calculator() {
   const theme = useTheme();
+  const { region } = useRegion();
   const { user, isAuthenticated } = useAuth();
   const [userCards, setUserCards] = useState([]);
   const [isFetchingUserData, setIsFetchingUserData] = useState(true);
@@ -143,6 +145,7 @@ function Calculator() {
       mcc: selectedMcc ? selectedMcc.mcc : null,
       amount: parseFloat(spentAmount),
       additionalInputs,
+      country: region.toLowerCase(), // Add country parameter
     };
 
     if (
@@ -160,6 +163,7 @@ function Calculator() {
         mcc: selectedMcc ? selectedMcc.mcc : null,
         amount: parseFloat(spentAmount),
         answers: additionalInputs,
+        country: region.toLowerCase(), // Add country parameter
       });
 
       logCalculation({
@@ -167,6 +171,7 @@ function Calculator() {
         card: selectedCard,
         mcc: selectedMcc?.mcc,
         amount: parseFloat(spentAmount),
+        country: region.toLowerCase(), // Add to analytics logging
       });
 
       setCalculationResult(result);
@@ -193,6 +198,7 @@ function Calculator() {
     hasCalculated,
     lastCalculationInputs,
     isLoadingQuestions,
+    region, // Add region as dependency
   ]);
 
   const handleCalculationError = (error) => {

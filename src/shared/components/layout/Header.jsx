@@ -1,5 +1,6 @@
 // src/shared/components/layout/Header.jsx
 import React, { useState, useEffect } from "react";
+import { useRegion } from "../../../core/providers/RegionContext";
 import {
   AppBar,
   Toolbar,
@@ -37,6 +38,7 @@ import RegionSelector from "./RegionSelector";
 
 function Header() {
   const { mode, toggleTheme } = useAppTheme();
+  const { region } = useRegion();
   const { user, logout, isAuthenticated } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
