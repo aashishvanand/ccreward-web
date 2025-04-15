@@ -19,6 +19,7 @@ import {
   Divider,
   Stack,
   useTheme,
+  InputAdornment
 } from "@mui/material";
 import {
   Info as InfoIcon,
@@ -350,30 +351,28 @@ const BestCardCalculator = () => {
           />
 
 <TextField
-        fullWidth
-        label="Spent Amount"
-        type="number"
-        value={spentAmount}
-        onChange={(e) => {
-          // Prevent negative numbers and ensure minimum of 1
-          const value = Math.max(1, Number(e.target.value));
-          onSpentAmountChange(value.toString());
-        }}
-        required
-        slotProps={{
-          input: {
-            startAdornment: (
-              <InputAdornment position="start">
-                {getCurrencySymbol()}
-              </InputAdornment>
-            ),
-            inputProps: {
-              min: 1,
-              step: 1,
-            },
-          }
-        }}
-      />
+  fullWidth
+  label="Spent Amount"
+  type="number"
+  value={spentAmount}
+  onChange={(e) => {
+    // Prevent negative numbers and ensure minimum of 1
+    const value = Math.max(1, Number(e.target.value));
+    setSpentAmount(value.toString());
+  }}
+  required
+  InputProps={{
+    startAdornment: (
+      <InputAdornment position="start">
+        {getCurrencySymbol()}
+      </InputAdornment>
+    ),
+    inputProps: {
+      min: 1,
+      step: 1,
+    },
+  }}
+/>
 
           <Accordion
             expanded={advancedMode}
@@ -429,28 +428,28 @@ const BestCardCalculator = () => {
 
           {isCalculated && (
             <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-              <ToggleButtonGroup
-                value={sortMethod}
-                exclusive
-                onChange={handleSortMethodChange}
-                aria-label="sort method"
+            <ToggleButtonGroup
+              value={sortMethod}
+              exclusive
+              onChange={handleSortMethodChange}
+              aria-label="sort method"
+            >
+              <ToggleButton value="points" aria-label="sort by points">
+                Ranking by Points/Cashback/Miles
+              </ToggleButton>
+              <ToggleButton
+                value="cashbackValue"
+                aria-label="sort by cashback value"
               >
-                <ToggleButton value="points" aria-label="sort by points">
-                  Ranking by Points/Cashback
-                </ToggleButton>
-                <ToggleButton
-                  value="cashbackValue"
-                  aria-label="sort by cashback value"
-                >
-                  Ranking by Value (INR)
-                  <Tooltip title="For comparison purposes, we assume 1 mile = ₹1">
-                    <IconButton size="small" sx={{ ml: 1 }}>
-                      <InfoIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </Box>
+                Ranking by Value ({getCurrencySymbol()})
+                <Tooltip title={`For comparison purposes, we assume 1 mile = ${getCurrencySymbol()}1`}>
+                  <IconButton size="small" sx={{ ml: 1 }}>
+                    <InfoIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
           )}
 
           <List sx={{ width: "100%" }}>

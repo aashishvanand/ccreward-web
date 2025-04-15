@@ -119,6 +119,20 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
     }
   }, [open]);
 
+  useEffect(() => {
+    if (open) {
+      // Reset to initial state when dialog opens
+      setNewCard({
+        bank: "",
+        cardName: "",
+      });
+      setSelectedMonth(new Date().toLocaleString("default", { month: "long" }));
+      setSelectedYear(new Date().getFullYear());
+      setExpanded(false);
+      setCards([]);
+    }
+  }, [open]);
+
   const fetchBankList = async () => {
     setLoading(true);
     try {
