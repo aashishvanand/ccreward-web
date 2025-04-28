@@ -96,6 +96,16 @@ function Footer() {
               Privacy Policy
             </Link>
             <Link 
+              href="/howto" 
+              color="inherit"
+              sx={{ 
+                textDecoration: 'none',
+                '&:hover': { color: 'primary.main' }
+              }}
+            >
+              How-to Guides
+            </Link>
+            <Link 
               href="/faq" 
               color="inherit"
               sx={{ 

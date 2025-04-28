@@ -14,6 +14,7 @@ Allow: /terms
 Allow: /faq
 Allow: /sitemap.xml
 Allow: /security.txt
+Allow: /howto
 
 # Block utility files
 Disallow: /_next/static/
