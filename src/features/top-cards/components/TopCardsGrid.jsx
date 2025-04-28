@@ -26,6 +26,7 @@ import {
   Receipt as ReceiptIcon,
   AccountBalanceWallet as AccountBalanceWalletIcon,
 } from "@mui/icons-material";
+import { motion } from 'framer-motion';
 import Image from "next/image";
 
 const CACHE_KEY = "referralData";

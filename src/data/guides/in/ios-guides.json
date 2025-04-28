@@ -1,0 +1,142 @@
+{
+  "platform": "iOS",
+  "topics": [
+    {
+      "id": "sms-import",
+      "title": "Setting Up Automatic SMS Import",
+      "description": "Follow this step-by-step guide to set up automatic transaction SMS import in the CCReward iOS app. This automation allows your credit card transaction SMS messages to be imported directly into the app without any manual input.",
+      "steps": [
+        {
+          "number": 1,
+          "description": "Find the Shortcuts App: Look for the Shortcuts app icon on your iPhone's home screen.",
+          "image": "7b9b638e-b46f-4407-41ad-c9b630447100",
+          "alt": "Shortcuts app icon on iOS home screen",
+          "tip": "If you can't find the Shortcuts app, you may need to download it from the App Store."
+        },
+        {
+          "number": 2,
+          "description": "Start a New Automation: Open the Shortcuts app. Tap the 'Automation' button at the bottom (middle icon). Tap the '+' sign in the top-right corner.",
+          "image": "736f133f-11e3-4045-289a-1dd32219ee00",
+          "alt": "Automation tab in Shortcuts app",
+          "caption": "The Automation tab is the second icon in the bottom navigation.",
+          "fullScreenImage": true
+        },
+        {
+          "number": 3,
+          "description": "Choose the Message Trigger: In the search bar at the top, type 'Message'. Select 'Message' from the options that appear.",
+          "image": "1be58268-4f40-48cf-f0c5-a6df0ddf2c00",
+          "alt": "Plus button to create a new automation",
+          "tip": "If you don't see the plus icon, you may need to scroll to the top of the screen.",
+          "fullScreenImage": true
+        },
+        {
+          "number": 4,
+          "description": "Set Up the 'When': You'll see options like 'Sender', 'Message Contains'. Tap on 'Message Contains' to specify the kind of message to look for.",
+          "image": "ef89a2af-2b2d-407e-dd21-d98caaa1e900",
+          "fullScreenImage": true,
+          "alt": "Create personal automation option",
+          "caption": "Personal automations run on your device."
+        },
+        {
+          "number": 5,
+          "description": "It should open a popup asking 'Message Contains'",
+          "image": "58ad9c43-b116-48fb-a1ab-0d4c835a8c00",
+          "fullScreenImage": true,
+          "alt": "Message received automation option",
+          "tip": "This trigger will run the automation whenever you receive specific text messages."
+        },
+        {
+          "number": 6,
+          "description": "Enter Your Bank's Message Text: Type the specific phrase your bank uses in its transaction SMS alerts (e.g., 'spent using ICICI Bank Card').",
+          "image": "3be3fd82-4d04-4b6f-fba6-53309f52fa00",
+          "fullScreenImage": true,
+          "details": [
+            "ICICI: spent using ICICI Bank Card",
+            "HDFC: spent on HDFC Bank Card",
+            "Axis: Spent Card no.",
+            "IDFC: spent on your IDFC FIRST Bank Credit Card ending",
+            "SBI: spent on your SBI Credit Card ending",
+            "Kotak: spent on Kotak Bank Card",
+            "RBL: on RBL Bank credit card",
+            "HSBC: Your HSBC credit card",
+            "Amex: on your AMEX card",
+            "AU: spent on AU Bank Credit Card",
+            "BOB: is spent on your BOBCARD ending",
+            "Federal: spent on your credit card ending with",
+            "PNB: Your PNB Credit Card",
+            "SC: Thank you for using StanChart Credit Card No",
+            "YesBank: spent on YES BANK Card"
+           ],
+          "alt": "Message trigger configuration screen showing message contains field",
+          "caption": "This is where you enter the specific text that identifies your bank messages."
+        },
+        {
+          "number": 7,
+          "description": "Select 'Run Immediately' (so it's automatic). Tap 'Next'.",
+          "image": "b6eb6704-9d2e-4d53-4539-2a342a098700",
+          "fullScreenImage": true,
+          "alt": "Message contains field selection with example",
+          "tip": "Run Immediately ensures the automation happens without asking you each time."
+        },
+        {
+          "number": 8,
+          "description": "choose 'New Blank Automation' under Get Started",
+          "image": "965bccee-7815-4a37-05c9-b04c08070c00",
+          "fullScreenImage": true,
+          "alt": "New Blank Automation button"
+        },
+        {
+          "number": 9,
+          "description": "In the 'Search Actions' bar at the bottom, type 'ccreward'.",
+          "image": "4fc41202-5f38-4652-685f-7b39996e7200",
+          "fullScreenImage": true,
+          "alt": "Searching for CCReward actions",
+          "tip": "Make sure you have the CCReward app installed."
+        },
+        {
+          "number": 10,
+          "description": "Tap on 'Process Bank Transaction' from the CCReward actions shown.",
+          "image": "5774e1a7-a8b3-4d71-6ff8-833f840e4500",
+          "fullScreenImage": true,
+          "alt": "Selecting the Process Bank Transaction action",
+          "caption": "This action sends the SMS to the CCReward app."
+        },
+        {
+          "number": 11,
+          "description": "Tap the 'Message Text' part of the action you just added (it might say 'Import bank transaction from message').",
+          "image": "906a3af5-e8a4-42a1-02d9-d3e1199dd500",
+          "fullScreenImage": true,
+          "alt": "Tapping on the Message Text placeholder"
+        },
+        {
+          "number": 12,
+          "description": "Keyboard should open now and show Select Variable, Scroll 'Select Variable' the right until see 'Shortcut Input'. Tap it.",
+          "image": "4a95f92f-ccb7-4361-f6a6-eedd27d47b00",
+          "fullScreenImage": true,
+          "alt": "Process Bank Transaction action ready for input",
+          "caption": "This prepares the action to use the SMS text."
+        },
+        {
+          "number": 13,
+          "description": "That's it! Now Shortcuts should ",
+          "image": "3c94cb4d-d368-4413-dc27-dc3a7dce3800",
+          "fullScreenImage": true,
+          "alt": "Setting Shortcut Input as the variable",
+          "tip": "This passes the SMS text to the CCReward app. You should find new SMS in the CCReward calculator page."
+        }
+      ],
+      "videoUrl": "https://www.youtube.com/embed/sNW101pmf54",
+      "lastUpdated": "2025-04-28",
+      "version": "1.0.0",
+      "troubleshooting": [
+        "If transactions aren't importing, make sure 'Run without asking' is enabled in the automation settings",
+        "Check that you've correctly copied the exact message pattern text for your bank",
+        "Ensure CCReward app is updated to the latest version",
+        "Sometimes bank message formats may vary; you might need to adjust the text pattern slightly",
+        "If you're not receiving transaction notifications, check that your bank has SMS alerts enabled for your credit card",
+        "Make sure you don't have message filtering enabled that could block bank SMS messages",
+        "Support for additional banks including IndusInd, Canara, DBS, OneCard, and IDBI coming soon"
+      ]
+    }
+  ]
+}
