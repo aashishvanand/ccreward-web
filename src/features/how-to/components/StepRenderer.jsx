@@ -8,18 +8,28 @@ const StepRenderer = ({ steps, videoUrl, platformColor, isMobile, region }) => {
   // Function to get the correct image URL with region-specific support
   const getImageUrl = (imageId) => {
     if (!imageId) return null;
-
+  
     // Check if the image ID already contains the full URL to avoid duplication
-    if (imageId.includes("imagedelivery.net")) {
-      return imageId;
+    if (imageId.includes("http")) {
+      try {
+        const parsedUrl = new URL(imageId);
+        // Only allow specific trusted domains
+        if (parsedUrl.host === "imagedelivery.net") {
+          return imageId;
+        }
+        // If domain doesn't match, fall through to the default path
+      } catch (e) {
+        // If imageId is not a valid URL or parsing fails, proceed with the existing logic
+        console.warn("Invalid URL format for image:", imageId);
+      }
     }
-
+  
     // Check if there's a region-specific image ID format
     const regionSpecificId =
       region && imageId.includes(":")
         ? imageId.split(":")[region === "SG" ? 1 : 0]
         : imageId;
-
+  
     // Create the proper URL, use different width for mobile
     return `https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/${regionSpecificId}/${
       isMobile ? "width=320" : "width=640"
