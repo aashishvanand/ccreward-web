@@ -4,33 +4,25 @@ import {
   Typography, 
   Container, 
   Paper,
-  Select,
-  MenuItem,
-  FormControl,
   Fade,
   CircularProgress,
   useTheme,
   useMediaQuery,
   Divider,
   Stack,
-  Grid,
-  Chip
+  Alert,
+  FormControl,
+  Select,
+  MenuItem
 } from '@mui/material';
+import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import Header from '../../shared/components/layout/Header';
 import Footer from '../../shared/components/layout/Footer';
 import StepRenderer from './components/StepRenderer';
 import VideoTutorial from './components/VideoTutorial';
+import HowToSelector from './components/HowToSelector';
 import { useRegion } from '../../core/providers/RegionContext';
-
-// Import region-specific guides directly
-import iosGuidesIN from '../../data/guides/in/ios-guides.json';
-import androidGuidesIN from '../../data/guides/in/android-guides.json';
-import webGuidesIN from '../../data/guides/in/web-guides.json';
-
-import iosGuidesSG from '../../data/guides/sg/ios-guides.json';
-import androidGuidesSG from '../../data/guides/sg/android-guides.json';
-import webGuidesSG from '../../data/guides/sg/web-guides.json';
 
 // Import Material UI icons for platforms
 import {
@@ -41,19 +33,6 @@ import {
 
 // Import necessary constants
 import { HELP_TOPICS } from './constants/helpTopics';
-
-const GUIDES_MAP = {
-  IN: {
-    ios: iosGuidesIN,
-    android: androidGuidesIN,
-    web: webGuidesIN
-  },
-  SG: {
-    ios: iosGuidesSG,
-    android: androidGuidesSG,
-    web: webGuidesSG
-  }
-};
 
 // Define platforms with MUI icons
 const PLATFORMS = {
@@ -88,7 +67,10 @@ const HowToGuide = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { region } = useRegion();
-  const guides = GUIDES_MAP[region] || GUIDES_MAP.IN;
+  
+  const [guidesData, setGuidesData] = useState({});
+  const [guidesLoaded, setGuidesLoaded] = useState(false);
+  const [dataError, setDataError] = useState(null);
   
   const [selectedPlatform, setSelectedPlatform] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('');
@@ -97,6 +79,41 @@ const HowToGuide = () => {
   const [availableTopics, setAvailableTopics] = useState([]);
   const [error, setError] = useState(null);
   const [showGuide, setShowGuide] = useState(false);
+
+  // Load guide data
+  useEffect(() => {
+    const loadGuideData = async () => {
+      setGuidesLoaded(false);
+      setDataError(null);
+      
+      const platforms = ['ios', 'android', 'web'];
+      const currentRegion = region || 'IN';
+      const guides = {};
+      
+      try {
+        await Promise.all(platforms.map(async (platform) => {
+          try {
+            const response = await axios.get(
+              `https://files.ccreward.app/guides/${currentRegion.toLowerCase()}/${platform}-guides.json`
+            );
+            guides[platform] = response.data;
+          } catch (err) {
+            console.error(`Error loading ${platform} guides:`, err);
+            // Create empty placeholder if guide data is missing
+            guides[platform] = { platform, topics: [] };
+          }
+        }));
+        
+        setGuidesData(guides);
+        setGuidesLoaded(true);
+      } catch (err) {
+        console.error('Error loading guide data:', err);
+        setDataError('Failed to load guides. Please try again later.');
+      }
+    };
+    
+    loadGuideData();
+  }, [region]);
 
   // Handle platform change
   const handlePlatformChange = (platform) => {
@@ -108,9 +125,9 @@ const HowToGuide = () => {
     setShowGuide(false);
     
     // Get available topics for this platform
-    if (platform) {
+    if (platform && guidesData[platform]) {
       try {
-        const platformGuides = guides[platform];
+        const platformGuides = guidesData[platform];
         const topicIds = platformGuides.topics.map(topic => topic.id);
         
         // Filter HELP_TOPICS to only include those available for this platform
@@ -146,9 +163,9 @@ const HowToGuide = () => {
 
   // Update current guide when platform and topic are selected
   useEffect(() => {
-    if (selectedPlatform && selectedTopic) {
+    if (selectedPlatform && selectedTopic && guidesData[selectedPlatform]) {
       try {
-        const platformGuides = guides[selectedPlatform];
+        const platformGuides = guidesData[selectedPlatform];
         const guide = platformGuides.topics.find(topic => topic.id === selectedTopic);
         
         if (guide) {
@@ -169,7 +186,7 @@ const HowToGuide = () => {
     } else {
       setCurrentGuide(null);
     }
-  }, [selectedPlatform, selectedTopic, guides]);
+  }, [selectedPlatform, selectedTopic, guidesData]);
 
   // Animation variants
   const fadeIn = {
@@ -206,6 +223,63 @@ const HowToGuide = () => {
     return <Icon sx={{ color: PLATFORM_COLORS[platformId] }} />;
   };
 
+  // Show loading state while guides are being loaded
+  if (!guidesLoaded && !dataError) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        minHeight: '100vh'
+      }}>
+        <Header />
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            flexGrow: 1
+          }}
+        >
+          <CircularProgress />
+        </Box>
+        <Footer />
+      </Box>
+    );
+  }
+
+  // Show error state if guides failed to load
+  if (dataError) {
+    return (
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        minHeight: '100vh'
+      }}>
+        <Header />
+        <Container 
+          sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center',
+            flexGrow: 1,
+            py: 4
+          }}
+        >
+          <Alert 
+            severity="error" 
+            sx={{ 
+              maxWidth: 500, 
+              width: '100%' 
+            }}
+          >
+            {dataError}
+          </Alert>
+        </Container>
+        <Footer />
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ 
       display: 'flex', 
@@ -227,258 +301,173 @@ const HowToGuide = () => {
         }}
       >
         <AnimatePresence mode="wait">
-          {!showGuide ? (
-            <motion.div
-              key="search-ui"
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              variants={fadeIn}
-              style={{ 
-                display: 'flex', 
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: '100%',
-                flexGrow: 1
+        {!showGuide ? (
+  <motion.div
+    key="search-ui"
+    initial="hidden"
+    animate="visible"
+    exit="exit"
+    variants={fadeIn}
+    style={{ 
+      display: 'flex', 
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '100%',
+      flexGrow: 1
+    }}
+  >
+    <Typography 
+      variant="h2" 
+      component="h1"
+      align="center"
+      sx={{ 
+        mb: { xs: 3, md: 4 },
+        fontWeight: 'bold',
+        fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' }
+      }}
+    >
+      How-To Guides
+    </Typography>
+    
+    <Box sx={{ 
+      maxWidth: 800, 
+      width: '100%',
+      textAlign: 'center',
+      mb: { xs: 4, md: 6 }
+    }}>
+      <motion.div variants={slideUp}>
+        {/* Both Desktop and Mobile layout - simplified */}
+        <Box sx={{ 
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          alignItems: 'center',
+          justifyContent: 'center', 
+          flexWrap: 'nowrap',
+          gap: 2
+        }}>
+          <Typography variant="h6" component="span">
+            I am using
+          </Typography>
+          
+          <FormControl sx={{ minWidth: isMobile ? '100%' : 200 }}>
+            <Select
+              value={selectedPlatform}
+              onChange={(e) => handlePlatformChange(e.target.value)}
+              displayEmpty
+              sx={{
+                borderRadius: 2,
+                '& .MuiSelect-select': {
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  py: 1.5
+                }
               }}
             >
-              <Typography 
-                variant="h2" 
-                component="h1"
-                align="center"
-                sx={{ 
-                  mb: { xs: 3, md: 4 },
-                  fontWeight: 'bold',
-                  fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' }
-                }}
-              >
-                How-To Guides
-              </Typography>
-              
-              <Box sx={{ 
-                maxWidth: 800, 
-                width: '100%',
-                textAlign: 'center',
-                mb: { xs: 4, md: 6 }
-              }}>
-                <motion.div variants={slideUp}>
-                  {/* Desktop layout (single line) */}
-                  {!isMobile && (
-                    <Box sx={{ 
+              <MenuItem value="" disabled>
+                Select Platform
+              </MenuItem>
+              {Object.values(PLATFORMS).map((platform) => {
+                const Icon = platform.icon;
+                return (
+                  <MenuItem 
+                    key={platform.id} 
+                    value={platform.id}
+                    sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center', 
-                      flexWrap: 'nowrap',
-                      gap: 2
-                    }}>
-                      <Typography variant="h6" component="span">
-                        I am using
-                      </Typography>
-                      
-                      <FormControl sx={{ minWidth: 200 }}>
-                        <Select
-                          value={selectedPlatform}
-                          onChange={(e) => handlePlatformChange(e.target.value)}
-                          displayEmpty
-                          sx={{
-                            borderRadius: 2,
-                            '& .MuiSelect-select': {
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1,
-                              py: 1.5
-                            }
-                          }}
-                        >
-                          <MenuItem value="" disabled>
-                            Select Platform
-                          </MenuItem>
-                          {Object.values(PLATFORMS).map((platform) => {
-                            const Icon = platform.icon;
-                            return (
-                              <MenuItem 
-                                key={platform.id} 
-                                value={platform.id}
-                                sx={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: 1
-                                }}
-                              >
-                                <Icon sx={{ 
-                                  fontSize: 24,
-                                  color: PLATFORM_COLORS[platform.id]
-                                }} />
-                                {platform.name}
-                              </MenuItem>
-                            );
-                          })}
-                        </Select>
-                      </FormControl>
-                      
-                      <Typography variant="h6" component="span">
-                        and I want to
-                      </Typography>
-                      
-                      <FormControl 
-                        sx={{ minWidth: 240 }}
-                        disabled={!selectedPlatform || isLoading}
-                      >
-                        <Select
-                          value={selectedTopic}
-                          onChange={(e) => handleTopicChange(e.target.value)}
-                          displayEmpty
-                          sx={{
-                            borderRadius: 2,
-                            '& .MuiSelect-select': {
-                              py: 1.5
-                            }
-                          }}
-                        >
-                          <MenuItem value="" disabled>
-                            {!selectedPlatform 
-                              ? 'Select platform first' 
-                              : isLoading 
-                                ? 'Loading...'
-                                : 'Select topic'
-                            }
-                          </MenuItem>
-                          {availableTopics.map((topic) => (
-                            <MenuItem 
-                              key={topic.id} 
-                              value={topic.id}
-                            >
-                              {topic.title}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Box>
-                  )}
-                  
-                  {/* Mobile layout (stacked) */}
-                  {isMobile && (
-                    <Stack spacing={3}>
-                      <Typography variant="h6">
-                        I am using
-                      </Typography>
-                      
-                      <FormControl fullWidth>
-                        <Select
-                          value={selectedPlatform}
-                          onChange={(e) => handlePlatformChange(e.target.value)}
-                          displayEmpty
-                          sx={{
-                            borderRadius: 2,
-                            '& .MuiSelect-select': {
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1,
-                              py: 1.5
-                            }
-                          }}
-                        >
-                          <MenuItem value="" disabled>
-                            Select Platform
-                          </MenuItem>
-                          {Object.values(PLATFORMS).map((platform) => {
-                            const Icon = platform.icon;
-                            return (
-                              <MenuItem 
-                                key={platform.id} 
-                                value={platform.id}
-                                sx={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: 1
-                                }}
-                              >
-                                <Icon sx={{ 
-                                  fontSize: 24,
-                                  color: PLATFORM_COLORS[platform.id]
-                                }} />
-                                {platform.name}
-                              </MenuItem>
-                            );
-                          })}
-                        </Select>
-                      </FormControl>
-                      
-                      <Typography variant="h6">
-                        and I want to
-                      </Typography>
-                      
-                      <FormControl 
-                        fullWidth
-                        disabled={!selectedPlatform || isLoading}
-                      >
-                        <Select
-                          value={selectedTopic}
-                          onChange={(e) => handleTopicChange(e.target.value)}
-                          displayEmpty
-                          sx={{
-                            borderRadius: 2,
-                            '& .MuiSelect-select': {
-                              py: 1.5
-                            }
-                          }}
-                        >
-                          <MenuItem value="" disabled>
-                            {!selectedPlatform 
-                              ? 'Select platform first' 
-                              : isLoading 
-                                ? 'Loading...'
-                                : 'Select topic'
-                            }
-                          </MenuItem>
-                          {availableTopics.map((topic) => (
-                            <MenuItem 
-                              key={topic.id} 
-                              value={topic.id}
-                            >
-                              {topic.title}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Stack>
-                  )}
-                </motion.div>
-                
-                {isLoading && (
-                  <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-                    <CircularProgress size={30} sx={{ color: getCurrentPlatformColor() }} />
-                  </Box>
-                )}
-                
-                {error && (
-                  <Typography 
-                    color="error" 
-                    sx={{ mt: 2 }}
+                      gap: 1
+                    }}
                   >
-                    {error}
-                  </Typography>
-                )}
-              </Box>
+                    <Icon sx={{ 
+                      fontSize: 24,
+                      color: PLATFORM_COLORS[platform.id]
+                    }} />
+                    {platform.name}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+          
+          {selectedPlatform && (
+            <>
+              <Typography variant="h6" component="span">
+                and I want to
+              </Typography>
               
-              <Box sx={{ 
-                maxWidth: 800, 
-                width: '100%',
-                opacity: 0.7,
-                mt: { xs: 2, md: 4 }
-              }}>
-                <Divider sx={{ mb: 3 }} />
-                <Typography 
-                  variant="body1" 
-                  align="center"
-                  sx={{ opacity: 0.8, px: 2 }}
+              <FormControl 
+                sx={{ minWidth: isMobile ? '100%' : 240 }}
+                disabled={!selectedPlatform || isLoading}
+              >
+                <Select
+                  value={selectedTopic}
+                  onChange={(e) => handleTopicChange(e.target.value)}
+                  displayEmpty
+                  sx={{
+                    borderRadius: 2,
+                    '& .MuiSelect-select': {
+                      py: 1.5
+                    }
+                  }}
                 >
-                  Select your platform and what you'd like to learn about to access our detailed step-by-step guides for {region === 'SG' ? 'Singapore' : 'India'}.
-                </Typography>
-              </Box>
-            </motion.div>
-          ) : (
+                  <MenuItem value="" disabled>
+                    {!selectedPlatform 
+                      ? 'Select platform first' 
+                      : isLoading 
+                        ? 'Loading...'
+                        : 'Select topic'
+                    }
+                  </MenuItem>
+                  {availableTopics.map((topic) => (
+                    <MenuItem 
+                      key={topic.id} 
+                      value={topic.id}
+                    >
+                      {topic.title}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </>
+          )}
+        </Box>
+      </motion.div>
+      
+      {isLoading && (
+        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+          <CircularProgress size={30} sx={{ color: getCurrentPlatformColor() }} />
+        </Box>
+      )}
+      
+      {error && (
+        <Typography 
+          color="error" 
+          sx={{ mt: 2 }}
+        >
+          {error}
+        </Typography>
+      )}
+    </Box>
+    
+    <Box sx={{ 
+      maxWidth: 800, 
+      width: '100%',
+      opacity: 0.7,
+      mt: { xs: 2, md: 4 }
+    }}>
+      <Divider sx={{ mb: 3 }} />
+      <Typography 
+        variant="body1" 
+        align="center"
+        sx={{ opacity: 0.8, px: 2 }}
+      >
+        Select your platform and what you'd like to learn about to access our detailed step-by-step guides for {region === 'SG' ? 'Singapore' : 'India'}.
+      </Typography>
+    </Box>
+  </motion.div>
+) : (
             <motion.div
               key="guide-content"
               initial="hidden"
@@ -521,75 +510,16 @@ const HowToGuide = () => {
                     spacing={1.5}
                     sx={{ width: { xs: '100%', sm: 'auto' } }}
                   >
-                    <FormControl 
-                      size="small" 
-                      sx={{ 
-                        minWidth: { xs: '100%', sm: 120 },
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          borderColor: getCurrentPlatformColor()
-                        }
-                      }}
-                    >
-                      <Select
-                        value={selectedPlatform}
-                        onChange={(e) => handlePlatformChange(e.target.value)}
-                        sx={{
-                          '& .MuiSelect-select': {
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 1,
-                            py: 1
-                          }
-                        }}
-                      >
-                        {Object.values(PLATFORMS).map((platform) => {
-                          const Icon = platform.icon;
-                          return (
-                            <MenuItem 
-                              key={platform.id} 
-                              value={platform.id}
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1
-                              }}
-                            >
-                              <Icon sx={{ 
-                                fontSize: 20,
-                                color: PLATFORM_COLORS[platform.id]
-                              }} />
-                              {platform.name}
-                            </MenuItem>
-                          );
-                        })}
-                      </Select>
-                    </FormControl>
-                    
-                    <FormControl 
-                      size="small" 
-                      sx={{ 
-                        minWidth: { xs: '100%', sm: 180 },
-                        '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          borderColor: getCurrentPlatformColor()
-                        }
-                      }}
-                    >
-                      <Select
-                        value={selectedTopic}
-                        onChange={(e) => handleTopicChange(e.target.value)}
-                      >
-                        {availableTopics.map((topic) => (
-                          <MenuItem 
-                            key={topic.id} 
-                            value={topic.id}
-                          >
-                            {topic.title}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
+                    <HowToSelector
+                      platforms={PLATFORMS}
+                      availableTopics={availableTopics}
+                      selectedPlatform={selectedPlatform}
+                      selectedTopic={selectedTopic}
+                      onPlatformChange={handlePlatformChange}
+                      onTopicChange={handleTopicChange}
+                      isLoading={isLoading}
+                      isMini={true}
+                    />
                   </Stack>
                 </Box>
                 
@@ -664,7 +594,7 @@ const HowToGuide = () => {
                       </Typography>
 
                       <StepRenderer 
-                        steps={currentGuide.steps}
+                        steps={currentGuide.steps || []}
                         videoUrl={currentGuide.videoUrl}
                         platformColor={getCurrentPlatformColor()}
                         isMobile={isMobile}
@@ -711,7 +641,13 @@ const HowToGuide = () => {
                       )}
                     </Paper>
                   </Fade>
-                ) : null}
+                ) : (
+                  <Box sx={{ textAlign: 'center', py: 4 }}>
+                    <Typography color="text.secondary">
+                      {error || 'Select a guide to view its content.'}
+                    </Typography>
+                  </Box>
+                )}
               </Box>
             </motion.div>
           )}
