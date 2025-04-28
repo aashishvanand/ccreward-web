@@ -41,9 +41,7 @@ export default function WrappedHome() {
     <ThemeRegistry>
       <RegionProvider>
         <AuthProvider>
-          <HowToProvider>
-            <Home />
-          </HowToProvider>
+          <Home />
         </AuthProvider>
       </RegionProvider>
     </ThemeRegistry>
