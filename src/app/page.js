@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic';
 import Box from '@mui/material/Box';
 import { ThemeRegistry } from '../core/providers/ThemeRegistry';
 import { AuthProvider } from '../core/providers/AuthContext';
-import { HowToProvider } from '../core/providers/HowToProvider';
 import { RegionProvider } from '../core/providers/RegionContext';
 
 const LandingPage = dynamic(() => import('../features/landing/components/LandingPage'), { ssr: false });
