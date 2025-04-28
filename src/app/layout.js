@@ -6,7 +6,6 @@ import Script from "next/script";
 import Providers from './providers'
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import { baseJsonLd } from '../shared/constants/jsonLd';
-import { motion } from 'framer-motion';
 
 const inter = Inter({ subsets: ['latin'] })
 
