@@ -73,16 +73,27 @@ const setToCache = (key, data) => {
     localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
 };
 
-// Helper function to get the current region/country code
+// Helper function to check if region is initialized
+const isRegionInitialized = () => {
+    if (typeof window === 'undefined') {
+        return false;
+    }
+    return !!localStorage.getItem('app-region');
+};
+
+// Enhanced getCountryCode that waits for region to be initialized
 const getCountryCode = () => {
     if (typeof localStorage === 'undefined') {
-        return 'in'; // Default to India during SSR
+        return null; // Return null during SSR
     }
     
     const region = localStorage.getItem('app-region');
+    if (!region) {
+        console.warn('Region not initialized in localStorage');
+        return null; // Return null if region not initialized
+    }
     
     return region.toLowerCase();
-    
 };
 
 // Function to set the authentication token
@@ -115,10 +126,18 @@ api.interceptors.request.use(async (config) => {
         config.headers['Authorization'] = `Bearer ${token}`;
     }
     
-    // Add country parameter to each request if not already present
-    if (!config.url.includes('country=')) {
-        const separator = config.url.includes('?') ? '&' : '?';
-        config.url = `${config.url}${separator}country=${getCountryCode()}`;
+    // Only add country parameter if region is initialized
+    const countryCode = getCountryCode();
+    if (countryCode) {
+        // Add country parameter to each request if not already present
+        if (!config.url.includes('country=')) {
+            const separator = config.url.includes('?') ? '&' : '?';
+            config.url = `${config.url}${separator}country=${countryCode}`;
+        }
+    } else {
+        console.warn('Skipping API request because region is not initialized:', config.url);
+        // Cancel the request
+        return Promise.reject(new Error('Region not initialized'));
     }
     
     // Ensure URL has versioning
@@ -152,10 +171,15 @@ const authenticatedRequest = async (method, url, data = null) => {
     }
 };
 
-// Fetch banks
+// Fetch banks with region initialization check
 export const fetchBanks = async () => {
-    // Get region from parameter or from localStorage as fallback
-    const region = localStorage.getItem('app-region')?.toLowerCase();
+    // Check if region is initialized
+    if (!isRegionInitialized()) {
+        console.warn('Cannot fetch banks: Region not initialized');
+        return [];
+    }
+    
+    const region = getCountryCode();
     
     // Create a region-specific cache key
     const cacheKey = `banks_${region}`;
@@ -178,14 +202,23 @@ export const fetchBanks = async () => {
         
         return data;
     } catch (error) {
+        // If error is about region not being initialized, return empty array
+        if (error.message === 'Region not initialized') {
+            return [];
+        }
         return handleApiError(error);
     }
 };
 
 // Fetch cards for a specific bank
-export const fetchCards = async (bank, regionCode) => {
-    // Get region from parameter or from localStorage as fallback
-    const region = localStorage.getItem('app-region')?.toLowerCase();
+export const fetchCards = async (bank) => {
+    // Check if region is initialized
+    if (!isRegionInitialized()) {
+        console.warn('Cannot fetch cards: Region not initialized');
+        return [];
+    }
+    
+    const region = getCountryCode();
     
     // Create a region-specific cache key for this bank
     const cacheKey = `cards_${region}_${bank}`;
@@ -200,6 +233,10 @@ export const fetchCards = async (bank, regionCode) => {
         setToCache(cacheKey, response.data);
         return response.data;
     } catch (error) {
+        // If error is about region not being initialized, return empty array
+        if (error.message === 'Region not initialized') {
+            return [];
+        }
         return handleApiError(error);
     }
 };
@@ -209,6 +246,12 @@ let mccCancelToken = null;
 
 // Fetch MCC (Merchant Category Code) data
 export const fetchMCC = async (search) => {
+    // Check if region is initialized
+    if (!isRegionInitialized()) {
+        console.warn('Cannot fetch MCC: Region not initialized');
+        return [];
+    }
+    
     if (mccCancelToken) {
         mccCancelToken.cancel('Operation canceled due to new request.');
     }
@@ -223,6 +266,8 @@ export const fetchMCC = async (search) => {
     } catch (error) {
         if (axios.isCancel(error)) {
             console.log('Request canceled:', error.message);
+        } else if (error.message === 'Region not initialized') {
+            return [];
         } else {
             console.error('Error fetching MCC data:', error);
         }
@@ -232,6 +277,12 @@ export const fetchMCC = async (search) => {
 
 // Fetch card questions for a specific bank and card
 export const fetchCardQuestions = async (bank, card) => {
+    // Check if region is initialized
+    if (!isRegionInitialized()) {
+        console.warn('Cannot fetch card questions: Region not initialized');
+        return [];
+    }
+    
     const encodedBank = encodeURIComponent(bank);
     const encodedCard = encodeURIComponent(card);
     const cacheKey = `questions_${bank}_${card}`;
@@ -243,36 +294,70 @@ export const fetchCardQuestions = async (bank, card) => {
         setToCache(cacheKey, response.data);
         return response.data;
     } catch (error) {
+        // If error is about region not being initialized, return empty array
+        if (error.message === 'Region not initialized') {
+            return [];
+        }
         return handleApiError(error);
     }
 };
 
 // Calculate rewards based on provided data
 export const calculateRewards = async (data) => {
+    // Check if region is initialized
+    if (!isRegionInitialized()) {
+        console.warn('Cannot calculate rewards: Region not initialized');
+        throw new Error('Region not initialized. Please refresh the page and try again.');
+    }
+    
     try {
         const response = await api.post('/calculateRewards', data);
         return response.data;
     } catch (error) {
+        // If error is about region not being initialized, throw specific error
+        if (error.message === 'Region not initialized') {
+            throw new Error('Region not initialized. Please refresh the page and try again.');
+        }
         return handleApiError(error);
     }
 };
 
 // Fetch questions for best card calculation
 export const fetchBestCardQuestions = async (cards) => {
+    // Check if region is initialized
+    if (!isRegionInitialized()) {
+        console.warn('Cannot fetch best card questions: Region not initialized');
+        return [];
+    }
+    
     try {
         const response = await authenticatedRequest('post', '/bestCardQuestions', { cards });
         return response;
     } catch (error) {
+        // If error is about region not being initialized, return empty array
+        if (error.message === 'Region not initialized') {
+            return [];
+        }
         return handleApiError(error);
     }
 };
 
 // Calculate the best card based on provided data
 export const calculateBestCard = async (data) => {
+    // Check if region is initialized
+    if (!isRegionInitialized()) {
+        console.warn('Cannot calculate best card: Region not initialized');
+        throw new Error('Region not initialized. Please refresh the page and try again.');
+    }
+    
     try {
         const response = await authenticatedRequest('post', '/calculateBestCard', data);
         return response;
     } catch (error) {
+        // If error is about region not being initialized, throw specific error
+        if (error.message === 'Region not initialized') {
+            throw new Error('Region not initialized. Please refresh the page and try again.');
+        }
         return handleApiError(error);
     }
 };

@@ -8,11 +8,11 @@ const nextConfig = {
     // Warnings are treated as warnings, not errors during build
     ignoreDuringBuilds: true,
   },
-  // compiler:{
-  //   removeConsole:{
-  //     exclude:["error"]
-  //   }
-  // },
+  compiler:{
+    removeConsole:{
+      exclude:["error"]
+    }
+  },
   trailingSlash: false,
   serverExternalPackages: ['sharp'], // Previously serverComponentsExternalPackages
   bundlePagesRouterDependencies: true, // Previously bundlePagesExternals

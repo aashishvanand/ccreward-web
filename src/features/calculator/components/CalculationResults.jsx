@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import { motion, AnimatePresence } from "framer-motion";
 
 const CalculationResults = ({ result, isLoading }) => {
   const [expanded, setExpanded] = useState(false);
@@ -49,82 +50,188 @@ const CalculationResults = ({ result, isLoading }) => {
   const hasRewards =
     result && (result.points > 0 || result.cashback > 0 || result.miles > 0);
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 25,
+        delay: 0.1
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      y: -20,
+      transition: { 
+        duration: 0.2 
+      }
+    }
+  };
+
+  // Celebration animations when rewards are high
+  const celebrationVariants = {
+    hidden: { scale: 0, rotate: -10, opacity: 0 },
+    visible: { 
+      scale: 1, 
+      rotate: 0, 
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 400,
+        damping: 10,
+        delay: 0.3
+      }
+    }
+  };
+
+  // Loading spinner animation
+  const spinnerVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: {
+        yoyo: Infinity,
+        duration: 0.8,
+        ease: "easeInOut"
+      }
+    }
+  };
+
   return (
-    <Paper
-      elevation={3}
-      sx={[
-        {
-          p: 2,
-          mt: 2,
-          width: "100%",
-          borderRadius: 2,
-        },
-        hasRewards
-          ? {
-              bgcolor: "success.light",
-            }
-          : {
-              bgcolor: "error.light",
+    <AnimatePresence mode="wait">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        variants={containerVariants}
+      >
+        <Paper
+          elevation={3}
+          sx={[
+            {
+              p: 2,
+              mt: 2,
+              width: "100%",
+              borderRadius: 2,
+              overflow: "hidden",
+              position: "relative"
             },
-      ]}
-      slots={{ root: "div" }}
-    >
-      {isLoading ? (
-        <Box
-          sx={{ display: "flex", justifyContent: "center" }}
-          slots={{ root: "div" }}
-        >
-          <CircularProgress />
-        </Box>
-      ) : (
-        <>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            slots={{ root: "div" }}
-          >
-            <Typography
-              ref={textRef}
-              variant="h6"
-              align="center"
-              color="textPrimary"
-              onClick={toggleExpand}
-              sx={[
-                {
-                  fontWeight: "bold",
-                  fontSize: { xs: "1rem", sm: "1.25rem" },
-                  cursor: "pointer",
-                  maxWidth: "calc(100% - 40px)",
+            hasRewards
+              ? {
+                  bgcolor: "success.light",
+                }
+              : {
+                  bgcolor: "error.light",
                 },
-                expanded
-                  ? {}
-                  : {
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    },
-              ]}
+          ]}
+        >
+          {isLoading ? (
+            <Box
+              sx={{ display: "flex", justifyContent: "center", py: 2 }}
             >
-              {hasRewards ? (
-                <>🎉 {result.rewardText} 🎉</>
-              ) : (
-                <>😢 No rewards earned 😢</>
-              )}
-            </Typography>
-            {(isMobile || isOverflowing) && (
-              <Tooltip title={expanded ? "Collapse" : "Expand"}>
-                <IconButton size="small" onClick={toggleExpand} sx={{ ml: 1 }}>
-                  {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                </IconButton>
-              </Tooltip>
-            )}
-          </Box>
-        </>
-      )}
-    </Paper>
+              <motion.div
+                variants={spinnerVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                <CircularProgress />
+              </motion.div>
+            </Box>
+          ) : (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  position: "relative",
+                }}
+              >
+                {hasRewards && (
+                  <>
+                    <motion.div
+                      style={{
+                        position: "absolute",
+                        left: 10,
+                        top: -5
+                      }}
+                      variants={celebrationVariants}
+                    >
+                      <Typography variant="h4">🎉</Typography>
+                    </motion.div>
+                    <motion.div
+                      style={{
+                        position: "absolute",
+                        right: 10,
+                        top: -5
+                      }}
+                      variants={celebrationVariants}
+                    >
+                      <Typography variant="h4">🎉</Typography>
+                    </motion.div>
+                  </>
+                )}
+                
+                <Typography
+                  ref={textRef}
+                  variant="h6"
+                  align="center"
+                  color="textPrimary"
+                  onClick={toggleExpand}
+                  sx={[
+                    {
+                      fontWeight: "bold",
+                      fontSize: { xs: "1rem", sm: "1.25rem" },
+                      cursor: "pointer",
+                      maxWidth: "calc(100% - 40px)",
+                      transition: "all 0.3s ease",
+                    },
+                    expanded
+                      ? {}
+                      : {
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        },
+                  ]}
+                >
+                  {hasRewards ? (
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.4, delay: 0.2 }}
+                    >
+                      {result.rewardText}
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.4, delay: 0.2 }}
+                    >
+                      😢 No rewards earned 😢
+                    </motion.span>
+                  )}
+                </Typography>
+                
+                {(isMobile || isOverflowing) && (
+                  <Tooltip title={expanded ? "Collapse" : "Expand"}>
+                    <IconButton size="small" onClick={toggleExpand} sx={{ ml: 1 }}>
+                      {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </Box>
+            </>
+          )}
+        </Paper>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

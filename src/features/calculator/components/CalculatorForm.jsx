@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Autocomplete,
   TextField,
@@ -9,6 +9,7 @@ import {
   Stack,
   useTheme,
   InputAdornment,
+  Alert,
 } from "@mui/material";
 import DynamicCardInputs from "../../../shared/components/ui/DynamicCardInputs";
 import {
@@ -39,7 +40,7 @@ const CalculatorForm = ({
   isCalculating = false,
 }) => {
   const theme = useTheme();
-  const { region } = useRegion();
+  const { region, isInitialized } = useRegion(); // Add isInitialized from RegionContext
   const isFirstRender = useRef(true);
   const [banks, setBanks] = useState([]);
   const [cards, setCards] = useState([]);
@@ -52,6 +53,7 @@ const CalculatorForm = ({
   const [isLoadingMcc, setIsLoadingMcc] = useState(false);
   const searchParams = useSearchParams();
   const [isValidating, setIsValidating] = useState(false);
+  const [regionError, setRegionError] = useState(false); // Add this state to track region initialization errors
 
   const handleRegionChange = useCallback(async () => {
     // Reset all form states
@@ -62,44 +64,58 @@ const CalculatorForm = ({
     setMccOptions([]);
     setMccInputValue("");
 
-    try {
-      setIsLoadingBanks(true);
-      const fetchedBanks = await fetchBanks();
-      setBanks(fetchedBanks);
-    } catch (error) {
-      console.error("Error fetching banks after region change:", error);
-      onError?.("Failed to load banks for the new region. Please try again.");
-    } finally {
-      setIsLoadingBanks(false);
+    // Only try to load banks if region is initialized
+    if (isInitialized) {
+      try {
+        setIsLoadingBanks(true);
+        const fetchedBanks = await fetchBanks();
+        setBanks(fetchedBanks);
+        setRegionError(false); // Clear any previous region errors
+      } catch (error) {
+        console.error("Error fetching banks after region change:", error);
+        if (error.message?.includes("Region not initialized")) {
+          setRegionError(true);
+        } else {
+          onError?.("Failed to load banks for the new region. Please try again.");
+        }
+      } finally {
+        setIsLoadingBanks(false);
+      }
     }
-  }, [onBankChange, onCardChange, onError]);
+  }, [onBankChange, onCardChange, onError, isInitialized]);
 
+  // Effect to load banks - now respects region initialization
   useEffect(() => {
+    if (isInitialized) {
       loadBanks();
-  }, [region]);
+    }
+  }, [region, isInitialized]);
 
+  // Effect for selected bank - now respects region initialization
   useEffect(() => {
-    if (selectedBank) {
+    if (isInitialized && selectedBank) {
       loadCards();
     } else {
       setCards([]);
     }
-  }, [selectedBank]);
+  }, [selectedBank, isInitialized]);
 
+  // Effect for selected card - now respects region initialization
   useEffect(() => {
-    if (selectedBank && selectedCard) {
+    if (isInitialized && selectedBank && selectedCard) {
       loadCardQuestions();
     } else {
       setCardQuestions(null);
     }
-  }, [selectedBank, selectedCard]);
+  }, [selectedBank, selectedCard, isInitialized]);
 
+  // URL parameter handling - now respects region initialization
   useEffect(() => {
     const validateAndSetBankCard = async () => {
       const bank = searchParams.get("bank");
       const card = searchParams.get("card");
 
-      if (!bank || !card) return;
+      if (!bank || !card || !isInitialized) return;
       if (selectedBank && selectedCard) return; // Don't revalidate if already set
 
       setIsValidating(true);
@@ -123,7 +139,11 @@ const CalculatorForm = ({
         }
       } catch (error) {
         console.error("Error validating bank and card:", error);
-        onError?.("Error validating card details. Please try again.");
+        if (error.message?.includes("Region not initialized")) {
+          setRegionError(true);
+        } else {
+          onError?.("Error validating card details. Please try again.");
+        }
       } finally {
         setIsValidating(false);
       }
@@ -137,10 +157,10 @@ const CalculatorForm = ({
     onBankChange,
     onCardChange,
     onError,
+    isInitialized,
   ]);
 
-
-  // Add event listener for region changes
+  // Event handler for region changes
   useEffect(() => {
     // Skip the first render to prevent unnecessary initial load
     if (isFirstRender.current) {
@@ -153,32 +173,48 @@ const CalculatorForm = ({
   }, [region, handleRegionChange]);
 
   const loadBanks = async () => {
+    if (!isInitialized) return; // Skip if region not initialized
+    
     setIsLoadingBanks(true);
     try {
       const fetchedBanks = await fetchBanks();
       setBanks(fetchedBanks);
+      setRegionError(false); // Clear any previous region errors
     } catch (error) {
       console.error("Error fetching banks:", error);
-      onError?.("Failed to load banks. Please try again.");
+      if (error.message?.includes("Region not initialized")) {
+        setRegionError(true);
+      } else {
+        onError?.("Failed to load banks. Please try again.");
+      }
     } finally {
       setIsLoadingBanks(false);
     }
   };
 
   const loadCards = async () => {
+    if (!isInitialized) return; // Skip if region not initialized
+    
     setIsLoadingCards(true);
     try {
       const fetchedCards = await fetchCards(selectedBank);
       setCards(fetchedCards);
+      setRegionError(false); // Clear any previous region errors
     } catch (error) {
       console.error("Error fetching cards:", error);
-      onError?.("Failed to load cards. Please try again.");
+      if (error.message?.includes("Region not initialized")) {
+        setRegionError(true);
+      } else {
+        onError?.("Failed to load cards. Please try again.");
+      }
     } finally {
       setIsLoadingCards(false);
     }
   };
 
   const loadCardQuestions = async () => {
+    if (!isInitialized) return; // Skip if region not initialized
+    
     setIsLoadingQuestions(true);
     try {
       const questions = await fetchCardQuestions(
@@ -186,6 +222,7 @@ const CalculatorForm = ({
         selectedCard
       );
       setCardQuestions(questions);
+      setRegionError(false); // Clear any previous region errors
     } catch (error) {
       handleQuestionsFetchError(error);
     } finally {
@@ -194,7 +231,9 @@ const CalculatorForm = ({
   };
 
   const handleQuestionsFetchError = (error) => {
-    if (error.message?.includes("too many requests")) {
+    if (error.message?.includes("Region not initialized")) {
+      setRegionError(true);
+    } else if (error.message?.includes("too many requests")) {
       onError?.(error.message, "warning");
     } else {
       console.error("Error fetching card questions:", error);
@@ -220,15 +259,22 @@ const CalculatorForm = ({
 
   const debouncedFetchMCC = useCallback(
     _.debounce(async (value) => {
+      if (!isInitialized) return; // Skip if region not initialized
+      
       if (value && value.length >= 2) {
         setIsLoadingMcc(true);
         try {
           const mccData = await fetchMCC(value);
           setMccOptions(mccData || []);
+          setRegionError(false); // Clear any previous region errors
         } catch (error) {
           console.error("Error fetching MCC data:", error);
-          setMccOptions([]);
-          onError?.("Failed to load MCC data. Please try again.");
+          if (error.message?.includes("Region not initialized")) {
+            setRegionError(true);
+          } else {
+            setMccOptions([]);
+            onError?.("Failed to load MCC data. Please try again.");
+          }
         } finally {
           setIsLoadingMcc(false);
         }
@@ -236,21 +282,54 @@ const CalculatorForm = ({
         setMccOptions([]);
       }
     }, 300),
-    [onError]
+    [onError, isInitialized]
   );
 
   const handleMccInputChange = (event, newValue) => {
     setMccInputValue(newValue);
-    debouncedFetchMCC(newValue);
+    if (isInitialized) {
+      debouncedFetchMCC(newValue);
+    }
   };
 
   const isCalculateDisabled =
+    !isInitialized ||
+    regionError ||
     !selectedBank ||
     !selectedCard ||
     !spentAmount ||
     parseFloat(spentAmount) <= 0 ||
     isLoadingQuestions ||
     isCalculating;
+
+  // Show loading state when region is not initialized
+  if (!isInitialized) {
+    return (
+      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 4 }}>
+        <CircularProgress size={40} />
+        <Typography variant="body1" sx={{ mt: 2 }}>
+          Initializing region settings...
+        </Typography>
+      </Box>
+    );
+  }
+
+  // Show error when region initialization failed
+  if (regionError) {
+    return (
+      <Alert 
+        severity="error" 
+        sx={{ my: 2 }}
+        action={
+          <Button color="inherit" size="small" onClick={() => window.location.reload()}>
+            Refresh
+          </Button>
+        }
+      >
+        Region settings not properly initialized. Please refresh the page to try again.
+      </Alert>
+    );
+  }
 
   return (
     <Stack spacing={3}>
