@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Autocomplete,
   TextField,
@@ -76,7 +76,9 @@ const CalculatorForm = ({
         if (error.message?.includes("Region not initialized")) {
           setRegionError(true);
         } else {
-          onError?.("Failed to load banks for the new region. Please try again.");
+          onError?.(
+            "Failed to load banks for the new region. Please try again."
+          );
         }
       } finally {
         setIsLoadingBanks(false);
@@ -174,7 +176,7 @@ const CalculatorForm = ({
 
   const loadBanks = async () => {
     if (!isInitialized) return; // Skip if region not initialized
-    
+
     setIsLoadingBanks(true);
     try {
       const fetchedBanks = await fetchBanks();
@@ -194,7 +196,7 @@ const CalculatorForm = ({
 
   const loadCards = async () => {
     if (!isInitialized) return; // Skip if region not initialized
-    
+
     setIsLoadingCards(true);
     try {
       const fetchedCards = await fetchCards(selectedBank);
@@ -214,13 +216,10 @@ const CalculatorForm = ({
 
   const loadCardQuestions = async () => {
     if (!isInitialized) return; // Skip if region not initialized
-    
+
     setIsLoadingQuestions(true);
     try {
-      const questions = await fetchCardQuestions(
-        selectedBank,
-        selectedCard
-      );
+      const questions = await fetchCardQuestions(selectedBank, selectedCard);
       setCardQuestions(questions);
       setRegionError(false); // Clear any previous region errors
     } catch (error) {
@@ -260,7 +259,7 @@ const CalculatorForm = ({
   const debouncedFetchMCC = useCallback(
     _.debounce(async (value) => {
       if (!isInitialized) return; // Skip if region not initialized
-      
+
       if (value && value.length >= 2) {
         setIsLoadingMcc(true);
         try {
@@ -304,11 +303,24 @@ const CalculatorForm = ({
 
   // Show loading state when region is not initialized
   if (!isInitialized) {
+    console.log("🔄 Calculator waiting for region to initialize:", {
+      region,
+      isInitialized,
+      isLoading,
+    });
     return (
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 4 }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          py: 4,
+        }}
+      >
         <CircularProgress size={40} />
         <Typography variant="body1" sx={{ mt: 2 }}>
-          Initializing region settings...
+          Initializing region settings...{" "}
+          {JSON.stringify({ region, isInitialized })}
         </Typography>
       </Box>
     );
@@ -317,16 +329,21 @@ const CalculatorForm = ({
   // Show error when region initialization failed
   if (regionError) {
     return (
-      <Alert 
-        severity="error" 
+      <Alert
+        severity="error"
         sx={{ my: 2 }}
         action={
-          <Button color="inherit" size="small" onClick={() => window.location.reload()}>
+          <Button
+            color="inherit"
+            size="small"
+            onClick={() => window.location.reload()}
+          >
             Refresh
           </Button>
         }
       >
-        Region settings not properly initialized. Please refresh the page to try again.
+        Region settings not properly initialized. Please refresh the page to try
+        again.
       </Alert>
     );
   }
@@ -453,7 +470,7 @@ const CalculatorForm = ({
               min: 1,
               step: 1,
             },
-          }
+          },
         }}
       />
       {isLoadingQuestions ? (
