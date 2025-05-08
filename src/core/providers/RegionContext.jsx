@@ -48,6 +48,27 @@ export function RegionProvider({ children }) {
   const [isInitialized, setIsInitialized] = useState(false);
   const [hasUserSetRegion, setHasUserSetRegion] = useState(getUserRegionPreference());
   
+  // Define updateRegion function that was missing
+  const updateRegion = useCallback((newRegion) => {
+    if (!newRegion || !isValidRegion(newRegion)) return;
+    
+    const upperCaseRegion = newRegion.toUpperCase();
+    
+    // Save to localStorage
+    localStorage.setItem("app-region", upperCaseRegion);
+    localStorage.setItem("user-set-region", "true");
+    
+    // Update state
+    setRegion(upperCaseRegion);
+    setHasUserSetRegion(true);
+    
+    // Dispatch event for other components
+    window.dispatchEvent(
+      new CustomEvent("region-changed", {
+        detail: { region: upperCaseRegion },
+      })
+    );
+  }, []);
   
   useEffect(() => {
     async function initializeRegion() {
@@ -98,11 +119,11 @@ export function RegionProvider({ children }) {
     <RegionContext.Provider
       value={{
         region,
-        setRegion: updateRegion,
+        setRegion: updateRegion,  // Now the function is defined
         regionName: REGIONS[region] || "Unknown Region",
         isLoading,
         hasUserSetRegion,
-        isInitialized, // <-- Add this to context
+        isInitialized,
       }}
     >
       {children}
