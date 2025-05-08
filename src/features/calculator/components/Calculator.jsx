@@ -32,7 +32,7 @@ import { useRegion } from "../../../core/providers/RegionContext";
 
 function Calculator() {
   const theme = useTheme();
-  const { region } = useRegion();
+  const { region, isInitialized, isLoading } = useRegion();
   const { user, isAuthenticated } = useAuth();
   const [userCards, setUserCards] = useState([]);
   const [isFetchingUserData, setIsFetchingUserData] = useState(true);
@@ -67,6 +67,12 @@ function Calculator() {
   const [calculationResult, setCalculationResult] = useState(null);
   const [calculationPerformed, setCalculationPerformed] = useState(false);
   const [lastCalculationInputs, setLastCalculationInputs] = useState(null);
+
+  console.log("🧮 [Calculator] Region context values:", {
+    region,
+    isInitialized,
+    isLoading,
+  });
 
   useEffect(() => {
     const fetchUserCards = async () => {
