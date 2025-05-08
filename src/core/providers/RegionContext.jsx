@@ -45,59 +45,53 @@ export function RegionProvider({ children }) {
   // Initialize state from localStorage
   const [region, setRegion] = useState(getInitialRegion());
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [hasUserSetRegion, setHasUserSetRegion] = useState(getUserRegionPreference());
   
-  // Check IP only if user hasn't set preference
+  
   useEffect(() => {
-    async function checkIPRegion() {
-      // Skip IP check if user has set a preference
-      if (hasUserSetRegion) {
-        setIsLoading(false);
-        return;
+    async function initializeRegion() {
+      // Don't do anything during SSR
+      if (typeof window === 'undefined') return;
+      
+      const savedRegion = localStorage.getItem("app-region");
+      
+      if (!savedRegion) {
+        try {
+          // Try to detect region from IP
+          const response = await fetch("https://ipinfo.io/json");
+          if (response.ok) {
+            const data = await response.json();
+            const countryCode = data.country?.toUpperCase();
+            
+            // Only set if it's a supported region
+            if (Object.keys(REGIONS).includes(countryCode)) {
+              localStorage.setItem("app-region", countryCode);
+              setRegion(countryCode);
+            } else {
+              // If not a supported region, use IN as default
+              localStorage.setItem("app-region", "IN");
+              setRegion("IN");
+            }
+          } else {
+            // Fallback if IP detection fails
+            localStorage.setItem("app-region", "IN");
+            setRegion("IN");
+          }
+        } catch (error) {
+          console.error("Error detecting region:", error);
+          // Fallback if anything goes wrong
+          localStorage.setItem("app-region", "IN");
+          setRegion("IN");
+        }
       }
       
-      try {
-        const response = await fetch("https://ipinfo.io/json");
-        if (response.ok) {
-          const data = await response.json();
-          const countryCode = data.country?.toUpperCase();
-          
-          // Only set if it's a supported region and different from current
-          if (isValidRegion(countryCode) && countryCode !== region) {
-            setRegion(countryCode);
-            localStorage.setItem("app-region", countryCode);
-          }
-        }
-      } catch (error) {
-        console.error("Error detecting region:", error);
-      } finally {
-        setIsLoading(false);
-      }
+      // Mark initialization as complete
+      setIsInitialized(true);
+      setIsLoading(false);
     }
     
-    checkIPRegion();
-  }, [hasUserSetRegion, region]);
-  
-  // Function for users to change region
-  const updateRegion = useCallback((newRegion) => {
-    if (!newRegion || !isValidRegion(newRegion)) return;
-    
-    const upperCaseRegion = newRegion.toUpperCase();
-    
-    // Save to localStorage
-    localStorage.setItem("app-region", upperCaseRegion);
-    localStorage.setItem("user-set-region", "true");
-    
-    // Update state
-    setRegion(upperCaseRegion);
-    setHasUserSetRegion(true);
-    
-    // Dispatch event for other components
-    window.dispatchEvent(
-      new CustomEvent("region-changed", {
-        detail: { region: upperCaseRegion },
-      })
-    );
+    initializeRegion();
   }, []);
   
   return (
@@ -108,6 +102,7 @@ export function RegionProvider({ children }) {
         regionName: REGIONS[region] || "Unknown Region",
         isLoading,
         hasUserSetRegion,
+        isInitialized, // <-- Add this to context
       }}
     >
       {children}

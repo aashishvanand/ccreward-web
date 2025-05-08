@@ -69,7 +69,8 @@ const limitConfig = {
     steps: [
       { value: 10000, label: "10K" },
       { value: 50000, label: "50K" },
-      { value: 100000, label: "100K" },
+      { value: 100000
+        , label: "100K" },
     ],
   },
 };
