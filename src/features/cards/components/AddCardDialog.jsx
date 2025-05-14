@@ -25,6 +25,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CardNetworkSelector from "./CardNetworkSelector";
 import { fetchBanks, fetchCards } from "../../../core/services/api";
 import { useRegion } from "../../../core/providers/RegionContext";
+import { motion, AnimatePresence } from "framer-motion";
 
 const BILLING_DATES = Array.from({ length: 31 }, (_, i) => i + 1);
 const months = [
@@ -41,6 +42,87 @@ const months = [
   "November",
   "December",
 ];
+
+// Animation variants
+const dialogVariants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { 
+    opacity: 1, 
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 25,
+      when: "beforeChildren",
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  },
+  exit: { 
+    opacity: 0, 
+    scale: 0.9,
+    transition: { 
+      duration: 0.2 
+    }
+  }
+};
+
+const inputVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 400,
+      damping: 25
+    }
+  }
+};
+
+const buttonVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 25,
+      delay: 0.3
+    }
+  },
+  hover: { 
+    scale: 1.05,
+    transition: {
+      type: "spring",
+      stiffness: 400,
+      damping: 10
+    }
+  },
+  tap: { scale: 0.98 }
+};
+
+const accordionVariants = {
+  hidden: { opacity: 0, height: 0 },
+  visible: { 
+    opacity: 1, 
+    height: "auto",
+    transition: {
+      type: "spring",
+      stiffness: 200,
+      damping: 25,
+      delay: 0.2
+    }
+  },
+  exit: { 
+    opacity: 0, 
+    height: 0,
+    transition: { 
+      duration: 0.3 
+    }
+  }
+};
 
 // Default limit config for all regions
 const limitConfig = {
@@ -69,8 +151,7 @@ const limitConfig = {
     steps: [
       { value: 10000, label: "10K" },
       { value: 50000, label: "50K" },
-      { value: 100000
-        , label: "100K" },
+      { value: 100000, label: "100K" },
     ],
   },
 };
@@ -206,242 +287,396 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      fullWidth
-      maxWidth="sm"
-      PaperProps={{
-        sx: {
-          borderRadius: 2,
-          boxShadow: theme.shadows[10],
-        },
-      }}
-    >
-      <DialogTitle
-        sx={{
-          borderBottom: `1px solid ${theme.palette.divider}`,
-          pb: 2,
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="h5" component="div" sx={{ fontWeight: 500 }}>
-          Add New Card
-        </Typography>
-      </DialogTitle>
-
-      <DialogContent sx={{ pt: 3 }}>
-        {isLoading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", my: 3 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <>
-            <TextField
-              select
-              label="Bank"
-              value={newCard.bank}
-              onChange={(e) => {
-                const selectedBank = e.target.value;
-                setNewCard({ bank: selectedBank, cardName: "" });
-                if (selectedBank) {
-                  fetchCardList(selectedBank);
-                } else {
-                  setCards([]);
-                }
-              }}
-              fullWidth
-              margin="normal"
-            >
-              <MenuItem value="">Select a bank</MenuItem>
-              {banks.map((bank) => (
-                <MenuItem key={bank} value={bank}>
-                  {bank}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
-              select
-              label="Card Name"
-              value={newCard.cardName}
-              onChange={(e) =>
-                setNewCard((prev) => ({ ...prev, cardName: e.target.value }))
-              }
-              fullWidth
-              margin="normal"
-              disabled={!newCard.bank || isLoading}
-            >
-              <MenuItem value="">Select a card</MenuItem>
-              {cards.map((card) => (
-                <MenuItem key={card} value={card}>
-                  {card}
-                </MenuItem>
-              ))}
-            </TextField>
-            <Accordion
-              expanded={expanded}
-              onChange={() => setExpanded(!expanded)}
-              elevation={0}
-              sx={{
-                mt: 2,
-                border: `1px solid ${theme.palette.divider}`,
-                borderRadius: 1,
-                "&::before": {
-                  display: "none",
-                },
-              }}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                sx={{
-                  backgroundColor:
-                    theme.palette.mode === "dark"
-                      ? "rgba(255, 255, 255, 0.05)"
-                      : "rgba(0, 0, 0, 0.02)",
-                }}
-              >
-                <Typography>Additional Card Details (Optional)</Typography>
-              </AccordionSummary>
-
-              <AccordionDetails sx={{ p: 3 }}>
-                <CardNetworkSelector
-                  selectedNetwork={newCard.network}
-                  onNetworkChange={(networkName) =>
-                    setNewCard((prev) => ({ ...prev, network: networkName }))
-                  }
-                  region={region}
-                />
-
-                <Typography
-                  variant="h6"
-                  gutterBottom
-                  sx={{ fontWeight: 500, mt: 2 }}
-                >
-                  Billing Date
-                </Typography>
-
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(7, 1fr)",
-                    gap: 0.5,
-                    mb: 3,
-                  }}
-                >
-                  {BILLING_DATES.map((date) => (
-                    <Button
-                      key={date}
-                      variant={
-                        newCard.billingDate === date ? "contained" : "outlined"
-                      }
-                      onClick={() =>
-                        setNewCard((prev) => ({ ...prev, billingDate: date }))
-                      }
-                      sx={{
-                        minWidth: 0,
-                        height: 36,
-                        p: 0,
-                      }}
-                    >
-                      {date}
-                    </Button>
-                  ))}
-                </Box>
-
-                <Typography
-                  variant="h6"
-                  gutterBottom
-                  sx={{ fontWeight: 500, mt: 2 }}
-                >
-                  Credit Limit ({getCurrencySymbol()})
-                </Typography>
-
-                <Box sx={{ px: 2, mb: 3 }}>
-                  <Slider
-                    value={newCard.limit}
-                    min={getLimitConfig().min}
-                    max={getLimitConfig().max}
-                    step={1000}
-                    valueLabelDisplay="auto"
-                    valueLabelFormat={(value) =>
-                      `${getCurrencySymbol()}${value.toLocaleString()}`
-                    }
-                    marks={getLimitConfig().steps}
-                    onChange={(e, newValue) =>
-                      setNewCard((prev) => ({ ...prev, limit: newValue }))
-                    }
-                  />
-                </Box>
-
-                <Typography
-                  variant="h6"
-                  gutterBottom
-                  sx={{ fontWeight: 500, mt: 2 }}
-                >
-                  Card Member Since
-                </Typography>
-
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <FormControl fullWidth>
-                      <InputLabel>Month</InputLabel>
-                      <Select
-                        value={selectedMonth}
-                        label="Month"
-                        onChange={(e) => setSelectedMonth(e.target.value)}
-                      >
-                        {months.map((month) => (
-                          <MenuItem key={month} value={month}>
-                            {month}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <FormControl fullWidth>
-                      <InputLabel>Year</InputLabel>
-                      <Select
-                        value={selectedYear}
-                        label="Year"
-                        onChange={(e) => setSelectedYear(e.target.value)}
-                      >
-                        {generateYearOptions().map((year) => (
-                          <MenuItem key={year} value={year}>
-                            {year}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
-          </>
-        )}
-      </DialogContent>
-
-      <DialogActions
-        sx={{ px: 3, py: 2, borderTop: `1px solid ${theme.palette.divider}` }}
-      >
-        <Button onClick={onClose} variant="outlined" sx={{ borderRadius: 2 }}>
-          Cancel
-        </Button>
-        <Button
-          onClick={handleAddCard}
-          color="primary"
-          variant="contained"
-          disabled={!newCard.bank || !newCard.cardName || isLoading}
-          sx={{
-            borderRadius: 2,
-            px: 3,
-            boxShadow: theme.shadows[3],
+    <AnimatePresence mode="wait">
+      {open && (
+        <Dialog
+          open={open}
+          onClose={onClose}
+          fullWidth
+          maxWidth="sm"
+          PaperProps={{
+            sx: {
+              borderRadius: 2,
+              boxShadow: theme.shadows[10],
+              overflow: "hidden"
+            },
+            component: motion.div,
+            variants: dialogVariants,
+            initial: "hidden",
+            animate: "visible",
+            exit: "exit"
           }}
         >
-          Add Card
-        </Button>
-      </DialogActions>
-    </Dialog>
+          <DialogTitle
+            sx={{
+              borderBottom: `1px solid ${theme.palette.divider}`,
+              pb: 2,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ 
+                opacity: 1, 
+                x: 0,
+                transition: {
+                  type: "spring",
+                  stiffness: 500,
+                  damping: 25
+                }
+              }}
+            >
+              <Typography variant="h5" component="div" sx={{ fontWeight: 500 }}>
+                Add New Card
+              </Typography>
+            </motion.div>
+          </DialogTitle>
+
+          <DialogContent sx={{ pt: 3 }}>
+            {isLoading ? (
+              <Box sx={{ display: "flex", justifyContent: "center", my: 3 }}>
+                <motion.div
+                  animate={{ 
+                    rotate: 360,
+                    transition: { 
+                      repeat: Infinity, 
+                      duration: 1.5,
+                      ease: "linear"
+                    }
+                  }}
+                >
+                  <CircularProgress />
+                </motion.div>
+              </Box>
+            ) : (
+              <>
+                <motion.div variants={inputVariants}>
+                  <TextField
+                    select
+                    label="Bank"
+                    value={newCard.bank}
+                    onChange={(e) => {
+                      const selectedBank = e.target.value;
+                      setNewCard({ bank: selectedBank, cardName: "" });
+                      if (selectedBank) {
+                        fetchCardList(selectedBank);
+                      } else {
+                        setCards([]);
+                      }
+                    }}
+                    fullWidth
+                    margin="normal"
+                  >
+                    <MenuItem value="">Select a bank</MenuItem>
+                    {banks.map((bank, index) => (
+                      <motion.div
+                        key={bank}
+                        initial={{ opacity: 0, x: -5 }}
+                        animate={{ 
+                          opacity: 1, 
+                          x: 0,
+                          transition: {
+                            delay: 0.05 * index,
+                            duration: 0.2
+                          }
+                        }}
+                      >
+                        <MenuItem value={bank}>{bank}</MenuItem>
+                      </motion.div>
+                    ))}
+                  </TextField>
+                </motion.div>
+                <motion.div 
+                  variants={inputVariants}
+                  custom={1}
+                >
+                  <TextField
+                    select
+                    label="Card Name"
+                    value={newCard.cardName}
+                    onChange={(e) =>
+                      setNewCard((prev) => ({ ...prev, cardName: e.target.value }))
+                    }
+                    fullWidth
+                    margin="normal"
+                    disabled={!newCard.bank || isLoading}
+                  >
+                    <MenuItem value="">Select a card</MenuItem>
+                    {cards.map((card, index) => (
+                      <motion.div
+                        key={card}
+                        initial={{ opacity: 0, x: -5 }}
+                        animate={{ 
+                          opacity: 1, 
+                          x: 0,
+                          transition: {
+                            delay: 0.03 * index,
+                            duration: 0.2
+                          }
+                        }}
+                      >
+                        <MenuItem value={card}>{card}</MenuItem>
+                      </motion.div>
+                    ))}
+                  </TextField>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ 
+                    opacity: 1, 
+                    y: 0,
+                    transition: {
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 30,
+                      delay: 0.3
+                    }
+                  }}
+                >
+                  <Accordion
+                    expanded={expanded}
+                    onChange={() => setExpanded(!expanded)}
+                    elevation={0}
+                    sx={{
+                      mt: 2,
+                      border: `1px solid ${theme.palette.divider}`,
+                      borderRadius: 1,
+                      "&::before": {
+                        display: "none",
+                      },
+                      overflow: "hidden"
+                    }}
+                  >
+                    <AccordionSummary
+                      expandIcon={
+                        <motion.div
+                          animate={{ 
+                            rotate: expanded ? 180 : 0,
+                            transition: { duration: 0.3 }
+                          }}
+                        >
+                          <ExpandMoreIcon />
+                        </motion.div>
+                      }
+                      sx={{
+                        backgroundColor:
+                          theme.palette.mode === "dark"
+                            ? "rgba(255, 255, 255, 0.05)"
+                            : "rgba(0, 0, 0, 0.02)",
+                      }}
+                    >
+                      <Typography>Additional Card Details (Optional)</Typography>
+                    </AccordionSummary>
+
+                    <AnimatePresence>
+                      {expanded && (
+                        <motion.div
+                          variants={accordionVariants}
+                          initial="hidden"
+                          animate="visible"
+                          exit="exit"
+                        >
+                          <AccordionDetails sx={{ p: 3 }}>
+                            <CardNetworkSelector
+                              selectedNetwork={newCard.network}
+                              onNetworkChange={(networkName) =>
+                                setNewCard((prev) => ({ ...prev, network: networkName }))
+                              }
+                              region={region}
+                            />
+
+                            <Typography
+                              variant="h6"
+                              gutterBottom
+                              sx={{ fontWeight: 500, mt: 2 }}
+                            >
+                              Billing Date
+                            </Typography>
+
+                            <Box
+                              sx={{
+                                display: "grid",
+                                gridTemplateColumns: "repeat(7, 1fr)",
+                                gap: 0.5,
+                                mb: 3,
+                              }}
+                            >
+                              {BILLING_DATES.map((date, index) => (
+                                <motion.div
+                                  key={date}
+                                  initial={{ opacity: 0, scale: 0.5 }}
+                                  animate={{ 
+                                    opacity: 1, 
+                                    scale: 1,
+                                    transition: {
+                                      delay: 0.01 * index,
+                                      duration: 0.2
+                                    }
+                                  }}
+                                  whileHover={{ 
+                                    scale: 1.1,
+                                    transition: {
+                                      type: "spring",
+                                      stiffness: 500,
+                                      damping: 10
+                                    }
+                                  }}
+                                  whileTap={{ scale: 0.95 }}
+                                >
+                                  <Button
+                                    variant={
+                                      newCard.billingDate === date ? "contained" : "outlined"
+                                    }
+                                    onClick={() =>
+                                      setNewCard((prev) => ({ ...prev, billingDate: date }))
+                                    }
+                                    sx={{
+                                      minWidth: 0,
+                                      height: 36,
+                                      p: 0,
+                                    }}
+                                  >
+                                    {date}
+                                  </Button>
+                                </motion.div>
+                              ))}
+                            </Box>
+
+                            <Typography
+                              variant="h6"
+                              gutterBottom
+                              sx={{ fontWeight: 500, mt: 2 }}
+                            >
+                              Credit Limit ({getCurrencySymbol()})
+                            </Typography>
+
+                            <Box sx={{ px: 2, mb: 3 }}>
+                              <Slider
+                                value={newCard.limit}
+                                min={getLimitConfig().min}
+                                max={getLimitConfig().max}
+                                step={1000}
+                                valueLabelDisplay="auto"
+                                valueLabelFormat={(value) =>
+                                  `${getCurrencySymbol()}${value.toLocaleString()}`
+                                }
+                                marks={getLimitConfig().steps}
+                                onChange={(e, newValue) =>
+                                  setNewCard((prev) => ({ ...prev, limit: newValue }))
+                                }
+                              />
+                            </Box>
+
+                            <Typography
+                              variant="h6"
+                              gutterBottom
+                              sx={{ fontWeight: 500, mt: 2 }}
+                            >
+                              Card Member Since
+                            </Typography>
+
+                            <Grid container spacing={2}>
+                              <Grid item xs={6}>
+                                <FormControl fullWidth>
+                                  <InputLabel>Month</InputLabel>
+                                  <Select
+                                    value={selectedMonth}
+                                    label="Month"
+                                    onChange={(e) => setSelectedMonth(e.target.value)}
+                                  >
+                                    {months.map((month, index) => (
+                                      <motion.div
+                                        key={month}
+                                        initial={{ opacity: 0, y: 5 }}
+                                        animate={{ 
+                                          opacity: 1, 
+                                          y: 0,
+                                          transition: {
+                                            delay: 0.02 * index,
+                                            duration: 0.2
+                                          }
+                                        }}
+                                      >
+                                        <MenuItem value={month}>{month}</MenuItem>
+                                      </motion.div>
+                                    ))}
+                                  </Select>
+                                </FormControl>
+                              </Grid>
+                              <Grid item xs={6}>
+                                <FormControl fullWidth>
+                                  <InputLabel>Year</InputLabel>
+                                  <Select
+                                    value={selectedYear}
+                                    label="Year"
+                                    onChange={(e) => setSelectedYear(e.target.value)}
+                                  >
+                                    {generateYearOptions().map((year, index) => (
+                                      <motion.div
+                                        key={year}
+                                        initial={{ opacity: 0, y: 5 }}
+                                        animate={{ 
+                                          opacity: 1, 
+                                          y: 0,
+                                          transition: {
+                                            delay: 0.02 * index,
+                                            duration: 0.2
+                                          }
+                                        }}
+                                      >
+                                        <MenuItem value={year}>{year}</MenuItem>
+                                      </motion.div>
+                                    ))}
+                                  </Select>
+                                </FormControl>
+                              </Grid>
+                            </Grid>
+                          </AccordionDetails>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </Accordion>
+                </motion.div>
+              </>
+            )}
+          </DialogContent>
+
+          <DialogActions
+            sx={{ px: 3, py: 2, borderTop: `1px solid ${theme.palette.divider}` }}
+          >
+            <motion.div
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+            >
+              <Button onClick={onClose} variant="outlined" sx={{ borderRadius: 2 }}>
+                Cancel
+              </Button>
+            </motion.div>
+            <motion.div
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+              custom={1}
+            >
+              <Button
+                onClick={handleAddCard}
+                color="primary"
+                variant="contained"
+                disabled={!newCard.bank || !newCard.cardName || isLoading}
+                sx={{
+                  borderRadius: 2,
+                  px: 3,
+                  boxShadow: theme.shadows[3],
+                }}
+              >
+                Add Card
+              </Button>
+            </motion.div>
+          </DialogActions>
+        </Dialog>
+      )}
+    </AnimatePresence>
   );
 }

@@ -6,7 +6,7 @@ import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { getCardsForUser } from "../../../core/services/firebaseUtils";
 import useCardImagesData from "../../../core/hooks/useCardImagesData";
-import { useRegion } from "../../../core/providers/RegionContext"; 
+import { useRegion } from "../../../core/providers/RegionContext";
 import Header from "../../../shared/components/layout/Header";
 import Footer from "../../../shared/components/layout/Footer";
 import HeroSection from "./HeroSection";
@@ -21,6 +21,27 @@ import { tweets } from "../../../shared/constants/testimonials";
 import { detectDevice } from "../../../core/utils/deviceUtils";
 import TopSearchs from "./sections/TopSearchs";
 import StatsSection from "./sections/StatsSection";
+import { motion } from "framer-motion";
+
+const pageVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 260,
+      damping: 20,
+      when: "beforeChildren",
+      staggerChildren: 0.1,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -20,
+    transition: { duration: 0.3 },
+  },
+};
 
 const MobileView = ({
   deviceInfo,
@@ -31,7 +52,7 @@ const MobileView = ({
   theme,
   alert,
   setAlert,
-  region
+  region,
 }) => {
   if (!deviceInfo) {
     return null;
@@ -94,7 +115,7 @@ const MobileView = ({
             <StatsSection />
           </Box>
 
-          {region === 'IN' && (
+          {region === "IN" && (
             <>
               <Box component="section" sx={{ bgcolor: "background.default" }}>
                 <TopCardsSection />
@@ -197,7 +218,7 @@ const DesktopView = ({
         <StatsSection />
       </Box>
 
-      {region === 'IN' && (
+      {region === "IN" && (
         <>
           <Box sx={{ bgcolor: "background.default" }}>
             <TopCardsSection />
@@ -266,7 +287,7 @@ const LandingPage = () => {
     loading,
   } = useAuth();
   const theme = useTheme();
-  const { region } = useRegion(); 
+  const { region } = useRegion();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
@@ -320,26 +341,54 @@ const LandingPage = () => {
   useEffect(() => {
     if (cardImagesData?.length > 0) {
       // Filter cards based on region
-      const regionCards = cardImagesData.filter(card => {
+      const regionCards = cardImagesData.filter((card) => {
         // For India region
-        if (region === 'IN') {
-          return ['HDFC', 'ICICI', 'SBI', 'Axis', 'AMEX', 'YESBank', 'SC', 'Kotak', 
-                 'IDFCFirst', 'HSBC', 'OneCard', 'RBL', 'IndusInd', 'IDBI', 'Federal', 
-                 'BOB', 'AU'].includes(card.bank);
+        if (region === "IN") {
+          return [
+            "HDFC",
+            "ICICI",
+            "SBI",
+            "Axis",
+            "AMEX",
+            "YESBank",
+            "SC",
+            "Kotak",
+            "IDFCFirst",
+            "HSBC",
+            "OneCard",
+            "RBL",
+            "IndusInd",
+            "IDBI",
+            "Federal",
+            "BOB",
+            "AU",
+          ].includes(card.bank);
         }
         // For Singapore region
-        else if (region === 'SG') {
-          return ['DBS', 'POSB', 'UOB', 'OCBC', 'Maybank', 'CIMB', 'AMEX', 'Citi', 
-                 'HSBC', 'SC', 'BOC', 'Trust'].includes(card.bank);
+        else if (region === "SG") {
+          return [
+            "DBS",
+            "POSB",
+            "UOB",
+            "OCBC",
+            "Maybank",
+            "CIMB",
+            "AMEX",
+            "Citi",
+            "HSBC",
+            "SC",
+            "BOC",
+            "Trust",
+          ].includes(card.bank);
         }
         return true; // Fallback
       });
-      
+
       // Get horizontal cards for the selected region
       const horizontalCards = regionCards.filter(
         (card) => card.orientation === "horizontal"
       );
-      
+
       // Shuffle and get 3 cards to display
       const shuffled = [...horizontalCards].sort(() => Math.random() - 0.5);
       setCardImages(shuffled.slice(0, 3));
@@ -431,24 +480,38 @@ const LandingPage = () => {
     alert,
     setAlert,
     deviceInfo,
-    region
+    region,
   };
 
-  return isMobileDevice ? (
-    <MobileView {...commonProps} />
-  ) : (
-    <DesktopView
-      {...commonProps}
-      cardImages={cardImages}
-      isTablet={isTablet}
-      isLargeScreen={isLargeScreen}
-      handleSignIn={handleSignIn}
-      isLoading={isLoading}
-      isAuthenticated={isAuthenticated()}
-      loading={loading}
-      signInWithGoogle={signInWithGoogle}
-      signInAnonymously={signInAnonymously}
-    />
+  return (
+    <motion.div
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+    >
+      <Box
+        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+      >
+        {/* Rest of the component remains the same */}
+        {isMobileDevice ? (
+          <MobileView {...commonProps} />
+        ) : (
+          <DesktopView
+            {...commonProps}
+            cardImages={cardImages}
+            isTablet={isTablet}
+            isLargeScreen={isLargeScreen}
+            handleSignIn={handleSignIn}
+            isLoading={isLoading}
+            isAuthenticated={isAuthenticated()}
+            loading={loading}
+            signInWithGoogle={signInWithGoogle}
+            signInAnonymously={signInAnonymously}
+          />
+        )}
+      </Box>
+    </motion.div>
   );
 };
 

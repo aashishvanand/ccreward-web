@@ -24,6 +24,27 @@ import {
   useTheme,
   CircularProgress,
 } from "@mui/material";
+import { motion } from "framer-motion";
+
+const pageVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 260,
+      damping: 20,
+      when: "beforeChildren",
+      staggerChildren: 0.1
+    }
+  },
+  exit: { 
+    opacity: 0, 
+    y: -20,
+    transition: { duration: 0.3 }
+  }
+};
 
 const categories = [
   "Education",
@@ -201,6 +222,12 @@ const TopCardsPage = () => {
   }
 
   return (
+    <motion.div
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+    >
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Header />
 
@@ -300,6 +327,7 @@ const TopCardsPage = () => {
 
       <Footer />
     </Box>
+    </motion.div>
   );
 };
 

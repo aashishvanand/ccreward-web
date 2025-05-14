@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import { ThemeRegistry } from '../core/providers/ThemeRegistry';
 import { AuthProvider } from '../core/providers/AuthContext';
 import { RegionProvider } from '../core/providers/RegionContext';
+import { AnimatePresence } from 'framer-motion';
 
 const LandingPage = dynamic(() => import('../features/landing/components/LandingPage'), { ssr: false });
 const MyCardsPage = dynamic(() => import('../features/cards/components/MyCardsPage'), { ssr: false });
@@ -36,14 +37,20 @@ function Home() {
   );
 }
 
-export default function WrappedHome() {
+function WrappedHome() {
+  const pathname = usePathname();
+  
   return (
     <ThemeRegistry>
       <RegionProvider>
         <AuthProvider>
-          <Home />
+          <AnimatePresence mode="wait">
+            <Home key={pathname} />
+          </AnimatePresence>
         </AuthProvider>
       </RegionProvider>
     </ThemeRegistry>
   );
 }
+
+export default WrappedHome;

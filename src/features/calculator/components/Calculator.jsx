@@ -29,6 +29,27 @@ import CalculationResults from "./CalculationResults";
 import Confetti from "react-confetti";
 import ReferralButton from "./ReferralButton";
 import { useRegion } from "../../../core/providers/RegionContext";
+import { motion } from "framer-motion";
+
+const pageVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 260,
+      damping: 20,
+      when: "beforeChildren",
+      staggerChildren: 0.1,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -20,
+    transition: { duration: 0.3 },
+  },
+};
 
 function Calculator() {
   const theme = useTheme();
@@ -232,149 +253,158 @@ function Calculator() {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100vh",
-        bgcolor: "background.default",
-      }}
+    <motion.div
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
     >
-      <Header />
-
-      <Container
-        component="main"
-        slots={{ root: "main" }}
-        maxWidth="lg"
+      <Box
         sx={{
-          mt: 4,
-          mb: 4,
-          px: { xs: 2, sm: 3 },
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh",
+          bgcolor: "background.default",
         }}
       >
-        {showConfetti && <Confetti />}
+        <Header />
 
-        <Stack spacing={4}>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: "bold",
-              fontSize: { xs: "1.75rem", sm: "2.125rem" },
-              textAlign: { xs: "center", sm: "left" },
-            }}
-          >
-            Credit Card Reward Calculator
-          </Typography>
-
-          <ErrorAlert message={error} onClose={() => setError(null)} />
-
-          {isFetchingUserData ? (
-            <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <Stack spacing={3}>
-              <CalculatorForm
-                selectedBank={selectedBank}
-                selectedCard={selectedCard}
-                selectedMcc={selectedMcc}
-                spentAmount={spentAmount}
-                additionalInputs={additionalInputs}
-                onBankChange={handleBankChange}
-                onCardChange={handleCardChange}
-                onMccChange={handleMccChange}
-                onSpentAmountChange={handleSpentAmountChange}
-                onAdditionalInputChange={handleAdditionalInputChange}
-                onCalculate={handleCalculate}
-                onClear={handleClearAll}
-                isLoadingQuestions={isLoadingQuestions}
-                setIsLoadingQuestions={setIsLoadingQuestions}
-                isCalculating={isCalculating}
-              />
-
-              <ReportButtons
-                calculationPerformed={calculationPerformed}
-                onMissingFormOpen={() => setMissingFormOpen(true)}
-                onIncorrectRewardOpen={() => setIncorrectRewardReportOpen(true)}
-              />
-
-              {calculationPerformed && calculationResult && (
-                <>
-                  <CalculationResults
-                    result={calculationResult}
-                    isLoading={isCalculating}
-                  />
-                  <ReferralButton
-                    bank={selectedBank}
-                    cardName={selectedCard}
-                    userCards={userCards}
-                    calculationPerformed={calculationPerformed}
-                  />
-                  {user && (
-                    <AddToMyCardsButton
-                      user={user}
-                      selectedBank={selectedBank}
-                      selectedCard={selectedCard}
-                      userCards={userCards}
-                      onAddCard={handleAddCard}
-                    />
-                  )}
-                </>
-              )}
-            </Stack>
-          )}
-        </Stack>
-      </Container>
-
-      <AnonymousConversionPrompt />
-
-      <MissingBankCardForm
-        open={missingFormOpen}
-        onClose={() => setMissingFormOpen(false)}
-        onSubmitSuccess={(message) =>
-          setAlert({ open: true, message, severity: "success" })
-        }
-      />
-
-      <IncorrectRewardReportForm
-        open={incorrectRewardReportOpen}
-        onClose={() => setIncorrectRewardReportOpen(false)}
-        onSubmitSuccess={(message) =>
-          setAlert({ open: true, message, severity: "success" })
-        }
-        formData={{
-          bank: selectedBank,
-          card: selectedCard,
-          mcc: selectedMcc
-            ? `${selectedMcc.mcc} - ${selectedMcc.name}`
-            : "Not selected",
-          spentAmount,
-          additionalInputs,
-          calculationResult,
-        }}
-      />
-
-      <Footer />
-
-      {alert.open && (
-        <Alert
-          severity={alert.severity}
-          onClose={() => setAlert({ ...alert, open: false })}
+        <Container
+          component="main"
+          slots={{ root: "main" }}
+          maxWidth="lg"
           sx={{
-            position: "fixed",
-            bottom: 24,
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: (theme) => theme.zIndex.snackbar,
-            maxWidth: "90%",
-            width: "auto",
-            boxShadow: (theme) => theme.shadows[8],
+            mt: 4,
+            mb: 4,
+            px: { xs: 2, sm: 3 },
           }}
         >
-          {alert.message}
-        </Alert>
-      )}
-    </Box>
+          {showConfetti && <Confetti />}
+
+          <Stack spacing={4}>
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: "bold",
+                fontSize: { xs: "1.75rem", sm: "2.125rem" },
+                textAlign: { xs: "center", sm: "left" },
+              }}
+            >
+              Credit Card Reward Calculator
+            </Typography>
+
+            <ErrorAlert message={error} onClose={() => setError(null)} />
+
+            {isFetchingUserData ? (
+              <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <Stack spacing={3}>
+                <CalculatorForm
+                  selectedBank={selectedBank}
+                  selectedCard={selectedCard}
+                  selectedMcc={selectedMcc}
+                  spentAmount={spentAmount}
+                  additionalInputs={additionalInputs}
+                  onBankChange={handleBankChange}
+                  onCardChange={handleCardChange}
+                  onMccChange={handleMccChange}
+                  onSpentAmountChange={handleSpentAmountChange}
+                  onAdditionalInputChange={handleAdditionalInputChange}
+                  onCalculate={handleCalculate}
+                  onClear={handleClearAll}
+                  isLoadingQuestions={isLoadingQuestions}
+                  setIsLoadingQuestions={setIsLoadingQuestions}
+                  isCalculating={isCalculating}
+                />
+
+                <ReportButtons
+                  calculationPerformed={calculationPerformed}
+                  onMissingFormOpen={() => setMissingFormOpen(true)}
+                  onIncorrectRewardOpen={() =>
+                    setIncorrectRewardReportOpen(true)
+                  }
+                />
+
+                {calculationPerformed && calculationResult && (
+                  <>
+                    <CalculationResults
+                      result={calculationResult}
+                      isLoading={isCalculating}
+                    />
+                    <ReferralButton
+                      bank={selectedBank}
+                      cardName={selectedCard}
+                      userCards={userCards}
+                      calculationPerformed={calculationPerformed}
+                    />
+                    {user && (
+                      <AddToMyCardsButton
+                        user={user}
+                        selectedBank={selectedBank}
+                        selectedCard={selectedCard}
+                        userCards={userCards}
+                        onAddCard={handleAddCard}
+                      />
+                    )}
+                  </>
+                )}
+              </Stack>
+            )}
+          </Stack>
+        </Container>
+
+        <AnonymousConversionPrompt />
+
+        <MissingBankCardForm
+          open={missingFormOpen}
+          onClose={() => setMissingFormOpen(false)}
+          onSubmitSuccess={(message) =>
+            setAlert({ open: true, message, severity: "success" })
+          }
+        />
+
+        <IncorrectRewardReportForm
+          open={incorrectRewardReportOpen}
+          onClose={() => setIncorrectRewardReportOpen(false)}
+          onSubmitSuccess={(message) =>
+            setAlert({ open: true, message, severity: "success" })
+          }
+          formData={{
+            bank: selectedBank,
+            card: selectedCard,
+            mcc: selectedMcc
+              ? `${selectedMcc.mcc} - ${selectedMcc.name}`
+              : "Not selected",
+            spentAmount,
+            additionalInputs,
+            calculationResult,
+          }}
+        />
+
+        <Footer />
+
+        {alert.open && (
+          <Alert
+            severity={alert.severity}
+            onClose={() => setAlert({ ...alert, open: false })}
+            sx={{
+              position: "fixed",
+              bottom: 24,
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: (theme) => theme.zIndex.snackbar,
+              maxWidth: "90%",
+              width: "auto",
+              boxShadow: (theme) => theme.shadows[8],
+            }}
+          >
+            {alert.message}
+          </Alert>
+        )}
+      </Box>
+    </motion.div>
   );
 }
 

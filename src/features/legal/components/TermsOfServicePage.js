@@ -1,9 +1,36 @@
 import { Box, Container, Typography } from '@mui/material';
 import Header from '../../../shared/components/layout/Header';
 import Footer from '../../../shared/components/layout/Footer';
+import { motion } from 'framer-motion';
+
+const pageVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 260,
+      damping: 20,
+      when: "beforeChildren",
+      staggerChildren: 0.1
+    }
+  },
+  exit: { 
+    opacity: 0, 
+    y: -20,
+    transition: { duration: 0.3 }
+  }
+};
 
 const TermsOfServicePage = () => {
   return (
+    <motion.div
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+    >
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Header />
       <Container component="main" sx={{ mt: 4, mb: 4, flexGrow: 1 }}>
@@ -139,6 +166,7 @@ const TermsOfServicePage = () => {
       </Container>
       <Footer />
     </Box>
+    </motion.div>
   );
 };
 

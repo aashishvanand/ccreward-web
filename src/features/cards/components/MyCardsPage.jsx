@@ -28,6 +28,27 @@ import PortfolioShare from "./PortfolioShare";
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
 import ShareDialog from "./ShareDialog";
 import { useRegion } from "../../../core/providers/RegionContext";
+import { motion } from "framer-motion";
+
+const pageVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 260,
+      damping: 20,
+      when: "beforeChildren",
+      staggerChildren: 0.1,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -20,
+    transition: { duration: 0.3 },
+  },
+};
 
 function MyCardsPage() {
   const { region } = useRegion();
@@ -228,8 +249,8 @@ function MyCardsPage() {
           }}
         >
           <Typography variant="h6" sx={{ mb: 2 }}>
-              Welcome! Let's start by adding your first credit card for the{" "}
-              {region} region.
+            Welcome! Let's start by adding your first credit card for the{" "}
+            {region} region.
           </Typography>
           <Typography color="text.secondary">
             Click the + button below to add your first card
@@ -273,100 +294,109 @@ function MyCardsPage() {
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <Header />
-      <Container
-        sx={{
-          py: 4,
-          flexGrow: 1,
-          pb: { xs: 10, sm: 12 },
-        }}
-        maxWidth="lg"
+    <motion.div
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+    >
+      <Box
+        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
-        <Stack spacing={4}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 4,
-            }}
-          >
-            <Typography
-              variant="h4"
-              component="h1"
+        <Header />
+        <Container
+          sx={{
+            py: 4,
+            flexGrow: 1,
+            pb: { xs: 10, sm: 12 },
+          }}
+          maxWidth="lg"
+        >
+          <Stack spacing={4}>
+            <Box
               sx={{
-                fontSize: { xs: "1.75rem", sm: "2.125rem" },
-                fontWeight: "bold",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 4,
               }}
             >
-              My Cards
-            </Typography>
-          </Box>
+              <Typography
+                variant="h4"
+                component="h1"
+                sx={{
+                  fontSize: { xs: "1.75rem", sm: "2.125rem" },
+                  fontWeight: "bold",
+                }}
+              >
+                My Cards
+              </Typography>
+            </Box>
 
-          {renderContent()}
-        </Stack>
-      </Container>
+            {renderContent()}
+          </Stack>
+        </Container>
 
-      <SpeedDial
-        ariaLabel="Card Actions"
-        sx={{
-          position: "fixed",
-          bottom: { xs: 80, sm: 100 },
-          right: { xs: 16, sm: 24 },
-        }}
-        icon={<SpeedDialIcon openIcon={<AddIcon />} />}
-      >
-        <SpeedDialAction
-          key="add"
-          icon={<AddIcon />}
-          tooltipTitle="Add New Card"
-          onClick={() => setIsAddCardDialogOpen(true)}
-        />
-        {cards.length > 0 && (
-          <SpeedDialAction
-            key="share"
-            icon={<ShareIcon />}
-            tooltipTitle="Share Collection"
-            onClick={() => setShareDialogOpen(true)}
-          />
-        )}
-      </SpeedDial>
-
-      <AddCardDialog
-        open={isAddCardDialogOpen}
-        onClose={() => setIsAddCardDialogOpen(false)}
-        onAddCard={handleAddCard}
-      />
-
-      <ShareDialog
-        open={shareDialogOpen}
-        onClose={() => setShareDialogOpen(false)}
-        onShare={handleShare}
-        isGenerating={isGeneratingImage}
-      />
-
-      {alert.open && (
-        <Alert
-          severity={alert.severity}
-          onClose={() => setAlert({ ...alert, open: false })}
+        <SpeedDial
+          ariaLabel="Card Actions"
           sx={{
             position: "fixed",
-            bottom: 24,
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: theme.zIndex.snackbar,
-            maxWidth: "90%",
-            width: "auto",
-            boxShadow: theme.shadows[8],
+            bottom: { xs: 80, sm: 100 },
+            right: { xs: 16, sm: 24 },
           }}
+          icon={<SpeedDialIcon openIcon={<AddIcon />} />}
         >
-          {alert.message}
-        </Alert>
-      )}
+          <SpeedDialAction
+            key="add"
+            icon={<AddIcon />}
+            tooltipTitle="Add New Card"
+            onClick={() => setIsAddCardDialogOpen(true)}
+          />
+          {cards.length > 0 && (
+            <SpeedDialAction
+              key="share"
+              icon={<ShareIcon />}
+              tooltipTitle="Share Collection"
+              onClick={() => setShareDialogOpen(true)}
+            />
+          )}
+        </SpeedDial>
 
-      <Footer />
-    </Box>
+        <AddCardDialog
+          open={isAddCardDialogOpen}
+          onClose={() => setIsAddCardDialogOpen(false)}
+          onAddCard={handleAddCard}
+        />
+
+        <ShareDialog
+          open={shareDialogOpen}
+          onClose={() => setShareDialogOpen(false)}
+          onShare={handleShare}
+          isGenerating={isGeneratingImage}
+        />
+
+        {alert.open && (
+          <Alert
+            severity={alert.severity}
+            onClose={() => setAlert({ ...alert, open: false })}
+            sx={{
+              position: "fixed",
+              bottom: 24,
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: theme.zIndex.snackbar,
+              maxWidth: "90%",
+              width: "auto",
+              boxShadow: theme.shadows[8],
+            }}
+          >
+            {alert.message}
+          </Alert>
+        )}
+
+        <Footer />
+      </Box>
+    </motion.div>
   );
 }
 

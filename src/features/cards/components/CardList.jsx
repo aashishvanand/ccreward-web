@@ -85,6 +85,18 @@ const emptyStateVariants = {
   }
 };
 
+const loadingSpinnerVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: { 
+    opacity: 1, 
+    scale: [0.8, 1.2, 0.8],
+    transition: {
+      repeat: Infinity,
+      duration: 1.5
+    }
+  }
+};
+
 const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -139,16 +151,9 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ 
-            opacity: 1, 
-            scale: 1,
-            transition: {
-              repeat: Infinity,
-              repeatType: "mirror",
-              duration: 1
-            }
-          }}
+          variants={loadingSpinnerVariants}
+          initial="hidden"
+          animate="visible"
         >
           <CircularProgress />
         </motion.div>
@@ -253,7 +258,7 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
           }}
         >
           <AnimatePresence>
-            {processedCards.map((card) => {
+            {processedCards.map((card, index) => {
               const cardKey = `${card.bank}-${card.cardName}`;
               const isRemoving = removingCard === cardKey;
               
@@ -267,6 +272,14 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                   exit="exit"
                   whileHover="hover"
                   whileTap="tap"
+                  custom={index} // Pass index for staggered animations
+                  transition={{
+                    layoutId: cardKey,
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 25,
+                    delay: index * 0.05, // Stagger delay based on index
+                  }}
                 >
                   <ImageListItem sx={{ width: "100%" }}>
                     <motion.div
@@ -292,16 +305,26 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                           }}
                         >
                           {card.image && (
-                            <Image
-                              src={card.image}
-                              alt={`${card.bank} ${card.cardName}`}
-                              layout="fill"
-                              objectFit="contain"
-                              priority={true}
-                            />
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ 
+                                opacity: 1,
+                                transition: { delay: 0.1 + (index * 0.05) }
+                              }}
+                            >
+                              <Image
+                                src={card.image}
+                                alt={`${card.bank} ${card.cardName}`}
+                                layout="fill"
+                                objectFit="contain"
+                                priority={index < 4} // Only prioritize first 4 images
+                              />
+                            </motion.div>
                           )}
                           <motion.div
                             variants={deleteButtonVariants}
+                            initial="hidden"
+                            whileHover="hover"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDeleteCard(card.bank, card.cardName);
@@ -333,31 +356,55 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                           }}
                         >
                           <Stack spacing={0.5}>
-                            <Typography
-                              variant="subtitle2"
-                              sx={{
-                                fontSize:
-                                  card.orientation === "vertical" ? "0.75rem" : "0.875rem",
-                                fontWeight: 600,
-                                lineHeight: 1.2,
+                            <motion.div
+                              initial={{ opacity: 0, x: -5 }}
+                              animate={{ 
+                                opacity: 1, 
+                                x: 0,
+                                transition: { 
+                                  delay: 0.2 + (index * 0.05),
+                                  duration: 0.3 
+                                }
                               }}
-                              noWrap
                             >
-                              {card.cardName}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              color="text.secondary"
-                              sx={{
-                                fontSize:
-                                  card.orientation === "vertical" ? "0.7rem" : "0.75rem",
-                                lineHeight: 1.2,
-                                display: "block",
+                              <Typography
+                                variant="subtitle2"
+                                sx={{
+                                  fontSize:
+                                    card.orientation === "vertical" ? "0.75rem" : "0.875rem",
+                                  fontWeight: 600,
+                                  lineHeight: 1.2,
+                                }}
+                                noWrap
+                              >
+                                {card.cardName}
+                              </Typography>
+                            </motion.div>
+                            <motion.div
+                              initial={{ opacity: 0, x: -5 }}
+                              animate={{ 
+                                opacity: 1, 
+                                x: 0,
+                                transition: { 
+                                  delay: 0.3 + (index * 0.05),
+                                  duration: 0.3 
+                                }
                               }}
-                              noWrap
                             >
-                              {card.bank}
-                            </Typography>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{
+                                  fontSize:
+                                    card.orientation === "vertical" ? "0.7rem" : "0.75rem",
+                                  lineHeight: 1.2,
+                                  display: "block",
+                                }}
+                                noWrap
+                              >
+                                {card.bank}
+                              </Typography>
+                            </motion.div>
                           </Stack>
                         </Box>
                       </Paper>

@@ -95,9 +95,24 @@ const CalculationResults = ({ result, isLoading }) => {
       opacity: 1, 
       scale: 1,
       transition: {
-        yoyo: Infinity,
-        duration: 0.8,
-        ease: "easeInOut"
+        repeat: Infinity,
+        repeatType: "mirror",
+        duration: 0.8
+      }
+    }
+  };
+
+  // Reward text number animation
+  const numberVariants = {
+    initial: { opacity: 0, y: 10 },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 15,
+        delay: 0.4
       }
     }
   };
@@ -201,13 +216,14 @@ const CalculationResults = ({ result, isLoading }) => {
                   ]}
                 >
                   {hasRewards ? (
-                    <motion.span
+                    <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.4, delay: 0.2 }}
                     >
-                      {result.rewardText}
-                    </motion.span>
+                      {/* Split the text to animate numbers separately */}
+                      {renderAnimatedRewardText(result.rewardText)}
+                    </motion.div>
                   ) : (
                     <motion.span
                       initial={{ opacity: 0 }}
@@ -232,6 +248,44 @@ const CalculationResults = ({ result, isLoading }) => {
         </Paper>
       </motion.div>
     </AnimatePresence>
+  );
+};
+
+// Helper to split and animate numbers in the reward text
+const renderAnimatedRewardText = (text) => {
+  // Regex to find numbers in the text
+  const parts = text.split(/(\d+(?:\.\d+)?)/);
+  
+  return (
+    <>
+      {parts.map((part, index) => {
+        // Check if this part is a number
+        if (/^\d+(?:\.\d+)?$/.test(part)) {
+          return (
+            <motion.span
+              key={index}
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ 
+                opacity: 1, 
+                scale: 1,
+                transition: {
+                  type: "spring",
+                  stiffness: 500,
+                  damping: 15,
+                  delay: 0.4 + (index * 0.1)
+                }
+              }}
+              style={{ display: "inline-block", fontWeight: "bold" }}
+            >
+              {part}
+            </motion.span>
+          );
+        }
+        
+        // Regular text
+        return <span key={index}>{part}</span>;
+      })}
+    </>
   );
 };
 
