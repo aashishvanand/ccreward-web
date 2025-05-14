@@ -20,6 +20,27 @@ import Footer from "../../../shared/components/layout/Footer";
 import TopCardsGrid from "../../top-cards/components/TopCardsGrid";
 import { useAuth } from "../../../core/providers/AuthContext";
 import useCardImagesData from "../../../core/hooks/useCardImagesData";
+import { motion } from "framer-motion";
+
+const pageVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 260,
+      damping: 20,
+      when: "beforeChildren",
+      staggerChildren: 0.1,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -20,
+    transition: { duration: 0.3 },
+  },
+};
 
 const BankPage = ({ bank, cards }) => {
   const router = useRouter();
@@ -87,76 +108,85 @@ const BankPage = ({ bank, cards }) => {
   const bankCards = getCardsWithImages();
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <Header />
-
-      <Container component="main" sx={{ py: 4, flexGrow: 1 }}>
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: "bold",
-            mb: 4,
-            fontSize: { xs: "1.75rem", sm: "2.125rem" },
-          }}
-        >
-          {bank} Credit Cards
-        </Typography>
-
-        {bankCards.length > 0 ? (
-          <Box sx={{ width: "100%" }}>
-            <TopCardsGrid
-              cards={bankCards}
-              isMobile={isMobile}
-              isTablet={isTablet}
-              handleCardClick={handleCardClick}
-              theme={theme}
-            />
-          </Box>
-        ) : (
-          <Alert severity="info">No cards found for this bank.</Alert>
-        )}
-      </Container>
-
-      <Dialog 
-        open={openDialog} 
-        onClose={handleCloseDialog}
-        slots={{
-          backdrop: "div",
-        }}
+    <motion.div
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+    >
+      <Box
+        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
-        <DialogTitle>Sign In Required</DialogTitle>
-        <DialogContent>
-          <Typography>Please sign in to calculate your rewards.</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button onClick={handleSignIn} variant="contained">
-            Sign In with Google
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <Header />
 
-      {alert.open && (
-        <Alert
-          severity={alert.severity}
-          onClose={() => setAlert({ ...alert, open: false })}
-          sx={{
-            position: "fixed",
-            bottom: 24,
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: theme.zIndex.snackbar,
-            maxWidth: "90%",
-            width: "auto",
-            boxShadow: theme.shadows[8],
+        <Container component="main" sx={{ py: 4, flexGrow: 1 }}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: "bold",
+              mb: 4,
+              fontSize: { xs: "1.75rem", sm: "2.125rem" },
+            }}
+          >
+            {bank} Credit Cards
+          </Typography>
+
+          {bankCards.length > 0 ? (
+            <Box sx={{ width: "100%" }}>
+              <TopCardsGrid
+                cards={bankCards}
+                isMobile={isMobile}
+                isTablet={isTablet}
+                handleCardClick={handleCardClick}
+                theme={theme}
+              />
+            </Box>
+          ) : (
+            <Alert severity="info">No cards found for this bank.</Alert>
+          )}
+        </Container>
+
+        <Dialog
+          open={openDialog}
+          onClose={handleCloseDialog}
+          slots={{
+            backdrop: "div",
           }}
         >
-          {alert.message}
-        </Alert>
-      )}
+          <DialogTitle>Sign In Required</DialogTitle>
+          <DialogContent>
+            <Typography>Please sign in to calculate your rewards.</Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Cancel</Button>
+            <Button onClick={handleSignIn} variant="contained">
+              Sign In with Google
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-      <Footer />
-    </Box>
+        {alert.open && (
+          <Alert
+            severity={alert.severity}
+            onClose={() => setAlert({ ...alert, open: false })}
+            sx={{
+              position: "fixed",
+              bottom: 24,
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: theme.zIndex.snackbar,
+              maxWidth: "90%",
+              width: "auto",
+              boxShadow: theme.shadows[8],
+            }}
+          >
+            {alert.message}
+          </Alert>
+        )}
+
+        <Footer />
+      </Box>
+    </motion.div>
   );
 };
 
