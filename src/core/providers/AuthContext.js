@@ -4,14 +4,35 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { auth, googleProvider, firebaseApp } from '../../../firebase';
 import { onAuthStateChanged, signInWithPopup, signInAnonymously as firebaseSignInAnonymously, getIdToken, signOut } from 'firebase/auth';
 import { getAnalytics, logEvent } from "firebase/analytics";
+import { useRouter, usePathname } from "next/navigation";
+import { Box, CircularProgress, Typography, Paper, useTheme } from "@mui/material";
+import { motion } from "framer-motion";
 
 const AuthContext = createContext();
+
+// Define which routes require authentication
+const PROTECTED_ROUTES = ['/my-cards', '/calculator', '/best-card'];
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isNewUser, setIsNewUser] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const theme = useTheme ? useTheme() : { zIndex: { modal: 1300 } };
+  const [loadingDuration, setLoadingDuration] = useState(0);
+
+  // Track loading duration
+  useEffect(() => {
+    let interval;
+    if (loading) {
+      interval = setInterval(() => {
+        setLoadingDuration(prev => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [loading]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -39,6 +60,13 @@ export function AuthProvider({ children }) {
     return () => unsubscribe();
   }, []);
 
+  // Handle route protection
+  useEffect(() => {
+    // Only redirect after authentication state is determined and if the route is protected
+    if (!loading && !user && PROTECTED_ROUTES.includes(pathname)) {
+      router.push('/');
+    }
+  }, [user, loading, pathname, router]);
 
   const signInWithGoogle = async () => {
     try {
@@ -137,6 +165,91 @@ export function AuthProvider({ children }) {
     isNewUser,
     markUserAsNotNew,
   };
+
+  // If loading and on a protected route, show loading state
+  if (loading && PROTECTED_ROUTES.includes(pathname)) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          width: "100%",
+          bgcolor: "background.default",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          zIndex: theme.zIndex.modal,
+        }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Paper
+            elevation={4}
+            sx={{
+              py: 6,
+              px: 8,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              borderRadius: 2,
+              maxWidth: 360,
+              textAlign: "center",
+            }}
+          >
+            <Box mb={3}>
+              <CircularProgress 
+                size={60} 
+                thickness={4} 
+                color="primary"
+                variant="indeterminate"
+              />
+            </Box>
+            
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                mb: 1,
+                fontWeight: 500,
+              }}
+            >
+              Checking authentication
+            </Typography>
+            
+            <Typography
+              variant="body2"
+              color="text.secondary"
+            >
+              {loadingDuration > 5 
+                ? "This is taking longer than expected..." 
+                : "Just a moment while we prepare your experience"}
+            </Typography>
+            
+            {loadingDuration > 10 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Typography
+                  variant="caption"
+                  color="error"
+                  sx={{ mt: 2, display: "block" }}
+                >
+                  If this persists, please try refreshing the page
+                </Typography>
+              </motion.div>
+            )}
+          </Paper>
+        </motion.div>
+      </Box>
+    );
+  }
 
   return (
     <AuthContext.Provider value={value}>
