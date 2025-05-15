@@ -6,7 +6,6 @@ import {
   DialogActions,
   TextField,
   Button,
-  Autocomplete,
   MenuItem,
   CircularProgress,
   Typography,
@@ -20,11 +19,13 @@ import {
   AccordionSummary,
   AccordionDetails,
   useTheme,
+  Snackbar,
+  Alert,
+  Paper,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CardNetworkSelector from "./CardNetworkSelector";
 import { fetchBanks, fetchCards } from "../../../core/services/api";
-import { useRegion } from "../../../core/providers/RegionContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 const BILLING_DATES = Array.from({ length: 31 }, (_, i) => i + 1);
@@ -46,8 +47,8 @@ const months = [
 // Animation variants
 const dialogVariants = {
   hidden: { opacity: 0, scale: 0.9 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     scale: 1,
     transition: {
       type: "spring",
@@ -55,73 +56,73 @@ const dialogVariants = {
       damping: 25,
       when: "beforeChildren",
       staggerChildren: 0.1,
-      delayChildren: 0.2
-    }
+      delayChildren: 0.2,
+    },
   },
-  exit: { 
-    opacity: 0, 
+  exit: {
+    opacity: 0,
     scale: 0.9,
-    transition: { 
-      duration: 0.2 
-    }
-  }
+    transition: {
+      duration: 0.2,
+    },
+  },
 };
 
 const inputVariants = {
   hidden: { opacity: 0, y: 10 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: {
       type: "spring",
       stiffness: 400,
-      damping: 25
-    }
-  }
+      damping: 25,
+    },
+  },
 };
 
 const buttonVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: {
       type: "spring",
       stiffness: 300,
       damping: 25,
-      delay: 0.3
-    }
+      delay: 0.3,
+    },
   },
-  hover: { 
+  hover: {
     scale: 1.05,
     transition: {
       type: "spring",
       stiffness: 400,
-      damping: 10
-    }
+      damping: 10,
+    },
   },
-  tap: { scale: 0.98 }
+  tap: { scale: 0.98 },
 };
 
 const accordionVariants = {
   hidden: { opacity: 0, height: 0 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     height: "auto",
     transition: {
       type: "spring",
       stiffness: 200,
       damping: 25,
-      delay: 0.2
-    }
+      delay: 0.2,
+    },
   },
-  exit: { 
-    opacity: 0, 
+  exit: {
+    opacity: 0,
     height: 0,
-    transition: { 
-      duration: 0.3 
-    }
-  }
+    transition: {
+      duration: 0.3,
+    },
+  },
 };
 
 // Default limit config for all regions
@@ -162,14 +163,14 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
   const [region, setRegion] = useState(() => {
     // Check if we're on the client side before accessing localStorage
     if (typeof window !== "undefined") {
-      return localStorage.getItem("app-region");
+      return localStorage.getItem("app-region") || "IN";
     }
     return "IN"; // Default fallback
   });
 
   const currentYear = new Date().getFullYear();
 
-  const [isLoading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [banks, setBanks] = useState([]);
   const [cards, setCards] = useState([]);
   const [expanded, setExpanded] = useState(false);
@@ -177,10 +178,18 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
     new Date().toLocaleString("default", { month: "long" })
   );
   const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
 
   const [newCard, setNewCard] = useState({
     bank: "",
     cardName: "",
+    network: "",
+    billingDate: 1,
+    limit: region === "SG" ? 10000 : 100000,
   });
 
   // Safe access to limit config based on region
@@ -190,10 +199,12 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedRegion = localStorage.getItem("app-region").toLowerCase();
-      setRegion(storedRegion);
+      const storedRegion = localStorage.getItem("app-region");
+      if (storedRegion) {
+        setRegion(storedRegion.toUpperCase());
+      }
     }
-  }, [region]);
+  }, []);
 
   useEffect(() => {
     if (open) {
@@ -207,41 +218,50 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
       setNewCard({
         bank: "",
         cardName: "",
+        network: "",
+        billingDate: 1,
+        limit: region === "SG" ? 10000 : 100000,
       });
       setSelectedMonth(new Date().toLocaleString("default", { month: "long" }));
       setSelectedYear(new Date().getFullYear());
       setExpanded(false);
       setCards([]);
     }
-  }, [open]);
+  }, [open, region]);
 
   const fetchBankList = async () => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const bankList = await fetchBanks();
       setBanks(bankList);
     } catch (error) {
       handleError(error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const fetchCardList = async (bank) => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const cardList = await fetchCards(bank);
       setCards(cardList);
     } catch (error) {
       handleError(error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const handleBankChange = (e) => {
     const selectedBank = e.target.value;
-    setNewCard({ bank: selectedBank, cardName: "" });
+    console.log("Bank selected:", selectedBank);
+    setNewCard({
+      ...newCard,
+      bank: selectedBank,
+      cardName: "",
+    });
+
     if (selectedBank) {
       fetchCardList(selectedBank);
     } else {
@@ -249,20 +269,25 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
     }
   };
 
+  const handleCardChange = (e) => {
+    console.log("Card selected:", e.target.value);
+    setNewCard((prev) => ({
+      ...prev,
+      cardName: e.target.value,
+    }));
+  };
+
   const handleError = (error) => {
-    if (error.message.includes("too many requests")) {
-      setSnackbar({
-        open: true,
-        message: error.message,
-        severity: "warning",
-      });
-    } else {
-      setSnackbar({
-        open: true,
-        message: "An error occurred. Please try again.",
-        severity: "error",
-      });
-    }
+    console.error("Error:", error);
+    setSnackbar({
+      open: true,
+      message: error.message?.includes("too many requests")
+        ? error.message
+        : "An error occurred. Please try again.",
+      severity: error.message?.includes("too many requests")
+        ? "warning"
+        : "error",
+    });
   };
 
   const handleAddCard = () => {
@@ -287,379 +312,336 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
   };
 
   return (
-    <AnimatePresence mode="wait">
-      {open && (
-        <Dialog
-          open={open}
-          onClose={onClose}
-          fullWidth
-          maxWidth="sm"
-          PaperProps={{
-            sx: {
-              borderRadius: 2,
-              boxShadow: theme.shadows[10],
-              overflow: "hidden"
-            },
-            component: motion.div,
-            variants: dialogVariants,
-            initial: "hidden",
-            animate: "visible",
-            exit: "exit"
-          }}
-        >
-          <DialogTitle
-            sx={{
-              borderBottom: `1px solid ${theme.palette.divider}`,
-              pb: 2,
-              display: "flex",
-              alignItems: "center",
+    <>
+      <AnimatePresence mode="wait">
+        {open && (
+          <Dialog
+            open={open}
+            onClose={onClose}
+            fullWidth
+            maxWidth="sm"
+            PaperProps={{
+              sx: {
+                borderRadius: 2,
+                boxShadow: theme.shadows[10],
+                overflow: "hidden",
+              },
+              component: motion.div,
+              variants: dialogVariants,
+              initial: "hidden",
+              animate: "visible",
+              exit: "exit",
             }}
           >
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ 
-                opacity: 1, 
-                x: 0,
-                transition: {
-                  type: "spring",
-                  stiffness: 500,
-                  damping: 25
-                }
+            <DialogTitle
+              sx={{
+                borderBottom: `1px solid ${theme.palette.divider}`,
+                pb: 2,
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
               }}
             >
-              <Typography variant="h5" component="div" sx={{ fontWeight: 500 }}>
-                Add New Card
-              </Typography>
-            </motion.div>
-          </DialogTitle>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                  transition: {
+                    type: "spring",
+                    stiffness: 500,
+                    damping: 25,
+                  },
+                }}
+              >
+                <Typography
+                  variant="h5"
+                  component="div"
+                  sx={{ fontWeight: 500 }}
+                >
+                  Add New Card
+                </Typography>
+              </motion.div>
+            </DialogTitle>
 
-          <DialogContent sx={{ pt: 3 }}>
-            {isLoading ? (
-              <Box sx={{ display: "flex", justifyContent: "center", my: 3 }}>
-                <motion.div
-                  animate={{ 
-                    rotate: 360,
-                    transition: { 
-                      repeat: Infinity, 
-                      duration: 1.5,
-                      ease: "linear"
-                    }
-                  }}
-                >
-                  <CircularProgress />
-                </motion.div>
-              </Box>
-            ) : (
-              <>
-                <motion.div variants={inputVariants}>
-                  <TextField
-                    select
-                    label="Bank"
-                    value={newCard.bank}
-                    onChange={(e) => {
-                      const selectedBank = e.target.value;
-                      setNewCard({ bank: selectedBank, cardName: "" });
-                      if (selectedBank) {
-                        fetchCardList(selectedBank);
-                      } else {
-                        setCards([]);
-                      }
+            <DialogContent sx={{ pt: 3 }}>
+              {isLoading ? (
+                <Box sx={{ display: "flex", justifyContent: "center", my: 3 }}>
+                  <motion.div
+                    animate={{
+                      rotate: 360,
+                      transition: {
+                        repeat: Infinity,
+                        duration: 1.5,
+                        ease: "linear",
+                      },
                     }}
-                    fullWidth
-                    margin="normal"
                   >
-                    <MenuItem value="">Select a bank</MenuItem>
-                    {banks.map((bank, index) => (
-                      <motion.div
-                        key={bank}
-                        initial={{ opacity: 0, x: -5 }}
-                        animate={{ 
-                          opacity: 1, 
-                          x: 0,
-                          transition: {
-                            delay: 0.05 * index,
-                            duration: 0.2
-                          }
-                        }}
+                    <CircularProgress />
+                  </motion.div>
+                </Box>
+              ) : (
+                <>
+                  <motion.div variants={inputVariants}>
+                    <FormControl fullWidth margin="normal" variant="outlined">
+                      <InputLabel id="bank-select-label">Bank</InputLabel>
+                      <Select
+                        labelId="bank-select-label"
+                        id="bank-select"
+                        value={newCard.bank}
+                        onChange={handleBankChange}
+                        label="Bank"
                       >
-                        <MenuItem value={bank}>{bank}</MenuItem>
-                      </motion.div>
-                    ))}
-                  </TextField>
-                </motion.div>
-                <motion.div 
-                  variants={inputVariants}
-                  custom={1}
-                >
-                  <TextField
-                    select
-                    label="Card Name"
-                    value={newCard.cardName}
-                    onChange={(e) =>
-                      setNewCard((prev) => ({ ...prev, cardName: e.target.value }))
-                    }
-                    fullWidth
-                    margin="normal"
-                    disabled={!newCard.bank || isLoading}
-                  >
-                    <MenuItem value="">Select a card</MenuItem>
-                    {cards.map((card, index) => (
-                      <motion.div
-                        key={card}
-                        initial={{ opacity: 0, x: -5 }}
-                        animate={{ 
-                          opacity: 1, 
-                          x: 0,
-                          transition: {
-                            delay: 0.03 * index,
-                            duration: 0.2
-                          }
-                        }}
+                        <MenuItem value="">
+                          <em>Select a bank</em>
+                        </MenuItem>
+                        {banks.map((bank, index) => (
+                          <MenuItem key={bank} value={bank}>
+                            {bank}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </motion.div>
+
+                  <motion.div variants={inputVariants} custom={1}>
+                    <FormControl
+                      fullWidth
+                      margin="normal"
+                      variant="outlined"
+                      disabled={!newCard.bank || isLoading}
+                    >
+                      <InputLabel id="card-select-label">Card Name</InputLabel>
+                      <Select
+                        labelId="card-select-label"
+                        id="card-select"
+                        value={newCard.cardName}
+                        onChange={handleCardChange}
+                        label="Card Name"
                       >
-                        <MenuItem value={card}>{card}</MenuItem>
-                      </motion.div>
-                    ))}
-                  </TextField>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ 
-                    opacity: 1, 
-                    y: 0,
-                    transition: {
-                      type: "spring",
-                      stiffness: 400,
-                      damping: 30,
-                      delay: 0.3
-                    }
-                  }}
-                >
-                  <Accordion
-                    expanded={expanded}
-                    onChange={() => setExpanded(!expanded)}
+                        <MenuItem value="">
+                          <em>Select a card</em>
+                        </MenuItem>
+                        {cards.map((card) => (
+                          <MenuItem key={card} value={card}>
+                            {card}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </motion.div>
+
+                  <Paper
                     elevation={0}
                     sx={{
-                      mt: 2,
+                      mt: 3,
+                      borderRadius: 2,
                       border: `1px solid ${theme.palette.divider}`,
-                      borderRadius: 1,
-                      "&::before": {
-                        display: "none",
-                      },
-                      overflow: "hidden"
+                      backgroundColor:
+                        theme.palette.mode === "dark"
+                          ? "rgba(255, 255, 255, 0.05)"
+                          : "rgba(0, 0, 0, 0.02)",
                     }}
                   >
-                    <AccordionSummary
-                      expandIcon={
-                        <motion.div
-                          animate={{ 
-                            rotate: expanded ? 180 : 0,
-                            transition: { duration: 0.3 }
-                          }}
-                        >
-                          <ExpandMoreIcon />
-                        </motion.div>
-                      }
+                    <Accordion
+                      expanded={expanded}
+                      onChange={() => setExpanded(!expanded)}
+                      elevation={0}
+                      disableGutters
                       sx={{
-                        backgroundColor:
-                          theme.palette.mode === "dark"
-                            ? "rgba(255, 255, 255, 0.05)"
-                            : "rgba(0, 0, 0, 0.02)",
+                        boxShadow: "none",
+                        "&:before": {
+                          display: "none",
+                        },
+                        borderRadius: 2,
                       }}
                     >
-                      <Typography>Additional Card Details (Optional)</Typography>
-                    </AccordionSummary>
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="additional-details-content"
+                        id="additional-details-header"
+                        sx={{ px: 2, py: 1 }}
+                      >
+                        <Typography variant="subtitle1" fontWeight="medium">
+                          Additional Card Details (Optional)
+                        </Typography>
+                      </AccordionSummary>
 
-                    <AnimatePresence>
-                      {expanded && (
-                        <motion.div
-                          variants={accordionVariants}
-                          initial="hidden"
-                          animate="visible"
-                          exit="exit"
-                        >
-                          <AccordionDetails sx={{ p: 3 }}>
-                            <CardNetworkSelector
-                              selectedNetwork={newCard.network}
-                              onNetworkChange={(networkName) =>
-                                setNewCard((prev) => ({ ...prev, network: networkName }))
-                              }
-                              region={region}
-                            />
+                      <AccordionDetails sx={{ px: 3, pb: 3, pt: 1 }}>
+                        <Box sx={{ mb: 4 }}>
+                          <Typography
+                            variant="subtitle1"
+                            gutterBottom
+                            sx={{
+                              fontWeight: 500,
+                              color: "text.primary",
+                              mb: 2,
+                            }}
+                          >
+                            Card Network
+                          </Typography>
+                          <CardNetworkSelector
+                            selectedNetwork={newCard.network}
+                            onNetworkChange={(networkName) =>
+                              setNewCard((prev) => ({
+                                ...prev,
+                                network: networkName,
+                              }))
+                            }
+                            region={region}
+                          />
+                        </Box>
 
-                            <Typography
-                              variant="h6"
-                              gutterBottom
-                              sx={{ fontWeight: 500, mt: 2 }}
-                            >
+                        <Box sx={{ mb: 4 }}>
+                          <Typography
+                            variant="subtitle1"
+                            gutterBottom
+                            sx={{ fontWeight: 500, color: "text.primary" }}
+                          >
+                            Billing Date
+                          </Typography>
+                          <FormControl fullWidth sx={{ mb: 3 }}>
+                            <InputLabel id="billing-date-label">
                               Billing Date
-                            </Typography>
-
-                            <Box
-                              sx={{
-                                display: "grid",
-                                gridTemplateColumns: "repeat(7, 1fr)",
-                                gap: 0.5,
-                                mb: 3,
-                              }}
+                            </InputLabel>
+                            <Select
+                              labelId="billing-date-label"
+                              value={newCard.billingDate || ""}
+                              onChange={(e) =>
+                                setNewCard((prev) => ({
+                                  ...prev,
+                                  billingDate: e.target.value,
+                                }))
+                              }
+                              label="Billing Date"
                             >
-                              {BILLING_DATES.map((date, index) => (
-                                <motion.div
-                                  key={date}
-                                  initial={{ opacity: 0, scale: 0.5 }}
-                                  animate={{ 
-                                    opacity: 1, 
-                                    scale: 1,
-                                    transition: {
-                                      delay: 0.01 * index,
-                                      duration: 0.2
-                                    }
-                                  }}
-                                  whileHover={{ 
-                                    scale: 1.1,
-                                    transition: {
-                                      type: "spring",
-                                      stiffness: 500,
-                                      damping: 10
-                                    }
-                                  }}
-                                  whileTap={{ scale: 0.95 }}
-                                >
-                                  <Button
-                                    variant={
-                                      newCard.billingDate === date ? "contained" : "outlined"
-                                    }
-                                    onClick={() =>
-                                      setNewCard((prev) => ({ ...prev, billingDate: date }))
-                                    }
-                                    sx={{
-                                      minWidth: 0,
-                                      height: 36,
-                                      p: 0,
-                                    }}
-                                  >
-                                    {date}
-                                  </Button>
-                                </motion.div>
+                              {BILLING_DATES.map((date) => (
+                                <MenuItem key={date} value={date}>
+                                  {date}
+                                </MenuItem>
                               ))}
-                            </Box>
+                            </Select>
+                          </FormControl>
+                        </Box>
 
-                            <Typography
-                              variant="h6"
-                              gutterBottom
-                              sx={{ fontWeight: 500, mt: 2 }}
-                            >
-                              Credit Limit ({getCurrencySymbol()})
-                            </Typography>
+                        <Box sx={{ mb: 4 }}>
+                          <Typography
+                            variant="subtitle1"
+                            gutterBottom
+                            sx={{ fontWeight: 500, color: "text.primary" }}
+                          >
+                            Credit Limit ({getCurrencySymbol()})
+                          </Typography>
+                          <Box sx={{ px: 1, mb: 2 }}>
+                            <Slider
+                              value={newCard.limit ?? getLimitConfig().min}
+                              min={getLimitConfig().min}
+                              max={getLimitConfig().max}
+                              step={1000}
+                              valueLabelDisplay="auto"
+                              valueLabelFormat={(value) =>
+                                `${getCurrencySymbol()}${value.toLocaleString()}`
+                              }
+                              marks={getLimitConfig().steps}
+                              onChange={(e, newValue) =>
+                                setNewCard((prev) => ({
+                                  ...prev,
+                                  limit: newValue,
+                                }))
+                              }
+                            />
+                          </Box>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mt: 1, textAlign: "right" }}
+                          >
+                            {getCurrencySymbol()}
+                            {newCard.limit?.toLocaleString() || "0"}
+                          </Typography>
+                        </Box>
 
-                            <Box sx={{ px: 2, mb: 3 }}>
-                              <Slider
-                                value={newCard.limit}
-                                min={getLimitConfig().min}
-                                max={getLimitConfig().max}
-                                step={1000}
-                                valueLabelDisplay="auto"
-                                valueLabelFormat={(value) =>
-                                  `${getCurrencySymbol()}${value.toLocaleString()}`
-                                }
-                                marks={getLimitConfig().steps}
-                                onChange={(e, newValue) =>
-                                  setNewCard((prev) => ({ ...prev, limit: newValue }))
-                                }
-                              />
-                            </Box>
-
-                            <Typography
-                              variant="h6"
-                              gutterBottom
-                              sx={{ fontWeight: 500, mt: 2 }}
-                            >
-                              Card Member Since
-                            </Typography>
-
-                            <Grid container spacing={2}>
-                              <Grid item xs={6}>
-                                <FormControl fullWidth>
-                                  <InputLabel>Month</InputLabel>
-                                  <Select
-                                    value={selectedMonth}
-                                    label="Month"
-                                    onChange={(e) => setSelectedMonth(e.target.value)}
-                                  >
-                                    {months.map((month, index) => (
-                                      <motion.div
-                                        key={month}
-                                        initial={{ opacity: 0, y: 5 }}
-                                        animate={{ 
-                                          opacity: 1, 
-                                          y: 0,
-                                          transition: {
-                                            delay: 0.02 * index,
-                                            duration: 0.2
-                                          }
-                                        }}
-                                      >
-                                        <MenuItem value={month}>{month}</MenuItem>
-                                      </motion.div>
-                                    ))}
-                                  </Select>
-                                </FormControl>
-                              </Grid>
-                              <Grid item xs={6}>
-                                <FormControl fullWidth>
-                                  <InputLabel>Year</InputLabel>
-                                  <Select
-                                    value={selectedYear}
-                                    label="Year"
-                                    onChange={(e) => setSelectedYear(e.target.value)}
-                                  >
-                                    {generateYearOptions().map((year, index) => (
-                                      <motion.div
-                                        key={year}
-                                        initial={{ opacity: 0, y: 5 }}
-                                        animate={{ 
-                                          opacity: 1, 
-                                          y: 0,
-                                          transition: {
-                                            delay: 0.02 * index,
-                                            duration: 0.2
-                                          }
-                                        }}
-                                      >
-                                        <MenuItem value={year}>{year}</MenuItem>
-                                      </motion.div>
-                                    ))}
-                                  </Select>
-                                </FormControl>
-                              </Grid>
+                        <Box>
+                          <Typography
+                            variant="subtitle1"
+                            gutterBottom
+                            sx={{ fontWeight: 500, color: "text.primary" }}
+                          >
+                            Card Member Since
+                          </Typography>
+                          <Grid container spacing={2}>
+                            <Grid item xs={6}>
+                              <FormControl fullWidth>
+                                <InputLabel id="month-select-label">
+                                  Month
+                                </InputLabel>
+                                <Select
+                                  labelId="month-select-label"
+                                  value={selectedMonth}
+                                  label="Month"
+                                  onChange={(e) =>
+                                    setSelectedMonth(e.target.value)
+                                  }
+                                >
+                                  {months.map((month) => (
+                                    <MenuItem key={month} value={month}>
+                                      {month}
+                                    </MenuItem>
+                                  ))}
+                                </Select>
+                              </FormControl>
                             </Grid>
-                          </AccordionDetails>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </Accordion>
-                </motion.div>
-              </>
-            )}
-          </DialogContent>
+                            <Grid item xs={6}>
+                              <FormControl fullWidth>
+                                <InputLabel id="year-select-label">
+                                  Year
+                                </InputLabel>
+                                <Select
+                                  labelId="year-select-label"
+                                  value={selectedYear}
+                                  label="Year"
+                                  onChange={(e) =>
+                                    setSelectedYear(e.target.value)
+                                  }
+                                >
+                                  {generateYearOptions().map((year) => (
+                                    <MenuItem key={year} value={year}>
+                                      {year}
+                                    </MenuItem>
+                                  ))}
+                                </Select>
+                              </FormControl>
+                            </Grid>
+                          </Grid>
+                        </Box>
+                      </AccordionDetails>
+                    </Accordion>
+                  </Paper>
+                </>
+              )}
+            </DialogContent>
 
-          <DialogActions
-            sx={{ px: 3, py: 2, borderTop: `1px solid ${theme.palette.divider}` }}
-          >
-            <motion.div
-              variants={buttonVariants}
-              whileHover="hover"
-              whileTap="tap"
+            <DialogActions
+              sx={{
+                px: 3,
+                py: 2,
+                borderTop: `1px solid ${theme.palette.divider}`,
+                gap: 1,
+              }}
             >
-              <Button onClick={onClose} variant="outlined" sx={{ borderRadius: 2 }}>
+              <Button
+                onClick={onClose}
+                variant="outlined"
+                sx={{
+                  borderRadius: 2,
+                  px: 3,
+                  textTransform: "none",
+                  fontWeight: 500,
+                }}
+              >
                 Cancel
               </Button>
-            </motion.div>
-            <motion.div
-              variants={buttonVariants}
-              whileHover="hover"
-              whileTap="tap"
-              custom={1}
-            >
               <Button
                 onClick={handleAddCard}
                 color="primary"
@@ -669,14 +651,29 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
                   borderRadius: 2,
                   px: 3,
                   boxShadow: theme.shadows[3],
+                  textTransform: "none",
+                  fontWeight: 500,
                 }}
               >
                 Add Card
               </Button>
-            </motion.div>
-          </DialogActions>
-        </Dialog>
-      )}
-    </AnimatePresence>
+            </DialogActions>
+          </Dialog>
+        )}
+      </AnimatePresence>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }

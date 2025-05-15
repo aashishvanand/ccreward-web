@@ -2,7 +2,6 @@ import dynamic from 'next/dynamic';
 import { generateMetadata, pageMetadata } from '../shared/components/seo';
 import { AuthProvider } from '../core/providers/AuthContext';
 import { ThemeRegistry } from '../core/providers/ThemeRegistry';
-import AuthRedirectWrapper from '../shared/components/auth/AuthRedirectWrapper';
 import { RegionProvider } from '../core/providers/RegionContext';
 
 const CalculatorWrapper = dynamic(() => import('../features/calculator/components/Calculator'), { ssr: false });
@@ -19,9 +18,7 @@ export default function CalculatorPage() {
     <ThemeRegistry>
       <RegionProvider>
         <AuthProvider>
-          <AuthRedirectWrapper>
-            <CalculatorWrapper />
-          </AuthRedirectWrapper>
+          <CalculatorWrapper />
         </AuthProvider>
       </RegionProvider>
     </ThemeRegistry>
