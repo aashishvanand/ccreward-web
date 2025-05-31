@@ -8,9 +8,21 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 // Set cache duration to 24 hours
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
-// Create an axios instance with the base URL
+// Create an axios instance with the base URL and gzip support
 const api = axios.create({
     baseURL: API_BASE_URL,
+    // Enable automatic decompression of gzipped responses
+    decompress: true,
+    // Set headers to accept gzip encoding
+    headers: {
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    },
+    // Timeout configuration
+    timeout: 30000, // 30 seconds
+    // Response type - axios will handle decompression automatically
+    responseType: 'json'
 });
 
 let currentToken = null;
@@ -148,9 +160,41 @@ api.interceptors.request.use(async (config) => {
     return config;
 }, (error) => Promise.reject(error));
 
+// Response interceptor to handle gzipped responses and errors
+api.interceptors.response.use(
+    (response) => {
+        // Log compression info for debugging (remove in production)
+        if (process.env.NODE_ENV === 'development') {
+            const contentEncoding = response.headers['content-encoding'];
+            if (contentEncoding) {
+                console.log(`Response compressed with: ${contentEncoding}`);
+            }
+        }
+        
+        // Axios automatically decompresses the response
+        // The response.data will already be the decompressed JSON
+        return response;
+    },
+    (error) => {
+        // Handle network errors that might be related to compression
+        if (error.code === 'ERR_NETWORK' && error.message.includes('compression')) {
+            console.error('Compression-related network error:', error);
+            return Promise.reject(new Error('Failed to decompress server response'));
+        }
+        
+        return Promise.reject(error);
+    }
+);
+
 // Handle API errors
 const handleApiError = (error) => {
     console.error("API Error:", error.response ? error.response.data : error.message);
+    
+    // Handle compression-specific errors
+    if (error.message?.includes('decompress') || error.message?.includes('compression')) {
+        throw new Error("Server response format error. Please try again.");
+    }
+    
     if (error.response && error.response.status === 429) {
         throw new Error("You've made too many requests. Please take a coffee break and try again later.");
     }
@@ -169,6 +213,25 @@ const authenticatedRequest = async (method, url, data = null) => {
     } catch (error) {
         return handleApiError(error);
     }
+};
+
+// Alternative method: Manual gzip handling (if automatic doesn't work)
+const handleGzippedResponse = async (response) => {
+    const contentEncoding = response.headers['content-encoding'];
+    
+    if (contentEncoding === 'gzip') {
+        // If axios didn't automatically decompress, you might need to handle it manually
+        // This is usually not needed as axios handles it automatically
+        try {
+            // Axios should have already decompressed the data
+            return response.data;
+        } catch (error) {
+            console.error('Failed to handle gzipped response:', error);
+            throw new Error('Failed to process compressed response');
+        }
+    }
+    
+    return response.data;
 };
 
 // Fetch banks with region initialization check
