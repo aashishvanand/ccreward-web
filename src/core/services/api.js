@@ -8,21 +8,45 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 // Set cache duration to 24 hours
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
-// Create an axios instance with the base URL and gzip support
+// Create an axios instance with optimized gzip configuration
 const api = axios.create({
     baseURL: API_BASE_URL,
-    // Enable automatic decompression of gzipped responses
+    // Axios automatically handles gzip decompression when these are set
     decompress: true,
-    // Set headers to accept gzip encoding
+    validateStatus: (status) => status < 500, // Don't throw on 4xx errors
     headers: {
+        // Critical: Tell server we accept gzip compression
         'Accept-Encoding': 'gzip, deflate, br',
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        // Add User-Agent for better server compatibility
+        'User-Agent': 'CCReward-Web/1.0'
     },
-    // Timeout configuration
-    timeout: 30000, // 30 seconds
-    // Response type - axios will handle decompression automatically
-    responseType: 'json'
+    timeout: 30000,
+    responseType: 'json',
+    // Enable automatic request/response transformation
+    transformRequest: axios.defaults.transformRequest,
+    transformResponse: [
+        // Custom response transformer to handle potential compression issues
+        function (data, headers) {
+            // If data is already parsed JSON, return it
+            if (typeof data === 'object') {
+                return data;
+            }
+            
+            // Try to parse JSON if it's a string
+            if (typeof data === 'string') {
+                try {
+                    return JSON.parse(data);
+                } catch (e) {
+                    console.warn('Failed to parse JSON response:', e);
+                    return data;
+                }
+            }
+            
+            return data;
+        }
+    ]
 });
 
 let currentToken = null;
@@ -67,12 +91,16 @@ const getFromCache = (key) => {
     if (typeof localStorage === 'undefined') {
         return null;
     }
-    const cached = localStorage.getItem(key);
-    if (cached) {
-        const { data, timestamp } = JSON.parse(cached);
-        if (Date.now() - timestamp < CACHE_DURATION) {
-            return data;
+    try {
+        const cached = localStorage.getItem(key);
+        if (cached) {
+            const { data, timestamp } = JSON.parse(cached);
+            if (Date.now() - timestamp < CACHE_DURATION) {
+                return data;
+            }
         }
+    } catch (error) {
+        console.warn('Cache read error:', error);
     }
     return null;
 };
@@ -82,7 +110,11 @@ const setToCache = (key, data) => {
     if (typeof localStorage === 'undefined') {
         return;
     }
-    localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
+    try {
+        localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
+    } catch (error) {
+        console.warn('Cache write error:', error);
+    }
 };
 
 // Helper function to check if region is initialized
@@ -96,13 +128,13 @@ const isRegionInitialized = () => {
 // Enhanced getCountryCode that waits for region to be initialized
 const getCountryCode = () => {
     if (typeof localStorage === 'undefined') {
-        return null; // Return null during SSR
+        return null;
     }
     
     const region = localStorage.getItem('app-region');
     if (!region) {
         console.warn('Region not initialized in localStorage');
-        return null; // Return null if region not initialized
+        return null;
     }
     
     return region.toLowerCase();
@@ -131,73 +163,117 @@ export const initializeAuth = async () => {
     }
 };
 
-// Interceptor to add the token to each request
+// Enhanced request interceptor with better error handling
 api.interceptors.request.use(async (config) => {
-    if (!config.headers['Authorization']) {
-        const token = await getToken();
-        config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    
-    // Only add country parameter if region is initialized
-    const countryCode = getCountryCode();
-    if (countryCode) {
-        // Add country parameter to each request if not already present
-        if (!config.url.includes('country=')) {
-            const separator = config.url.includes('?') ? '&' : '?';
-            config.url = `${config.url}${separator}country=${countryCode}`;
+    try {
+        // Add authentication token
+        if (!config.headers['Authorization']) {
+            const token = await getToken();
+            config.headers['Authorization'] = `Bearer ${token}`;
         }
-    } else {
-        console.warn('Skipping API request because region is not initialized:', config.url);
-        // Cancel the request
-        return Promise.reject(new Error('Region not initialized'));
+        
+        // Only add country parameter if region is initialized
+        const countryCode = getCountryCode();
+        if (countryCode) {
+            if (!config.url.includes('country=')) {
+                const separator = config.url.includes('?') ? '&' : '?';
+                config.url = `${config.url}${separator}country=${countryCode}`;
+            }
+        } else {
+            console.warn('Skipping API request because region is not initialized:', config.url);
+            return Promise.reject(new Error('Region not initialized'));
+        }
+        
+        // Ensure URL has versioning
+        if (!config.url.startsWith('/v1/')) {
+            config.url = `/v1${config.url}`;
+        }
+        
+        // Log request details in development
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
+        }
+        
+        return config;
+    } catch (error) {
+        console.error('Request interceptor error:', error);
+        return Promise.reject(error);
     }
-    
-    // Ensure URL has versioning
-    if (!config.url.startsWith('/v1/')) {
-        config.url = `/v1${config.url}`;
-    }
-    
-    return config;
-}, (error) => Promise.reject(error));
+}, (error) => {
+    console.error('Request interceptor failed:', error);
+    return Promise.reject(error);
+});
 
-// Response interceptor to handle gzipped responses and errors
+// Enhanced response interceptor with better compression handling
 api.interceptors.response.use(
     (response) => {
-        // Log compression info for debugging (remove in production)
+        // Log compression info in development
         if (process.env.NODE_ENV === 'development') {
             const contentEncoding = response.headers['content-encoding'];
+            const contentLength = response.headers['content-length'];
             if (contentEncoding) {
-                console.log(`Response compressed with: ${contentEncoding}`);
+                console.log(`✅ Response compressed with: ${contentEncoding}${contentLength ? ` (${contentLength} bytes)` : ''}`);
             }
         }
         
-        // Axios automatically decompresses the response
-        // The response.data will already be the decompressed JSON
+        // Verify the response data is properly decompressed and parsed
+        if (response.data && typeof response.data === 'string') {
+            try {
+                response.data = JSON.parse(response.data);
+            } catch (e) {
+                console.warn('Response data is string but not valid JSON:', e);
+            }
+        }
+        
         return response;
     },
     (error) => {
-        // Handle network errors that might be related to compression
-        if (error.code === 'ERR_NETWORK' && error.message.includes('compression')) {
-            console.error('Compression-related network error:', error);
-            return Promise.reject(new Error('Failed to decompress server response'));
+        // Enhanced error handling for compression issues
+        if (error.code === 'ERR_NETWORK') {
+            console.error('Network error (possibly compression-related):', error);
+        }
+        
+        if (error.response) {
+            // Server responded with error status
+            const { status, data } = error.response;
+            console.error(`API Error ${status}:`, data);
+            
+            // Handle specific status codes
+            if (status === 429) {
+                error.message = "You've made too many requests. Please take a coffee break and try again later.";
+            } else if (status >= 500) {
+                error.message = "Server error. Please try again later.";
+            }
+        } else if (error.request) {
+            // Request made but no response received
+            console.error('No response received:', error.request);
+            error.message = "Network error. Please check your connection and try again.";
         }
         
         return Promise.reject(error);
     }
 );
 
-// Handle API errors
+// Enhanced API error handler
 const handleApiError = (error) => {
-    console.error("API Error:", error.response ? error.response.data : error.message);
+    console.error("API Error Details:", {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+        headers: error.response?.headers
+    });
     
     // Handle compression-specific errors
-    if (error.message?.includes('decompress') || error.message?.includes('compression')) {
+    if (error.message?.includes('decompress') || 
+        error.message?.includes('compression') ||
+        error.code === 'ERR_CONTENT_DECODING_FAILED') {
         throw new Error("Server response format error. Please try again.");
     }
     
-    if (error.response && error.response.status === 429) {
+    if (error.response?.status === 429) {
         throw new Error("You've made too many requests. Please take a coffee break and try again later.");
     }
+    
     throw error;
 };
 
@@ -215,36 +291,14 @@ const authenticatedRequest = async (method, url, data = null) => {
     }
 };
 
-// Alternative method: Manual gzip handling (if automatic doesn't work)
-const handleGzippedResponse = async (response) => {
-    const contentEncoding = response.headers['content-encoding'];
-    
-    if (contentEncoding === 'gzip') {
-        // If axios didn't automatically decompress, you might need to handle it manually
-        // This is usually not needed as axios handles it automatically
-        try {
-            // Axios should have already decompressed the data
-            return response.data;
-        } catch (error) {
-            console.error('Failed to handle gzipped response:', error);
-            throw new Error('Failed to process compressed response');
-        }
-    }
-    
-    return response.data;
-};
-
-// Fetch banks with region initialization check
+// Rest of your functions remain the same...
 export const fetchBanks = async () => {
-    // Check if region is initialized
     if (!isRegionInitialized()) {
         console.warn('Cannot fetch banks: Region not initialized');
         return [];
     }
     
     const region = getCountryCode();
-    
-    // Create a region-specific cache key
     const cacheKey = `banks_${region}`;
     
     console.log(`Fetching banks for region: ${region} (Cache key: ${cacheKey})`);
@@ -256,16 +310,11 @@ export const fetchBanks = async () => {
     }
 
     try {
-        // Explicitly include region in request
         const response = await api.get(`/bank?country=${region}`);
         const data = response.data;
-        
-        // Store with region-specific cache key
         setToCache(cacheKey, data);
-        
         return data;
     } catch (error) {
-        // If error is about region not being initialized, return empty array
         if (error.message === 'Region not initialized') {
             return [];
         }
@@ -273,17 +322,13 @@ export const fetchBanks = async () => {
     }
 };
 
-// Fetch cards for a specific bank
 export const fetchCards = async (bank) => {
-    // Check if region is initialized
     if (!isRegionInitialized()) {
         console.warn('Cannot fetch cards: Region not initialized');
         return [];
     }
     
     const region = getCountryCode();
-    
-    // Create a region-specific cache key for this bank
     const cacheKey = `cards_${region}_${bank}`;
     
     console.log(`Fetching cards for bank: ${bank} in region: ${region}`);
@@ -296,7 +341,6 @@ export const fetchCards = async (bank) => {
         setToCache(cacheKey, response.data);
         return response.data;
     } catch (error) {
-        // If error is about region not being initialized, return empty array
         if (error.message === 'Region not initialized') {
             return [];
         }
@@ -307,9 +351,7 @@ export const fetchCards = async (bank) => {
 // Cancel token for MCC requests
 let mccCancelToken = null;
 
-// Fetch MCC (Merchant Category Code) data
 export const fetchMCC = async (search) => {
-    // Check if region is initialized
     if (!isRegionInitialized()) {
         console.warn('Cannot fetch MCC: Region not initialized');
         return [];
@@ -338,9 +380,7 @@ export const fetchMCC = async (search) => {
     }
 };
 
-// Fetch card questions for a specific bank and card
 export const fetchCardQuestions = async (bank, card) => {
-    // Check if region is initialized
     if (!isRegionInitialized()) {
         console.warn('Cannot fetch card questions: Region not initialized');
         return [];
@@ -357,7 +397,6 @@ export const fetchCardQuestions = async (bank, card) => {
         setToCache(cacheKey, response.data);
         return response.data;
     } catch (error) {
-        // If error is about region not being initialized, return empty array
         if (error.message === 'Region not initialized') {
             return [];
         }
@@ -365,9 +404,7 @@ export const fetchCardQuestions = async (bank, card) => {
     }
 };
 
-// Calculate rewards based on provided data
 export const calculateRewards = async (data) => {
-    // Check if region is initialized
     if (!isRegionInitialized()) {
         console.warn('Cannot calculate rewards: Region not initialized');
         throw new Error('Region not initialized. Please refresh the page and try again.');
@@ -377,7 +414,6 @@ export const calculateRewards = async (data) => {
         const response = await api.post('/calculateRewards', data);
         return response.data;
     } catch (error) {
-        // If error is about region not being initialized, throw specific error
         if (error.message === 'Region not initialized') {
             throw new Error('Region not initialized. Please refresh the page and try again.');
         }
@@ -385,9 +421,7 @@ export const calculateRewards = async (data) => {
     }
 };
 
-// Fetch questions for best card calculation
 export const fetchBestCardQuestions = async (cards) => {
-    // Check if region is initialized
     if (!isRegionInitialized()) {
         console.warn('Cannot fetch best card questions: Region not initialized');
         return [];
@@ -397,7 +431,6 @@ export const fetchBestCardQuestions = async (cards) => {
         const response = await authenticatedRequest('post', '/bestCardQuestions', { cards });
         return response;
     } catch (error) {
-        // If error is about region not being initialized, return empty array
         if (error.message === 'Region not initialized') {
             return [];
         }
@@ -405,9 +438,7 @@ export const fetchBestCardQuestions = async (cards) => {
     }
 };
 
-// Calculate the best card based on provided data
 export const calculateBestCard = async (data) => {
-    // Check if region is initialized
     if (!isRegionInitialized()) {
         console.warn('Cannot calculate best card: Region not initialized');
         throw new Error('Region not initialized. Please refresh the page and try again.');
@@ -417,7 +448,6 @@ export const calculateBestCard = async (data) => {
         const response = await authenticatedRequest('post', '/calculateBestCard', data);
         return response;
     } catch (error) {
-        // If error is about region not being initialized, throw specific error
         if (error.message === 'Region not initialized') {
             throw new Error('Region not initialized. Please refresh the page and try again.');
         }
@@ -425,5 +455,4 @@ export const calculateBestCard = async (data) => {
     }
 };
 
-// Export the API instance
 export { api };
