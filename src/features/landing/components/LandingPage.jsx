@@ -1,3 +1,4 @@
+// src/features/landing/components/LandingPage.jsx - Enhanced with Analytics
 import { useState, useEffect, useMemo } from "react";
 import { Box, Alert, Container, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
@@ -23,6 +24,14 @@ import TopSearchs from "./sections/TopSearchs";
 import StatsSection from "./sections/StatsSection";
 import { motion } from "framer-motion";
 
+// Add analytics imports
+import { 
+  useAnalytics, 
+  usePagePerformance, 
+  useEngagementTracking,
+  useJourneyTracking 
+} from "../../../core/hooks/useAnalytics";
+
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
@@ -43,6 +52,399 @@ const pageVariants = {
   },
 };
 
+const LandingPage = () => {
+  const router = useRouter();
+  const {
+    signInWithGoogle,
+    signInAnonymously,
+    user,
+    isAuthenticated,
+    loading,
+  } = useAuth();
+  const theme = useTheme();
+  const { region } = useRegion();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
+
+  // Analytics hooks
+  const { 
+    trackButtonClick, 
+    trackFeatureUsage, 
+    trackConversion,
+    trackNavigation,
+    trackEvent 
+  } = useAnalytics();
+  const { recordCustomMetric } = usePagePerformance('landing');
+  const { trackCustomEngagement } = useEngagementTracking();
+  const { trackJourneyStep, trackJourneyCompletion } = useJourneyTracking();
+
+  const [cardImages, setCardImages] = useState([]);
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  const [hasCheckedCards, setHasCheckedCards] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [deviceInfo, setDeviceInfo] = useState({
+    isMobile: false,
+    isAndroid: false,
+    isIOS: false,
+    isTablet: false,
+  });
+
+  const { cardImagesData } = useCardImagesData();
+
+  const tweetsPerPage = isMobile ? 1 : isTablet ? 2 : 3;
+  const totalPages = Math.ceil(tweets.length / tweetsPerPage);
+
+  const visibleTweets = useMemo(
+    () =>
+      tweets.slice(
+        currentPage * tweetsPerPage,
+        (currentPage + 1) * tweetsPerPage
+      ),
+    [currentPage, tweetsPerPage]
+  );
+
+  // Track landing page visit
+  useEffect(() => {
+    trackFeatureUsage('landing_page_visit', {
+      region,
+      device_type: deviceInfo.isMobile ? 'mobile' : deviceInfo.isTablet ? 'tablet' : 'desktop',
+      is_authenticated: isAuthenticated(),
+      user_agent: navigator.userAgent
+    });
+
+    trackJourneyStep('landing_page_loaded', {
+      region,
+      device_info: deviceInfo
+    });
+
+    // Track page load performance
+    recordCustomMetric('page_load_start', performance.now());
+  }, []);
+
+  // Track device detection
+  useEffect(() => {
+    const initialDeviceInfo = detectDevice();
+    setDeviceInfo(initialDeviceInfo);
+
+    trackEvent('device_detected', {
+      is_mobile: initialDeviceInfo.isMobile,
+      is_android: initialDeviceInfo.isAndroid,
+      is_ios: initialDeviceInfo.isIOS,
+      is_tablet: initialDeviceInfo.isTablet,
+      screen_width: window.innerWidth,
+      screen_height: window.innerHeight
+    });
+
+    const handleResize = () => {
+      const updatedDeviceInfo = detectDevice();
+      setDeviceInfo(updatedDeviceInfo);
+      
+      trackEvent('viewport_changed', {
+        new_width: window.innerWidth,
+        new_height: window.innerHeight,
+        device_type: updatedDeviceInfo.isMobile ? 'mobile' : 'desktop'
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [trackEvent]);
+
+  // Track region and card images loading
+  useEffect(() => {
+    if (cardImagesData?.length > 0) {
+      trackEvent('card_images_loaded', {
+        region,
+        total_images: cardImagesData.length,
+        loading_time: performance.now()
+      });
+
+      // Filter cards based on region
+      const regionCards = cardImagesData.filter((card) => {
+        if (region === "IN") {
+          return [
+            "HDFC", "ICICI", "SBI", "Axis", "AMEX", "YESBank", "SC", "Kotak",
+            "IDFCFirst", "HSBC", "OneCard", "RBL", "IndusInd", "IDBI", "Federal", "BOB", "AU",
+          ].includes(card.bank);
+        } else if (region === "SG") {
+          return [
+            "DBS", "POSB", "UOB", "OCBC", "Maybank", "CIMB", "AMEX", "Citi",
+            "HSBC", "SC", "BOC", "Trust",
+          ].includes(card.bank);
+        }
+        return true;
+      });
+
+      const horizontalCards = regionCards.filter(
+        (card) => card.orientation === "horizontal"
+      );
+
+      const shuffled = [...horizontalCards].sort(() => Math.random() - 0.5);
+      setCardImages(shuffled.slice(0, 3));
+
+      recordCustomMetric('hero_cards_prepared', shuffled.length);
+    }
+  }, [cardImagesData, region, trackEvent, recordCustomMetric]);
+
+  // Track user card checking flow
+  useEffect(() => {
+    const authenticated = isAuthenticated();
+    if (!loading && authenticated && user?.uid && !hasCheckedCards) {
+      trackJourneyStep('checking_user_cards', {
+        user_id: user.uid,
+        is_new_user: user.metadata?.creationTime === user.metadata?.lastSignInTime
+      });
+
+      const checkUserCards = async () => {
+        try {
+          const fetchedCards = await getCardsForUser(user.uid);
+          
+          trackEvent('user_cards_checked', {
+            user_id: user.uid,
+            cards_count: fetchedCards.length,
+            has_cards: fetchedCards.length > 0
+          });
+
+          if (fetchedCards.length === 0) {
+            trackJourneyStep('redirecting_to_cards', {
+              reason: 'no_cards_found'
+            });
+            trackNavigation('/my-cards', 'automatic_redirect');
+            router.push("/my-cards");
+          } else {
+            trackJourneyCompletion('landing_with_cards', {
+              cards_count: fetchedCards.length
+            });
+          }
+        } catch (error) {
+          trackEvent('user_cards_check_error', {
+            error_message: error.message,
+            user_id: user.uid
+          });
+          
+          setAlert({
+            open: true,
+            message: "Error checking your cards. Please try again later.",
+            severity: "error",
+          });
+        } finally {
+          setHasCheckedCards(true);
+        }
+      };
+      checkUserCards();
+    }
+  }, [loading, isAuthenticated, user?.uid, router, hasCheckedCards, trackEvent, trackJourneyStep, trackJourneyCompletion, trackNavigation]);
+
+  // Enhanced sign-in handler with analytics
+  const handleSignIn = async (signInMethod) => {
+    const signInMethodName = signInMethod === signInWithGoogle ? 'google' : 'anonymous';
+    
+    trackButtonClick('sign_in_attempt', {
+      method: signInMethodName,
+      location: 'hero_section',
+      device_type: deviceInfo.isMobile ? 'mobile' : 'desktop'
+    });
+
+    trackJourneyStep('sign_in_initiated', {
+      method: signInMethodName,
+      source: 'landing_page'
+    });
+
+    setIsLoading(true);
+    const startTime = performance.now();
+
+    try {
+      await signInMethod();
+      
+      const signInDuration = performance.now() - startTime;
+      
+      trackConversion('user_sign_in', 1);
+      trackJourneyCompletion('sign_in_success', {
+        method: signInMethodName,
+        duration: Math.round(signInDuration)
+      });
+
+      trackEvent('sign_in_success', {
+        method: signInMethodName,
+        duration: Math.round(signInDuration),
+        source: 'landing_page'
+      });
+
+      recordCustomMetric('sign_in_duration', Math.round(signInDuration));
+
+      setAlert({
+        open: true,
+        message: "Sign-in successful!",
+        severity: "success",
+      });
+      setHasCheckedCards(false);
+    } catch (error) {
+      const signInDuration = performance.now() - startTime;
+      
+      trackEvent('sign_in_error', {
+        method: signInMethodName,
+        error_code: error.code,
+        error_message: error.message,
+        duration: Math.round(signInDuration)
+      });
+
+      trackJourneyCompletion('sign_in_failed', {
+        method: signInMethodName,
+        error: error.code,
+        duration: Math.round(signInDuration)
+      });
+
+      console.error("Error signing in:", error);
+      
+      if (error.code === "auth/popup-closed-by-user") {
+        trackEvent('sign_in_cancelled', { method: signInMethodName });
+        setAlert({ open: false, message: "", severity: "info" });
+      } else if (error.code === "auth/cancelled-popup-request") {
+        setAlert({
+          open: true,
+          message: "Another sign-in window is already open. Please close it and try again.",
+          severity: "warning",
+        });
+      } else if (error.code === "auth/popup-blocked") {
+        setAlert({
+          open: true,
+          message: "Pop-up was blocked by your browser. Please enable pop-ups and try again.",
+          severity: "warning",
+        });
+      } else {
+        setAlert({
+          open: true,
+          message: "Failed to sign in. Please try again.",
+          severity: "error",
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Enhanced testimonial navigation with tracking
+  const handleNextPage = () => {
+    const newPage = (currentPage + 1) % totalPages;
+    setCurrentPage(newPage);
+    
+    trackButtonClick('testimonials_next', {
+      current_page: currentPage,
+      new_page: newPage,
+      total_pages: totalPages
+    });
+
+    trackCustomEngagement('testimonials_navigation', {
+      direction: 'next',
+      page: newPage
+    });
+  };
+
+  const handlePrevPage = () => {
+    const newPage = (currentPage - 1 + totalPages) % totalPages;
+    setCurrentPage(newPage);
+    
+    trackButtonClick('testimonials_prev', {
+      current_page: currentPage,
+      new_page: newPage,
+      total_pages: totalPages
+    });
+
+    trackCustomEngagement('testimonials_navigation', {
+      direction: 'prev',
+      page: newPage
+    });
+  };
+
+  // Track section visibility
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const sectionName = entry.target.getAttribute('data-section');
+            if (sectionName) {
+              trackEvent('section_viewed', {
+                section_name: sectionName,
+                visibility_ratio: entry.intersectionRatio,
+                device_type: deviceInfo.isMobile ? 'mobile' : 'desktop'
+              });
+
+              trackCustomEngagement('section_engagement', {
+                section: sectionName
+              });
+            }
+          }
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    // Observe all sections
+    const sections = document.querySelectorAll('[data-section]');
+    sections.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, [trackEvent, trackCustomEngagement, deviceInfo]);
+
+  const isMobileDevice = Boolean(
+    deviceInfo?.isMobile || deviceInfo?.isAndroid || deviceInfo?.isIOS
+  );
+
+  const commonProps = {
+    visibleTweets,
+    handlePrevPage,
+    handleNextPage,
+    isMobile,
+    theme,
+    alert,
+    setAlert,
+    deviceInfo,
+    region,
+    // Add analytics tracking functions
+    trackButtonClick,
+    trackFeatureUsage,
+    trackEvent
+  };
+
+  return (
+    <motion.div
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+    >
+      <Box
+        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+      >
+        {isMobileDevice ? (
+          <MobileView {...commonProps} />
+        ) : (
+          <DesktopView
+            {...commonProps}
+            cardImages={cardImages}
+            isTablet={isTablet}
+            isLargeScreen={isLargeScreen}
+            handleSignIn={handleSignIn}
+            isLoading={isLoading}
+            isAuthenticated={isAuthenticated()}
+            loading={loading}
+            signInWithGoogle={signInWithGoogle}
+            signInAnonymously={signInAnonymously}
+          />
+        )}
+      </Box>
+    </motion.div>
+  );
+};
+
+// Enhanced Mobile View with analytics
 const MobileView = ({
   deviceInfo,
   visibleTweets,
@@ -53,7 +455,28 @@ const MobileView = ({
   alert,
   setAlert,
   region,
+  trackButtonClick,
+  trackFeatureUsage,
+  trackEvent
 }) => {
+  // Track mobile app promotion interaction
+  const handleAppStoreClick = (store) => {
+    trackButtonClick(`app_store_${store}`, {
+      source: 'mobile_promotion',
+      device_type: 'mobile',
+      region
+    });
+    
+    trackConversion('app_store_click', 1);
+  };
+
+  useEffect(() => {
+    trackFeatureUsage('mobile_view_loaded', {
+      device_info: deviceInfo,
+      region
+    });
+  }, [deviceInfo, region, trackFeatureUsage]);
+
   if (!deviceInfo) {
     return null;
   }
@@ -67,7 +490,6 @@ const MobileView = ({
         position: "relative",
       }}
     >
-      {/* Main Content with higher z-index */}
       <Box sx={{ position: "relative", zIndex: 10 }}>
         <Header />
         <Box
@@ -75,7 +497,6 @@ const MobileView = ({
           sx={{
             flexGrow: 1,
             bgcolor: "background.default",
-            // add some backdrop or slight opacity to ensure text legibility
             backdropFilter: "blur(2px)",
           }}
         >
@@ -103,35 +524,38 @@ const MobileView = ({
             </Typography>
           </Container>
 
-          <Box component="section">
-            <MobileAppPromotion isAndroid={Boolean(deviceInfo.isAndroid)} />
+          <Box component="section" data-section="mobile-promotion">
+            <MobileAppPromotion 
+              isAndroid={Boolean(deviceInfo.isAndroid)}
+              onAppStoreClick={handleAppStoreClick}
+            />
           </Box>
 
-          <Box component="section">
+          <Box component="section" data-section="features">
             <FeaturesSection />
           </Box>
 
-          <Box component="section" sx={{ bgcolor: "background.paper" }}>
+          <Box component="section" data-section="stats" sx={{ bgcolor: "background.paper" }}>
             <StatsSection />
           </Box>
 
           {region === "IN" && (
             <>
-              <Box component="section" sx={{ bgcolor: "background.default" }}>
+              <Box component="section" data-section="top-cards" sx={{ bgcolor: "background.default" }}>
                 <TopCardsSection />
               </Box>
 
-              <Box sx={{ bgcolor: "background.paper" }}>
+              <Box component="section" data-section="trending" sx={{ bgcolor: "background.paper" }}>
                 <TopSearchs />
               </Box>
             </>
           )}
 
-          <Box component="section" sx={{ bgcolor: "background.default" }}>
+          <Box component="section" data-section="banks" sx={{ bgcolor: "background.default" }}>
             <BankSection />
           </Box>
 
-          <Box component="section" sx={{ bgcolor: "background.paper" }}>
+          <Box component="section" data-section="testimonials" sx={{ bgcolor: "background.paper" }}>
             <TestimonialsSection
               visibleTweets={visibleTweets}
               handlePrevPage={handlePrevPage}
@@ -165,6 +589,7 @@ const MobileView = ({
   );
 };
 
+// Enhanced Desktop View with analytics
 const DesktopView = ({
   cardImages,
   isMobile,
@@ -183,335 +608,122 @@ const DesktopView = ({
   alert,
   setAlert,
   region,
-}) => (
-  <Box
-    sx={{
-      display: "flex",
-      flexDirection: "column",
-      minHeight: "100vh",
-      position: "relative",
-    }}
-  >
-    <Box className="absolute inset-0 z-0 overflow-hidden"></Box>
-    {/* Main Content with higher z-index */}
-    <Box className="relative z-10">
-      <Header />
-
-      <HeroSection
-        cardImages={cardImages}
-        isMobile={isMobile}
-        isTablet={isTablet}
-        isLargeScreen={isLargeScreen}
-        handleSignIn={handleSignIn}
-        isLoading={isLoading}
-        isAuthenticated={isAuthenticated}
-        loading={loading}
-        signInWithGoogle={signInWithGoogle}
-        signInAnonymously={signInAnonymously}
-      />
-
-      <Box sx={{ bgcolor: "background.default" }}>
-        <FeaturesSection />
-      </Box>
-
-      <Box sx={{ bgcolor: "background.paper" }}>
-        <StatsSection />
-      </Box>
-
-      {region === "IN" && (
-        <>
-          <Box sx={{ bgcolor: "background.default" }}>
-            <TopCardsSection />
-          </Box>
-
-          <Box sx={{ bgcolor: "background.paper" }}>
-            <TopSearchs />
-          </Box>
-        </>
-      )}
-
-      <Box sx={{ bgcolor: "background.default" }}>
-        <BankSection />
-      </Box>
-
-      <CallToActionSection
-        isAuthenticated={isAuthenticated}
-        handleSignIn={handleSignIn}
-        signInWithGoogle={signInWithGoogle}
-      />
-
-      <Box sx={{ bgcolor: "background.default" }}>
-        <AppStoreSection isMobile={isMobile} theme={theme} />
-      </Box>
-
-      <Box sx={{ bgcolor: "background.paper" }}>
-        <TestimonialsSection
-          visibleTweets={visibleTweets}
-          handlePrevPage={handlePrevPage}
-          handleNextPage={handleNextPage}
-          isMobile={isMobile}
-        />
-      </Box>
-
-      <Footer />
-
-      {alert.open && (
-        <Alert
-          severity={alert.severity}
-          onClose={() => setAlert({ ...alert, open: false })}
-          sx={{
-            position: "fixed",
-            bottom: 24,
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: theme.zIndex.snackbar,
-            maxWidth: "90%",
-            width: "auto",
-            boxShadow: theme.shadows[8],
-          }}
-        >
-          {alert.message}
-        </Alert>
-      )}
-    </Box>
-  </Box>
-);
-
-const LandingPage = () => {
-  const router = useRouter();
-  const {
-    signInWithGoogle,
-    signInAnonymously,
-    user,
-    isAuthenticated,
-    loading,
-  } = useAuth();
-  const theme = useTheme();
-  const { region } = useRegion();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
-  const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
-  const [cardImages, setCardImages] = useState([]);
-  const [alert, setAlert] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
-  const [hasCheckedCards, setHasCheckedCards] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [deviceInfo, setDeviceInfo] = useState({
-    isMobile: false,
-    isAndroid: false,
-    isIOS: false,
-    isTablet: false,
-  });
-
-  const { cardImagesData } = useCardImagesData();
-
-  const tweetsPerPage = isMobile ? 1 : isTablet ? 2 : 3;
-  const totalPages = Math.ceil(tweets.length / tweetsPerPage);
-
-  const visibleTweets = useMemo(
-    () =>
-      tweets.slice(
-        currentPage * tweetsPerPage,
-        (currentPage + 1) * tweetsPerPage
-      ),
-    [currentPage, tweetsPerPage]
-  );
+  trackButtonClick,
+  trackFeatureUsage
+}) => {
+  // Enhanced CTA click tracking
+  const handleCTAClick = () => {
+    trackButtonClick('cta_get_started', {
+      location: 'call_to_action_section',
+      is_authenticated: isAuthenticated,
+      device_type: 'desktop'
+    });
+    
+    handleSignIn(signInWithGoogle);
+  };
 
   useEffect(() => {
-    const initialDeviceInfo = detectDevice();
-    setDeviceInfo(initialDeviceInfo);
-
-    const handleResize = () => {
-      const updatedDeviceInfo = detectDevice();
-      setDeviceInfo(updatedDeviceInfo);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const isMobileDevice = Boolean(
-    deviceInfo?.isMobile || deviceInfo?.isAndroid || deviceInfo?.isIOS
-  );
-
-  useEffect(() => {
-    if (cardImagesData?.length > 0) {
-      // Filter cards based on region
-      const regionCards = cardImagesData.filter((card) => {
-        // For India region
-        if (region === "IN") {
-          return [
-            "HDFC",
-            "ICICI",
-            "SBI",
-            "Axis",
-            "AMEX",
-            "YESBank",
-            "SC",
-            "Kotak",
-            "IDFCFirst",
-            "HSBC",
-            "OneCard",
-            "RBL",
-            "IndusInd",
-            "IDBI",
-            "Federal",
-            "BOB",
-            "AU",
-          ].includes(card.bank);
-        }
-        // For Singapore region
-        else if (region === "SG") {
-          return [
-            "DBS",
-            "POSB",
-            "UOB",
-            "OCBC",
-            "Maybank",
-            "CIMB",
-            "AMEX",
-            "Citi",
-            "HSBC",
-            "SC",
-            "BOC",
-            "Trust",
-          ].includes(card.bank);
-        }
-        return true; // Fallback
-      });
-
-      // Get horizontal cards for the selected region
-      const horizontalCards = regionCards.filter(
-        (card) => card.orientation === "horizontal"
-      );
-
-      // Shuffle and get 3 cards to display
-      const shuffled = [...horizontalCards].sort(() => Math.random() - 0.5);
-      setCardImages(shuffled.slice(0, 3));
-    }
-  }, [cardImagesData, region]);
-
-  useEffect(() => {
-    const authenticated = isAuthenticated();
-    if (!loading && authenticated && user?.uid && !hasCheckedCards) {
-      const checkUserCards = async () => {
-        try {
-          const fetchedCards = await getCardsForUser(user.uid);
-          if (fetchedCards.length === 0) {
-            router.push("/my-cards");
-          }
-        } catch (error) {
-          console.error("Error checking user cards:", error);
-          setAlert({
-            open: true,
-            message: "Error checking your cards. Please try again later.",
-            severity: "error",
-          });
-        } finally {
-          setHasCheckedCards(true);
-        }
-      };
-      checkUserCards();
-    }
-  }, [loading, isAuthenticated, user?.uid, router, hasCheckedCards]);
-
-  const handleSignIn = async (signInMethod) => {
-    setIsLoading(true);
-    try {
-      await signInMethod();
-      setAlert({
-        open: true,
-        message: "Sign-in successful!",
-        severity: "success",
-      });
-      setHasCheckedCards(false);
-    } catch (error) {
-      console.error("Error signing in:", error);
-      if (error.code === "auth/popup-closed-by-user") {
-        setAlert({
-          open: false,
-          message: "",
-          severity: "info",
-        });
-      } else if (error.code === "auth/cancelled-popup-request") {
-        setAlert({
-          open: true,
-          message:
-            "Another sign-in window is already open. Please close it and try again.",
-          severity: "warning",
-        });
-      } else if (error.code === "auth/popup-blocked") {
-        setAlert({
-          open: true,
-          message:
-            "Pop-up was blocked by your browser. Please enable pop-ups and try again.",
-          severity: "warning",
-        });
-      } else {
-        setAlert({
-          open: true,
-          message: "Failed to sign in. Please try again.",
-          severity: "error",
-        });
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prev) => (prev + 1) % totalPages);
-  };
-
-  const handlePrevPage = () => {
-    setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
-  };
-
-  const commonProps = {
-    visibleTweets,
-    handlePrevPage,
-    handleNextPage,
-    isMobile,
-    theme,
-    alert,
-    setAlert,
-    deviceInfo,
-    region,
-  };
+    trackFeatureUsage('desktop_view_loaded', {
+      screen_width: window.innerWidth,
+      screen_height: window.innerHeight,
+      region
+    });
+  }, [region, trackFeatureUsage]);
 
   return (
-    <motion.div
-      variants={pageVariants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        position: "relative",
+      }}
     >
-      <Box
-        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
-      >
-        {/* Rest of the component remains the same */}
-        {isMobileDevice ? (
-          <MobileView {...commonProps} />
-        ) : (
-          <DesktopView
-            {...commonProps}
+      <Box className="relative z-10">
+        <Header />
+
+        <Box component="section" data-section="hero">
+          <HeroSection
             cardImages={cardImages}
+            isMobile={isMobile}
             isTablet={isTablet}
             isLargeScreen={isLargeScreen}
             handleSignIn={handleSignIn}
             isLoading={isLoading}
-            isAuthenticated={isAuthenticated()}
+            isAuthenticated={isAuthenticated}
             loading={loading}
             signInWithGoogle={signInWithGoogle}
             signInAnonymously={signInAnonymously}
           />
+        </Box>
+
+        <Box component="section" data-section="features" sx={{ bgcolor: "background.default" }}>
+          <FeaturesSection />
+        </Box>
+
+        <Box component="section" data-section="stats" sx={{ bgcolor: "background.paper" }}>
+          <StatsSection />
+        </Box>
+
+        {region === "IN" && (
+          <>
+            <Box component="section" data-section="top-cards" sx={{ bgcolor: "background.default" }}>
+              <TopCardsSection />
+            </Box>
+
+            <Box component="section" data-section="trending" sx={{ bgcolor: "background.paper" }}>
+              <TopSearchs />
+            </Box>
+          </>
+        )}
+
+        <Box component="section" data-section="banks" sx={{ bgcolor: "background.default" }}>
+          <BankSection />
+        </Box>
+
+        <Box component="section" data-section="cta">
+          <CallToActionSection
+            isAuthenticated={isAuthenticated}
+            handleSignIn={handleCTAClick}
+            signInWithGoogle={signInWithGoogle}
+          />
+        </Box>
+
+        <Box component="section" data-section="app-store" sx={{ bgcolor: "background.default" }}>
+          <AppStoreSection isMobile={isMobile} theme={theme} />
+        </Box>
+
+        <Box component="section" data-section="testimonials" sx={{ bgcolor: "background.paper" }}>
+          <TestimonialsSection
+            visibleTweets={visibleTweets}
+            handlePrevPage={handlePrevPage}
+            handleNextPage={handleNextPage}
+            isMobile={isMobile}
+          />
+        </Box>
+
+        <Footer />
+
+        {alert.open && (
+          <Alert
+            severity={alert.severity}
+            onClose={() => setAlert({ ...alert, open: false })}
+            sx={{
+              position: "fixed",
+              bottom: 24,
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: theme.zIndex.snackbar,
+              maxWidth: "90%",
+              width: "auto",
+              boxShadow: theme.shadows[8],
+            }}
+          >
+            {alert.message}
+          </Alert>
         )}
       </Box>
-    </motion.div>
+    </Box>
   );
 };
 

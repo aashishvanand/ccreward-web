@@ -6,6 +6,7 @@ import Script from "next/script";
 import Providers from './providers'
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import { baseJsonLd } from '../shared/constants/jsonLd';
+import ErrorBoundary from '../shared/components/ErrorBoundary';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -50,9 +51,11 @@ function RootLayout({ children }) {
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-          <Providers>
-            {children}
-          </Providers>
+          <ErrorBoundary componentName="RootLayout">
+            <Providers>
+              {children}
+            </Providers>
+          </ErrorBoundary>
         </AppRouterCacheProvider>
 
         {/* Load analytics script with proper strategy */}

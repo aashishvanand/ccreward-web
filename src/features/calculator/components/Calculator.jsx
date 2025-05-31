@@ -88,12 +88,21 @@ function Calculator() {
   const [calculationResult, setCalculationResult] = useState(null);
   const [calculationPerformed, setCalculationPerformed] = useState(false);
   const [lastCalculationInputs, setLastCalculationInputs] = useState(null);
+  const { trackButtonClick, trackFeatureUsage, trackConversion } = useAnalytics();
+  const { recordCustomMetric } = usePagePerformance('calculator');
+  const { trackFormStart, trackFormSubmission } = useFormTracking('reward-calculator');
+
 
   console.log("🧮 [Calculator] Region context values:", {
     region,
     isInitialized,
     isLoading,
   });
+
+  useEffect(() => {
+    trackFeatureUsage('calculator_loaded', { region });
+    trackFormStart();
+  }, []);
 
   useEffect(() => {
     const fetchUserCards = async () => {
@@ -166,6 +175,13 @@ function Calculator() {
       return;
     }
 
+    trackButtonClick('calculate_rewards', {
+      bank: selectedBank,
+      card: selectedCard,
+      amount: spentAmount,
+      has_mcc: !!selectedMcc
+    });
+
     const currentInputs = {
       bank: selectedBank,
       card: selectedCard,
@@ -193,6 +209,11 @@ function Calculator() {
         country: region.toLowerCase(), // Add country parameter
       });
 
+      trackFormSubmission(true);
+      trackConversion('reward_calculation', parseFloat(spentAmount));
+
+      recordCustomMetric('calculation_success', 1);
+
       logCalculation({
         bank: selectedBank,
         card: selectedCard,
@@ -212,6 +233,8 @@ function Calculator() {
       }
     } catch (error) {
       console.error("Error calculating rewards:", error);
+      trackFormSubmission(false, error.message);
+      recordCustomMetric('calculation_error', 1);
       handleCalculationError(error);
     } finally {
       setIsCalculating(false);

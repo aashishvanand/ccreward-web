@@ -1,3 +1,4 @@
+// src/features/cards/components/MyCardsPage.jsx - Enhanced with Analytics
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Box,
@@ -30,6 +31,15 @@ import ShareDialog from "./ShareDialog";
 import { useRegion } from "../../../core/providers/RegionContext";
 import { motion } from "framer-motion";
 
+// Add analytics imports
+import { 
+  useAnalytics, 
+  usePagePerformance, 
+  useEngagementTracking,
+  useJourneyTracking,
+  useComponentAnalytics 
+} from "../../../core/hooks/useAnalytics";
+
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
@@ -53,6 +63,20 @@ const pageVariants = {
 function MyCardsPage() {
   const { region } = useRegion();
   const theme = useTheme();
+  
+  // Analytics hooks
+  const { 
+    trackButtonClick, 
+    trackFeatureUsage, 
+    trackConversion,
+    trackEvent,
+    trackError 
+  } = useAnalytics();
+  const { recordCustomMetric } = usePagePerformance('my-cards');
+  const { trackCustomEngagement } = useEngagementTracking();
+  const { trackJourneyStep, trackJourneyCompletion } = useJourneyTracking();
+  const { trackComponentError, trackComponentInteraction } = useComponentAnalytics('MyCardsPage');
+
   const [cards, setCards] = useState([]);
   const [isAddCardDialogOpen, setIsAddCardDialogOpen] = useState(false);
   const [alert, setAlert] = useState({
@@ -64,51 +88,120 @@ function MyCardsPage() {
   const portfolioRef = useRef(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  // Keep track of current region for comparison
   const regionRef = useRef(region);
 
-  const { user, isAuthenticated, loading, isNewUser, markUserAsNotNew } =
-    useAuth();
+  const { user, isAuthenticated, loading, isNewUser, markUserAsNotNew } = useAuth();
 
-  // Add scroll trigger for FAB animation
   const trigger = useScrollTrigger({
     disableHysteresis: true,
     threshold: 100,
   });
 
-  // Define fetchUserCards - doesn't need to depend on region, we'll handle that separately
+  // Track page load and user state
+  useEffect(() => {
+    trackFeatureUsage('my_cards_page_loaded', {
+      region,
+      user_authenticated: isAuthenticated(),
+      user_id: user?.uid || 'anonymous',
+      is_new_user: isNewUser
+    });
+
+    trackJourneyStep('my_cards_accessed', {
+      source: 'direct_navigation',
+      user_type: user?.isAnonymous ? 'anonymous' : 'authenticated'
+    });
+
+    recordCustomMetric('page_load_time', performance.now());
+  }, []);
+
+  // Enhanced fetch user cards with analytics
   const fetchUserCards = useCallback(async () => {
     if (!user) {
       setIsLoading(false);
       return;
     }
 
+    const startTime = performance.now();
+    
+    trackEvent('cards_fetch_started', {
+      user_id: user.uid,
+      region
+    });
+
     try {
       setIsLoading(true);
-
-      // Get region directly from localStorage for most up-to-date value
       const currentRegion = localStorage.getItem("app-region");
-      console.log(
-        `🔄 Fetching cards for user ${user.uid} in region ${currentRegion}`
-      );
-
-      // Clear any cached data to ensure fresh fetch with current region
+      
+      // Clear cache for fresh data
       localStorage.removeItem(`userCardsCache_${user.uid}`);
       localStorage.removeItem(`userCardsCacheTimestamp_${user.uid}`);
 
       const fetchedCards = await getCardsForUser(user.uid);
-      console.log(`🔄 Fetching cards for user ${user.uid} in region ${region}`);
-
-      // Only update state if component is still mounted and region matches current
+      const fetchDuration = performance.now() - startTime;
+      
       setCards(fetchedCards);
       regionRef.current = currentRegion;
+
+      // Track successful fetch
+      trackEvent('cards_fetch_success', {
+        user_id: user.uid,
+        region: currentRegion,
+        cards_count: fetchedCards.length,
+        fetch_duration: Math.round(fetchDuration),
+        cache_cleared: true
+      });
+
+      recordCustomMetric('cards_fetch_duration', Math.round(fetchDuration));
+      recordCustomMetric('user_cards_count', fetchedCards.length);
+
+      // Track user portfolio insights
+      if (fetchedCards.length > 0) {
+        const bankDiversity = new Set(fetchedCards.map(card => card.bank)).size;
+        const hasNetworkInfo = fetchedCards.filter(card => card.network).length;
+        
+        trackEvent('portfolio_insights', {
+          total_cards: fetchedCards.length,
+          unique_banks: bankDiversity,
+          cards_with_network: hasNetworkInfo,
+          diversity_score: bankDiversity / fetchedCards.length,
+          region: currentRegion
+        });
+      }
+
     } catch (error) {
+      const fetchDuration = performance.now() - startTime;
+      
+      trackComponentError('cards_fetch_failed', {
+        error_message: error.message,
+        fetch_duration: Math.round(fetchDuration),
+        user_id: user.uid,
+        region
+      });
+
       console.error("❌ Error fetching cards:", error);
       showAlert("Error fetching cards. Please try again later.", "error");
     } finally {
       setIsLoading(false);
     }
-  }, [user, region]);
+  }, [user, region, trackEvent, trackComponentError, recordCustomMetric]);
+
+  // Track region changes
+  useEffect(() => {
+    if (region !== regionRef.current && isAuthenticated()) {
+      trackEvent('region_changed_cards_page', {
+        old_region: regionRef.current,
+        new_region: region,
+        cards_count: cards.length
+      });
+      
+      trackJourneyStep('region_switch_cards_refresh', {
+        from_region: regionRef.current,
+        to_region: region
+      });
+
+      fetchUserCards();
+    }
+  }, [region, isAuthenticated, fetchUserCards, cards.length, trackEvent, trackJourneyStep]);
 
   // Initial load and auth state changes
   useEffect(() => {
@@ -117,26 +210,18 @@ function MyCardsPage() {
     }
   }, [isAuthenticated, fetchUserCards]);
 
-  // Handle region changes via context
-  useEffect(() => {
-    if (region !== regionRef.current && isAuthenticated()) {
-      console.log(
-        `🔄 Region changed from ${regionRef.current} to ${region} - refreshing cards`
-      );
-      fetchUserCards();
-    }
-  }, [region, isAuthenticated, fetchUserCards]);
-
-  // Also listen for direct region-changed events (more immediate)
+  // Listen for direct region-changed events
   useEffect(() => {
     const handleRegionChanged = (event) => {
       const newRegion = event.detail?.region;
-      console.log(
-        `📣 Region changed event detected: ${newRegion} (current: ${regionRef.current})`
-      );
+      
+      trackEvent('region_event_received', {
+        new_region: newRegion,
+        current_region: regionRef.current,
+        cards_count: cards.length
+      });
 
       if (newRegion && newRegion !== regionRef.current && isAuthenticated()) {
-        console.log(`🔄 Refreshing cards due to region event`);
         fetchUserCards();
       }
     };
@@ -145,40 +230,128 @@ function MyCardsPage() {
     return () => {
       window.removeEventListener("region-changed", handleRegionChanged);
     };
-  }, [isAuthenticated, fetchUserCards]);
+  }, [isAuthenticated, fetchUserCards, cards.length, trackEvent]);
 
+  // Enhanced share handler with analytics
   const handleShare = async (platform) => {
+    trackButtonClick('portfolio_share_attempt', {
+      platform,
+      cards_count: cards.length,
+      share_method: platform === 'generate' ? 'preview' : platform
+    });
+
+    trackJourneyStep('portfolio_share_initiated', {
+      platform,
+      portfolio_size: cards.length
+    });
+
     setIsGeneratingImage(true);
+    const startTime = performance.now();
+
     try {
       if (platform === "generate") {
         await portfolioRef.current?.generateAndShare("preview");
       } else {
         await portfolioRef.current?.generateAndShare(platform);
+        
+        trackConversion('portfolio_shared', 1);
+        trackJourneyCompletion('portfolio_share_success', {
+          platform,
+          cards_count: cards.length
+        });
       }
+
+      const shareTime = performance.now() - startTime;
+      recordCustomMetric('portfolio_share_time', Math.round(shareTime));
+
+      trackEvent('portfolio_share_success', {
+        platform,
+        cards_count: cards.length,
+        generation_time: Math.round(shareTime)
+      });
+
     } catch (error) {
+      const shareTime = performance.now() - startTime;
+      
+      trackComponentError('portfolio_share_failed', {
+        platform,
+        error_message: error.message,
+        generation_time: Math.round(shareTime),
+        cards_count: cards.length
+      });
+
       console.error("Error handling share action:", error);
     } finally {
       setIsGeneratingImage(false);
     }
   };
 
+  // Enhanced card update with analytics
   const handleUpdateCard = async (updatedCard) => {
+    trackButtonClick('card_update_attempt', {
+      card_bank: updatedCard.bank,
+      card_name: updatedCard.cardName,
+      has_network: !!updatedCard.network,
+      has_limit: !!updatedCard.limit
+    });
+
+    trackJourneyStep('card_update_initiated', {
+      card_bank: updatedCard.bank,
+      update_type: 'details'
+    });
+
     try {
       await updateCardForUser(user.uid, updatedCard);
+      
       setCards((prevCards) =>
         prevCards.map((card) =>
           card.id === updatedCard.id ? updatedCard : card
         )
       );
+      
       notifyCardUpdate();
+      
+      trackEvent('card_update_success', {
+        user_id: user.uid,
+        card_bank: updatedCard.bank,
+        card_name: updatedCard.cardName,
+        updated_fields: Object.keys(updatedCard).filter(key => 
+          !['id', 'bank', 'cardName'].includes(key)
+        )
+      });
+
+      trackJourneyCompletion('card_update_success', {
+        card_bank: updatedCard.bank
+      });
+
       showAlert("Card updated successfully", "success");
     } catch (error) {
+      trackComponentError('card_update_failed', {
+        card_bank: updatedCard.bank,
+        error_message: error.message,
+        user_id: user.uid
+      });
+
       console.error("Error updating card:", error);
       showAlert("Error updating card. Please try again later.", "error");
     }
   };
 
+  // Enhanced add card with analytics
   const handleAddCard = async (newCard) => {
+    trackButtonClick('add_card_attempt', {
+      card_bank: newCard.bank,
+      card_name: newCard.cardName,
+      user_cards_count: cards.length,
+      has_additional_details: !!(newCard.network || newCard.limit || newCard.billingDate)
+    });
+
+    trackJourneyStep('add_card_initiated', {
+      card_bank: newCard.bank,
+      card_name: newCard.cardName,
+      current_portfolio_size: cards.length
+    });
+
     try {
       const existingCards = await getCardsForUser(user.uid);
       const isDuplicate = existingCards.some(
@@ -187,6 +360,12 @@ function MyCardsPage() {
       );
 
       if (isDuplicate) {
+        trackEvent('add_card_duplicate_prevented', {
+          card_bank: newCard.bank,
+          card_name: newCard.cardName,
+          user_id: user.uid
+        });
+
         showAlert("This card is already in your collection.", "info");
         return;
       }
@@ -194,37 +373,187 @@ function MyCardsPage() {
       await addCardForUser(user.uid, newCard);
       await fetchUserCards();
       notifyCardUpdate();
+
+      // Track successful addition
+      trackConversion('card_added', 1);
+      trackJourneyCompletion('add_card_success', {
+        card_bank: newCard.bank,
+        card_name: newCard.cardName,
+        new_portfolio_size: cards.length + 1
+      });
+
+      trackEvent('card_add_success', {
+        user_id: user.uid,
+        card_bank: newCard.bank,
+        card_name: newCard.cardName,
+        new_total_cards: cards.length + 1,
+        card_network: newCard.network,
+        has_custom_details: !!(newCard.network || newCard.limit),
+        region
+      });
+
+      recordCustomMetric('user_portfolio_growth', cards.length + 1);
+
+      // Track milestone achievements
+      const newCount = cards.length + 1;
+      if ([1, 2, 5, 10, 15, 20].includes(newCount)) {
+        trackEvent('portfolio_milestone_reached', {
+          milestone: newCount,
+          user_id: user.uid,
+          card_added: `${newCard.bank} ${newCard.cardName}`
+        });
+      }
+
       showAlert("Card added successfully", "success");
 
       if (isNewUser) {
+        trackEvent('first_card_added_new_user', {
+          user_id: user.uid,
+          card_bank: newCard.bank,
+          time_to_first_card: Date.now() - (user.metadata?.creationTime ? new Date(user.metadata.creationTime).getTime() : Date.now())
+        });
         markUserAsNotNew();
       }
+
     } catch (error) {
+      trackComponentError('add_card_failed', {
+        card_bank: newCard.bank,
+        card_name: newCard.cardName,
+        error_message: error.message,
+        user_id: user.uid
+      });
+
       console.error("Error adding card:", error);
       showAlert("Failed to add card. Please try again.", "error");
     }
   };
 
+  // Enhanced delete card with analytics
   const handleDeleteCard = async (bank, cardName) => {
+    trackButtonClick('delete_card_attempt', {
+      card_bank: bank,
+      card_name: cardName,
+      current_cards_count: cards.length
+    });
+
+    trackJourneyStep('card_deletion_initiated', {
+      card_bank: bank,
+      card_name: cardName,
+      portfolio_size_before: cards.length
+    });
+
     try {
       const cardKey = `${bank}_${cardName}`;
       await deleteCardForUser(user.uid, cardKey);
+      
       setCards((prevCards) =>
         prevCards.filter(
           (card) => card.bank !== bank || card.cardName !== cardName
         )
       );
+      
       notifyCardUpdate();
+
+      trackEvent('card_delete_success', {
+        user_id: user.uid,
+        card_bank: bank,
+        card_name: cardName,
+        remaining_cards: cards.length - 1,
+        region
+      });
+
+      trackJourneyCompletion('card_deletion_success', {
+        card_bank: bank,
+        new_portfolio_size: cards.length - 1
+      });
+
+      recordCustomMetric('user_portfolio_size', cards.length - 1);
+
+      // Track if portfolio becomes empty
+      if (cards.length === 1) {
+        trackEvent('portfolio_emptied', {
+          user_id: user.uid,
+          last_card_removed: `${bank} ${cardName}`
+        });
+      }
+
       showAlert("Card deleted successfully", "success");
     } catch (error) {
+      trackComponentError('card_delete_failed', {
+        card_bank: bank,
+        card_name: cardName,
+        error_message: error.message,
+        user_id: user.uid
+      });
+
       console.error("Error deleting card:", error);
       showAlert("Error deleting card. Please try again later.", "error");
     }
   };
 
+  // Enhanced dialog handlers with analytics
+  const handleOpenAddDialog = () => {
+    trackButtonClick('add_card_dialog_open', {
+      source: 'speed_dial',
+      current_cards_count: cards.length
+    });
+
+    trackCustomEngagement('add_card_interaction', {
+      current_portfolio_size: cards.length
+    });
+
+    setIsAddCardDialogOpen(true);
+  };
+
+  const handleOpenShareDialog = () => {
+    trackButtonClick('share_dialog_open', {
+      source: 'speed_dial',
+      cards_count: cards.length
+    });
+
+    trackCustomEngagement('share_portfolio_interaction', {
+      portfolio_size: cards.length
+    });
+
+    setShareDialogOpen(true);
+  };
+
   const showAlert = (message, severity = "info") => {
     setAlert({ open: true, message, severity });
+    
+    trackEvent('alert_shown', {
+      message_type: severity,
+      message_content: message.substring(0, 50) // Limit message length for analytics
+    });
   };
+
+  // Track card list interactions
+  const handleCardListInteraction = (interactionType, cardData = {}) => {
+    trackComponentInteraction('card_list_interaction', {
+      interaction_type: interactionType,
+      cards_count: cards.length,
+      ...cardData
+    });
+  };
+
+  // Track scroll engagement
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPercent = Math.round(
+        (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100
+      );
+
+      if (scrollPercent > 0 && scrollPercent % 25 === 0) {
+        trackCustomEngagement('page_scroll', {
+          scroll_percentage: scrollPercent,
+          cards_count: cards.length
+        });
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [cards.length, trackCustomEngagement]);
 
   const renderContent = () => {
     if (isLoading || loading) {
@@ -236,6 +565,15 @@ function MyCardsPage() {
     }
 
     if (cards.length === 0) {
+      // Track empty state view
+      useEffect(() => {
+        trackEvent('empty_portfolio_viewed', {
+          user_id: user?.uid,
+          is_new_user: isNewUser,
+          region
+        });
+      }, []);
+
       return (
         <Paper
           elevation={0}
@@ -288,6 +626,7 @@ function MyCardsPage() {
           cards={cards}
           onDeleteCard={handleDeleteCard}
           onUpdateCard={handleUpdateCard}
+          onInteraction={handleCardListInteraction}
         />
       </>
     );
@@ -345,32 +684,40 @@ function MyCardsPage() {
             right: { xs: 16, sm: 24 },
           }}
           icon={<SpeedDialIcon openIcon={<AddIcon />} />}
+          onOpen={() => trackEvent('speed_dial_opened', { cards_count: cards.length })}
+          onClose={() => trackEvent('speed_dial_closed', { cards_count: cards.length })}
         >
           <SpeedDialAction
             key="add"
             icon={<AddIcon />}
             tooltipTitle="Add New Card"
-            onClick={() => setIsAddCardDialogOpen(true)}
+            onClick={handleOpenAddDialog}
           />
           {cards.length > 0 && (
             <SpeedDialAction
               key="share"
               icon={<ShareIcon />}
               tooltipTitle="Share Collection"
-              onClick={() => setShareDialogOpen(true)}
+              onClick={handleOpenShareDialog}
             />
           )}
         </SpeedDial>
 
         <AddCardDialog
           open={isAddCardDialogOpen}
-          onClose={() => setIsAddCardDialogOpen(false)}
+          onClose={() => {
+            setIsAddCardDialogOpen(false);
+            trackEvent('add_card_dialog_closed', { cards_count: cards.length });
+          }}
           onAddCard={handleAddCard}
         />
 
         <ShareDialog
           open={shareDialogOpen}
-          onClose={() => setShareDialogOpen(false)}
+          onClose={() => {
+            setShareDialogOpen(false);
+            trackEvent('share_dialog_closed', { cards_count: cards.length });
+          }}
           onShare={handleShare}
           isGenerating={isGeneratingImage}
         />
