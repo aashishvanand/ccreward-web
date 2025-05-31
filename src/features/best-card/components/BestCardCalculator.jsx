@@ -1,3 +1,4 @@
+// src/features/best-card/components/BestCardCalculator.jsx - Enhanced with Analytics
 import { useState, useEffect, useCallback } from "react";
 import {
   Box,
@@ -41,6 +42,17 @@ import _ from "lodash";
 import { useRegion } from "../../../core/providers/RegionContext";
 import { motion } from "framer-motion";
 
+// Add analytics imports
+import { 
+  useAnalytics, 
+  usePagePerformance, 
+  useEngagementTracking,
+  useJourneyTracking,
+  useFormTracking,
+  useAPITracking,
+  useComponentAnalytics 
+} from "../../../core/hooks/useAnalytics";
+
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
@@ -64,6 +76,27 @@ const pageVariants = {
 const BestCardCalculator = () => {
   const theme = useTheme();
   const { region } = useRegion();
+  
+  // Analytics hooks
+  const { 
+    trackButtonClick, 
+    trackFeatureUsage, 
+    trackConversion,
+    trackEvent,
+    trackError 
+  } = useAnalytics();
+  const { recordCustomMetric } = usePagePerformance('best-card-calculator');
+  const { trackCustomEngagement } = useEngagementTracking();
+  const { trackJourneyStep, trackJourneyCompletion } = useJourneyTracking();
+  const { 
+    trackFormStart, 
+    trackFormSubmission, 
+    trackFieldInteraction,
+    trackFormAbandonment 
+  } = useFormTracking('best-card-calculator');
+  const { trackAPICall } = useAPITracking();
+  const { trackComponentError, trackComponentInteraction } = useComponentAnalytics('BestCardCalculator');
+
   const [userCards, setUserCards] = useState([]);
   const [selectedMcc, setSelectedMcc] = useState(null);
   const [spentAmount, setSpentAmount] = useState("");
@@ -92,16 +125,74 @@ const BestCardCalculator = () => {
 
   const currentRanking = sortMethod === "points" ? pointsRanking : valueRanking;
 
+  // Track page load and initialization
+  useEffect(() => {
+    trackFeatureUsage('best_card_calculator_loaded', {
+      region,
+      user_authenticated: !!user,
+      device_type: window.innerWidth < 768 ? 'mobile' : 'desktop'
+    });
+
+    trackJourneyStep('best_card_calculator_accessed', {
+      user_id: user?.uid || 'anonymous',
+      region
+    });
+
+    trackFormStart();
+    
+    recordCustomMetric('page_load_time', performance.now());
+  }, [trackFeatureUsage, trackJourneyStep, trackFormStart, recordCustomMetric, region, user]);
+
+  // Enhanced user cards fetching with analytics
   useEffect(() => {
     const fetchUserCards = async () => {
       if (user) {
         try {
           setIsCardListLoading(true);
-          const fetchedCards = await getCardsForUser(user.uid);
+          
+          const startTime = performance.now();
+          const fetchedCards = await trackAPICall(
+            () => getCardsForUser(user.uid),
+            'get_user_cards',
+            { user_id: user.uid }
+          );
+          
+          const fetchDuration = performance.now() - startTime;
+          
           setUserCards(fetchedCards);
-          await fetchCardQuestions(fetchedCards);
+          
+          // Track user cards analytics
+          trackEvent('user_cards_loaded_best_card', {
+            user_id: user.uid,
+            cards_count: fetchedCards.length,
+            fetch_duration: Math.round(fetchDuration),
+            region
+          });
+
+          recordCustomMetric('user_cards_count', fetchedCards.length);
+          recordCustomMetric('cards_fetch_duration', Math.round(fetchDuration));
+
+          // Check if user has enough cards for comparison
+          if (fetchedCards.length < 2) {
+            trackEvent('insufficient_cards_for_comparison', {
+              user_id: user.uid,
+              cards_count: fetchedCards.length
+            });
+
+            setAlert({
+              open: true,
+              message: "Add at least 2 cards to your collection to use the Best Card feature.",
+              severity: "info",
+            });
+          } else {
+            await fetchCardQuestions(fetchedCards);
+          }
         } catch (error) {
-          console.error("Error fetching user cards:", error);
+          trackComponentError('user_cards_fetch_failed', {
+            error_message: error.message,
+            user_id: user.uid
+          });
+
           setAlert({
             open: true,
             message: "Error fetching user cards. Please try again.",
@@ -115,7 +206,7 @@ const BestCardCalculator = () => {
 
     fetchUserCards();
     setHasCalculated(false);
-  }, [user]);
+  }, [user, trackAPICall, trackEvent, trackComponentError, recordCustomMetric]);
 
   const getCurrencySymbol = () => {
     switch (region) {
@@ -123,18 +214,36 @@ const BestCardCalculator = () => {
         return "S$";
       case "IN":
         return "₹";
+      default:
+        return "$";
     }
   };
 
+  // Enhanced MCC search with analytics
   const debouncedFetchMCC = useCallback(
     _.debounce(async (value) => {
       if (value && value.length >= 2) {
         setIsLoadingMcc(true);
         try {
-          const mccData = await fetchMCC(value);
+          const mccData = await trackAPICall(
+            () => fetchMCC(value),
+            'fetch_mcc',
+            { search_query: value }
+          );
+          
           setMccOptions(mccData || []);
+          
+          trackEvent('mcc_search_results', {
+            query: value,
+            results_count: mccData?.length || 0,
+            has_results: (mccData?.length || 0) > 0
+          });
         } catch (error) {
-          console.error("Error fetching MCC data:", error);
+          trackComponentError('mcc_fetch_failed', {
+            search_query: value,
+            error_message: error.message
+          });
+
           setMccOptions([]);
           setAlert({
             open: true,
@@ -148,19 +257,42 @@ const BestCardCalculator = () => {
         setMccOptions([]);
       }
     }, 300),
-    []
+    [trackAPICall, trackEvent, trackComponentError]
   );
 
+  // Enhanced card questions fetching with analytics
   const fetchCardQuestions = async (cards) => {
     try {
+      const startTime = performance.now();
       const cardsData = cards.map((card) => ({
         bank: card.bank,
         cardName: card.cardName,
       }));
-      const questions = await fetchBestCardQuestions(cardsData);
+      
+      const questions = await trackAPICall(
+        () => fetchBestCardQuestions(cardsData),
+        'fetch_best_card_questions',
+        { cards_count: cardsData.length }
+      );
+      
+      const fetchDuration = performance.now() - startTime;
+      
       setCardQuestions(questions);
+      
+      trackEvent('card_questions_loaded', {
+        user_id: user?.uid,
+        cards_count: cardsData.length,
+        questions_count: questions.length,
+        fetch_duration: Math.round(fetchDuration)
+      });
+
+      recordCustomMetric('card_questions_loaded', questions.length);
     } catch (error) {
-      console.error("Error fetching card questions:", error);
+      trackComponentError('card_questions_fetch_failed', {
+        error_message: error.message,
+        cards_count: cards.length
+      });
+
       setAlert({
         open: true,
         message: "Error fetching card questions. Please try again.",
@@ -172,11 +304,23 @@ const BestCardCalculator = () => {
 
   const handleMccInputChange = (event, newValue) => {
     setMccInputValue(newValue);
+    
+    trackFieldInteraction('mcc_search', 'input_change');
+    
+    if (newValue && newValue.length >= 2) {
+      trackCustomEngagement('mcc_search_interaction', {
+        query_length: newValue.length
+      });
+    }
+    
     debouncedFetchMCC(newValue);
   };
 
+  // Enhanced calculation with comprehensive analytics
   const handleCalculate = useCallback(async () => {
     if (!spentAmount || parseFloat(spentAmount) <= 0) {
+      trackFormSubmission(false, 'Invalid spent amount');
+      
       setAlert({
         open: true,
         message: "Please enter a valid spent amount",
@@ -184,6 +328,30 @@ const BestCardCalculator = () => {
       });
       return;
     }
+
+    if (userCards.length < 2) {
+      trackFormSubmission(false, 'Insufficient cards');
+      
+      setAlert({
+        open: true,
+        message: "You need at least 2 cards to compare.",
+        severity: "error",
+      });
+      return;
+    }
+
+    trackButtonClick('calculate_best_card', {
+      cards_count: userCards.length,
+      has_mcc: !!selectedMcc,
+      spent_amount: parseFloat(spentAmount),
+      advanced_mode: advancedMode,
+      additional_inputs_count: Object.keys(additionalInputs).length
+    });
+
+    trackJourneyStep('best_card_calculation_initiated', {
+      cards_count: userCards.length,
+      calculation_amount: parseFloat(spentAmount)
+    });
 
     const answers = {};
     const cards = userCards
@@ -222,6 +390,11 @@ const BestCardCalculator = () => {
       JSON.stringify(calculationParams) ===
       JSON.stringify(lastCalculationParams)
     ) {
+      trackEvent('duplicate_calculation_prevented', {
+        user_id: user?.uid,
+        cards_count: cards.length
+      });
+
       setAlert({
         open: true,
         message:
@@ -232,20 +405,72 @@ const BestCardCalculator = () => {
     }
 
     setIsLoading(true);
+    const startTime = performance.now();
+    
     try {
-      const response = await calculateBestCard(calculationParams);
+      const response = await trackAPICall(
+        () => calculateBestCard(calculationParams),
+        'calculate_best_card',
+        { 
+          cards_count: cards.length,
+          has_mcc: !!selectedMcc,
+          amount: parseFloat(spentAmount)
+        }
+      );
+      
+      const calculationDuration = performance.now() - startTime;
+      
       setPointsRanking(response.rankingByPoints);
       setValueRanking(response.rankingByValueINR);
       setIsCalculated(true);
       setLastCalculationParams(calculationParams);
 
+      // Track successful calculation
+      trackFormSubmission(true);
+      trackConversion('best_card_calculated', parseFloat(spentAmount));
+      
+      trackJourneyCompletion('best_card_calculation_success', {
+        cards_compared: cards.length,
+        calculation_duration: Math.round(calculationDuration),
+        top_card_bank: response.rankingByPoints[0]?.bank,
+        top_card_name: response.rankingByPoints[0]?.cardName
+      });
+
+      trackEvent('best_card_calculation_success', {
+        user_id: user?.uid,
+        cards_count: cards.length,
+        calculation_duration: Math.round(calculationDuration),
+        mcc_used: selectedMcc?.mcc || 'none',
+        amount: parseFloat(spentAmount),
+        top_card: `${response.rankingByPoints[0]?.bank} ${response.rankingByPoints[0]?.cardName}`,
+        advanced_mode_used: advancedMode,
+        region
+      });
+
+      recordCustomMetric('calculation_duration', Math.round(calculationDuration));
+      recordCustomMetric('cards_compared', cards.length);
+
       if (!hasCalculated) {
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 5000);
         setHasCalculated(true);
+        
+        trackEvent('first_best_card_calculation', {
+          user_id: user?.uid,
+          cards_count: cards.length
+        });
       }
     } catch (error) {
-      console.error("Error in calculateBestCard:", error);
+      const calculationDuration = performance.now() - startTime;
+      
+      trackFormSubmission(false, error.message);
+      trackComponentError('best_card_calculation_failed', {
+        error_message: error.message,
+        calculation_duration: Math.round(calculationDuration),
+        cards_count: cards.length,
+        user_id: user?.uid
+      });
+
       handleCalculationError(error);
     } finally {
       setIsLoading(false);
@@ -257,6 +482,17 @@ const BestCardCalculator = () => {
     additionalInputs,
     lastCalculationParams,
     hasCalculated,
+    advancedMode,
+    trackButtonClick,
+    trackJourneyStep,
+    trackJourneyCompletion,
+    trackFormSubmission,
+    trackConversion,
+    trackEvent,
+    trackComponentError,
+    trackAPICall,
+    recordCustomMetric,
+    user
   ]);
 
   const handleCalculationError = (error) => {
@@ -275,10 +511,35 @@ const BestCardCalculator = () => {
     }
   };
 
+  // Enhanced sort method change with analytics
   const handleSortMethodChange = (event, newMethod) => {
     if (newMethod !== null) {
+      trackButtonClick('sort_method_change', {
+        old_method: sortMethod,
+        new_method: newMethod,
+        results_count: currentRanking.length
+      });
+
+      trackCustomEngagement('results_sorting_interaction', {
+        sort_method: newMethod
+      });
+
       setSortMethod(newMethod);
     }
+  };
+
+  // Enhanced advanced mode toggle with analytics
+  const handleAdvancedModeToggle = (event, isExpanded) => {
+    trackButtonClick('advanced_mode_toggle', {
+      new_state: isExpanded,
+      questions_available: cardQuestions.length
+    });
+
+    trackCustomEngagement('advanced_mode_interaction', {
+      expanded: isExpanded
+    });
+
+    setAdvancedMode(isExpanded);
   };
 
   const handleImageError = (cardId) => {
@@ -290,6 +551,8 @@ const BestCardCalculator = () => {
 
   const handleAdditionalInputChange = useCallback(
     (cardKey, inputKey, value) => {
+      trackFieldInteraction('advanced_input', 'change');
+      
       setAdditionalInputs((prevInputs) => ({
         ...prevInputs,
         [cardKey]: {
@@ -298,8 +561,37 @@ const BestCardCalculator = () => {
         },
       }));
     },
-    []
+    [trackFieldInteraction]
   );
+
+  // Track form abandonment on component unmount
+  useEffect(() => {
+    return () => {
+      if (spentAmount && !isCalculated) {
+        trackFormAbandonment('spent_amount');
+      }
+    };
+  }, [spentAmount, isCalculated, trackFormAbandonment]);
+
+  // Track scroll engagement
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPercent = Math.round(
+        (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100
+      );
+
+      if (scrollPercent > 0 && scrollPercent % 25 === 0) {
+        trackCustomEngagement('page_scroll', {
+          scroll_percentage: scrollPercent,
+          has_results: isCalculated,
+          cards_count: userCards.length
+        });
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isCalculated, userCards.length, trackCustomEngagement]);
 
   return (
     <motion.div
@@ -329,7 +621,17 @@ const BestCardCalculator = () => {
             <Autocomplete
               options={mccOptions}
               value={selectedMcc}
-              onChange={(event, newValue) => setSelectedMcc(newValue)}
+              onChange={(event, newValue) => {
+                setSelectedMcc(newValue);
+                trackFieldInteraction('mcc_selection', 'select');
+                
+                if (newValue) {
+                  trackEvent('mcc_selected', {
+                    mcc_code: newValue.mcc,
+                    mcc_name: newValue.name
+                  });
+                }
+              }}
               inputValue={mccInputValue}
               onInputChange={handleMccInputChange}
               getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
@@ -371,7 +673,7 @@ const BestCardCalculator = () => {
                   </Box>
                 </li>
               )}
-              filterOptions={(options) => options} // Disable client-side filtering
+              filterOptions={(options) => options}
               noOptionsText={
                 mccInputValue.length < 2
                   ? "Type at least 2 characters to search"
@@ -385,9 +687,9 @@ const BestCardCalculator = () => {
               type="number"
               value={spentAmount}
               onChange={(e) => {
-                // Prevent negative numbers and ensure minimum of 1
                 const value = Math.max(1, Number(e.target.value));
                 setSpentAmount(value.toString());
+                trackFieldInteraction('spent_amount', 'input');
               }}
               required
               InputProps={{
@@ -405,7 +707,7 @@ const BestCardCalculator = () => {
 
             <Accordion
               expanded={advancedMode}
-              onChange={(event, isExpanded) => setAdvancedMode(isExpanded)}
+              onChange={handleAdvancedModeToggle}
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography>Advanced Mode</Typography>
