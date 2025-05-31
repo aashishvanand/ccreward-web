@@ -30,6 +30,7 @@ import Confetti from "react-confetti";
 import ReferralButton from "./ReferralButton";
 import { useRegion } from "../../../core/providers/RegionContext";
 import { motion } from "framer-motion";
+import { useAnalytics, usePagePerformance, useFormTracking } from "../../../core/hooks";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },

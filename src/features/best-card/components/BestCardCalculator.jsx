@@ -51,7 +51,7 @@ import {
   useFormTracking,
   useAPITracking,
   useComponentAnalytics 
-} from "../../../core/hooks/useAnalytics";
+} from "../../../core/hooks";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },
