@@ -1,7 +1,11 @@
 import { Box, Container, Typography, Grid, IconButton } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import TweetContainer from "./TweetContainer";
-import { motion, AnimatePresence } from 'framer-motion';
+// For motion components
+import { motion } from 'framer-motion';
+
+// For AnimatePresence
+import { AnimatePresence } from 'framer-motion';
 
 const TestimonialsSection = ({
   visibleTweets,

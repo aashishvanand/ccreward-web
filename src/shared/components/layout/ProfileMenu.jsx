@@ -11,7 +11,11 @@ import {
   Typography,
 } from "@mui/material";
 import { AccountCircle, Logout } from "@mui/icons-material";
-import { motion, AnimatePresence } from 'framer-motion';
+// For motion components
+import { motion } from 'framer-motion';
+
+// For AnimatePresence
+import { AnimatePresence } from 'framer-motion';
 
 const ProfileMenu = ({ user, onLogout }) => {
   const [anchorEl, setAnchorEl] = useState(null);

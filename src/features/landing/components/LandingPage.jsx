@@ -22,6 +22,7 @@ import { tweets } from "../../../shared/constants/testimonials";
 import { detectDevice } from "../../../core/utils/deviceUtils";
 import TopSearchs from "./sections/TopSearchs";
 import StatsSection from "./sections/StatsSection";
+// FIXED: Use specific imports instead of export *
 import { motion } from "framer-motion";
 
 // Add analytics imports - FIXED
