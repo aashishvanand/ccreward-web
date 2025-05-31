@@ -8,43 +8,51 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 // Set cache duration to 24 hours
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
-// Create an axios instance with optimized gzip configuration
+// Create an axios instance with proper gzip handling
 const api = axios.create({
     baseURL: API_BASE_URL,
-    // Axios automatically handles gzip decompression when these are set
-    decompress: true,
-    validateStatus: (status) => status < 500, // Don't throw on 4xx errors
+    timeout: 30000,
     headers: {
-        // Critical: Tell server we accept gzip compression
-        'Accept-Encoding': 'gzip, deflate, br',
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        // Add User-Agent for better server compatibility
+        'Accept-Encoding': 'gzip, deflate, br',
         'User-Agent': 'CCReward-Web/1.0'
     },
-    timeout: 30000,
-    responseType: 'json',
-    // Enable automatic request/response transformation
-    transformRequest: axios.defaults.transformRequest,
+    // CRITICAL: Ensure axios properly handles compression
+    decompress: true,
+    responseType: 'json', // Force JSON parsing
+    validateStatus: (status) => status < 500,
+    
+    // Custom response transformation to ensure proper decompression
     transformResponse: [
-        // Custom response transformer to handle potential compression issues
+        // First, let axios handle the default transformation (including decompression)
+        ...axios.defaults.transformResponse,
+        // Then ensure we have proper JSON
         function (data, headers) {
-            // If data is already parsed JSON, return it
-            if (typeof data === 'object') {
+            // If data is already an object, return it
+            if (data && typeof data === 'object') {
                 return data;
             }
             
-            // Try to parse JSON if it's a string
+            // If data is a string, try to parse it as JSON
             if (typeof data === 'string') {
                 try {
                     return JSON.parse(data);
                 } catch (e) {
-                    console.warn('Failed to parse JSON response:', e);
-                    return data;
+                    console.error('Failed to parse JSON response:', e);
+                    console.error('Raw data:', data);
+                    throw new Error('Invalid JSON response from server');
                 }
             }
             
-            return data;
+            // If data is binary/compressed, it means decompression failed
+            if (data instanceof ArrayBuffer || data instanceof Uint8Array) {
+                console.error('Received binary data - decompression may have failed');
+                throw new Error('Received compressed data that could not be decompressed');
+            }
+            
+            console.error('Unexpected data type:', typeof data, data);
+            throw new Error('Unexpected response format');
         }
     ]
 });
@@ -86,6 +94,35 @@ export const isTokenExpired = (token) => {
     }
 };
 
+// Helper function to validate and clean data before caching
+const validateAndCleanData = (data) => {
+    // Ensure data is a valid object or array
+    if (data === null || data === undefined) {
+        throw new Error('Received null or undefined data');
+    }
+    
+    // Check if data is compressed/binary (this shouldn't happen after proper decompression)
+    if (typeof data === 'string' && data.charCodeAt(0) === 0x1f && data.charCodeAt(1) === 0x8b) {
+        throw new Error('Data appears to be gzip compressed - decompression failed');
+    }
+    
+    // If it's a string, try to parse as JSON
+    if (typeof data === 'string') {
+        try {
+            return JSON.parse(data);
+        } catch (e) {
+            throw new Error('Data is not valid JSON');
+        }
+    }
+    
+    // If it's already an object/array, return as-is
+    if (typeof data === 'object') {
+        return data;
+    }
+    
+    throw new Error('Invalid data format');
+};
+
 // Helper function to get data from cache
 const getFromCache = (key) => {
     if (typeof localStorage === 'undefined') {
@@ -94,13 +131,23 @@ const getFromCache = (key) => {
     try {
         const cached = localStorage.getItem(key);
         if (cached) {
-            const { data, timestamp } = JSON.parse(cached);
+            const parsed = JSON.parse(cached);
+            const { data, timestamp } = parsed;
+            
             if (Date.now() - timestamp < CACHE_DURATION) {
-                return data;
+                // Validate cached data
+                const cleanData = validateAndCleanData(data);
+                return cleanData;
             }
         }
     } catch (error) {
         console.warn('Cache read error:', error);
+        // Clear corrupted cache
+        try {
+            localStorage.removeItem(key);
+        } catch (e) {
+            console.warn('Failed to clear corrupted cache:', e);
+        }
     }
     return null;
 };
@@ -111,9 +158,23 @@ const setToCache = (key, data) => {
         return;
     }
     try {
-        localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
+        // Validate data before caching
+        const cleanData = validateAndCleanData(data);
+        
+        const cacheObject = {
+            data: cleanData,
+            timestamp: Date.now()
+        };
+        
+        localStorage.setItem(key, JSON.stringify(cacheObject));
+        
+        // Log successful cache operation in development
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`✅ Cached data for key: ${key}`, cleanData);
+        }
     } catch (error) {
-        console.warn('Cache write error:', error);
+        console.error('Cache write error for key:', key, error);
+        // Don't throw - caching failure shouldn't break the app
     }
 };
 
@@ -163,7 +224,7 @@ export const initializeAuth = async () => {
     }
 };
 
-// Enhanced request interceptor with better error handling
+// Enhanced request interceptor
 api.interceptors.request.use(async (config) => {
     try {
         // Add authentication token
@@ -191,7 +252,7 @@ api.interceptors.request.use(async (config) => {
         
         // Log request details in development
         if (process.env.NODE_ENV === 'development') {
-            console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
+            console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
         }
         
         return config;
@@ -204,39 +265,46 @@ api.interceptors.request.use(async (config) => {
     return Promise.reject(error);
 });
 
-// Enhanced response interceptor with better compression handling
+// Enhanced response interceptor with better error handling
 api.interceptors.response.use(
     (response) => {
-        // Log compression info in development
+        // Log response details in development
         if (process.env.NODE_ENV === 'development') {
             const contentEncoding = response.headers['content-encoding'];
             const contentLength = response.headers['content-length'];
-            if (contentEncoding) {
-                console.log(`✅ Response compressed with: ${contentEncoding}${contentLength ? ` (${contentLength} bytes)` : ''}`);
-            }
+            const dataType = typeof response.data;
+            const isArray = Array.isArray(response.data);
+            
+            console.log(`✅ API Response:`, {
+                status: response.status,
+                contentEncoding,
+                contentLength,
+                dataType,
+                isArray,
+                dataLength: isArray ? response.data.length : 'N/A'
+            });
         }
         
-        // Verify the response data is properly decompressed and parsed
-        if (response.data && typeof response.data === 'string') {
-            try {
-                response.data = JSON.parse(response.data);
-            } catch (e) {
-                console.warn('Response data is string but not valid JSON:', e);
-            }
+        // Validate response data
+        try {
+            const validatedData = validateAndCleanData(response.data);
+            response.data = validatedData;
+        } catch (error) {
+            console.error('Response validation failed:', error);
+            throw new Error('Invalid response data format');
         }
         
         return response;
     },
     (error) => {
-        // Enhanced error handling for compression issues
-        if (error.code === 'ERR_NETWORK') {
-            console.error('Network error (possibly compression-related):', error);
-        }
-        
+        // Enhanced error handling
         if (error.response) {
-            // Server responded with error status
-            const { status, data } = error.response;
-            console.error(`API Error ${status}:`, data);
+            const { status, data, headers } = error.response;
+            console.error(`❌ API Error ${status}:`, {
+                data,
+                headers: headers,
+                url: error.config?.url
+            });
             
             // Handle specific status codes
             if (status === 429) {
@@ -245,9 +313,10 @@ api.interceptors.response.use(
                 error.message = "Server error. Please try again later.";
             }
         } else if (error.request) {
-            // Request made but no response received
-            console.error('No response received:', error.request);
+            console.error('❌ No response received:', error.request);
             error.message = "Network error. Please check your connection and try again.";
+        } else {
+            console.error('❌ Request setup error:', error.message);
         }
         
         return Promise.reject(error);
@@ -262,13 +331,6 @@ const handleApiError = (error) => {
         data: error.response?.data,
         headers: error.response?.headers
     });
-    
-    // Handle compression-specific errors
-    if (error.message?.includes('decompress') || 
-        error.message?.includes('compression') ||
-        error.code === 'ERR_CONTENT_DECODING_FAILED') {
-        throw new Error("Server response format error. Please try again.");
-    }
     
     if (error.response?.status === 429) {
         throw new Error("You've made too many requests. Please take a coffee break and try again later.");
@@ -291,7 +353,7 @@ const authenticatedRequest = async (method, url, data = null) => {
     }
 };
 
-// Rest of your functions remain the same...
+// API functions with better error handling and validation
 export const fetchBanks = async () => {
     if (!isRegionInitialized()) {
         console.warn('Cannot fetch banks: Region not initialized');
@@ -301,20 +363,31 @@ export const fetchBanks = async () => {
     const region = getCountryCode();
     const cacheKey = `banks_${region}`;
     
-    console.log(`Fetching banks for region: ${region} (Cache key: ${cacheKey})`);
+    console.log(`🔍 Fetching banks for region: ${region}`);
     
+    // Try cache first
     const cachedData = getFromCache(cacheKey);
     if (cachedData) {
-        console.log(`Using cached banks for region ${region}`);
+        console.log(`📋 Using cached banks for region ${region}:`, cachedData);
         return cachedData;
     }
 
     try {
+        console.log(`🌐 Making API call for banks in region: ${region}`);
         const response = await api.get(`/bank?country=${region}`);
-        const data = response.data;
-        setToCache(cacheKey, data);
-        return data;
+        
+        // Validate response data
+        if (!Array.isArray(response.data)) {
+            throw new Error('Expected array of banks but received: ' + typeof response.data);
+        }
+        
+        console.log(`✅ Successfully fetched ${response.data.length} banks:`, response.data);
+        
+        // Cache the validated data
+        setToCache(cacheKey, response.data);
+        return response.data;
     } catch (error) {
+        console.error(`❌ Error fetching banks for region ${region}:`, error);
         if (error.message === 'Region not initialized') {
             return [];
         }
@@ -331,16 +404,29 @@ export const fetchCards = async (bank) => {
     const region = getCountryCode();
     const cacheKey = `cards_${region}_${bank}`;
     
-    console.log(`Fetching cards for bank: ${bank} in region: ${region}`);
+    console.log(`🔍 Fetching cards for bank: ${bank} in region: ${region}`);
     
     const cachedData = getFromCache(cacheKey);
-    if (cachedData) return cachedData;
+    if (cachedData) {
+        console.log(`📋 Using cached cards for ${bank}:`, cachedData);
+        return cachedData;
+    }
 
     try {
+        console.log(`🌐 Making API call for cards: ${bank} in region: ${region}`);
         const response = await api.get(`/card?bank=${bank}&country=${region}`);
+        
+        // Validate response data
+        if (!Array.isArray(response.data)) {
+            throw new Error('Expected array of cards but received: ' + typeof response.data);
+        }
+        
+        console.log(`✅ Successfully fetched ${response.data.length} cards for ${bank}:`, response.data);
+        
         setToCache(cacheKey, response.data);
         return response.data;
     } catch (error) {
+        console.error(`❌ Error fetching cards for bank ${bank}:`, error);
         if (error.message === 'Region not initialized') {
             return [];
         }
@@ -367,10 +453,17 @@ export const fetchMCC = async (search) => {
         const response = await api.get(`/mcc?search=${search}`, {
             cancelToken: mccCancelToken.token,
         });
+        
+        // Validate response data
+        if (!Array.isArray(response.data)) {
+            console.warn('Expected array of MCC data but received:', typeof response.data);
+            return [];
+        }
+        
         return response.data;
     } catch (error) {
         if (axios.isCancel(error)) {
-            console.log('Request canceled:', error.message);
+            console.log('MCC request canceled:', error.message);
         } else if (error.message === 'Region not initialized') {
             return [];
         } else {
@@ -394,6 +487,13 @@ export const fetchCardQuestions = async (bank, card) => {
 
     try {
         const response = await api.get(`/cardQuestions?bank=${encodedBank}&card=${encodedCard}`);
+        
+        // Validate response data
+        if (!Array.isArray(response.data)) {
+            console.warn('Expected array of questions but received:', typeof response.data);
+            return [];
+        }
+        
         setToCache(cacheKey, response.data);
         return response.data;
     } catch (error) {
