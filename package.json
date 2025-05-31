@@ -1,10 +1,10 @@
 {
   "name": "ccreward.app",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "A comprehensive tool to calculate and optimize credit card rewards across multiple banks in India",
   "author": "Aashish Vivekanand",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
     "url": "https://github.com/aashishvanand/ccreward-web.git"
@@ -18,7 +18,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "npm install --include=optional sharp --legacy-peer-deps"
+    "postinstall": "npm install --include=optional sharp --legacy-peer-deps",
+    "analyze": "cross-env ANALYZE=true npm run build",
+    "test:analytics": "node scripts/test-analytics.js"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -43,6 +45,8 @@
     "sharp": "^0.34.2"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^15.3.3",
+    "cross-env": "^7.0.3",
     "eslint": "^9.24.0",
     "eslint-config-next": "^15.3.0",
     "jest": "^29.7.0",
