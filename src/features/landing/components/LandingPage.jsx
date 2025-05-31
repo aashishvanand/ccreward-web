@@ -1,4 +1,4 @@
-// src/features/landing/components/LandingPage.jsx - Enhanced with Analytics
+// src/features/landing/components/LandingPage.jsx - Enhanced with Analytics (FIXED)
 import { useState, useEffect, useMemo } from "react";
 import { Box, Alert, Container, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
@@ -24,7 +24,7 @@ import TopSearchs from "./sections/TopSearchs";
 import StatsSection from "./sections/StatsSection";
 import { motion } from "framer-motion";
 
-// Add analytics imports
+// Add analytics imports - FIXED
 import { 
   useAnalytics, 
   usePagePerformance, 
@@ -115,7 +115,7 @@ const LandingPage = () => {
       region,
       device_type: deviceInfo.isMobile ? 'mobile' : deviceInfo.isTablet ? 'tablet' : 'desktop',
       is_authenticated: isAuthenticated(),
-      user_agent: navigator.userAgent
+      user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown'
     });
 
     trackJourneyStep('landing_page_loaded', {
@@ -125,7 +125,7 @@ const LandingPage = () => {
 
     // Track page load performance
     recordCustomMetric('page_load_start', performance.now());
-  }, []);
+  }, [trackFeatureUsage, trackJourneyStep, recordCustomMetric, region, deviceInfo, isAuthenticated]);
 
   // Track device detection
   useEffect(() => {
@@ -137,8 +137,8 @@ const LandingPage = () => {
       is_android: initialDeviceInfo.isAndroid,
       is_ios: initialDeviceInfo.isIOS,
       is_tablet: initialDeviceInfo.isTablet,
-      screen_width: window.innerWidth,
-      screen_height: window.innerHeight
+      screen_width: typeof window !== 'undefined' ? window.innerWidth : 0,
+      screen_height: typeof window !== 'undefined' ? window.innerHeight : 0
     });
 
     const handleResize = () => {
@@ -146,14 +146,16 @@ const LandingPage = () => {
       setDeviceInfo(updatedDeviceInfo);
       
       trackEvent('viewport_changed', {
-        new_width: window.innerWidth,
-        new_height: window.innerHeight,
+        new_width: typeof window !== 'undefined' ? window.innerWidth : 0,
+        new_height: typeof window !== 'undefined' ? window.innerHeight : 0,
         device_type: updatedDeviceInfo.isMobile ? 'mobile' : 'desktop'
       });
     };
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    if (typeof window !== 'undefined') {
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }
   }, [trackEvent]);
 
   // Track region and card images loading
@@ -364,6 +366,8 @@ const LandingPage = () => {
 
   // Track section visibility
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -381,7 +385,7 @@ const LandingPage = () => {
               });
             }
           }
-        }
+        });
       },
       { threshold: 0.5 }
     );
@@ -467,7 +471,7 @@ const MobileView = ({
       region
     });
     
-    trackConversion('app_store_click', 1);
+    trackEvent('app_store_click', { store, source: 'mobile_promotion' });
   };
 
   useEffect(() => {
@@ -624,8 +628,8 @@ const DesktopView = ({
 
   useEffect(() => {
     trackFeatureUsage('desktop_view_loaded', {
-      screen_width: window.innerWidth,
-      screen_height: window.innerHeight,
+      screen_width: typeof window !== 'undefined' ? window.innerWidth : 0,
+      screen_height: typeof window !== 'undefined' ? window.innerHeight : 0,
       region
     });
   }, [region, trackFeatureUsage]);

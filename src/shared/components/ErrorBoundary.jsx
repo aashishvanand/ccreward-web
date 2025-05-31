@@ -1,8 +1,9 @@
-// src/shared/components/ErrorBoundary.jsx - React Error Boundary with Crashlytics
+// src/shared/components/ErrorBoundary.jsx - React Error Boundary with Crashlytics (FIXED)
 import React from 'react';
 import { Box, Typography, Button, Paper, Alert, Stack } from '@mui/material';
 import { Refresh as RefreshIcon, BugReport as BugReportIcon } from '@mui/icons-material';
 import { handleReactError, logBreadcrumb, recordFatalError } from '../../core/services/crashlytics';
+// FIXED: Use specific imports instead of export *
 import { motion } from 'framer-motion';
 
 class ErrorBoundary extends React.Component {
