@@ -25,7 +25,11 @@ import {
   Menu as MenuIcon,
   Stars as StarsIcon,
 } from "@mui/icons-material";
-import { motion, AnimatePresence } from 'framer-motion';
+// For motion components
+import { motion } from 'framer-motion';
+
+// For AnimatePresence
+import { AnimatePresence } from 'framer-motion';
 import { useAppTheme } from "../../../core/providers/ThemeRegistry";
 import { useAuth } from "../../../core/providers/AuthContext";
 import { useRouter, usePathname } from "next/navigation";

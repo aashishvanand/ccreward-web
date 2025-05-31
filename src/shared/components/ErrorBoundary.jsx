@@ -1,4 +1,5 @@
-// src/shared/components/ErrorBoundary.jsx - React Error Boundary with Crashlytics (FIXED)
+"use client"
+// src/shared/components/ErrorBoundary.jsx - React Error Boundary with Crashlytics
 import React from 'react';
 import { Box, Typography, Button, Paper, Alert, Stack } from '@mui/material';
 import { Refresh as RefreshIcon, BugReport as BugReportIcon } from '@mui/icons-material';
