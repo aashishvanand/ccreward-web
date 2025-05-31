@@ -8,53 +8,9 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 // Set cache duration to 24 hours
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
-// Create an axios instance with proper gzip handling
+// Create an axios instance with the base URL
 const api = axios.create({
     baseURL: API_BASE_URL,
-    timeout: 30000,
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'User-Agent': 'CCReward-Web/1.0'
-    },
-    // CRITICAL: Ensure axios properly handles compression
-    decompress: true,
-    responseType: 'json', // Force JSON parsing
-    validateStatus: (status) => status < 500,
-    
-    // Custom response transformation to ensure proper decompression
-    transformResponse: [
-        // First, let axios handle the default transformation (including decompression)
-        ...axios.defaults.transformResponse,
-        // Then ensure we have proper JSON
-        function (data, headers) {
-            // If data is already an object, return it
-            if (data && typeof data === 'object') {
-                return data;
-            }
-            
-            // If data is a string, try to parse it as JSON
-            if (typeof data === 'string') {
-                try {
-                    return JSON.parse(data);
-                } catch (e) {
-                    console.error('Failed to parse JSON response:', e);
-                    console.error('Raw data:', data);
-                    throw new Error('Invalid JSON response from server');
-                }
-            }
-            
-            // If data is binary/compressed, it means decompression failed
-            if (data instanceof ArrayBuffer || data instanceof Uint8Array) {
-                console.error('Received binary data - decompression may have failed');
-                throw new Error('Received compressed data that could not be decompressed');
-            }
-            
-            console.error('Unexpected data type:', typeof data, data);
-            throw new Error('Unexpected response format');
-        }
-    ]
 });
 
 let currentToken = null;
@@ -94,59 +50,16 @@ export const isTokenExpired = (token) => {
     }
 };
 
-// Helper function to validate and clean data before caching
-const validateAndCleanData = (data) => {
-    // Ensure data is a valid object or array
-    if (data === null || data === undefined) {
-        throw new Error('Received null or undefined data');
-    }
-    
-    // Check if data is compressed/binary (this shouldn't happen after proper decompression)
-    if (typeof data === 'string' && data.charCodeAt(0) === 0x1f && data.charCodeAt(1) === 0x8b) {
-        throw new Error('Data appears to be gzip compressed - decompression failed');
-    }
-    
-    // If it's a string, try to parse as JSON
-    if (typeof data === 'string') {
-        try {
-            return JSON.parse(data);
-        } catch (e) {
-            throw new Error('Data is not valid JSON');
-        }
-    }
-    
-    // If it's already an object/array, return as-is
-    if (typeof data === 'object') {
-        return data;
-    }
-    
-    throw new Error('Invalid data format');
-};
-
 // Helper function to get data from cache
 const getFromCache = (key) => {
     if (typeof localStorage === 'undefined') {
         return null;
     }
-    try {
-        const cached = localStorage.getItem(key);
-        if (cached) {
-            const parsed = JSON.parse(cached);
-            const { data, timestamp } = parsed;
-            
-            if (Date.now() - timestamp < CACHE_DURATION) {
-                // Validate cached data
-                const cleanData = validateAndCleanData(data);
-                return cleanData;
-            }
-        }
-    } catch (error) {
-        console.warn('Cache read error:', error);
-        // Clear corrupted cache
-        try {
-            localStorage.removeItem(key);
-        } catch (e) {
-            console.warn('Failed to clear corrupted cache:', e);
+    const cached = localStorage.getItem(key);
+    if (cached) {
+        const { data, timestamp } = JSON.parse(cached);
+        if (Date.now() - timestamp < CACHE_DURATION) {
+            return data;
         }
     }
     return null;
@@ -157,25 +70,7 @@ const setToCache = (key, data) => {
     if (typeof localStorage === 'undefined') {
         return;
     }
-    try {
-        // Validate data before caching
-        const cleanData = validateAndCleanData(data);
-        
-        const cacheObject = {
-            data: cleanData,
-            timestamp: Date.now()
-        };
-        
-        localStorage.setItem(key, JSON.stringify(cacheObject));
-        
-        // Log successful cache operation in development
-        if (process.env.NODE_ENV === 'development') {
-            console.log(`✅ Cached data for key: ${key}`, cleanData);
-        }
-    } catch (error) {
-        console.error('Cache write error for key:', key, error);
-        // Don't throw - caching failure shouldn't break the app
-    }
+    localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
 };
 
 // Helper function to check if region is initialized
@@ -189,13 +84,13 @@ const isRegionInitialized = () => {
 // Enhanced getCountryCode that waits for region to be initialized
 const getCountryCode = () => {
     if (typeof localStorage === 'undefined') {
-        return null;
+        return null; // Return null during SSR
     }
     
     const region = localStorage.getItem('app-region');
     if (!region) {
         console.warn('Region not initialized in localStorage');
-        return null;
+        return null; // Return null if region not initialized
     }
     
     return region.toLowerCase();
@@ -224,118 +119,41 @@ export const initializeAuth = async () => {
     }
 };
 
-// Enhanced request interceptor
+// Interceptor to add the token to each request
 api.interceptors.request.use(async (config) => {
-    try {
-        // Add authentication token
-        if (!config.headers['Authorization']) {
-            const token = await getToken();
-            config.headers['Authorization'] = `Bearer ${token}`;
-        }
-        
-        // Only add country parameter if region is initialized
-        const countryCode = getCountryCode();
-        if (countryCode) {
-            if (!config.url.includes('country=')) {
-                const separator = config.url.includes('?') ? '&' : '?';
-                config.url = `${config.url}${separator}country=${countryCode}`;
-            }
-        } else {
-            console.warn('Skipping API request because region is not initialized:', config.url);
-            return Promise.reject(new Error('Region not initialized'));
-        }
-        
-        // Ensure URL has versioning
-        if (!config.url.startsWith('/v1/')) {
-            config.url = `/v1${config.url}`;
-        }
-        
-        // Log request details in development
-        if (process.env.NODE_ENV === 'development') {
-            console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
-        }
-        
-        return config;
-    } catch (error) {
-        console.error('Request interceptor error:', error);
-        return Promise.reject(error);
+    if (!config.headers['Authorization']) {
+        const token = await getToken();
+        config.headers['Authorization'] = `Bearer ${token}`;
     }
-}, (error) => {
-    console.error('Request interceptor failed:', error);
-    return Promise.reject(error);
-});
-
-// Enhanced response interceptor with better error handling
-api.interceptors.response.use(
-    (response) => {
-        // Log response details in development
-        if (process.env.NODE_ENV === 'development') {
-            const contentEncoding = response.headers['content-encoding'];
-            const contentLength = response.headers['content-length'];
-            const dataType = typeof response.data;
-            const isArray = Array.isArray(response.data);
-            
-            console.log(`✅ API Response:`, {
-                status: response.status,
-                contentEncoding,
-                contentLength,
-                dataType,
-                isArray,
-                dataLength: isArray ? response.data.length : 'N/A'
-            });
-        }
-        
-        // Validate response data
-        try {
-            const validatedData = validateAndCleanData(response.data);
-            response.data = validatedData;
-        } catch (error) {
-            console.error('Response validation failed:', error);
-            throw new Error('Invalid response data format');
-        }
-        
-        return response;
-    },
-    (error) => {
-        // Enhanced error handling
-        if (error.response) {
-            const { status, data, headers } = error.response;
-            console.error(`❌ API Error ${status}:`, {
-                data,
-                headers: headers,
-                url: error.config?.url
-            });
-            
-            // Handle specific status codes
-            if (status === 429) {
-                error.message = "You've made too many requests. Please take a coffee break and try again later.";
-            } else if (status >= 500) {
-                error.message = "Server error. Please try again later.";
-            }
-        } else if (error.request) {
-            console.error('❌ No response received:', error.request);
-            error.message = "Network error. Please check your connection and try again.";
-        } else {
-            console.error('❌ Request setup error:', error.message);
-        }
-        
-        return Promise.reject(error);
-    }
-);
-
-// Enhanced API error handler
-const handleApiError = (error) => {
-    console.error("API Error Details:", {
-        message: error.message,
-        status: error.response?.status,
-        data: error.response?.data,
-        headers: error.response?.headers
-    });
     
-    if (error.response?.status === 429) {
+    // Only add country parameter if region is initialized
+    const countryCode = getCountryCode();
+    if (countryCode) {
+        // Add country parameter to each request if not already present
+        if (!config.url.includes('country=')) {
+            const separator = config.url.includes('?') ? '&' : '?';
+            config.url = `${config.url}${separator}country=${countryCode}`;
+        }
+    } else {
+        console.warn('Skipping API request because region is not initialized:', config.url);
+        // Cancel the request
+        return Promise.reject(new Error('Region not initialized'));
+    }
+    
+    // Ensure URL has versioning
+    if (!config.url.startsWith('/v1/')) {
+        config.url = `/v1${config.url}`;
+    }
+    
+    return config;
+}, (error) => Promise.reject(error));
+
+// Handle API errors
+const handleApiError = (error) => {
+    console.error("API Error:", error.response ? error.response.data : error.message);
+    if (error.response && error.response.status === 429) {
         throw new Error("You've made too many requests. Please take a coffee break and try again later.");
     }
-    
     throw error;
 };
 
@@ -353,41 +171,38 @@ const authenticatedRequest = async (method, url, data = null) => {
     }
 };
 
-// API functions with better error handling and validation
+// Fetch banks with region initialization check
 export const fetchBanks = async () => {
+    // Check if region is initialized
     if (!isRegionInitialized()) {
         console.warn('Cannot fetch banks: Region not initialized');
         return [];
     }
     
     const region = getCountryCode();
+    
+    // Create a region-specific cache key
     const cacheKey = `banks_${region}`;
     
-    console.log(`🔍 Fetching banks for region: ${region}`);
+    console.log(`Fetching banks for region: ${region} (Cache key: ${cacheKey})`);
     
-    // Try cache first
     const cachedData = getFromCache(cacheKey);
     if (cachedData) {
-        console.log(`📋 Using cached banks for region ${region}:`, cachedData);
+        console.log(`Using cached banks for region ${region}`);
         return cachedData;
     }
 
     try {
-        console.log(`🌐 Making API call for banks in region: ${region}`);
+        // Explicitly include region in request
         const response = await api.get(`/bank?country=${region}`);
+        const data = response.data;
         
-        // Validate response data
-        if (!Array.isArray(response.data)) {
-            throw new Error('Expected array of banks but received: ' + typeof response.data);
-        }
+        // Store with region-specific cache key
+        setToCache(cacheKey, data);
         
-        console.log(`✅ Successfully fetched ${response.data.length} banks:`, response.data);
-        
-        // Cache the validated data
-        setToCache(cacheKey, response.data);
-        return response.data;
+        return data;
     } catch (error) {
-        console.error(`❌ Error fetching banks for region ${region}:`, error);
+        // If error is about region not being initialized, return empty array
         if (error.message === 'Region not initialized') {
             return [];
         }
@@ -395,38 +210,30 @@ export const fetchBanks = async () => {
     }
 };
 
+// Fetch cards for a specific bank
 export const fetchCards = async (bank) => {
+    // Check if region is initialized
     if (!isRegionInitialized()) {
         console.warn('Cannot fetch cards: Region not initialized');
         return [];
     }
     
     const region = getCountryCode();
+    
+    // Create a region-specific cache key for this bank
     const cacheKey = `cards_${region}_${bank}`;
     
-    console.log(`🔍 Fetching cards for bank: ${bank} in region: ${region}`);
+    console.log(`Fetching cards for bank: ${bank} in region: ${region}`);
     
     const cachedData = getFromCache(cacheKey);
-    if (cachedData) {
-        console.log(`📋 Using cached cards for ${bank}:`, cachedData);
-        return cachedData;
-    }
+    if (cachedData) return cachedData;
 
     try {
-        console.log(`🌐 Making API call for cards: ${bank} in region: ${region}`);
         const response = await api.get(`/card?bank=${bank}&country=${region}`);
-        
-        // Validate response data
-        if (!Array.isArray(response.data)) {
-            throw new Error('Expected array of cards but received: ' + typeof response.data);
-        }
-        
-        console.log(`✅ Successfully fetched ${response.data.length} cards for ${bank}:`, response.data);
-        
         setToCache(cacheKey, response.data);
         return response.data;
     } catch (error) {
-        console.error(`❌ Error fetching cards for bank ${bank}:`, error);
+        // If error is about region not being initialized, return empty array
         if (error.message === 'Region not initialized') {
             return [];
         }
@@ -437,7 +244,9 @@ export const fetchCards = async (bank) => {
 // Cancel token for MCC requests
 let mccCancelToken = null;
 
+// Fetch MCC (Merchant Category Code) data
 export const fetchMCC = async (search) => {
+    // Check if region is initialized
     if (!isRegionInitialized()) {
         console.warn('Cannot fetch MCC: Region not initialized');
         return [];
@@ -453,17 +262,10 @@ export const fetchMCC = async (search) => {
         const response = await api.get(`/mcc?search=${search}`, {
             cancelToken: mccCancelToken.token,
         });
-        
-        // Validate response data
-        if (!Array.isArray(response.data)) {
-            console.warn('Expected array of MCC data but received:', typeof response.data);
-            return [];
-        }
-        
         return response.data;
     } catch (error) {
         if (axios.isCancel(error)) {
-            console.log('MCC request canceled:', error.message);
+            console.log('Request canceled:', error.message);
         } else if (error.message === 'Region not initialized') {
             return [];
         } else {
@@ -473,7 +275,9 @@ export const fetchMCC = async (search) => {
     }
 };
 
+// Fetch card questions for a specific bank and card
 export const fetchCardQuestions = async (bank, card) => {
+    // Check if region is initialized
     if (!isRegionInitialized()) {
         console.warn('Cannot fetch card questions: Region not initialized');
         return [];
@@ -487,16 +291,10 @@ export const fetchCardQuestions = async (bank, card) => {
 
     try {
         const response = await api.get(`/cardQuestions?bank=${encodedBank}&card=${encodedCard}`);
-        
-        // Validate response data
-        if (!Array.isArray(response.data)) {
-            console.warn('Expected array of questions but received:', typeof response.data);
-            return [];
-        }
-        
         setToCache(cacheKey, response.data);
         return response.data;
     } catch (error) {
+        // If error is about region not being initialized, return empty array
         if (error.message === 'Region not initialized') {
             return [];
         }
@@ -504,7 +302,9 @@ export const fetchCardQuestions = async (bank, card) => {
     }
 };
 
+// Calculate rewards based on provided data
 export const calculateRewards = async (data) => {
+    // Check if region is initialized
     if (!isRegionInitialized()) {
         console.warn('Cannot calculate rewards: Region not initialized');
         throw new Error('Region not initialized. Please refresh the page and try again.');
@@ -514,6 +314,7 @@ export const calculateRewards = async (data) => {
         const response = await api.post('/calculateRewards', data);
         return response.data;
     } catch (error) {
+        // If error is about region not being initialized, throw specific error
         if (error.message === 'Region not initialized') {
             throw new Error('Region not initialized. Please refresh the page and try again.');
         }
@@ -521,7 +322,9 @@ export const calculateRewards = async (data) => {
     }
 };
 
+// Fetch questions for best card calculation
 export const fetchBestCardQuestions = async (cards) => {
+    // Check if region is initialized
     if (!isRegionInitialized()) {
         console.warn('Cannot fetch best card questions: Region not initialized');
         return [];
@@ -531,6 +334,7 @@ export const fetchBestCardQuestions = async (cards) => {
         const response = await authenticatedRequest('post', '/bestCardQuestions', { cards });
         return response;
     } catch (error) {
+        // If error is about region not being initialized, return empty array
         if (error.message === 'Region not initialized') {
             return [];
         }
@@ -538,7 +342,9 @@ export const fetchBestCardQuestions = async (cards) => {
     }
 };
 
+// Calculate the best card based on provided data
 export const calculateBestCard = async (data) => {
+    // Check if region is initialized
     if (!isRegionInitialized()) {
         console.warn('Cannot calculate best card: Region not initialized');
         throw new Error('Region not initialized. Please refresh the page and try again.');
@@ -548,6 +354,7 @@ export const calculateBestCard = async (data) => {
         const response = await authenticatedRequest('post', '/calculateBestCard', data);
         return response;
     } catch (error) {
+        // If error is about region not being initialized, throw specific error
         if (error.message === 'Region not initialized') {
             throw new Error('Region not initialized. Please refresh the page and try again.');
         }
@@ -555,4 +362,5 @@ export const calculateBestCard = async (data) => {
     }
 };
 
+// Export the API instance
 export { api };
