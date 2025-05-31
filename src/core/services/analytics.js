@@ -261,11 +261,36 @@ export const logEngagementEvent = (eventType, duration = 0) => {
     });
 };
 
+// Helper function to generate cryptographically secure random string
+function generateSecureRandomString(length = 9) {
+    if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+        // Browser environment - use crypto.getRandomValues
+        const array = new Uint8Array(length);
+        window.crypto.getRandomValues(array);
+        return Array.from(array, byte => byte.toString(36)).join('').substr(0, length);
+    } else if (typeof require !== 'undefined') {
+        // Node.js environment - use crypto module
+        try {
+            const crypto = require('crypto');
+            return crypto.randomBytes(Math.ceil(length * 3/4)).toString('base64').substr(0, length);
+        } catch (error) {
+            console.warn('Crypto module not available, falling back to timestamp-based ID');
+        }
+    }
+    
+    // Fallback for environments without crypto support
+    // This is less secure but better than Math.random()
+    console.warn('Using fallback session ID generation - not cryptographically secure');
+    return `fallback_${Date.now()}_${performance.now()}`;
+}
+
 // Helper functions
 function getSessionId() {
     let sessionId = sessionStorage.getItem('analytics_session_id');
     if (!sessionId) {
-        sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        // Use cryptographically secure random generation
+        const secureRandom = generateSecureRandomString(12);
+        sessionId = `session_${Date.now()}_${secureRandom}`;
         sessionStorage.setItem('analytics_session_id', sessionId);
         sessionStorage.setItem('session_start_time', Date.now().toString());
     }
