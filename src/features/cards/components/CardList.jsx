@@ -430,6 +430,7 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
         onClose={() => setDetailsModalOpen(false)}
         card={selectedCard}
         onSave={handleUpdateCard}
+        onDelete={onDeleteCard}
       />
     </>
   );

@@ -31,58 +31,10 @@ import { getCurrencySymbol } from "../../../core/utils";
 
 const BILLING_DATES = Array.from({ length: 31 }, (_, i) => i + 1);
 const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  "January", "February", "March", "April", "May", "June", "July",
+  "August", "September", "October", "November", "December",
 ];
 
-// Animation variants
-const dialogVariants = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-      type: "spring",
-      stiffness: 300,
-      damping: 25,
-      when: "beforeChildren",
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    },
-  },
-  exit: {
-    opacity: 0,
-    scale: 0.9,
-    transition: {
-      duration: 0.2,
-    },
-  },
-};
-
-const inputVariants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: "spring",
-      stiffness: 400,
-      damping: 25,
-    },
-  },
-};
-
-// Default limit config for all regions
 const limitConfig = {
     IN: {
       steps: [
@@ -106,513 +58,148 @@ const limitConfig = {
 
 export default function AddCardDialog({ open, onClose, onAddCard }) {
   const theme = useTheme();
-  // Get region from localStorage directly if needed or fallback to 'IN'
-  const [region, setRegion] = useState(() => {
-    // Check if we're on the client side before accessing localStorage
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("app-region") || "IN";
-    }
-    return "IN"; // Default fallback
-  });
-
+  const [region, setRegion] = useState("IN");
   const currentYear = new Date().getFullYear();
 
   const [isLoading, setIsLoading] = useState(false);
   const [banks, setBanks] = useState([]);
   const [cards, setCards] = useState([]);
   const [expanded, setExpanded] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState(
-    new Date().toLocaleString("default", { month: "long" })
-  );
+  const [selectedMonth, setSelectedMonth] = useState(new Date().toLocaleString("default", { month: "long" }));
   const [selectedYear, setSelectedYear] = useState(currentYear);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "info",
-  });
-
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "info" });
+  
   const [newCard, setNewCard] = useState({
-    bank: "",
-    cardName: "",
-    network: "",
-    billingDate: 1,
+    bank: "", cardName: "", network: "", billingDate: 1,
     limit: region === "SG" ? 10000 : 100000,
   });
-
-  // Safe access to limit config based on region
-  const getLimitConfig = () => {
-    return limitConfig[region] || limitConfig.default;
+  const [selectedLimitRange, setSelectedLimitRange] = useState(null);
+  
+  const findRangeForLimit = (limit, currentRegion) => {
+    const config = limitConfig[currentRegion] || limitConfig.default;
+    return config.steps.find(range => limit >= range.min && limit <= range.max) || config.steps[0];
   };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedRegion = localStorage.getItem("app-region");
-      if (storedRegion) {
-        setRegion(storedRegion.toUpperCase());
-      }
+      if (storedRegion) setRegion(storedRegion.toUpperCase());
     }
   }, []);
 
   useEffect(() => {
     if (open) {
+      const currentRegion = (typeof window !== "undefined" && localStorage.getItem("app-region")?.toUpperCase()) || "IN";
+      const initialLimit = currentRegion === "SG" ? 10000 : 100000;
+      
+      setRegion(currentRegion);
+      setNewCard({
+          bank: "", cardName: "", network: "", billingDate: 1,
+          limit: initialLimit,
+      });
+      setSelectedMonth(new Date().toLocaleString("default", { month: "long" }));
+      setSelectedYear(currentYear);
+      setExpanded(false);
+      setCards([]);
+
+      const initialRange = findRangeForLimit(initialLimit, currentRegion);
+      setSelectedLimitRange(initialRange);
+      
       fetchBankList();
     }
   }, [open]);
 
-  useEffect(() => {
-    if (open) {
-      // Reset to initial state when dialog opens
-      setNewCard({
-        bank: "",
-        cardName: "",
-        network: "",
-        billingDate: 1,
-        limit: region === "SG" ? 10000 : 100000,
-      });
-      setSelectedMonth(new Date().toLocaleString("default", { month: "long" }));
-      setSelectedYear(new Date().getFullYear());
-      setExpanded(false);
-      setCards([]);
-    }
-  }, [open, region]);
-
-  const fetchBankList = async () => {
-    setIsLoading(true);
-    try {
-      const bankList = await fetchBanks();
-      setBanks(bankList);
-    } catch (error) {
-      handleError(error);
-    } finally {
-      setIsLoading(false);
+  const handleLimitRangeChange = (event) => {
+    const rangeLabel = event.target.value;
+    const config = limitConfig[region] || limitConfig.default;
+    const newRange = config.steps.find(r => r.label === rangeLabel);
+    if (newRange) {
+      setSelectedLimitRange(newRange);
+      setNewCard(prev => ({ ...prev, limit: newRange.min }));
     }
   };
-
-  const fetchCardList = async (bank) => {
-    setIsLoading(true);
-    try {
-      const cardList = await fetchCards(bank);
-      setCards(cardList);
-    } catch (error) {
-      handleError(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleBankChange = (e) => {
-    const selectedBank = e.target.value;
-    setNewCard({
-      ...newCard,
-      bank: selectedBank,
-      cardName: "",
-    });
-
-    if (selectedBank) {
-      fetchCardList(selectedBank);
-    } else {
-      setCards([]);
-    }
-  };
-
-  const handleCardChange = (e) => {
-    setNewCard((prev) => ({
-      ...prev,
-      cardName: e.target.value,
-    }));
-  };
-
-  const handleError = (error) => {
-    console.error("Error:", error);
-    setSnackbar({
-      open: true,
-      message: error.message?.includes("too many requests")
-        ? error.message
-        : "An error occurred. Please try again.",
-      severity: error.message?.includes("too many requests")
-        ? "warning"
-        : "error",
-    });
-  };
-
-  const handleAddCard = () => {
-    const cardWithDetails = {
-      ...newCard,
-      country: region.toLowerCase(),
-      since: `${selectedMonth}, ${selectedYear}`,
-    };
-
-    onAddCard(cardWithDetails);
-    onClose();
-  };
-
-  const generateYearOptions = () => {
-    return Array.from({ length: 10 }, (_, i) => currentYear - i);
-  };
+  
+  const fetchBankList = async () => { setIsLoading(true); try { const bankList = await fetchBanks(); setBanks(bankList); } catch (error) { handleError(error); } finally { setIsLoading(false); } };
+  const fetchCardList = async (bank) => { setIsLoading(true); try { const cardList = await fetchCards(bank); setCards(cardList); } catch (error) { handleError(error); } finally { setIsLoading(false); } };
+  const handleBankChange = (e) => { const selectedBank = e.target.value; setNewCard({ ...newCard, bank: selectedBank, cardName: "" }); if (selectedBank) { fetchCardList(selectedBank); } else { setCards([]); } };
+  const handleCardChange = (e) => { setNewCard((prev) => ({ ...prev, cardName: e.target.value })); };
+  const handleError = (error) => { console.error("Error:", error); setSnackbar({ open: true, message: error.message?.includes("too many requests") ? error.message : "An error occurred. Please try again.", severity: error.message?.includes("too many requests") ? "warning" : "error", }); };
+  const handleAddCard = () => { const cardWithDetails = { ...newCard, country: region.toLowerCase(), since: `${selectedMonth}, ${selectedYear}` }; onAddCard(cardWithDetails); onClose(); };
+  const generateYearOptions = () => Array.from({ length: 10 }, (_, i) => currentYear - i);
 
   return (
     <>
       <AnimatePresence mode="wait">
         {open && (
-          <Dialog
-            open={open}
-            onClose={onClose}
-            fullWidth
-            maxWidth="sm"
-            PaperProps={{
-              sx: {
-                borderRadius: 2,
-                boxShadow: theme.shadows[10],
-                overflow: "hidden",
-              },
-              component: motion.div,
-              variants: dialogVariants,
-              initial: "hidden",
-              animate: "visible",
-              exit: "exit",
-            }}
-          >
-            <DialogTitle
-              sx={{
-                borderBottom: `1px solid ${theme.palette.divider}`,
-                pb: 2,
-                display: "flex",
-                alignItems: "center",
-                backgroundColor: theme.palette.primary.main,
-                color: theme.palette.primary.contrastText,
-              }}
-            >
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{
-                  opacity: 1,
-                  x: 0,
-                  transition: {
-                    type: "spring",
-                    stiffness: 500,
-                    damping: 25,
-                  },
-                }}
-              >
-                <Typography
-                  variant="h5"
-                  component="div"
-                  sx={{ fontWeight: 500 }}
-                >
-                  Add New Card
-                </Typography>
-              </motion.div>
+          <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 2, boxShadow: theme.shadows[10], overflow: "hidden" } }}>
+            <DialogTitle sx={{ borderBottom: `1px solid ${theme.palette.divider}`, pb: 2, display: "flex", alignItems: "center", backgroundColor: theme.palette.primary.main, color: theme.palette.primary.contrastText }}>
+                <Typography variant="h5" component="div" sx={{ fontWeight: 500 }}>Add New Card</Typography>
             </DialogTitle>
-
             <DialogContent sx={{ pt: 3 }}>
-              {isLoading ? (
-                <Box sx={{ display: "flex", justifyContent: "center", my: 3 }}>
-                  <motion.div
-                    animate={{
-                      rotate: 360,
-                      transition: {
-                        repeat: Infinity,
-                        duration: 1.5,
-                        ease: "linear",
-                      },
-                    }}
-                  >
-                    <CircularProgress />
-                  </motion.div>
-                </Box>
-              ) : (
+              {isLoading ? <Box sx={{ display: "flex", justifyContent: "center", my: 3 }}><CircularProgress /></Box> :
                 <>
-                  <motion.div variants={inputVariants}>
-                    <FormControl fullWidth margin="normal" variant="outlined">
-                      <InputLabel id="bank-select-label">Bank</InputLabel>
-                      <Select
-                        labelId="bank-select-label"
-                        id="bank-select"
-                        value={newCard.bank}
-                        onChange={handleBankChange}
-                        label="Bank"
-                      >
-                        <MenuItem value="">
-                          <em>Select a bank</em>
-                        </MenuItem>
-                        {banks.map((bank, index) => (
-                          <MenuItem key={bank} value={bank}>
-                            {bank}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </motion.div>
-
-                  <motion.div variants={inputVariants} custom={1}>
-                    <FormControl
-                      fullWidth
-                      margin="normal"
-                      variant="outlined"
-                      disabled={!newCard.bank || isLoading}
-                    >
-                      <InputLabel id="card-select-label">Card Name</InputLabel>
-                      <Select
-                        labelId="card-select-label"
-                        id="card-select"
-                        value={newCard.cardName}
-                        onChange={handleCardChange}
-                        label="Card Name"
-                      >
-                        <MenuItem value="">
-                          <em>Select a card</em>
-                        </MenuItem>
-                        {cards.map((card) => (
-                          <MenuItem key={card} value={card}>
-                            {card}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </motion.div>
-
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      mt: 3,
-                      borderRadius: 2,
-                      border: `1px solid ${theme.palette.divider}`,
-                      backgroundColor:
-                        theme.palette.mode === "dark"
-                          ? "rgba(255, 255, 255, 0.05)"
-                          : "rgba(0, 0, 0, 0.02)",
-                    }}
-                  >
-                    <Accordion
-                      expanded={expanded}
-                      onChange={() => setExpanded(!expanded)}
-                      elevation={0}
-                      disableGutters
-                      sx={{
-                        boxShadow: "none",
-                        "&:before": {
-                          display: "none",
-                        },
-                        borderRadius: 2,
-                      }}
-                    >
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="additional-details-content"
-                        id="additional-details-header"
-                        sx={{ px: 2, py: 1 }}
-                      >
-                        <Typography variant="subtitle1" fontWeight="medium">
-                          Additional Card Details (Optional)
-                        </Typography>
-                      </AccordionSummary>
-
+                  <FormControl fullWidth margin="normal" variant="outlined">
+                    <InputLabel>Bank</InputLabel>
+                    <Select value={newCard.bank} onChange={handleBankChange} label="Bank">
+                      <MenuItem value=""><em>Select a bank</em></MenuItem>
+                      {banks.map((bank) => (<MenuItem key={bank} value={bank}>{bank}</MenuItem>))}
+                    </Select>
+                  </FormControl>
+                  <FormControl fullWidth margin="normal" variant="outlined" disabled={!newCard.bank || isLoading}>
+                    <InputLabel>Card Name</InputLabel>
+                    <Select value={newCard.cardName} onChange={handleCardChange} label="Card Name">
+                      <MenuItem value=""><em>Select a card</em></MenuItem>
+                      {cards.map((card) => (<MenuItem key={card} value={card}>{card}</MenuItem>))}
+                    </Select>
+                  </FormControl>
+                  <Paper elevation={0} sx={{ mt: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}`, backgroundColor: theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.02)" }}>
+                    <Accordion expanded={expanded} onChange={() => setExpanded(!expanded)} elevation={0} disableGutters sx={{ boxShadow: "none", "&:before": { display: "none" }, borderRadius: 2 }}>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}><Typography variant="subtitle1" fontWeight="medium">Additional Card Details (Optional)</Typography></AccordionSummary>
                       <AccordionDetails sx={{ px: 3, pb: 3, pt: 1 }}>
                         <Box sx={{ mb: 4 }}>
-                          <Typography
-                            variant="subtitle1"
-                            gutterBottom
-                            sx={{
-                              fontWeight: 500,
-                              color: "text.primary",
-                              mb: 2,
-                            }}
-                          >
-                            Card Network
-                          </Typography>
-                          <CardNetworkSelector
-                            selectedNetwork={newCard.network}
-                            onNetworkChange={(networkName) =>
-                              setNewCard((prev) => ({
-                                ...prev,
-                                network: networkName,
-                              }))
-                            }
-                            region={region}
-                          />
+                          <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 500, color: "text.primary", mb: 2 }}>Card Network</Typography>
+                          <CardNetworkSelector selectedNetwork={newCard.network} onNetworkChange={(networkName) => setNewCard((prev) => ({ ...prev, network: networkName }))} region={region} />
                         </Box>
-
                         <Box sx={{ mb: 4 }}>
-                          <Typography
-                            variant="subtitle1"
-                            gutterBottom
-                            sx={{ fontWeight: 500, color: "text.primary" }}
-                          >
-                            Billing Date
-                          </Typography>
-                          <FormControl fullWidth sx={{ mb: 3 }}>
-                            <InputLabel id="billing-date-label">
-                              Billing Date
-                            </InputLabel>
-                            <Select
-                              labelId="billing-date-label"
-                              value={newCard.billingDate || ""}
-                              onChange={(e) =>
-                                setNewCard((prev) => ({
-                                  ...prev,
-                                  billingDate: e.target.value,
-                                }))
-                              }
-                              label="Billing Date"
-                            >
-                              {BILLING_DATES.map((date) => (
-                                <MenuItem key={date} value={date}>
-                                  {date}
-                                </MenuItem>
-                              ))}
+                          <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 500, color: "text.primary" }}>Billing Date</Typography>
+                          <FormControl fullWidth><InputLabel>Billing Date</InputLabel><Select value={newCard.billingDate || ""} onChange={(e) => setNewCard((prev) => ({ ...prev, billingDate: e.target.value }))} label="Billing Date">{BILLING_DATES.map((date) => (<MenuItem key={date} value={date}>{date}</MenuItem>))}</Select></FormControl>
+                        </Box>
+                        <Box sx={{ mb: 4 }}>
+                          <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 500, color: 'text.primary' }}>Credit Limit ({getCurrencySymbol(region)})</Typography>
+                          <FormControl fullWidth sx={{ mb: 2 }}>
+                            <InputLabel>Select Range</InputLabel>
+                            <Select value={selectedLimitRange?.label || ""} label="Select Range" onChange={handleLimitRangeChange}>
+                              {(limitConfig[region]?.steps || limitConfig.default.steps).map((option) => (<MenuItem key={option.label} value={option.label}>{option.label}</MenuItem>))}
                             </Select>
                           </FormControl>
+                          {selectedLimitRange && (
+                            <Box sx={{ px: 1, mb: 2 }}>
+                              <Slider value={newCard.limit} min={selectedLimitRange.min} max={selectedLimitRange.max} step={region === "IN" ? 1000 : 100} valueLabelDisplay="auto" valueLabelFormat={(value) => `${getCurrencySymbol(region)}${value.toLocaleString()}`} onChange={(e, newValue) => setNewCard(prev => ({ ...prev, limit: newValue }))} />
+                            </Box>
+                          )}
+                          <Typography variant="body2" color="text.secondary" sx={{ mt: 1, textAlign: "right" }}>{getCurrencySymbol(region)}{newCard.limit?.toLocaleString() || "0"}</Typography>
                         </Box>
-
-                        <Box sx={{ mb: 4 }}>
-                          <Typography
-                            variant="subtitle1"
-                            gutterBottom
-                            sx={{ fontWeight: 500, color: "text.primary" }}
-                          >
-                            Credit Limit ({getCurrencySymbol()})
-                          </Typography>
-                          <Box sx={{ px: 1, mb: 2 }}>
-                            <Slider
-                              value={newCard.limit ?? getLimitConfig().min}
-                              min={getLimitConfig().min}
-                              max={getLimitConfig().max}
-                              step={1000}
-                              valueLabelDisplay="auto"
-                              valueLabelFormat={(value) =>
-                                `${getCurrencySymbol()}${value.toLocaleString()}`
-                              }
-                              marks={getLimitConfig().steps}
-                              onChange={(e, newValue) =>
-                                setNewCard((prev) => ({
-                                  ...prev,
-                                  limit: newValue,
-                                }))
-                              }
-                            />
-                          </Box>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ mt: 1, textAlign: "right" }}
-                          >
-                            {getCurrencySymbol()}
-                            {newCard.limit?.toLocaleString() || "0"}
-                          </Typography>
-                        </Box>
-
                         <Box>
-                          <Typography
-                            variant="subtitle1"
-                            gutterBottom
-                            sx={{ fontWeight: 500, color: "text.primary" }}
-                          >
-                            Card Member Since
-                          </Typography>
+                          <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 500, color: "text.primary" }}>Card Member Since</Typography>
                           <Grid container spacing={2}>
-                            <Grid item xs={6}>
-                              <FormControl fullWidth>
-                                <InputLabel id="month-select-label">
-                                  Month
-                                </InputLabel>
-                                <Select
-                                  labelId="month-select-label"
-                                  value={selectedMonth}
-                                  label="Month"
-                                  onChange={(e) =>
-                                    setSelectedMonth(e.target.value)
-                                  }
-                                >
-                                  {months.map((month) => (
-                                    <MenuItem key={month} value={month}>
-                                      {month}
-                                    </MenuItem>
-                                  ))}
-                                </Select>
-                              </FormControl>
-                            </Grid>
-                            <Grid item xs={6}>
-                              <FormControl fullWidth>
-                                <InputLabel id="year-select-label">
-                                  Year
-                                </InputLabel>
-                                <Select
-                                  labelId="year-select-label"
-                                  value={selectedYear}
-                                  label="Year"
-                                  onChange={(e) =>
-                                    setSelectedYear(e.target.value)
-                                  }
-                                >
-                                  {generateYearOptions().map((year) => (
-                                    <MenuItem key={year} value={year}>
-                                      {year}
-                                    </MenuItem>
-                                  ))}
-                                </Select>
-                              </FormControl>
-                            </Grid>
+                            <Grid item xs={6}><FormControl fullWidth><InputLabel>Month</InputLabel><Select value={selectedMonth} label="Month" onChange={(e) => setSelectedMonth(e.target.value)}>{months.map((month) => (<MenuItem key={month} value={month}>{month}</MenuItem>))}</Select></FormControl></Grid>
+                            <Grid item xs={6}><FormControl fullWidth><InputLabel>Year</InputLabel><Select value={selectedYear} label="Year" onChange={(e) => setSelectedYear(e.target.value)}>{generateYearOptions().map((year) => (<MenuItem key={year} value={year}>{year}</MenuItem>))}</Select></FormControl></Grid>
                           </Grid>
                         </Box>
                       </AccordionDetails>
                     </Accordion>
                   </Paper>
                 </>
-              )}
+              }
             </DialogContent>
-
-            <DialogActions
-              sx={{
-                px: 3,
-                py: 2,
-                borderTop: `1px solid ${theme.palette.divider}`,
-                gap: 1,
-              }}
-            >
-              <Button
-                onClick={onClose}
-                variant="outlined"
-                sx={{
-                  borderRadius: 2,
-                  px: 3,
-                  textTransform: "none",
-                  fontWeight: 500,
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleAddCard}
-                color="primary"
-                variant="contained"
-                disabled={!newCard.bank || !newCard.cardName || isLoading}
-                sx={{
-                  borderRadius: 2,
-                  px: 3,
-                  boxShadow: theme.shadows[3],
-                  textTransform: "none",
-                  fontWeight: 500,
-                }}
-              >
-                Add Card
-              </Button>
+            <DialogActions sx={{ px: 3, py: 2, borderTop: `1px solid ${theme.palette.divider}`, gap: 1 }}>
+              <Button onClick={onClose} variant="outlined" sx={{ borderRadius: 2, px: 3, textTransform: "none", fontWeight: 500 }}>Cancel</Button>
+              <Button onClick={handleAddCard} color="primary" variant="contained" disabled={!newCard.bank || !newCard.cardName || isLoading} sx={{ borderRadius: 2, px: 3, boxShadow: theme.shadows[3], textTransform: "none", fontWeight: 500 }}>Add Card</Button>
             </DialogActions>
           </Dialog>
         )}
       </AnimatePresence>
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-      >
-        <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })}><Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity}>{snackbar.message}</Alert></Snackbar>
     </>
   );
 }
