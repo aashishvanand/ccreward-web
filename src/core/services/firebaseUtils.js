@@ -38,7 +38,7 @@ export const addCardForUser = async (userId, cardData) => {
 
     // Get country from region context or local storage
     const country = localStorage.getItem('app-region')?.toLowerCase() || 'in';
-    
+
     // Create a new object with only essential and provided fields
     const cardToAdd = {
       bank: cardData.bank,
@@ -78,7 +78,7 @@ export const getCardsForUser = async (userId) => {
     // Get current region/country directly from localStorage (don't use cached value)
     const selectedCountry = localStorage.getItem('app-region')?.toLowerCase() || 'in';
     console.log("📍 Selected country/region:", selectedCountry);
-    
+
     // If not in cache, fetch from Firebase
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
@@ -98,30 +98,30 @@ export const getCardsForUser = async (userId) => {
       id: key,
       ...value
     }));
-    
+
     // console.log("📊 ALL CARDS (unfiltered):", cardList);
-    
+
     // Log each card's properties in detail
     cardList.forEach((card, index) => {
       // console.log(`📌 Card ${index + 1}: ${card.bank} ${card.cardName}`);
       // console.log(`   Country: ${card.country || 'undefined'} (type: ${typeof card.country})`);
-      
+
       // Convert card country to lowercase for case-insensitive comparison
       const cardCountry = (card.country || '').toLowerCase();
       const shouldInclude = !card.country || cardCountry === selectedCountry;
-      
+
       console.log(`   Will be included for ${selectedCountry}? ${shouldInclude}`);
     });
-    
+
     // Filter cards by country - using case-insensitive comparison
     const filteredCardList = cardList.filter(card => {
       // If card has no country, include it in all regions
       if (!card.country) return true;
-      
+
       // Otherwise do case-insensitive comparison
       return card.country.toLowerCase() === selectedCountry.toLowerCase();
     });
-    
+
     console.log(`🔍 FILTERED CARDS for region '${selectedCountry}':`, filteredCardList);
     console.log(`📊 Stats: ${filteredCardList.length} of ${cardList.length} cards matched the current region`);
 
@@ -140,27 +140,27 @@ export const getCardsForUser = async (userId) => {
 export const updateCardForUser = async (userId, cardData) => {
   try {
     const userRef = doc(db, 'users', userId);
-    
+
     // Destructure and remove unwanted fields
-    const { 
-      id, 
-      image, 
-      orientation, 
-      updatedAt, 
-      addedAt, 
-      ...cardDetails 
+    const {
+      id,
+      image,
+      orientation,
+      updatedAt,
+      addedAt,
+      ...cardDetails
     } = cardData;
-    
+
     await updateDoc(userRef, {
       [`cards.${id}`]: {
         ...cardDetails
       }
     });
-    
+
     // Clear cache to force a fresh fetch next time
     localStorage.removeItem(`${CACHE_KEY}_${userId}`);
     localStorage.removeItem(`${CACHE_TIMESTAMP_KEY}_${userId}`);
-    
+
     return id;
   } catch (error) {
     console.error("Error updating card:", error);
@@ -191,7 +191,7 @@ export const refreshCardCache = async (userId) => {
     // Clear cache
     localStorage.removeItem(`${CACHE_KEY}_${userId}`);
     localStorage.removeItem(`${CACHE_TIMESTAMP_KEY}_${userId}`);
-    
+
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
 

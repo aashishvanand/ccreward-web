@@ -9,18 +9,18 @@ export const initializeCrashlytics = async () => {
     try {
         // For web, we'll implement a custom crash reporting system
         // that integrates with Firebase Analytics for error tracking
-        
+
         // Set up global error handlers
         setupGlobalErrorHandlers();
-        
+
         // Set up unhandled promise rejection handler
         setupUnhandledRejectionHandler();
-        
+
         // Set up performance observer for monitoring
         setupPerformanceMonitoring();
-        
+
         isInitialized = true;
-        
+
         console.log('✅ Crashlytics-like error reporting initialized');
         return true;
     } catch (error) {
@@ -43,7 +43,7 @@ function setupGlobalErrorHandlers() {
             userAgent: navigator.userAgent,
             type: 'javascript_error'
         };
-        
+
         recordError('global_javascript_error', errorInfo);
     });
 }
@@ -59,7 +59,7 @@ function setupUnhandledRejectionHandler() {
             userAgent: navigator.userAgent,
             type: 'unhandled_promise_rejection'
         };
-        
+
         recordError('unhandled_promise_rejection', errorInfo);
     });
 }
@@ -145,7 +145,7 @@ export const recordError = (errorName, errorInfo = {}) => {
 
         // Store critical errors locally for later analysis
         storeCriticalError(errorName, enhancedErrorInfo);
-        
+
     } catch (error) {
         console.error('Error recording crash:', error);
     }
@@ -195,7 +195,7 @@ export const recordPerformanceIssue = (issueName, issueInfo = {}) => {
 export const setCrashlyticsUserId = (userId) => {
     try {
         sessionStorage.setItem('crashlytics_user_id', userId);
-        
+
         // Also set in Google Analytics
         if (typeof window !== 'undefined' && window.gtag) {
             window.gtag('config', process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID, {
@@ -231,7 +231,7 @@ function getCustomKeys() {
 export const logBreadcrumb = (message, category = 'info', data = {}) => {
     try {
         const breadcrumbs = JSON.parse(sessionStorage.getItem('crashlytics_breadcrumbs') || '[]');
-        
+
         const breadcrumb = {
             message,
             category,
@@ -239,16 +239,16 @@ export const logBreadcrumb = (message, category = 'info', data = {}) => {
             data,
             level: getBreadcrumbLevel(category)
         };
-        
+
         breadcrumbs.push(breadcrumb);
-        
+
         // Keep only last 50 breadcrumbs
         if (breadcrumbs.length > 50) {
             breadcrumbs.shift();
         }
-        
+
         sessionStorage.setItem('crashlytics_breadcrumbs', JSON.stringify(breadcrumbs));
-        
+
         if (process.env.NODE_ENV === 'development') {
             console.log('🍞 Breadcrumb:', breadcrumb);
         }
@@ -267,7 +267,7 @@ export const handleReactError = (error, errorInfo) => {
         fatal: true,
         react_version: React?.version || 'unknown'
     };
-    
+
     recordFatalError('react_error_boundary', reactErrorInfo);
 };
 
@@ -282,7 +282,7 @@ export const recordAPIError = (endpoint, statusCode, errorMessage, requestData =
         retry_count: requestData.retryCount || 0,
         api_error: true
     };
-    
+
     recordNonFatalError('api_error', apiErrorInfo);
 };
 
@@ -335,18 +335,18 @@ function getBreadcrumbLevel(category) {
 function storeCriticalError(errorName, errorInfo) {
     try {
         const criticalErrors = JSON.parse(localStorage.getItem('critical_errors') || '[]');
-        
+
         criticalErrors.push({
             error_name: errorName,
             timestamp: new Date().toISOString(),
             ...errorInfo
         });
-        
+
         // Keep only last 10 critical errors
         if (criticalErrors.length > 10) {
             criticalErrors.shift();
         }
-        
+
         localStorage.setItem('critical_errors', JSON.stringify(criticalErrors));
     } catch (error) {
         console.error('Error storing critical error:', error);

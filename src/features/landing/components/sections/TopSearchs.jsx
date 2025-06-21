@@ -33,15 +33,15 @@ const TopSearchs = () => {
       setLoading(true);
       setError(null);
       setStatsData(null);
-      
+
       try {
         // Construct the URL dynamically based on the current region
         const url = `https://files.ccreward.app/stats/${region.toLowerCase()}/latest.json`;
         const response = await fetch(url);
 
         if (!response.ok) {
-            console.warn(`Trending stats for region "${region}" not found.`);
-            throw new Error('Stats not available for this region.');
+          console.warn(`Trending stats for region "${region}" not found.`);
+          throw new Error("Stats not available for this region.");
         }
 
         const data = await response.json();
@@ -53,11 +53,11 @@ const TopSearchs = () => {
         setLoading(false);
       }
     };
-    
+
     if (region) {
       fetchStats();
     }
-  // Add `region` to the dependency array to refetch when it changes
+    // Add `region` to the dependency array to refetch when it changes
   }, [region]);
 
   const handleTimeframeChange = (event, newValue) => {

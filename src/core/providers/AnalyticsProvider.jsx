@@ -5,71 +5,84 @@ import { useRef, useEffect, useState } from "react";
 import Script from "next/script";
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { firebaseApp } from "../../../firebase";
-import { initializeClarity } from '../services/clarity';
-import { initializeAnalytics, setUserAnalytics, logPageView } from '../services/analytics';
-import { initializeCrashlytics, setCrashlyticsUserId, logBreadcrumb } from '../services/crashlytics';
-import { useAuth } from './AuthContext';
-import { useRouter } from 'next/navigation';
+import { initializeClarity } from "../services/clarity";
+import {
+  initializeAnalytics,
+  setUserAnalytics,
+  logPageView,
+} from "../services/analytics";
+import {
+  initializeCrashlytics,
+  setCrashlyticsUserId,
+  logBreadcrumb,
+} from "../services/crashlytics";
+import { useAuth } from "./AuthContext";
+import { useRouter } from "next/navigation";
 
 export function AnalyticsProvider({ children }) {
   const initialized = useRef(false);
   const [analyticsReady, setAnalyticsReady] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
-  const currentPath = useRef('');
+  const currentPath = useRef("");
 
   // Initialize analytics services
   useEffect(() => {
     const initializeAllAnalytics = async () => {
-      if (!initialized.current && typeof window !== 'undefined') {
+      if (!initialized.current && typeof window !== "undefined") {
         try {
-          console.log('🚀 Initializing analytics services...');
-          
+          console.log("🚀 Initializing analytics services...");
+
           // Initialize Firebase Analytics
           let firebaseAnalyticsReady = false;
           if (await isSupported()) {
             getAnalytics(firebaseApp);
             firebaseAnalyticsReady = true;
-            console.log('✅ Firebase Analytics initialized');
+            console.log("✅ Firebase Analytics initialized");
           }
-          
+
           // Initialize enhanced analytics
           const enhancedAnalyticsReady = await initializeAnalytics();
-          console.log('✅ Enhanced Analytics initialized:', enhancedAnalyticsReady);
-          
+          console.log(
+            "✅ Enhanced Analytics initialized:",
+            enhancedAnalyticsReady
+          );
+
           // Initialize Crashlytics-like error reporting
           const crashlyticsReady = await initializeCrashlytics();
-          console.log('✅ Crashlytics initialized:', crashlyticsReady);
-          
+          console.log("✅ Crashlytics initialized:", crashlyticsReady);
+
           // Initialize Microsoft Clarity
           try {
             initializeClarity();
-            console.log('✅ Microsoft Clarity initialized');
+            console.log("✅ Microsoft Clarity initialized");
           } catch (clarityError) {
-            console.warn('⚠️ Microsoft Clarity initialization failed:', clarityError);
+            console.warn(
+              "⚠️ Microsoft Clarity initialization failed:",
+              clarityError
+            );
           }
-          
+
           initialized.current = true;
           setAnalyticsReady(true);
-          
+
           // Log initial breadcrumb
-          logBreadcrumb('Analytics services initialized', 'info', {
+          logBreadcrumb("Analytics services initialized", "info", {
             firebase_analytics: firebaseAnalyticsReady,
             enhanced_analytics: enhancedAnalyticsReady,
-            crashlytics: crashlyticsReady
+            crashlytics: crashlyticsReady,
           });
-          
-          console.log('🎉 All analytics services initialized successfully');
-          
+
+          console.log("🎉 All analytics services initialized successfully");
         } catch (error) {
           console.error("❌ Failed to initialize analytics:", error);
           // Record this initialization error
-          if (typeof window !== 'undefined') {
+          if (typeof window !== "undefined") {
             setTimeout(() => {
-              import('../services/crashlytics').then(({ recordFatalError }) => {
-                recordFatalError('analytics_initialization_failed', {
+              import("../services/crashlytics").then(({ recordFatalError }) => {
+                recordFatalError("analytics_initialization_failed", {
                   error_message: error.message,
-                  error_stack: error.stack
+                  error_stack: error.stack,
                 });
               });
             }, 1000);
@@ -88,73 +101,73 @@ export function AnalyticsProvider({ children }) {
         // Set user ID for analytics
         setUserAnalytics(user.uid, {
           isAnonymous: user.isAnonymous,
-          signupMethod: user.isAnonymous ? 'anonymous' : 'google',
+          signupMethod: user.isAnonymous ? "anonymous" : "google",
           emailVerified: user.emailVerified || false,
           creationTime: user.metadata?.creationTime,
-          lastSignInTime: user.metadata?.lastSignInTime
+          lastSignInTime: user.metadata?.lastSignInTime,
         });
 
         // Set user ID for crashlytics
         setCrashlyticsUserId(user.uid);
 
         // Log breadcrumb for user authentication
-        logBreadcrumb('User authenticated', 'user', {
+        logBreadcrumb("User authenticated", "user", {
           user_id: user.uid,
           is_anonymous: user.isAnonymous,
-          email_verified: user.emailVerified || false
+          email_verified: user.emailVerified || false,
         });
 
-        console.log('👤 User analytics updated for:', user.uid);
+        console.log("👤 User analytics updated for:", user.uid);
       } catch (error) {
-        console.error('Error updating user analytics:', error);
+        console.error("Error updating user analytics:", error);
       }
     }
   }, [user, analyticsReady]);
 
   // Track route changes
   useEffect(() => {
-    if (analyticsReady && typeof window !== 'undefined') {
+    if (analyticsReady && typeof window !== "undefined") {
       const handleRouteChange = () => {
         const newPath = window.location.pathname;
         if (newPath !== currentPath.current) {
           currentPath.current = newPath;
-          
+
           // Log page view
           logPageView(newPath, {
             previous_page: currentPath.current,
-            navigation_type: 'route_change'
+            navigation_type: "route_change",
           });
 
           // Log breadcrumb for navigation
-          logBreadcrumb(`Navigated to ${newPath}`, 'navigation', {
+          logBreadcrumb(`Navigated to ${newPath}`, "navigation", {
             from: currentPath.current,
-            to: newPath
+            to: newPath,
           });
 
-          console.log('📱 Route change tracked:', newPath);
+          console.log("📱 Route change tracked:", newPath);
         }
       };
 
       // Initial page view
-      if (currentPath.current === '') {
+      if (currentPath.current === "") {
         currentPath.current = window.location.pathname;
         logPageView(currentPath.current, {
-          navigation_type: 'initial_load'
+          navigation_type: "initial_load",
         });
       }
 
       // Listen for route changes (for client-side navigation)
-      window.addEventListener('popstate', handleRouteChange);
-      
+      window.addEventListener("popstate", handleRouteChange);
+
       // For Next.js router events
       if (router?.events) {
-        router.events.on('routeChangeComplete', handleRouteChange);
+        router.events.on("routeChangeComplete", handleRouteChange);
       }
 
       return () => {
-        window.removeEventListener('popstate', handleRouteChange);
+        window.removeEventListener("popstate", handleRouteChange);
         if (router?.events) {
-          router.events.off('routeChangeComplete', handleRouteChange);
+          router.events.off("routeChangeComplete", handleRouteChange);
         }
       };
     }
@@ -162,30 +175,33 @@ export function AnalyticsProvider({ children }) {
 
   // Track visibility changes for engagement
   useEffect(() => {
-    if (analyticsReady && typeof window !== 'undefined') {
+    if (analyticsReady && typeof window !== "undefined") {
       let visibilityStartTime = Date.now();
 
       const handleVisibilityChange = () => {
         if (document.hidden) {
           // Page became hidden
           const engagementTime = Date.now() - visibilityStartTime;
-          logBreadcrumb('Page hidden', 'user', {
+          logBreadcrumb("Page hidden", "user", {
             engagement_time: engagementTime,
-            page: window.location.pathname
+            page: window.location.pathname,
           });
         } else {
           // Page became visible
           visibilityStartTime = Date.now();
-          logBreadcrumb('Page visible', 'user', {
-            page: window.location.pathname
+          logBreadcrumb("Page visible", "user", {
+            page: window.location.pathname,
           });
         }
       };
 
-      document.addEventListener('visibilitychange', handleVisibilityChange);
+      document.addEventListener("visibilitychange", handleVisibilityChange);
 
       return () => {
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        document.removeEventListener(
+          "visibilitychange",
+          handleVisibilityChange
+        );
       };
     }
   }, [analyticsReady]);
@@ -197,13 +213,13 @@ export function AnalyticsProvider({ children }) {
         src={`https://www.googletagmanager.com/gtag/js?l=dataLayer&id=${process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID}`}
         strategy="afterInteractive"
         onLoad={() => {
-          console.log('📊 Google Analytics script loaded');
+          console.log("📊 Google Analytics script loaded");
         }}
         onError={(error) => {
-          console.error('❌ Google Analytics script failed to load:', error);
+          console.error("❌ Google Analytics script failed to load:", error);
         }}
       />
-      
+
       <Script id="firebase-analytics-init" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];

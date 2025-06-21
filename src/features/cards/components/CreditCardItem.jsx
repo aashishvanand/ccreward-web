@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 import Image from "next/image";
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 const bankColors = {
   HDFC: "#004C8F",
@@ -33,33 +33,33 @@ const bankColors = {
 // Card animations
 const cardVariants = {
   initial: { scale: 0.96, y: 10, opacity: 0 },
-  animate: { 
-    scale: 1, 
-    y: 0, 
+  animate: {
+    scale: 1,
+    y: 0,
     opacity: 1,
     transition: {
       type: "spring",
       stiffness: 260,
       damping: 20,
-      delay: 0.1
-    }
+      delay: 0.1,
+    },
   },
-  hover: { 
-    y: -8, 
+  hover: {
+    y: -8,
     boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
-    transition: { 
-      type: "spring", 
-      stiffness: 400, 
-      damping: 10 
-    }
+    transition: {
+      type: "spring",
+      stiffness: 400,
+      damping: 10,
+    },
   },
-  tap: { scale: 0.98 }
+  tap: { scale: 0.98 },
 };
 
 // Delete button animation
 const deleteButtonVariants = {
   initial: { opacity: 0 },
-  hover: { opacity: 1 }
+  hover: { opacity: 1 },
 };
 
 function CreditCardItem({ card, onDelete }) {

@@ -44,13 +44,16 @@ const ReferralButton = ({
         // Construct the URL dynamically using the current region
         const url = `https://files.ccreward.app/referral_${region.toLowerCase()}.json`;
         const response = await fetch(url);
-        
+
         if (!response.ok) {
-            // Handle cases where a region-specific file might not exist
-            console.warn(`Referral file for region "${region}" not found.`);
-            // Set empty data in cache to avoid refetching on every render
-            localStorage.setItem(cacheKey, JSON.stringify({ data: [], timestamp: Date.now() }));
-            return;
+          // Handle cases where a region-specific file might not exist
+          console.warn(`Referral file for region "${region}" not found.`);
+          // Set empty data in cache to avoid refetching on every render
+          localStorage.setItem(
+            cacheKey,
+            JSON.stringify({ data: [], timestamp: Date.now() })
+          );
+          return;
         }
 
         const data = await response.json();
@@ -79,7 +82,7 @@ const ReferralButton = ({
     if (bank && cardName && region) {
       fetchReferralData();
     }
-  // Add region and cacheKey to the dependency array
+    // Add region and cacheKey to the dependency array
   }, [bank, cardName, region, cacheKey]);
 
   if (!calculationPerformed || !referralLink || isLoading) {

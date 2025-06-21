@@ -1,75 +1,77 @@
-import React from 'react';
-import { 
-  Box, 
-  Typography, 
-  Select, 
-  MenuItem, 
-  FormControl, 
+import React from "react";
+import {
+  Box,
+  Typography,
+  Select,
+  MenuItem,
+  FormControl,
   InputLabel,
   Skeleton,
   useMediaQuery,
-  useTheme
-} from '@mui/material';
-import PropTypes from 'prop-types';
-import { motion } from 'framer-motion';
+  useTheme,
+} from "@mui/material";
+import PropTypes from "prop-types";
+import { motion } from "framer-motion";
 
-const HowToSelector = ({ 
-  platforms, 
+const HowToSelector = ({
+  platforms,
   availableTopics,
-  selectedPlatform, 
-  selectedTopic, 
-  onPlatformChange, 
+  selectedPlatform,
+  selectedTopic,
+  onPlatformChange,
   onTopicChange,
   isLoading,
   isMini = false,
-  showLabels = true
+  showLabels = true,
 }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // If in mini mode, render a more compact selector
   if (isMini) {
     return (
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: isMobile ? 'column' : 'row',
-        alignItems: 'center',
-        gap: 1,
-        width: isMobile ? '100%' : 'auto'
-      }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: isMobile ? "column" : "row",
+          alignItems: "center",
+          gap: 1,
+          width: isMobile ? "100%" : "auto",
+        }}
+      >
         {showLabels && (
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              mr: 1, 
+          <Typography
+            variant="body2"
+            sx={{
+              mr: 1,
               fontWeight: 500,
-              whiteSpace: 'nowrap',
-              color: 'text.secondary'
+              whiteSpace: "nowrap",
+              color: "text.secondary",
             }}
           >
             Platform:
           </Typography>
         )}
-        
-        <FormControl 
-          size="small" 
-          sx={{ 
-            minWidth: { xs: '100%', sm: 120 },
-            '& .MuiOutlinedInput-root': {
-              borderRadius: 2
-            }
+
+        <FormControl
+          size="small"
+          sx={{
+            minWidth: { xs: "100%", sm: 120 },
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 2,
+            },
           }}
         >
           <Select
             value={selectedPlatform}
             onChange={(e) => onPlatformChange(e.target.value)}
             sx={{
-              '& .MuiSelect-select': {
-                display: 'flex',
-                alignItems: 'center',
+              "& .MuiSelect-select": {
+                display: "flex",
+                alignItems: "center",
                 gap: 1,
-                py: 1
-              }
+                py: 1,
+              },
             }}
             displayEmpty={!selectedPlatform}
           >
@@ -81,13 +83,13 @@ const HowToSelector = ({
             {Object.values(platforms).map((platform) => {
               const Icon = platform.icon;
               return (
-                <MenuItem 
-                  key={platform.id} 
+                <MenuItem
+                  key={platform.id}
                   value={platform.id}
                   sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
                   }}
                 >
                   <Icon sx={{ fontSize: 20 }} />
@@ -97,28 +99,28 @@ const HowToSelector = ({
             })}
           </Select>
         </FormControl>
-        
+
         {showLabels && (
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              mr: 1, 
+          <Typography
+            variant="body2"
+            sx={{
+              mr: 1,
               fontWeight: 500,
-              whiteSpace: 'nowrap',
-              color: 'text.secondary'
+              whiteSpace: "nowrap",
+              color: "text.secondary",
             }}
           >
             Topic:
           </Typography>
         )}
-        
-        <FormControl 
-          size="small" 
-          sx={{ 
-            minWidth: { xs: '100%', sm: 180 },
-            '& .MuiOutlinedInput-root': {
-              borderRadius: 2
-            }
+
+        <FormControl
+          size="small"
+          sx={{
+            minWidth: { xs: "100%", sm: 180 },
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 2,
+            },
           }}
           disabled={!selectedPlatform || isLoading}
         >
@@ -129,19 +131,15 @@ const HowToSelector = ({
           >
             {!selectedTopic && (
               <MenuItem value="" disabled>
-                {!selectedPlatform 
-                  ? 'Select platform first' 
-                  : availableTopics.length === 0 
-                    ? 'No topics available' 
-                    : 'Select topic'
-                }
+                {!selectedPlatform
+                  ? "Select platform first"
+                  : availableTopics.length === 0
+                  ? "No topics available"
+                  : "Select topic"}
               </MenuItem>
             )}
             {availableTopics.map((topic) => (
-              <MenuItem 
-                key={topic.id} 
-                value={topic.id}
-              >
+              <MenuItem key={topic.id} value={topic.id}>
                 {topic.title}
               </MenuItem>
             ))}
@@ -156,44 +154,51 @@ const HowToSelector = ({
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      style={{ width: '100%' }}
+      style={{ width: "100%" }}
     >
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column',
-        gap: 2,
-        p: 3,
-        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
-        borderRadius: 2,
-        width: '100%'
-      }}>
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: 'column',
-          gap: 1,
-          width: '100%'
-        }}>
-          <Typography 
-            variant="body1" 
-            sx={{ 
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          p: 3,
+          bgcolor:
+            theme.palette.mode === "dark"
+              ? "rgba(255, 255, 255, 0.05)"
+              : "rgba(0, 0, 0, 0.02)",
+          borderRadius: 2,
+          width: "100%",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+            width: "100%",
+          }}
+        >
+          <Typography
+            variant="body1"
+            sx={{
               fontWeight: 500,
-              color: 'text.primary'
+              color: "text.primary",
             }}
           >
             Platform:
           </Typography>
-          
+
           {isLoading ? (
             <Skeleton variant="rectangular" width="100%" height={40} />
           ) : (
-            <FormControl 
-              sx={{ 
-                width: '100%',
-                '& .MuiSelect-select': {
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1
-                }
+            <FormControl
+              sx={{
+                width: "100%",
+                "& .MuiSelect-select": {
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                },
               }}
             >
               <Select
@@ -206,16 +211,18 @@ const HowToSelector = ({
                   Select Platform
                 </MenuItem>
                 {Object.values(platforms).map((platform) => (
-                  <MenuItem 
-                    key={platform.id} 
+                  <MenuItem
+                    key={platform.id}
                     value={platform.id}
                     sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
                     }}
                   >
-                    {React.createElement(platform.icon, { style: { fontSize: 24 } })}
+                    {React.createElement(platform.icon, {
+                      style: { fontSize: 24 },
+                    })}
                     {platform.name}
                   </MenuItem>
                 ))}
@@ -223,28 +230,30 @@ const HowToSelector = ({
             </FormControl>
           )}
         </Box>
-        
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: 'column',
-          gap: 1,
-          width: '100%'
-        }}>
-          <Typography 
-            variant="body1" 
-            sx={{ 
+
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+            width: "100%",
+          }}
+        >
+          <Typography
+            variant="body1"
+            sx={{
               fontWeight: 500,
-              color: 'text.primary'
+              color: "text.primary",
             }}
           >
             Topic:
           </Typography>
-          
+
           {isLoading ? (
             <Skeleton variant="rectangular" width="100%" height={40} />
           ) : (
-            <FormControl 
-              sx={{ width: '100%' }}
+            <FormControl
+              sx={{ width: "100%" }}
               disabled={!selectedPlatform || isLoading}
             >
               <Select
@@ -254,26 +263,25 @@ const HowToSelector = ({
                 size="small"
               >
                 <MenuItem value="" disabled>
-                  {!selectedPlatform 
-                    ? 'Select platform first' 
-                    : availableTopics.length === 0 
-                      ? 'No topics available' 
-                      : 'Select topic'
-                  }
+                  {!selectedPlatform
+                    ? "Select platform first"
+                    : availableTopics.length === 0
+                    ? "No topics available"
+                    : "Select topic"}
                 </MenuItem>
                 {availableTopics.map((topic) => (
-                  <MenuItem 
-                    key={topic.id} 
-                    value={topic.id}
-                  >
-                    <Box sx={{
-                      display: 'flex',
-                      flexDirection: 'column'
-                    }}>
+                  <MenuItem key={topic.id} value={topic.id}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
+                    >
                       <Typography variant="body2">{topic.title}</Typography>
                       {topic.difficulty && (
                         <Typography variant="caption" color="text.secondary">
-                          Difficulty: {topic.difficulty} • Est. Time: {topic.estimatedTime}
+                          Difficulty: {topic.difficulty} • Est. Time:{" "}
+                          {topic.estimatedTime}
                         </Typography>
                       )}
                     </Box>
@@ -297,14 +305,14 @@ HowToSelector.propTypes = {
   onTopicChange: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
   isMini: PropTypes.bool,
-  showLabels: PropTypes.bool
+  showLabels: PropTypes.bool,
 };
 
 HowToSelector.defaultProps = {
   availableTopics: [],
   isLoading: false,
   isMini: false,
-  showLabels: true
+  showLabels: true,
 };
 
 export default HowToSelector;

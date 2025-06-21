@@ -44,7 +44,9 @@ const ShareDialog = ({ open, onClose, onShare, isGenerating }) => {
     if (open && isGenerating) {
       timeoutId = setTimeout(() => {
         setGenerationTimeout(true);
-        setError("Image generation is taking longer than expected. Please try again.");
+        setError(
+          "Image generation is taking longer than expected. Please try again."
+        );
       }, 30000); // 30 second timeout
     }
     return () => clearTimeout(timeoutId);
@@ -94,8 +96,8 @@ const ShareDialog = ({ open, onClose, onShare, isGenerating }) => {
       <DialogTitle>Share Your Card Collection</DialogTitle>
       <DialogContent>
         {error ? (
-          <Alert 
-            severity="error" 
+          <Alert
+            severity="error"
             sx={{ mb: 2 }}
             action={
               <Button color="inherit" size="small" onClick={handleRetry}>
@@ -127,7 +129,7 @@ const ShareDialog = ({ open, onClose, onShare, isGenerating }) => {
             color={imageDownloaded ? "success" : "primary"}
           >
             {isGenerating
-              ? generationTimeout 
+              ? generationTimeout
                 ? "Generation Taking Long..."
                 : "Generating Image..."
               : !imageGenerated

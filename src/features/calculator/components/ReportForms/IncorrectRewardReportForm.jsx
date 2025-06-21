@@ -57,9 +57,13 @@ const IncorrectRewardReportForm = ({
       <form onSubmit={handleSubmit}>
         <DialogTitle>Report Incorrect Reward Points</DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
-          <Typography variant="body2" color="textSecondary" sx={{
-            marginBottom: "16px"
-          }}>
+          <Typography
+            variant="body2"
+            color="textSecondary"
+            sx={{
+              marginBottom: "16px",
+            }}
+          >
             Please provide feedback about the issue with the reward point
             calculation.
           </Typography>
@@ -76,7 +80,7 @@ const IncorrectRewardReportForm = ({
             slotProps={{
               htmlInput: {
                 maxLength: 500,
-              }
+              },
             }}
           />
         </DialogContent>

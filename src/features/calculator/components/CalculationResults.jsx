@@ -53,53 +53,53 @@ const CalculationResults = ({ result, isLoading }) => {
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: {
         type: "spring",
         stiffness: 300,
         damping: 25,
-        delay: 0.1
-      }
+        delay: 0.1,
+      },
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       y: -20,
-      transition: { 
-        duration: 0.2 
-      }
-    }
+      transition: {
+        duration: 0.2,
+      },
+    },
   };
 
   // Celebration animations when rewards are high
   const celebrationVariants = {
     hidden: { scale: 0, rotate: -10, opacity: 0 },
-    visible: { 
-      scale: 1, 
-      rotate: 0, 
+    visible: {
+      scale: 1,
+      rotate: 0,
       opacity: 1,
       transition: {
         type: "spring",
         stiffness: 400,
         damping: 10,
-        delay: 0.3
-      }
-    }
+        delay: 0.3,
+      },
+    },
   };
 
   // Loading spinner animation
   const spinnerVariants = {
     hidden: { opacity: 0, scale: 0.8 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
       transition: {
         repeat: Infinity,
         repeatType: "mirror",
-        duration: 0.8
-      }
-    }
+        duration: 0.8,
+      },
+    },
   };
 
   // Reward text number animation
@@ -112,9 +112,9 @@ const CalculationResults = ({ result, isLoading }) => {
         type: "spring",
         stiffness: 300,
         damping: 15,
-        delay: 0.4
-      }
-    }
+        delay: 0.4,
+      },
+    },
   };
 
   return (
@@ -134,7 +134,7 @@ const CalculationResults = ({ result, isLoading }) => {
               width: "100%",
               borderRadius: 2,
               overflow: "hidden",
-              position: "relative"
+              position: "relative",
             },
             hasRewards
               ? {
@@ -146,9 +146,7 @@ const CalculationResults = ({ result, isLoading }) => {
           ]}
         >
           {isLoading ? (
-            <Box
-              sx={{ display: "flex", justifyContent: "center", py: 2 }}
-            >
+            <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
               <motion.div
                 variants={spinnerVariants}
                 initial="hidden"
@@ -173,7 +171,7 @@ const CalculationResults = ({ result, isLoading }) => {
                       style={{
                         position: "absolute",
                         left: 10,
-                        top: -5
+                        top: -5,
                       }}
                       variants={celebrationVariants}
                     >
@@ -183,7 +181,7 @@ const CalculationResults = ({ result, isLoading }) => {
                       style={{
                         position: "absolute",
                         right: 10,
-                        top: -5
+                        top: -5,
                       }}
                       variants={celebrationVariants}
                     >
@@ -191,7 +189,7 @@ const CalculationResults = ({ result, isLoading }) => {
                     </motion.div>
                   </>
                 )}
-                
+
                 <Typography
                   ref={textRef}
                   variant="h6"
@@ -234,10 +232,14 @@ const CalculationResults = ({ result, isLoading }) => {
                     </motion.span>
                   )}
                 </Typography>
-                
+
                 {(isMobile || isOverflowing) && (
                   <Tooltip title={expanded ? "Collapse" : "Expand"}>
-                    <IconButton size="small" onClick={toggleExpand} sx={{ ml: 1 }}>
+                    <IconButton
+                      size="small"
+                      onClick={toggleExpand}
+                      sx={{ ml: 1 }}
+                    >
                       {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                     </IconButton>
                   </Tooltip>
@@ -255,7 +257,7 @@ const CalculationResults = ({ result, isLoading }) => {
 const renderAnimatedRewardText = (text) => {
   // Regex to find numbers in the text
   const parts = text.split(/(\d+(?:\.\d+)?)/);
-  
+
   return (
     <>
       {parts.map((part, index) => {
@@ -265,15 +267,15 @@ const renderAnimatedRewardText = (text) => {
             <motion.span
               key={index}
               initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ 
-                opacity: 1, 
+              animate={{
+                opacity: 1,
                 scale: 1,
                 transition: {
                   type: "spring",
                   stiffness: 500,
                   damping: 15,
-                  delay: 0.4 + (index * 0.1)
-                }
+                  delay: 0.4 + index * 0.1,
+                },
               }}
               style={{ display: "inline-block", fontWeight: "bold" }}
             >
@@ -281,7 +283,7 @@ const renderAnimatedRewardText = (text) => {
             </motion.span>
           );
         }
-        
+
         // Regular text
         return <span key={index}>{part}</span>;
       })}

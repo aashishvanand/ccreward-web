@@ -2,10 +2,10 @@ import { Box, Container, Typography, Grid, IconButton } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import TweetContainer from "./TweetContainer";
 // For motion components
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 // For AnimatePresence
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from "framer-motion";
 
 const TestimonialsSection = ({
   visibleTweets,
@@ -39,18 +39,22 @@ const TestimonialsSection = ({
 
           <AnimatePresence mode="wait">
             <motion.div
-              key={visibleTweets[0]?.url || 'empty'} // Use the first tweet URL as key
+              key={visibleTweets[0]?.url || "empty"} // Use the first tweet URL as key
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
-              transition={{ 
-                type: "spring", 
-                stiffness: 300, 
+              transition={{
+                type: "spring",
+                stiffness: 300,
                 damping: 30,
-                duration: 0.4
+                duration: 0.4,
               }}
             >
-              <Grid container spacing={3} sx={{ width: "100%", margin: "0 auto" }}>
+              <Grid
+                container
+                spacing={3}
+                sx={{ width: "100%", margin: "0 auto" }}
+              >
                 {visibleTweets.map((tweet, index) => {
                   // Extract tweet ID from URL for a unique key
                   const tweetId = tweet.url.split("/").pop();
@@ -60,15 +64,15 @@ const TestimonialsSection = ({
                       size={{
                         xs: 12,
                         sm: 6,
-                        md: 4
+                        md: 4,
                       }}
                     >
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ 
+                        transition={{
                           delay: index * 0.1,
-                          duration: 0.3
+                          duration: 0.3,
                         }}
                       >
                         <TweetContainer tweetUrl={tweet.url} />

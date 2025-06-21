@@ -6,7 +6,7 @@ import bankImagesSGData from "../../../../shared/constants/bankImagesSG";
 import { useRegion } from "../../../../core/providers/RegionContext";
 
 const BankSection = () => {
-  const { region } = useRegion();
+  const { region, regionName } = useRegion();
   
   // Select bank data based on region
   const bankData = region === 'SG' ? bankImagesSGData : bankImagesDataIN;
@@ -15,7 +15,7 @@ const BankSection = () => {
     <Box sx={{ py: 8 }}>
       <Container maxWidth="lg">
         <Typography variant="h3" align="center" gutterBottom sx={{ mb: 6 }}>
-          Supported Banks {region === 'SG' ? 'in Singapore' : 'in India'}
+          Supported Banks {regionName}
         </Typography>
         <Grid container spacing={2} sx={{ justifyContent: "center" }}>
           {bankData.map((bank) => (

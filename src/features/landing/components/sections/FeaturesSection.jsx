@@ -1,6 +1,13 @@
 // src/features/landing/components/sections/FeaturesSection.jsx
 import React from "react";
-import { Box, Container, Typography, Grid, Card, useTheme } from "@mui/material";
+import {
+  Box,
+  Container,
+  Typography,
+  Grid,
+  Card,
+  useTheme,
+} from "@mui/material";
 import {
   Search as SearchIcon,
   Calculate as CalculateIcon,
@@ -29,7 +36,7 @@ const features = [
 
 const FeaturesSection = () => {
   const theme = useTheme();
-  
+
   return (
     <Box
       sx={{
@@ -71,8 +78,9 @@ const FeaturesSection = () => {
               key={index}
               size={{
                 xs: 12,
-                md: 4
-              }}>
+                md: 4,
+              }}
+            >
               <Card
                 sx={{
                   height: "100%",

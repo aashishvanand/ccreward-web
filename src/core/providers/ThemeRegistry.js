@@ -105,7 +105,7 @@ function getInitialMode() {
   if (typeof window === 'undefined') {
     return 'light';
   }
-  
+
   const savedMode = localStorage.getItem(STORAGE_KEY);
   if (savedMode) {
     return savedMode;
@@ -125,7 +125,7 @@ export function ThemeRegistry({ children }) {
     // Set the actual mode once we're on the client
     const initialMode = getInitialMode();
     setMode(initialMode);
-    
+
     // If no saved preference, use system preference
     if (!localStorage.getItem(STORAGE_KEY) && prefersDarkMode) {
       setMode('dark');
@@ -142,7 +142,7 @@ export function ThemeRegistry({ children }) {
 
   const theme = useMemo(() => {
     if (!mode) return createTheme({ palette: { mode: 'light' } });
-    
+
     return createTheme({
       palette: {
         mode,

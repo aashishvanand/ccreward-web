@@ -1,32 +1,32 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { 
-  Box, 
-  Typography, 
-  IconButton, 
-  Dialog, 
+import React, { useState } from "react";
+import PropTypes from "prop-types";
+import {
+  Box,
+  Typography,
+  IconButton,
+  Dialog,
   DialogContent,
   Tooltip,
   Paper,
   useTheme,
-  useMediaQuery
-} from '@mui/material';
-import { 
-  PlayCircle as PlayIcon, 
-  FullscreenExit as MinimizeIcon, 
+  useMediaQuery,
+} from "@mui/material";
+import {
+  PlayCircle as PlayIcon,
+  FullscreenExit as MinimizeIcon,
   Fullscreen as FullscreenIcon,
-  Close as CloseIcon 
-} from '@mui/icons-material';
+  Close as CloseIcon,
+} from "@mui/icons-material";
 
-const VideoTutorial = ({ 
-  videoUrl, 
-  title, 
-  description, 
+const VideoTutorial = ({
+  videoUrl,
+  title,
+  description,
   thumbnail,
-  platformColor
+  platformColor,
 }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [isOpen, setIsOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -41,10 +41,10 @@ const VideoTutorial = ({
     if (!validateYouTubeUrl(url)) return null;
 
     let embedUrl = url;
-    if (url.includes('watch?v=')) {
-      embedUrl = url.replace('watch?v=', 'embed/');
-    } else if (url.includes('youtu.be/')) {
-      embedUrl = url.replace('youtu.be/', 'youtube.com/embed/');
+    if (url.includes("watch?v=")) {
+      embedUrl = url.replace("watch?v=", "embed/");
+    } else if (url.includes("youtu.be/")) {
+      embedUrl = url.replace("youtu.be/", "youtube.com/embed/");
     }
 
     // Add autoplay and other parameters
@@ -54,8 +54,10 @@ const VideoTutorial = ({
   // Extract video ID from URL
   const getVideoId = (url) => {
     if (!url) return null;
-    
-    const idMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^\/\?\&]+)/);
+
+    const idMatch = url.match(
+      /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^\/\?\&]+)/
+    );
     return idMatch && idMatch[1] ? idMatch[1] : null;
   };
 
@@ -63,7 +65,7 @@ const VideoTutorial = ({
   const embedUrl = getEmbedUrl(videoUrl);
 
   if (!embedUrl) {
-    console.warn('Invalid YouTube URL provided');
+    console.warn("Invalid YouTube URL provided");
     return null;
   }
 
@@ -77,52 +79,54 @@ const VideoTutorial = ({
   const toggleFullscreen = () => setIsFullscreen(!isFullscreen);
 
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'center',
-      width: '100%',
-      my: 2 
-    }}>
-      <Typography 
-        variant="h6" 
-        sx={{ 
-          mb: 1.5, 
-          textAlign: 'center',
-          fontWeight: 'medium',
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        width: "100%",
+        my: 2,
+      }}
+    >
+      <Typography
+        variant="h6"
+        sx={{
+          mb: 1.5,
+          textAlign: "center",
+          fontWeight: "medium",
           color: platformColor || theme.palette.primary.main,
-          fontSize: { xs: '1rem', sm: '1.25rem' }
+          fontSize: { xs: "1rem", sm: "1.25rem" },
         }}
       >
-        {title || 'Video Tutorial'}
+        {title || "Video Tutorial"}
       </Typography>
-      
+
       {description && (
-        <Typography 
-          variant="body2" 
-          color="text.secondary" 
-          sx={{ 
-            mb: 2, 
-            textAlign: 'center', 
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            mb: 2,
+            textAlign: "center",
             maxWidth: 600,
-            fontSize: '0.875rem'
+            fontSize: "0.875rem",
           }}
         >
           {description}
         </Typography>
       )}
-      
-      <Paper 
+
+      <Paper
         elevation={2}
         sx={{
-          position: 'relative',
-          width: '100%',
+          position: "relative",
+          width: "100%",
           maxWidth: 700,
-          paddingTop: '56.25%', // 16:9 aspect ratio
+          paddingTop: "56.25%", // 16:9 aspect ratio
           borderRadius: isMobile ? 1.5 : 2,
-          overflow: 'hidden',
-          cursor: 'pointer',
-          mx: 'auto'
+          overflow: "hidden",
+          cursor: "pointer",
+          mx: "auto",
         }}
         onClick={handleOpenVideo}
       >
@@ -130,54 +134,56 @@ const VideoTutorial = ({
           component="img"
           src={thumbnail || getThumbnailUrl(videoId)}
           alt={`${title} Tutorial Thumbnail`}
-          sx={{ 
-            position: 'absolute',
+          sx={{
+            position: "absolute",
             top: 0,
             left: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover'
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
           }}
           loading="lazy"
         />
-        
+
         {/* Semi-transparent overlay */}
         <Box
           sx={{
-            position: 'absolute',
+            position: "absolute",
             top: 0,
             left: 0,
-            width: '100%',
-            height: '100%',
-            bgcolor: 'rgba(0,0,0,0.2)',
-            transition: 'background-color 0.3s ease',
-            '&:hover': {
-              bgcolor: 'rgba(0,0,0,0.4)'
-            }
+            width: "100%",
+            height: "100%",
+            bgcolor: "rgba(0,0,0,0.2)",
+            transition: "background-color 0.3s ease",
+            "&:hover": {
+              bgcolor: "rgba(0,0,0,0.4)",
+            },
           }}
         />
-        
+
         {/* Play button */}
-        <Box 
+        <Box
           sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center'
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
         >
           <IconButton
             sx={{
-              color: 'white',
-              bgcolor: platformColor || 'rgba(0,0,0,0.7)',
+              color: "white",
+              bgcolor: platformColor || "rgba(0,0,0,0.7)",
               p: isMobile ? 0.5 : 1,
               mb: 1,
-              '&:hover': {
-                bgcolor: platformColor ? `${platformColor}CC` : 'rgba(0,0,0,0.8)'
-              }
+              "&:hover": {
+                bgcolor: platformColor
+                  ? `${platformColor}CC`
+                  : "rgba(0,0,0,0.8)",
+              },
             }}
           >
             <PlayIcon sx={{ fontSize: isMobile ? 48 : 60 }} />
@@ -192,35 +198,35 @@ const VideoTutorial = ({
         fullWidth
         fullScreen={isFullscreen || isMobile}
         PaperProps={{
-          sx: { 
-            bgcolor: 'black',
-            position: 'relative',
-            overflow: 'hidden',
+          sx: {
+            bgcolor: "black",
+            position: "relative",
+            overflow: "hidden",
             borderRadius: isFullscreen || isMobile ? 0 : 2,
-            m: isMobile ? 0 : 2
-          }
+            m: isMobile ? 0 : 2,
+          },
         }}
       >
-        <Box 
-          sx={{ 
-            position: 'absolute', 
-            top: 12, 
-            right: 12, 
+        <Box
+          sx={{
+            position: "absolute",
+            top: 12,
+            right: 12,
             zIndex: 1000,
-            display: 'flex',
-            gap: 1
+            display: "flex",
+            gap: 1,
           }}
         >
           {!isMobile && (
             <Tooltip title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
-              <IconButton 
+              <IconButton
                 onClick={toggleFullscreen}
-                sx={{ 
-                  bgcolor: 'rgba(0,0,0,0.6)', 
-                  color: 'white',
-                  '&:hover': {
-                    bgcolor: 'rgba(0,0,0,0.8)'
-                  }
+                sx={{
+                  bgcolor: "rgba(0,0,0,0.6)",
+                  color: "white",
+                  "&:hover": {
+                    bgcolor: "rgba(0,0,0,0.8)",
+                  },
                 }}
                 size="small"
               >
@@ -228,16 +234,16 @@ const VideoTutorial = ({
               </IconButton>
             </Tooltip>
           )}
-          
+
           <Tooltip title="Close">
-            <IconButton 
+            <IconButton
               onClick={handleCloseVideo}
-              sx={{ 
-                bgcolor: 'rgba(0,0,0,0.6)', 
-                color: 'white',
-                '&:hover': {
-                  bgcolor: 'rgba(0,0,0,0.8)'
-                }
+              sx={{
+                bgcolor: "rgba(0,0,0,0.6)",
+                color: "white",
+                "&:hover": {
+                  bgcolor: "rgba(0,0,0,0.8)",
+                },
               }}
               size="small"
             >
@@ -246,27 +252,27 @@ const VideoTutorial = ({
           </Tooltip>
         </Box>
 
-        <DialogContent sx={{ p: 0, height: '100%' }}>
-          <Box 
+        <DialogContent sx={{ p: 0, height: "100%" }}>
+          <Box
             sx={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             <iframe
               width="100%"
-              height={isFullscreen || isMobile ? '100%' : '56.25vw'} // 16:9 aspect ratio
+              height={isFullscreen || isMobile ? "100%" : "56.25vw"} // 16:9 aspect ratio
               src={embedUrl}
               title={title || "Video Tutorial"}
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-              style={{ 
-                border: 'none',
-                maxHeight: isFullscreen || isMobile ? '100vh' : '80vh'
+              style={{
+                border: "none",
+                maxHeight: isFullscreen || isMobile ? "100vh" : "80vh",
               }}
             />
           </Box>
@@ -281,13 +287,13 @@ VideoTutorial.propTypes = {
   title: PropTypes.string,
   description: PropTypes.string,
   thumbnail: PropTypes.string,
-  platformColor: PropTypes.string
+  platformColor: PropTypes.string,
 };
 
 VideoTutorial.defaultProps = {
-  title: 'Tutorial Video',
-  description: '',
-  thumbnail: null
+  title: "Tutorial Video",
+  description: "",
+  thumbnail: null,
 };
 
 export default VideoTutorial;

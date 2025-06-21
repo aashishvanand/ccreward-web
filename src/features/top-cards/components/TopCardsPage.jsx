@@ -28,31 +28,31 @@ import {
 import { motion } from "framer-motion";
 
 // Add analytics imports
-import { 
-  useAnalytics, 
-  usePagePerformance, 
+import {
+  useAnalytics,
+  usePagePerformance,
   useEngagementTracking,
-  useComponentAnalytics 
+  useComponentAnalytics,
 } from "../../../core/hooks";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: {
       type: "spring",
       stiffness: 260,
       damping: 20,
       when: "beforeChildren",
-      staggerChildren: 0.1
-    }
+      staggerChildren: 0.1,
+    },
   },
-  exit: { 
-    opacity: 0, 
+  exit: {
+    opacity: 0,
     y: -20,
-    transition: { duration: 0.3 }
-  }
+    transition: { duration: 0.3 },
+  },
 };
 
 const categories = [
@@ -81,15 +81,11 @@ const TopCardsPage = () => {
   const { user, signInWithGoogle } = useAuth();
 
   // Analytics hooks
-  const { 
-    trackButtonClick, 
-    trackFeatureUsage, 
-    trackEvent,
-    trackNavigation 
-  } = useAnalytics();
-  const { recordCustomMetric } = usePagePerformance('top-cards');
+  const { trackButtonClick, trackFeatureUsage, trackEvent, trackNavigation } =
+    useAnalytics();
+  const { recordCustomMetric } = usePagePerformance("top-cards");
   const { trackCustomEngagement } = useEngagementTracking();
-  const { trackComponentError } = useComponentAnalytics('TopCardsPage');
+  const { trackComponentError } = useComponentAnalytics("TopCardsPage");
 
   const [category, setCategory] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
@@ -111,12 +107,12 @@ const TopCardsPage = () => {
 
   // Track page load
   useEffect(() => {
-    trackFeatureUsage('top_cards_page_loaded', {
+    trackFeatureUsage("top_cards_page_loaded", {
       user_authenticated: !!user,
-      device_type: isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop'
+      device_type: isMobile ? "mobile" : isTablet ? "tablet" : "desktop",
     });
-    
-    recordCustomMetric('page_load_time', performance.now());
+
+    recordCustomMetric("page_load_time", performance.now());
   }, [trackFeatureUsage, recordCustomMetric, user, isMobile, isTablet]);
 
   // Validate category helper function
@@ -131,21 +127,21 @@ const TopCardsPage = () => {
         if (categoryFromUrl) {
           const decodedCategory = decodeURIComponent(categoryFromUrl);
 
-          trackEvent('category_url_parameter_detected', {
+          trackEvent("category_url_parameter_detected", {
             category: decodedCategory,
-            is_valid: isValidCategory(decodedCategory)
+            is_valid: isValidCategory(decodedCategory),
           });
 
           if (isValidCategory(decodedCategory)) {
             setCategory(decodedCategory);
-            
-            trackEvent('category_set_from_url', {
-              category: decodedCategory
+
+            trackEvent("category_set_from_url", {
+              category: decodedCategory,
             });
           } else {
-            trackComponentError('invalid_category_in_url', {
+            trackComponentError("invalid_category_in_url", {
               invalid_category: decodedCategory,
-              valid_categories: categories
+              valid_categories: categories,
             });
 
             setAlert({
@@ -157,8 +153,8 @@ const TopCardsPage = () => {
           }
         }
       } catch (error) {
-        trackComponentError('category_validation_error', {
-          error_message: error.message
+        trackComponentError("category_validation_error", {
+          error_message: error.message,
         });
 
         console.error("Error validating category:", error);
@@ -179,7 +175,10 @@ const TopCardsPage = () => {
   useEffect(() => {
     if (!isValidating) {
       if (category) {
-        trackNavigation(`/top-cards?category=${encodeURIComponent(category)}`, 'category_filter');
+        trackNavigation(
+          `/top-cards?category=${encodeURIComponent(category)}`,
+          "category_filter"
+        );
         router.push(
           `/top-cards?category=${encodeURIComponent(category)}`,
           undefined,
@@ -210,33 +209,33 @@ const TopCardsPage = () => {
 
   const handleCategoryChange = (event) => {
     const newCategory = event.target.value;
-    
-    trackButtonClick('category_dropdown_change', {
+
+    trackButtonClick("category_dropdown_change", {
       old_category: category,
       new_category: newCategory,
-      category_valid: isValidCategory(newCategory)
+      category_valid: isValidCategory(newCategory),
     });
 
-    trackCustomEngagement('category_selection', {
+    trackCustomEngagement("category_selection", {
       category: newCategory,
-      source: 'dropdown'
+      source: "dropdown",
     });
 
     if (isValidCategory(newCategory)) {
       setCategory(newCategory);
-      
+
       // Track category analytics
       if (categoriesData && categoriesData[newCategory]) {
         const categoryCards = getCardsForCategory(newCategory, categoriesData);
-        trackEvent('category_selected', {
+        trackEvent("category_selected", {
           category: newCategory,
           cards_available: categoryCards.length,
-          selection_method: 'dropdown'
+          selection_method: "dropdown",
         });
       }
     } else {
-      trackComponentError('invalid_category_selected', {
-        invalid_category: newCategory
+      trackComponentError("invalid_category_selected", {
+        invalid_category: newCategory,
       });
 
       setAlert({
@@ -248,22 +247,25 @@ const TopCardsPage = () => {
   };
 
   const handleCardClick = (bank, cardName) => {
-    trackButtonClick('card_click_from_top_cards', {
+    trackButtonClick("card_click_from_top_cards", {
       bank,
       card_name: cardName,
-      category: category || 'all',
+      category: category || "all",
       user_authenticated: !!user,
-      device_type: isMobile ? 'mobile' : 'desktop'
+      device_type: isMobile ? "mobile" : "desktop",
     });
 
     if (user) {
-      trackNavigation(`/calculator?bank=${bank}&card=${cardName}`, 'card_selection');
+      trackNavigation(
+        `/calculator?bank=${bank}&card=${cardName}`,
+        "card_selection"
+      );
       router.push(`/calculator?bank=${bank}&card=${cardName}`);
     } else {
-      trackEvent('sign_in_required_for_card', {
+      trackEvent("sign_in_required_for_card", {
         bank,
         card_name: cardName,
-        source: 'top_cards_page'
+        source: "top_cards_page",
       });
 
       setSelectedCard({ bank, cardName });
@@ -272,8 +274,10 @@ const TopCardsPage = () => {
   };
 
   const handleCloseDialog = () => {
-    trackButtonClick('sign_in_dialog_close', {
-      selected_card: selectedCard ? `${selectedCard.bank} ${selectedCard.cardName}` : 'none'
+    trackButtonClick("sign_in_dialog_close", {
+      selected_card: selectedCard
+        ? `${selectedCard.bank} ${selectedCard.cardName}`
+        : "none",
     });
 
     setOpenDialog(false);
@@ -281,31 +285,37 @@ const TopCardsPage = () => {
   };
 
   const handleSignIn = async () => {
-    trackButtonClick('sign_in_from_top_cards', {
-      selected_card: selectedCard ? `${selectedCard.bank} ${selectedCard.cardName}` : 'none',
-      category: category || 'all'
+    trackButtonClick("sign_in_from_top_cards", {
+      selected_card: selectedCard
+        ? `${selectedCard.bank} ${selectedCard.cardName}`
+        : "none",
+      category: category || "all",
     });
 
     try {
       await signInWithGoogle();
-      
+
       if (selectedCard) {
         trackNavigation(
           `/calculator?bank=${selectedCard.bank}&card=${selectedCard.cardName}`,
-          'post_signin_redirect'
+          "post_signin_redirect"
         );
         router.push(
           `/calculator?bank=${selectedCard.bank}&card=${selectedCard.cardName}`
         );
       }
 
-      trackEvent('sign_in_success_top_cards', {
-        selected_card: selectedCard ? `${selectedCard.bank} ${selectedCard.cardName}` : 'none'
+      trackEvent("sign_in_success_top_cards", {
+        selected_card: selectedCard
+          ? `${selectedCard.bank} ${selectedCard.cardName}`
+          : "none",
       });
     } catch (error) {
-      trackComponentError('sign_in_failed_top_cards', {
+      trackComponentError("sign_in_failed_top_cards", {
         error_message: error.message,
-        selected_card: selectedCard ? `${selectedCard.bank} ${selectedCard.cardName}` : 'none'
+        selected_card: selectedCard
+          ? `${selectedCard.bank} ${selectedCard.cardName}`
+          : "none",
       });
 
       setAlert({
@@ -322,12 +332,12 @@ const TopCardsPage = () => {
   // Track category performance
   useEffect(() => {
     if (category && categoryCards.length > 0) {
-      recordCustomMetric('category_cards_loaded', categoryCards.length);
-      
-      trackEvent('category_cards_displayed', {
+      recordCustomMetric("category_cards_loaded", categoryCards.length);
+
+      trackEvent("category_cards_displayed", {
         category,
         cards_count: categoryCards.length,
-        load_time: performance.now()
+        load_time: performance.now(),
       });
     }
   }, [category, categoryCards.length, recordCustomMetric, trackEvent]);
@@ -336,25 +346,27 @@ const TopCardsPage = () => {
   useEffect(() => {
     const handleScroll = () => {
       const scrollPercent = Math.round(
-        (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100
+        (window.scrollY /
+          (document.documentElement.scrollHeight - window.innerHeight)) *
+          100
       );
 
       if (scrollPercent > 0 && scrollPercent % 25 === 0) {
-        trackCustomEngagement('page_scroll', {
+        trackCustomEngagement("page_scroll", {
           scroll_percentage: scrollPercent,
-          category: category || 'all',
-          cards_visible: categoryCards.length
+          category: category || "all",
+          cards_visible: categoryCards.length,
         });
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [category, categoryCards.length, trackCustomEngagement]);
 
   if (categoriesError) {
-    trackComponentError('categories_load_error', {
-      error_message: categoriesError.message
+    trackComponentError("categories_load_error", {
+      error_message: categoriesError.message,
     });
 
     return (
@@ -379,7 +391,9 @@ const TopCardsPage = () => {
       animate="visible"
       exit="exit"
     >
-      <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <Box
+        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+      >
         <Header />
 
         <Container component="main" sx={{ py: 4, flexGrow: 1 }}>

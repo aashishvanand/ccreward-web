@@ -143,7 +143,7 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
                   htmlInput: {
                     min: "0700",
                     max: "9999",
-                  }
+                  },
                 }}
               />
               <TextField

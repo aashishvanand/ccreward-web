@@ -22,79 +22,79 @@ import CardDetailsModal from "./CardDetailsModal";
 // Animation variants
 const listContainerVariants = {
   hidden: { opacity: 0 },
-  visible: { 
+  visible: {
     opacity: 1,
-    transition: { 
+    transition: {
       when: "beforeChildren",
       staggerChildren: 0.1,
-      delayChildren: 0.2
-    }
-  }
+      delayChildren: 0.2,
+    },
+  },
 };
 
 const cardVariants = {
   hidden: { y: 20, opacity: 0 },
-  visible: { 
-    y: 0, 
+  visible: {
+    y: 0,
     opacity: 1,
     transition: {
       type: "spring",
       stiffness: 260,
-      damping: 20
-    }
+      damping: 20,
+    },
   },
-  exit: { 
-    scale: 0.9, 
+  exit: {
+    scale: 0.9,
     opacity: 0,
-    transition: { duration: 0.3 }
+    transition: { duration: 0.3 },
   },
   hover: {
     y: -8,
     boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
-    transition: { 
+    transition: {
       type: "spring",
       stiffness: 400,
-      damping: 10
-    }
+      damping: 10,
+    },
   },
-  tap: { scale: 0.98 }
+  tap: { scale: 0.98 },
 };
 
 const deleteButtonVariants = {
   hidden: { opacity: 0, scale: 0 },
-  hover: { 
-    opacity: 1, 
+  hover: {
+    opacity: 1,
     scale: 1,
     transition: {
       type: "spring",
       stiffness: 500,
-      damping: 25
-    }
-  }
+      damping: 25,
+    },
+  },
 };
 
 const emptyStateVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: {
       delay: 0.2,
-      duration: 0.6
-    }
-  }
+      duration: 0.6,
+    },
+  },
 };
 
 const loadingSpinnerVariants = {
   hidden: { opacity: 0, scale: 0.8 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     scale: [0.8, 1.2, 0.8],
     transition: {
       repeat: Infinity,
-      duration: 1.5
-    }
-  }
+      duration: 1.5,
+    },
+  },
 };
 
 const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
@@ -139,7 +139,7 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
 
   const handleDeleteCard = (bank, cardName) => {
     setRemovingCard(`${bank}-${cardName}`);
-    
+
     // Small delay to allow for animation to complete
     setTimeout(() => {
       onDeleteCard(bank, cardName);
@@ -203,30 +203,30 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
 
           <motion.div
             initial={{ scale: 0, opacity: 0 }}
-            animate={{ 
-              scale: 1, 
+            animate={{
+              scale: 1,
               opacity: 1,
               transition: {
                 delay: 0.5,
                 type: "spring",
                 stiffness: 260,
-                damping: 20
-              }
+                damping: 20,
+              },
             }}
-            whileHover={{ 
+            whileHover={{
               rotate: [0, -5, 5, -5, 0],
-              transition: { duration: 0.5 }
+              transition: { duration: 0.5 },
             }}
           >
-            <Box 
+            <Box
               component="img"
               src="https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/c68cca10-3860-4546-74e7-06ea7aa8e000/public"
               alt="CCReward Logo"
-              sx={{ 
-                mt: 4, 
-                width: 100, 
-                height: 100, 
-                opacity: 0.7 
+              sx={{
+                mt: 4,
+                width: 100,
+                height: 100,
+                opacity: 0.7,
               }}
             />
           </motion.div>
@@ -261,7 +261,7 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
             {processedCards.map((card, index) => {
               const cardKey = `${card.bank}-${card.cardName}`;
               const isRemoving = removingCard === cardKey;
-              
+
               return (
                 <motion.div
                   key={cardKey}
@@ -300,16 +300,18 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                             position: "relative",
                             width: "100%",
                             aspectRatio:
-                              card.orientation === "vertical" ? "0.63/1" : "1.59/1",
+                              card.orientation === "vertical"
+                                ? "0.63/1"
+                                : "1.59/1",
                             marginBottom: 0,
                           }}
                         >
                           {card.image && (
                             <motion.div
                               initial={{ opacity: 0 }}
-                              animate={{ 
+                              animate={{
                                 opacity: 1,
-                                transition: { delay: 0.1 + (index * 0.05) }
+                                transition: { delay: 0.1 + index * 0.05 },
                               }}
                             >
                               <Image
@@ -343,7 +345,9 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                                 }}
                                 size="small"
                               >
-                                <DeleteIcon sx={{ color: "white", fontSize: "1.25rem" }} />
+                                <DeleteIcon
+                                  sx={{ color: "white", fontSize: "1.25rem" }}
+                                />
                               </IconButton>
                             </Tooltip>
                           </motion.div>
@@ -358,20 +362,22 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                           <Stack spacing={0.5}>
                             <motion.div
                               initial={{ opacity: 0, x: -5 }}
-                              animate={{ 
-                                opacity: 1, 
+                              animate={{
+                                opacity: 1,
                                 x: 0,
-                                transition: { 
-                                  delay: 0.2 + (index * 0.05),
-                                  duration: 0.3 
-                                }
+                                transition: {
+                                  delay: 0.2 + index * 0.05,
+                                  duration: 0.3,
+                                },
                               }}
                             >
                               <Typography
                                 variant="subtitle2"
                                 sx={{
                                   fontSize:
-                                    card.orientation === "vertical" ? "0.75rem" : "0.875rem",
+                                    card.orientation === "vertical"
+                                      ? "0.75rem"
+                                      : "0.875rem",
                                   fontWeight: 600,
                                   lineHeight: 1.2,
                                 }}
@@ -382,13 +388,13 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                             </motion.div>
                             <motion.div
                               initial={{ opacity: 0, x: -5 }}
-                              animate={{ 
-                                opacity: 1, 
+                              animate={{
+                                opacity: 1,
                                 x: 0,
-                                transition: { 
-                                  delay: 0.3 + (index * 0.05),
-                                  duration: 0.3 
-                                }
+                                transition: {
+                                  delay: 0.3 + index * 0.05,
+                                  duration: 0.3,
+                                },
                               }}
                             >
                               <Typography
@@ -396,7 +402,9 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                                 color="text.secondary"
                                 sx={{
                                   fontSize:
-                                    card.orientation === "vertical" ? "0.7rem" : "0.75rem",
+                                    card.orientation === "vertical"
+                                      ? "0.7rem"
+                                      : "0.75rem",
                                   lineHeight: 1.2,
                                   display: "block",
                                 }}

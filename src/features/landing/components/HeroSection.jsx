@@ -24,7 +24,7 @@ const HeroSection = ({
   signInAnonymously,
 }) => {
   const theme = useTheme();
-  
+
   return (
     <Box
       sx={{
@@ -48,8 +48,9 @@ const HeroSection = ({
           <Grid
             size={{
               xs: 12,
-              md: 6
-            }}>
+              md: 6,
+            }}
+          >
             <Typography
               variant="h2"
               sx={{
@@ -113,8 +114,9 @@ const HeroSection = ({
           <Grid
             size={{
               xs: 12,
-              md: 6
-            }}>
+              md: 6,
+            }}
+          >
             <Box
               sx={{
                 position: "relative",
