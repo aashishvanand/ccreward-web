@@ -27,6 +27,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CardNetworkSelector from "./CardNetworkSelector";
 import { fetchBanks, fetchCards } from "../../../core/services/api";
 import { motion, AnimatePresence } from "framer-motion";
+import { getCurrencySymbol } from "../../../core/utils";
 
 const BILLING_DATES = Array.from({ length: 31 }, (_, i) => i + 1);
 const months = [
@@ -303,12 +304,6 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
 
   const generateYearOptions = () => {
     return Array.from({ length: 10 }, (_, i) => currentYear - i);
-  };
-
-  const getCurrencySymbol = () => {
-    if (region === "SG") return "S$";
-    if (region === "IN") return "₹";
-    return "$"; // Default
   };
 
   return (

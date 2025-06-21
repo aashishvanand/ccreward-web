@@ -141,8 +141,8 @@ api.interceptors.request.use(async (config) => {
     }
     
     // Ensure URL has versioning
-    if (!config.url.startsWith('/v1/')) {
-        config.url = `/v1${config.url}`;
+    if (!config.url.startsWith('/v2/')) {
+        config.url = `/v2${config.url}`;
     }
     
     return config;

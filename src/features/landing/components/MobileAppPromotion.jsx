@@ -9,15 +9,24 @@ const MobileAppPromotion = ({ isAndroid }) => {
   const theme = useTheme();
   const screenshots = isAndroid
     ? [
-        "f8cfbf48-0e82-4095-89d8-3dbbd9406700",
-        "e89a3c45-b747-4fc5-ae82-9afbc7112800",
-        "9c347c88-aff4-4d98-2e05-3b5271de9f00",
-        "0f7a22f5-00aa-457d-212f-2490e22ea900",
+        "ce5efd9d-6027-4ab0-6248-05e4d09f3600",
+        "f2cf43a3-8bad-44b4-58d3-a7bb0383bf00",
+        "dd338f12-a709-4e82-a8e0-0eff777b2100",
+        "801a4c01-01f5-4564-e73b-9a77f46ce500",
+        "3a8dc462-51ce-4367-8292-1e1ae594da00",
+        "46f32a7a-d554-4897-deaa-440d69df4800",
+        "970ac62d-57cf-4638-4aa6-9a2c351aaa00",
+        "2ccc7b3f-acda-4147-25f1-2b5806bce500"
       ]
     : [
-        "439c672a-a623-4006-dbc0-147d773a6300",
-        "5efcffce-4ba7-46ce-54ca-2803b2291c00",
-        "f48ef214-901e-437d-5c5c-b7b8820e5900",
+        "cc11f2c9-1423-4cf8-cc35-dd3264ac0600",
+        "75b6651c-dee3-497a-6f8f-b3dcf6d88100",
+        "ac414eb8-1f97-4178-5c22-6c1a9b2cf400",
+        "cc0ec534-3d57-4b87-7b43-426510ad1c00",
+        "16f92704-1e8a-43f1-77a0-380dfd407e00",
+        "d66ff993-81c8-4de8-3a50-0f62d0700800",
+        "e1300447-5ee8-400b-38ff-60a202621500",
+        "3dc86490-32bf-4560-6bf5-97766ebe4a00",
       ];
 
   return (
