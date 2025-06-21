@@ -43,24 +43,42 @@ const CardDetailsModal = ({ open, onClose, card, onSave, onDelete }) => {
       min: 1000,
       max: 1000000,
       steps: [
-        { label: "1-50k", min: 1000, max: 50000 },
-        { label: "50k-1L", min: 50000, max: 100000 },
-        { label: "1L-5L", min: 100000, max: 500000 },
-        { label: "5L-10L", min: 500000, max: 1000000 },
+        { label: "1-50k", value: 25000 },
+        { label: "50k-1L", value: 75000 },
+        { label: "1L-5L", value: 300000 },
+        { label: "5L-10L", value: 750000 },
       ],
     },
     SG: {
       min: 500,
       max: 50000,
       steps: [
-        { label: "500-1k", min: 500, max: 1000 },
-        { label: "1k-10k", min: 500, max: 10000 },
-        { label: "10k-20k", min: 10000, max: 20000 },
-        { label: "20k-30k", min: 20000, max: 30000 },
-        { label: "30k-40k", min: 30000, max: 40000 },
-        { label: "40k-50k", min: 40000, max: 50000 },
+        { label: "500-1k", value: 750 },
+        { label: "1k-10k", value: 5500 },
+        { label: "10k-20k", value: 15000 },
+        { label: "20k-30k", value: 25000 },
+        { label: "30k-40k", value: 35000 },
+        { label: "40k-50k", value: 45000 },
       ],
     },
+  };
+
+  // Define credit limit options for dropdown
+  const getCreditLimitOptions = () => {
+    const config = limitConfig[region];
+    if (!config) return [];
+    
+    const options = [];
+    const step = region === "IN" ? 50000 : 5000;
+    
+    for (let i = config.min; i <= config.max; i += step) {
+      const label = region === "IN" 
+        ? `₹${(i / 1000).toFixed(0)}k`
+        : `$${(i / 1000).toFixed(0)}k`;
+      options.push({ value: i, label });
+    }
+    
+    return options;
   };
 
   const months = [
@@ -108,9 +126,17 @@ const CardDetailsModal = ({ open, onClose, card, onSave, onDelete }) => {
 
   const handleDelete = () => {
     if (onDelete && card) {
+      console.log("Delete button clicked - calling onDelete with:", card.bank, card.cardName);
       onDelete(card.bank, card.cardName);
       onClose();
+    } else {
+      console.error("Delete failed - missing onDelete handler or card data:", { onDelete: !!onDelete, card });
     }
+  };
+
+  const handleNetworkChange = (network) => {
+    console.log("Network changed to:", network);
+    setCardDetails(prev => ({ ...prev, network }));
   };
 
   if (!card) return null;
@@ -126,10 +152,17 @@ const CardDetailsModal = ({ open, onClose, card, onSave, onDelete }) => {
           </Typography>
           <CardNetworkSelector
             selectedNetwork={cardDetails.network}
-            onNetworkChange={(network) =>
-              setCardDetails({ ...cardDetails, network })
-            }
+            onNetworkChange={handleNetworkChange}
           />
+
+          {/* Display Selected Network */}
+          {cardDetails.network && (
+            <Box sx={{ mt: 1, mb: 2 }}>
+              <Typography variant="body2" color="primary" sx={{ fontWeight: 'medium' }}>
+                Selected: {cardDetails.network}
+              </Typography>
+            </Box>
+          )}
 
           {/* Billing Date */}
           <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
@@ -163,9 +196,29 @@ const CardDetailsModal = ({ open, onClose, card, onSave, onDelete }) => {
             ))}
           </ToggleButtonGroup>
 
-          {/* Credit Limit */}
+          {/* Credit Limit - Using Dropdown instead of Slider */}
           <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
             Credit Limit
+          </Typography>
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel id="credit-limit-label">Credit Limit</InputLabel>
+            <Select
+              labelId="credit-limit-label"
+              value={cardDetails.limit}
+              label="Credit Limit"
+              onChange={(e) => setCardDetails({ ...cardDetails, limit: e.target.value })}
+            >
+              {getCreditLimitOptions().map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* Alternative: Keep slider as backup option */}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Or use slider for custom amount:
           </Typography>
           <Box sx={{ px: 2 }}>
             <Slider
@@ -230,6 +283,7 @@ const CardDetailsModal = ({ open, onClose, card, onSave, onDelete }) => {
           onClick={handleDelete}
           color="error"
           variant="outlined"
+          disabled={!onDelete || !card}
         >
           Delete Card
         </Button>
