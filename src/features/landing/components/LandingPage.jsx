@@ -26,11 +26,11 @@ import StatsSection from "./sections/StatsSection";
 import { motion } from "framer-motion";
 
 // Add analytics imports - FIXED
-import { 
-  useAnalytics, 
-  usePagePerformance, 
+import {
+  useAnalytics,
+  usePagePerformance,
   useEngagementTracking,
-  useJourneyTracking 
+  useJourneyTracking,
 } from "../../../core/hooks";
 
 const pageVariants = {
@@ -69,14 +69,14 @@ const LandingPage = () => {
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
 
   // Analytics hooks
-  const { 
-    trackButtonClick, 
-    trackFeatureUsage, 
+  const {
+    trackButtonClick,
+    trackFeatureUsage,
     trackConversion,
     trackNavigation,
-    trackEvent 
+    trackEvent,
   } = useAnalytics();
-  const { recordCustomMetric } = usePagePerformance('landing');
+  const { recordCustomMetric } = usePagePerformance("landing");
   const { trackCustomEngagement } = useEngagementTracking();
   const { trackJourneyStep, trackJourneyCompletion } = useJourneyTracking();
 
@@ -112,48 +112,60 @@ const LandingPage = () => {
 
   // Track landing page visit
   useEffect(() => {
-    trackFeatureUsage('landing_page_visit', {
+    trackFeatureUsage("landing_page_visit", {
       region,
-      device_type: deviceInfo.isMobile ? 'mobile' : deviceInfo.isTablet ? 'tablet' : 'desktop',
+      device_type: deviceInfo.isMobile
+        ? "mobile"
+        : deviceInfo.isTablet
+        ? "tablet"
+        : "desktop",
       is_authenticated: isAuthenticated(),
-      user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown'
+      user_agent:
+        typeof navigator !== "undefined" ? navigator.userAgent : "unknown",
     });
 
-    trackJourneyStep('landing_page_loaded', {
+    trackJourneyStep("landing_page_loaded", {
       region,
-      device_info: deviceInfo
+      device_info: deviceInfo,
     });
 
     // Track page load performance
-    recordCustomMetric('page_load_start', performance.now());
-  }, [trackFeatureUsage, trackJourneyStep, recordCustomMetric, region, deviceInfo, isAuthenticated]);
+    recordCustomMetric("page_load_start", performance.now());
+  }, [
+    trackFeatureUsage,
+    trackJourneyStep,
+    recordCustomMetric,
+    region,
+    deviceInfo,
+    isAuthenticated,
+  ]);
 
   // Track device detection
   useEffect(() => {
     const initialDeviceInfo = detectDevice();
     setDeviceInfo(initialDeviceInfo);
 
-    trackEvent('device_detected', {
+    trackEvent("device_detected", {
       is_mobile: initialDeviceInfo.isMobile,
       is_android: initialDeviceInfo.isAndroid,
       is_ios: initialDeviceInfo.isIOS,
       is_tablet: initialDeviceInfo.isTablet,
-      screen_width: typeof window !== 'undefined' ? window.innerWidth : 0,
-      screen_height: typeof window !== 'undefined' ? window.innerHeight : 0
+      screen_width: typeof window !== "undefined" ? window.innerWidth : 0,
+      screen_height: typeof window !== "undefined" ? window.innerHeight : 0,
     });
 
     const handleResize = () => {
       const updatedDeviceInfo = detectDevice();
       setDeviceInfo(updatedDeviceInfo);
-      
-      trackEvent('viewport_changed', {
-        new_width: typeof window !== 'undefined' ? window.innerWidth : 0,
-        new_height: typeof window !== 'undefined' ? window.innerHeight : 0,
-        device_type: updatedDeviceInfo.isMobile ? 'mobile' : 'desktop'
+
+      trackEvent("viewport_changed", {
+        new_width: typeof window !== "undefined" ? window.innerWidth : 0,
+        new_height: typeof window !== "undefined" ? window.innerHeight : 0,
+        device_type: updatedDeviceInfo.isMobile ? "mobile" : "desktop",
       });
     };
 
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       window.addEventListener("resize", handleResize);
       return () => window.removeEventListener("resize", handleResize);
     }
@@ -162,23 +174,48 @@ const LandingPage = () => {
   // Track region and card images loading
   useEffect(() => {
     if (cardImagesData?.length > 0) {
-      trackEvent('card_images_loaded', {
+      trackEvent("card_images_loaded", {
         region,
         total_images: cardImagesData.length,
-        loading_time: performance.now()
+        loading_time: performance.now(),
       });
 
       // Filter cards based on region
       const regionCards = cardImagesData.filter((card) => {
         if (region === "IN") {
           return [
-            "HDFC", "ICICI", "SBI", "Axis", "AMEX", "YESBank", "SC", "Kotak",
-            "IDFCFirst", "HSBC", "OneCard", "RBL", "IndusInd", "IDBI", "Federal", "BOB", "AU",
+            "HDFC",
+            "ICICI",
+            "SBI",
+            "Axis",
+            "AMEX",
+            "YESBank",
+            "SC",
+            "Kotak",
+            "IDFCFirst",
+            "HSBC",
+            "OneCard",
+            "RBL",
+            "IndusInd",
+            "IDBI",
+            "Federal",
+            "BOB",
+            "AU",
           ].includes(card.bank);
         } else if (region === "SG") {
           return [
-            "DBS", "POSB", "UOB", "OCBC", "Maybank", "CIMB", "AMEX", "Citi",
-            "HSBC", "SC", "BOC", "Trust",
+            "DBS",
+            "POSB",
+            "UOB",
+            "OCBC",
+            "Maybank",
+            "CIMB",
+            "AMEX",
+            "Citi",
+            "HSBC",
+            "SC",
+            "BOC",
+            "Trust",
           ].includes(card.bank);
         }
         return true;
@@ -191,7 +228,7 @@ const LandingPage = () => {
       const shuffled = [...horizontalCards].sort(() => Math.random() - 0.5);
       setCardImages(shuffled.slice(0, 3));
 
-      recordCustomMetric('hero_cards_prepared', shuffled.length);
+      recordCustomMetric("hero_cards_prepared", shuffled.length);
     }
   }, [cardImagesData, region, trackEvent, recordCustomMetric]);
 
@@ -199,38 +236,39 @@ const LandingPage = () => {
   useEffect(() => {
     const authenticated = isAuthenticated();
     if (!loading && authenticated && user?.uid && !hasCheckedCards) {
-      trackJourneyStep('checking_user_cards', {
+      trackJourneyStep("checking_user_cards", {
         user_id: user.uid,
-        is_new_user: user.metadata?.creationTime === user.metadata?.lastSignInTime
+        is_new_user:
+          user.metadata?.creationTime === user.metadata?.lastSignInTime,
       });
 
       const checkUserCards = async () => {
         try {
           const fetchedCards = await getCardsForUser(user.uid);
-          
-          trackEvent('user_cards_checked', {
+
+          trackEvent("user_cards_checked", {
             user_id: user.uid,
             cards_count: fetchedCards.length,
-            has_cards: fetchedCards.length > 0
+            has_cards: fetchedCards.length > 0,
           });
 
           if (fetchedCards.length === 0) {
-            trackJourneyStep('redirecting_to_cards', {
-              reason: 'no_cards_found'
+            trackJourneyStep("redirecting_to_cards", {
+              reason: "no_cards_found",
             });
-            trackNavigation('/my-cards', 'automatic_redirect');
+            trackNavigation("/my-cards", "automatic_redirect");
             router.push("/my-cards");
           } else {
-            trackJourneyCompletion('landing_with_cards', {
-              cards_count: fetchedCards.length
+            trackJourneyCompletion("landing_with_cards", {
+              cards_count: fetchedCards.length,
             });
           }
         } catch (error) {
-          trackEvent('user_cards_check_error', {
+          trackEvent("user_cards_check_error", {
             error_message: error.message,
-            user_id: user.uid
+            user_id: user.uid,
           });
-          
+
           setAlert({
             open: true,
             message: "Error checking your cards. Please try again later.",
@@ -242,21 +280,32 @@ const LandingPage = () => {
       };
       checkUserCards();
     }
-  }, [loading, isAuthenticated, user?.uid, router, hasCheckedCards, trackEvent, trackJourneyStep, trackJourneyCompletion, trackNavigation]);
+  }, [
+    loading,
+    isAuthenticated,
+    user?.uid,
+    router,
+    hasCheckedCards,
+    trackEvent,
+    trackJourneyStep,
+    trackJourneyCompletion,
+    trackNavigation,
+  ]);
 
   // Enhanced sign-in handler with analytics
   const handleSignIn = async (signInMethod) => {
-    const signInMethodName = signInMethod === signInWithGoogle ? 'google' : 'anonymous';
-    
-    trackButtonClick('sign_in_attempt', {
+    const signInMethodName =
+      signInMethod === signInWithGoogle ? "google" : "anonymous";
+
+    trackButtonClick("sign_in_attempt", {
       method: signInMethodName,
-      location: 'hero_section',
-      device_type: deviceInfo.isMobile ? 'mobile' : 'desktop'
+      location: "hero_section",
+      device_type: deviceInfo.isMobile ? "mobile" : "desktop",
     });
 
-    trackJourneyStep('sign_in_initiated', {
+    trackJourneyStep("sign_in_initiated", {
       method: signInMethodName,
-      source: 'landing_page'
+      source: "landing_page",
     });
 
     setIsLoading(true);
@@ -264,22 +313,22 @@ const LandingPage = () => {
 
     try {
       await signInMethod();
-      
-      const signInDuration = performance.now() - startTime;
-      
-      trackConversion('user_sign_in', 1);
-      trackJourneyCompletion('sign_in_success', {
-        method: signInMethodName,
-        duration: Math.round(signInDuration)
-      });
 
-      trackEvent('sign_in_success', {
+      const signInDuration = performance.now() - startTime;
+
+      trackConversion("user_sign_in", 1);
+      trackJourneyCompletion("sign_in_success", {
         method: signInMethodName,
         duration: Math.round(signInDuration),
-        source: 'landing_page'
       });
 
-      recordCustomMetric('sign_in_duration', Math.round(signInDuration));
+      trackEvent("sign_in_success", {
+        method: signInMethodName,
+        duration: Math.round(signInDuration),
+        source: "landing_page",
+      });
+
+      recordCustomMetric("sign_in_duration", Math.round(signInDuration));
 
       setAlert({
         open: true,
@@ -289,35 +338,37 @@ const LandingPage = () => {
       setHasCheckedCards(false);
     } catch (error) {
       const signInDuration = performance.now() - startTime;
-      
-      trackEvent('sign_in_error', {
+
+      trackEvent("sign_in_error", {
         method: signInMethodName,
         error_code: error.code,
         error_message: error.message,
-        duration: Math.round(signInDuration)
+        duration: Math.round(signInDuration),
       });
 
-      trackJourneyCompletion('sign_in_failed', {
+      trackJourneyCompletion("sign_in_failed", {
         method: signInMethodName,
         error: error.code,
-        duration: Math.round(signInDuration)
+        duration: Math.round(signInDuration),
       });
 
       console.error("Error signing in:", error);
-      
+
       if (error.code === "auth/popup-closed-by-user") {
-        trackEvent('sign_in_cancelled', { method: signInMethodName });
+        trackEvent("sign_in_cancelled", { method: signInMethodName });
         setAlert({ open: false, message: "", severity: "info" });
       } else if (error.code === "auth/cancelled-popup-request") {
         setAlert({
           open: true,
-          message: "Another sign-in window is already open. Please close it and try again.",
+          message:
+            "Another sign-in window is already open. Please close it and try again.",
           severity: "warning",
         });
       } else if (error.code === "auth/popup-blocked") {
         setAlert({
           open: true,
-          message: "Pop-up was blocked by your browser. Please enable pop-ups and try again.",
+          message:
+            "Pop-up was blocked by your browser. Please enable pop-ups and try again.",
           severity: "warning",
         });
       } else {
@@ -336,53 +387,57 @@ const LandingPage = () => {
   const handleNextPage = () => {
     const newPage = (currentPage + 1) % totalPages;
     setCurrentPage(newPage);
-    
-    trackButtonClick('testimonials_next', {
+
+    trackButtonClick("testimonials_next", {
       current_page: currentPage,
       new_page: newPage,
-      total_pages: totalPages
+      total_pages: totalPages,
     });
 
-    trackCustomEngagement('testimonials_navigation', {
-      direction: 'next',
-      page: newPage
+    trackCustomEngagement("testimonials_navigation", {
+      direction: "next",
+      page: newPage,
     });
   };
 
   const handlePrevPage = () => {
     const newPage = (currentPage - 1 + totalPages) % totalPages;
     setCurrentPage(newPage);
-    
-    trackButtonClick('testimonials_prev', {
+
+    trackButtonClick("testimonials_prev", {
       current_page: currentPage,
       new_page: newPage,
-      total_pages: totalPages
+      total_pages: totalPages,
     });
 
-    trackCustomEngagement('testimonials_navigation', {
-      direction: 'prev',
-      page: newPage
+    trackCustomEngagement("testimonials_navigation", {
+      direction: "prev",
+      page: newPage,
     });
   };
 
   // Track section visibility
   useEffect(() => {
-    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') return;
+    if (
+      typeof window === "undefined" ||
+      typeof IntersectionObserver === "undefined"
+    )
+      return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const sectionName = entry.target.getAttribute('data-section');
+            const sectionName = entry.target.getAttribute("data-section");
             if (sectionName) {
-              trackEvent('section_viewed', {
+              trackEvent("section_viewed", {
                 section_name: sectionName,
                 visibility_ratio: entry.intersectionRatio,
-                device_type: deviceInfo.isMobile ? 'mobile' : 'desktop'
+                device_type: deviceInfo.isMobile ? "mobile" : "desktop",
               });
 
-              trackCustomEngagement('section_engagement', {
-                section: sectionName
+              trackCustomEngagement("section_engagement", {
+                section: sectionName,
               });
             }
           }
@@ -392,7 +447,7 @@ const LandingPage = () => {
     );
 
     // Observe all sections
-    const sections = document.querySelectorAll('[data-section]');
+    const sections = document.querySelectorAll("[data-section]");
     sections.forEach((section) => observer.observe(section));
 
     return () => observer.disconnect();
@@ -415,7 +470,7 @@ const LandingPage = () => {
     // Add analytics tracking functions
     trackButtonClick,
     trackFeatureUsage,
-    trackEvent
+    trackEvent,
   };
 
   return (
@@ -462,23 +517,23 @@ const MobileView = ({
   region,
   trackButtonClick,
   trackFeatureUsage,
-  trackEvent
+  trackEvent,
 }) => {
   // Track mobile app promotion interaction
   const handleAppStoreClick = (store) => {
     trackButtonClick(`app_store_${store}`, {
-      source: 'mobile_promotion',
-      device_type: 'mobile',
-      region
+      source: "mobile_promotion",
+      device_type: "mobile",
+      region,
     });
-    
-    trackEvent('app_store_click', { store, source: 'mobile_promotion' });
+
+    trackEvent("app_store_click", { store, source: "mobile_promotion" });
   };
 
   useEffect(() => {
-    trackFeatureUsage('mobile_view_loaded', {
+    trackFeatureUsage("mobile_view_loaded", {
       device_info: deviceInfo,
-      region
+      region,
     });
   }, [deviceInfo, region, trackFeatureUsage]);
 
@@ -530,7 +585,7 @@ const MobileView = ({
           </Container>
 
           <Box component="section" data-section="mobile-promotion">
-            <MobileAppPromotion 
+            <MobileAppPromotion
               isAndroid={Boolean(deviceInfo.isAndroid)}
               onAppStoreClick={handleAppStoreClick}
             />
@@ -540,27 +595,45 @@ const MobileView = ({
             <FeaturesSection />
           </Box>
 
-          <Box component="section" data-section="stats" sx={{ bgcolor: "background.paper" }}>
+          <Box
+            component="section"
+            data-section="stats"
+            sx={{ bgcolor: "background.paper" }}
+          >
             <StatsSection />
           </Box>
 
-          {region === "IN" && (
-            <>
-              <Box component="section" data-section="top-cards" sx={{ bgcolor: "background.default" }}>
-                <TopCardsSection />
-              </Box>
+          <>
+            <Box
+              component="section"
+              data-section="top-cards"
+              sx={{ bgcolor: "background.default" }}
+            >
+              <TopCardsSection />
+            </Box>
 
-              <Box component="section" data-section="trending" sx={{ bgcolor: "background.paper" }}>
-                <TopSearchs />
-              </Box>
-            </>
-          )}
+            <Box
+              component="section"
+              data-section="trending"
+              sx={{ bgcolor: "background.paper" }}
+            >
+              <TopSearchs />
+            </Box>
+          </>
 
-          <Box component="section" data-section="banks" sx={{ bgcolor: "background.default" }}>
+          <Box
+            component="section"
+            data-section="banks"
+            sx={{ bgcolor: "background.default" }}
+          >
             <BankSection />
           </Box>
 
-          <Box component="section" data-section="testimonials" sx={{ bgcolor: "background.paper" }}>
+          <Box
+            component="section"
+            data-section="testimonials"
+            sx={{ bgcolor: "background.paper" }}
+          >
             <TestimonialsSection
               visibleTweets={visibleTweets}
               handlePrevPage={handlePrevPage}
@@ -614,24 +687,24 @@ const DesktopView = ({
   setAlert,
   region,
   trackButtonClick,
-  trackFeatureUsage
+  trackFeatureUsage,
 }) => {
   // Enhanced CTA click tracking
   const handleCTAClick = () => {
-    trackButtonClick('cta_get_started', {
-      location: 'call_to_action_section',
+    trackButtonClick("cta_get_started", {
+      location: "call_to_action_section",
       is_authenticated: isAuthenticated,
-      device_type: 'desktop'
+      device_type: "desktop",
     });
-    
+
     handleSignIn(signInWithGoogle);
   };
 
   useEffect(() => {
-    trackFeatureUsage('desktop_view_loaded', {
-      screen_width: typeof window !== 'undefined' ? window.innerWidth : 0,
-      screen_height: typeof window !== 'undefined' ? window.innerHeight : 0,
-      region
+    trackFeatureUsage("desktop_view_loaded", {
+      screen_width: typeof window !== "undefined" ? window.innerWidth : 0,
+      screen_height: typeof window !== "undefined" ? window.innerHeight : 0,
+      region,
     });
   }, [region, trackFeatureUsage]);
 
@@ -662,27 +735,47 @@ const DesktopView = ({
           />
         </Box>
 
-        <Box component="section" data-section="features" sx={{ bgcolor: "background.default" }}>
+        <Box
+          component="section"
+          data-section="features"
+          sx={{ bgcolor: "background.default" }}
+        >
           <FeaturesSection />
         </Box>
 
-        <Box component="section" data-section="stats" sx={{ bgcolor: "background.paper" }}>
+        <Box
+          component="section"
+          data-section="stats"
+          sx={{ bgcolor: "background.paper" }}
+        >
           <StatsSection />
         </Box>
 
         {region === "IN" && (
           <>
-            <Box component="section" data-section="top-cards" sx={{ bgcolor: "background.default" }}>
+            <Box
+              component="section"
+              data-section="top-cards"
+              sx={{ bgcolor: "background.default" }}
+            >
               <TopCardsSection />
             </Box>
 
-            <Box component="section" data-section="trending" sx={{ bgcolor: "background.paper" }}>
+            <Box
+              component="section"
+              data-section="trending"
+              sx={{ bgcolor: "background.paper" }}
+            >
               <TopSearchs />
             </Box>
           </>
         )}
 
-        <Box component="section" data-section="banks" sx={{ bgcolor: "background.default" }}>
+        <Box
+          component="section"
+          data-section="banks"
+          sx={{ bgcolor: "background.default" }}
+        >
           <BankSection />
         </Box>
 
@@ -694,11 +787,19 @@ const DesktopView = ({
           />
         </Box>
 
-        <Box component="section" data-section="app-store" sx={{ bgcolor: "background.default" }}>
+        <Box
+          component="section"
+          data-section="app-store"
+          sx={{ bgcolor: "background.default" }}
+        >
           <AppStoreSection isMobile={isMobile} theme={theme} />
         </Box>
 
-        <Box component="section" data-section="testimonials" sx={{ bgcolor: "background.paper" }}>
+        <Box
+          component="section"
+          data-section="testimonials"
+          sx={{ bgcolor: "background.paper" }}
+        >
           <TestimonialsSection
             visibleTweets={visibleTweets}
             handlePrevPage={handlePrevPage}
