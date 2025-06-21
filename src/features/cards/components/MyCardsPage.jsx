@@ -29,8 +29,6 @@ import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
 import ShareDialog from "./ShareDialog";
 import { useRegion } from "../../../core/providers/RegionContext";
 import { motion } from "framer-motion";
-
-// Add analytics imports
 import {
   useAnalytics,
   usePagePerformance,
@@ -62,8 +60,6 @@ const pageVariants = {
 function MyCardsPage() {
   const { region } = useRegion();
   const theme = useTheme();
-
-  // Analytics hooks
   const {
     trackButtonClick,
     trackFeatureUsage,
@@ -76,7 +72,6 @@ function MyCardsPage() {
   const { trackJourneyStep, trackJourneyCompletion } = useJourneyTracking();
   const { trackComponentError, trackComponentInteraction } =
     useComponentAnalytics("MyCardsPage");
-
   const [cards, setCards] = useState([]);
   const [isAddCardDialogOpen, setIsAddCardDialogOpen] = useState(false);
   const [alert, setAlert] = useState({
@@ -89,7 +84,6 @@ function MyCardsPage() {
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const regionRef = useRef(region);
-
   const { user, isAuthenticated, loading, isNewUser, markUserAsNotNew } =
     useAuth();
 
@@ -98,7 +92,6 @@ function MyCardsPage() {
     threshold: 100,
   });
 
-  // Track page load and user state
   useEffect(() => {
     trackFeatureUsage("my_cards_page_loaded", {
       region,
@@ -106,16 +99,13 @@ function MyCardsPage() {
       user_id: user?.uid || "anonymous",
       is_new_user: isNewUser,
     });
-
     trackJourneyStep("my_cards_accessed", {
       source: "direct_navigation",
       user_type: user?.isAnonymous ? "anonymous" : "authenticated",
     });
-
     recordCustomMetric("page_load_time", performance.now());
   }, []);
 
-  // Enhanced fetch user cards with analytics
   const fetchUserCards = useCallback(async () => {
     if (!user) {
       setIsLoading(false);
@@ -123,7 +113,6 @@ function MyCardsPage() {
     }
 
     const startTime = performance.now();
-
     trackEvent("cards_fetch_started", {
       user_id: user.uid,
       region,
@@ -132,18 +121,12 @@ function MyCardsPage() {
     try {
       setIsLoading(true);
       const currentRegion = localStorage.getItem("app-region");
-
-      // Clear cache for fresh data
       localStorage.removeItem(`userCardsCache_${user.uid}`);
       localStorage.removeItem(`userCardsCacheTimestamp_${user.uid}`);
-
       const fetchedCards = await getCardsForUser(user.uid);
       const fetchDuration = performance.now() - startTime;
-
       setCards(fetchedCards);
       regionRef.current = currentRegion;
-
-      // Track successful fetch
       trackEvent("cards_fetch_success", {
         user_id: user.uid,
         region: currentRegion,
@@ -151,11 +134,9 @@ function MyCardsPage() {
         fetch_duration: Math.round(fetchDuration),
         cache_cleared: true,
       });
-
       recordCustomMetric("cards_fetch_duration", Math.round(fetchDuration));
       recordCustomMetric("user_cards_count", fetchedCards.length);
 
-      // Track user portfolio insights
       if (fetchedCards.length > 0) {
         const bankDiversity = new Set(fetchedCards.map((card) => card.bank))
           .size;
@@ -173,14 +154,12 @@ function MyCardsPage() {
       }
     } catch (error) {
       const fetchDuration = performance.now() - startTime;
-
       trackComponentError("cards_fetch_failed", {
         error_message: error.message,
         fetch_duration: Math.round(fetchDuration),
         user_id: user.uid,
         region,
       });
-
       console.error("❌ Error fetching cards:", error);
       showAlert("Error fetching cards. Please try again later.", "error");
     } finally {
@@ -188,7 +167,6 @@ function MyCardsPage() {
     }
   }, [user, region, trackEvent, trackComponentError, recordCustomMetric]);
 
-  // Track region changes
   useEffect(() => {
     if (region !== regionRef.current && isAuthenticated()) {
       trackEvent("region_changed_cards_page", {
@@ -196,12 +174,10 @@ function MyCardsPage() {
         new_region: region,
         cards_count: cards.length,
       });
-
       trackJourneyStep("region_switch_cards_refresh", {
         from_region: regionRef.current,
         to_region: region,
       });
-
       fetchUserCards();
     }
   }, [
@@ -213,67 +189,55 @@ function MyCardsPage() {
     trackJourneyStep,
   ]);
 
-  // Initial load and auth state changes
   useEffect(() => {
     if (isAuthenticated()) {
       fetchUserCards();
     }
   }, [isAuthenticated, fetchUserCards]);
 
-  // Listen for direct region-changed events
   useEffect(() => {
     const handleRegionChanged = (event) => {
       const newRegion = event.detail?.region;
-
       trackEvent("region_event_received", {
         new_region: newRegion,
         current_region: regionRef.current,
         cards_count: cards.length,
       });
-
       if (newRegion && newRegion !== regionRef.current && isAuthenticated()) {
         fetchUserCards();
       }
     };
-
     window.addEventListener("region-changed", handleRegionChanged);
     return () => {
       window.removeEventListener("region-changed", handleRegionChanged);
     };
   }, [isAuthenticated, fetchUserCards, cards.length, trackEvent]);
 
-  // Enhanced share handler with analytics
   const handleShare = async (platform) => {
     trackButtonClick("portfolio_share_attempt", {
       platform,
       cards_count: cards.length,
       share_method: platform === "generate" ? "preview" : platform,
     });
-
     trackJourneyStep("portfolio_share_initiated", {
       platform,
       portfolio_size: cards.length,
     });
-
     setIsGeneratingImage(true);
     const startTime = performance.now();
-
     try {
       if (platform === "generate") {
         await portfolioRef.current?.generateAndShare("preview");
       } else {
         await portfolioRef.current?.generateAndShare(platform);
-
         trackConversion("portfolio_shared", 1);
         trackJourneyCompletion("portfolio_share_success", {
           platform,
           cards_count: cards.length,
         });
       }
-
       const shareTime = performance.now() - startTime;
       recordCustomMetric("portfolio_share_time", Math.round(shareTime));
-
       trackEvent("portfolio_share_success", {
         platform,
         cards_count: cards.length,
@@ -281,21 +245,18 @@ function MyCardsPage() {
       });
     } catch (error) {
       const shareTime = performance.now() - startTime;
-
       trackComponentError("portfolio_share_failed", {
         platform,
         error_message: error.message,
         generation_time: Math.round(shareTime),
         cards_count: cards.length,
       });
-
       console.error("Error handling share action:", error);
     } finally {
       setIsGeneratingImage(false);
     }
   };
 
-  // Enhanced card update with analytics
   const handleUpdateCard = async (updatedCard) => {
     trackButtonClick("card_update_attempt", {
       card_bank: updatedCard.bank,
@@ -303,23 +264,18 @@ function MyCardsPage() {
       has_network: !!updatedCard.network,
       has_limit: !!updatedCard.limit,
     });
-
     trackJourneyStep("card_update_initiated", {
       card_bank: updatedCard.bank,
       update_type: "details",
     });
-
     try {
       await updateCardForUser(user.uid, updatedCard);
-
       setCards((prevCards) =>
         prevCards.map((card) =>
           card.id === updatedCard.id ? updatedCard : card
         )
       );
-
       notifyCardUpdate();
-
       trackEvent("card_update_success", {
         user_id: user.uid,
         card_bank: updatedCard.bank,
@@ -328,11 +284,9 @@ function MyCardsPage() {
           (key) => !["id", "bank", "cardName"].includes(key)
         ),
       });
-
       trackJourneyCompletion("card_update_success", {
         card_bank: updatedCard.bank,
       });
-
       showAlert("Card updated successfully", "success");
     } catch (error) {
       trackComponentError("card_update_failed", {
@@ -340,13 +294,11 @@ function MyCardsPage() {
         error_message: error.message,
         user_id: user.uid,
       });
-
       console.error("Error updating card:", error);
       showAlert("Error updating card. Please try again later.", "error");
     }
   };
 
-  // Enhanced add card with analytics
   const handleAddCard = async (newCard) => {
     trackButtonClick("add_card_attempt", {
       card_bank: newCard.bank,
@@ -358,43 +310,35 @@ function MyCardsPage() {
         newCard.billingDate
       ),
     });
-
     trackJourneyStep("add_card_initiated", {
       card_bank: newCard.bank,
       card_name: newCard.cardName,
       current_portfolio_size: cards.length,
     });
-
     try {
       const existingCards = await getCardsForUser(user.uid);
       const isDuplicate = existingCards.some(
         (card) =>
           card.bank === newCard.bank && card.cardName === newCard.cardName
       );
-
       if (isDuplicate) {
         trackEvent("add_card_duplicate_prevented", {
           card_bank: newCard.bank,
           card_name: newCard.cardName,
           user_id: user.uid,
         });
-
         showAlert("This card is already in your collection.", "info");
         return;
       }
-
       await addCardForUser(user.uid, newCard);
       await fetchUserCards();
       notifyCardUpdate();
-
-      // Track successful addition
       trackConversion("card_added", 1);
       trackJourneyCompletion("add_card_success", {
         card_bank: newCard.bank,
         card_name: newCard.cardName,
         new_portfolio_size: cards.length + 1,
       });
-
       trackEvent("card_add_success", {
         user_id: user.uid,
         card_bank: newCard.bank,
@@ -404,10 +348,7 @@ function MyCardsPage() {
         has_custom_details: !!(newCard.network || newCard.limit),
         region,
       });
-
       recordCustomMetric("user_portfolio_growth", cards.length + 1);
-
-      // Track milestone achievements
       const newCount = cards.length + 1;
       if ([1, 2, 5, 10, 15, 20].includes(newCount)) {
         trackEvent("portfolio_milestone_reached", {
@@ -416,9 +357,7 @@ function MyCardsPage() {
           card_added: `${newCard.bank} ${newCard.cardName}`,
         });
       }
-
       showAlert("Card added successfully", "success");
-
       if (isNewUser) {
         trackEvent("first_card_added_new_user", {
           user_id: user.uid,
@@ -438,38 +377,31 @@ function MyCardsPage() {
         error_message: error.message,
         user_id: user.uid,
       });
-
       console.error("Error adding card:", error);
       showAlert("Failed to add card. Please try again.", "error");
     }
   };
 
-  // Enhanced delete card with analytics
   const handleDeleteCard = async (bank, cardName) => {
     trackButtonClick("delete_card_attempt", {
       card_bank: bank,
       card_name: cardName,
       current_cards_count: cards.length,
     });
-
     trackJourneyStep("card_deletion_initiated", {
       card_bank: bank,
       card_name: cardName,
       portfolio_size_before: cards.length,
     });
-
     try {
       const cardKey = `${bank}_${cardName}`;
       await deleteCardForUser(user.uid, cardKey);
-
       setCards((prevCards) =>
         prevCards.filter(
           (card) => card.bank !== bank || card.cardName !== cardName
         )
       );
-
       notifyCardUpdate();
-
       trackEvent("card_delete_success", {
         user_id: user.uid,
         card_bank: bank,
@@ -477,22 +409,17 @@ function MyCardsPage() {
         remaining_cards: cards.length - 1,
         region,
       });
-
       trackJourneyCompletion("card_deletion_success", {
         card_bank: bank,
         new_portfolio_size: cards.length - 1,
       });
-
       recordCustomMetric("user_portfolio_size", cards.length - 1);
-
-      // Track if portfolio becomes empty
       if (cards.length === 1) {
         trackEvent("portfolio_emptied", {
           user_id: user.uid,
           last_card_removed: `${bank} ${cardName}`,
         });
       }
-
       showAlert("Card deleted successfully", "success");
     } catch (error) {
       trackComponentError("card_delete_failed", {
@@ -501,23 +428,19 @@ function MyCardsPage() {
         error_message: error.message,
         user_id: user.uid,
       });
-
       console.error("Error deleting card:", error);
       showAlert("Error deleting card. Please try again later.", "error");
     }
   };
 
-  // Enhanced dialog handlers with analytics
   const handleOpenAddDialog = () => {
     trackButtonClick("add_card_dialog_open", {
       source: "speed_dial",
       current_cards_count: cards.length,
     });
-
     trackCustomEngagement("add_card_interaction", {
       current_portfolio_size: cards.length,
     });
-
     setIsAddCardDialogOpen(true);
   };
 
@@ -526,24 +449,20 @@ function MyCardsPage() {
       source: "speed_dial",
       cards_count: cards.length,
     });
-
     trackCustomEngagement("share_portfolio_interaction", {
       portfolio_size: cards.length,
     });
-
     setShareDialogOpen(true);
   };
 
   const showAlert = (message, severity = "info") => {
     setAlert({ open: true, message, severity });
-
     trackEvent("alert_shown", {
       message_type: severity,
-      message_content: message.substring(0, 50), // Limit message length for analytics
+      message_content: message.substring(0, 50),
     });
   };
 
-  // Track card list interactions
   const handleCardListInteraction = (interactionType, cardData = {}) => {
     trackComponentInteraction("card_list_interaction", {
       interaction_type: interactionType,
@@ -552,7 +471,6 @@ function MyCardsPage() {
     });
   };
 
-  // Track scroll engagement
   useEffect(() => {
     const handleScroll = () => {
       const scrollPercent = Math.round(
@@ -560,7 +478,6 @@ function MyCardsPage() {
           (document.documentElement.scrollHeight - window.innerHeight)) *
           100
       );
-
       if (scrollPercent > 0 && scrollPercent % 25 === 0) {
         trackCustomEngagement("page_scroll", {
           scroll_percentage: scrollPercent,
@@ -568,7 +485,6 @@ function MyCardsPage() {
         });
       }
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [cards.length, trackCustomEngagement]);
@@ -581,9 +497,7 @@ function MyCardsPage() {
         </Box>
       );
     }
-
     if (cards.length === 0) {
-      // Track empty state view
       useEffect(() => {
         trackEvent("empty_portfolio_viewed", {
           user_id: user?.uid,
@@ -591,7 +505,6 @@ function MyCardsPage() {
           region,
         });
       }, []);
-
       return (
         <Paper
           elevation={0}
@@ -614,7 +527,6 @@ function MyCardsPage() {
         </Paper>
       );
     }
-
     return (
       <>
         {cards.length === 1 && (
@@ -689,11 +601,9 @@ function MyCardsPage() {
                 My Cards
               </Typography>
             </Box>
-
             {renderContent()}
           </Stack>
         </Container>
-
         <SpeedDial
           ariaLabel="Card Actions"
           sx={{
@@ -724,7 +634,6 @@ function MyCardsPage() {
             />
           )}
         </SpeedDial>
-
         <AddCardDialog
           open={isAddCardDialogOpen}
           onClose={() => {
@@ -733,7 +642,6 @@ function MyCardsPage() {
           }}
           onAddCard={handleAddCard}
         />
-
         <ShareDialog
           open={shareDialogOpen}
           onClose={() => {
@@ -743,7 +651,6 @@ function MyCardsPage() {
           onShare={handleShare}
           isGenerating={isGeneratingImage}
         />
-
         {alert.open && (
           <Alert
             severity={alert.severity}
@@ -762,7 +669,6 @@ function MyCardsPage() {
             {alert.message}
           </Alert>
         )}
-
         <Footer />
       </Box>
     </motion.div>
