@@ -27,7 +27,6 @@ const networkItemVariants = {
     tap: { scale: 0.95 },
     selected: {
         scale: [1, 1.1, 1],
-        borderColor: "#3A86FF",
         transition: {
             duration: 0.3
         }
@@ -40,6 +39,8 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
     const [cardNetworks, setCardNetworks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    console.log("CardNetworkSelector rendered with:", { selectedNetwork, region });
+
     useEffect(() => {
         const fetchCardNetworks = async () => {
             if (!region) return;
@@ -51,6 +52,7 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
                     throw new Error(`Failed to fetch card networks for region: ${region}`);
                 }
                 const data = await response.json();
+                console.log("Fetched card networks:", data);
                 setCardNetworks(data);
             } catch (error) {
                 console.error("Error fetching card networks:", error);
@@ -62,6 +64,11 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
 
         fetchCardNetworks();
     }, [region]);
+
+    const handleNetworkClick = (networkName) => {
+        console.log("Network clicked:", networkName);
+        onNetworkChange(networkName);
+    };
 
     if (isLoading) {
         return (
@@ -84,6 +91,7 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
             }}>
                 {cardNetworks.map((item, index) => {
                     const isSelected = selectedNetwork === item.network;
+                    console.log(`Network ${item.network} selected:`, isSelected);
 
                     return (
                         <Tooltip key={item.network} title={item.network} placement="top" TransitionComponent={Fade} TransitionProps={{ timeout: 400 }} arrow>
@@ -97,7 +105,7 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
                                     animate={isSelected ? "selected" : "visible"}
                                 >
                                     <Box
-                                        onClick={() => onNetworkChange(item.network)}
+                                        onClick={() => handleNetworkClick(item.network)}
                                         sx={{
                                             width: 80,
                                             height: 80,
@@ -106,13 +114,18 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
                                             justifyContent: "center",
                                             cursor: "pointer",
                                             borderRadius: "50%",
-                                            border: `2px solid ${isSelected ? theme.palette.primary.main : theme.palette.divider}`,
+                                            border: `3px solid ${isSelected ? theme.palette.primary.main : theme.palette.divider}`,
                                             transition: "all 0.2s ease",
-                                            backgroundColor: theme.palette.background.paper,
-                                            boxShadow: isSelected ? `0 0 0 3px ${theme.palette.primary.main}40` : "none",
+                                            backgroundColor: isSelected 
+                                                ? `${theme.palette.primary.main}10` 
+                                                : theme.palette.background.paper,
+                                            boxShadow: isSelected 
+                                                ? `0 0 0 3px ${theme.palette.primary.main}40` 
+                                                : "none",
                                             "&:hover": {
                                                 borderColor: theme.palette.primary.main,
-                                                boxShadow: `0 0 0 3px ${theme.palette.primary.main}30`
+                                                boxShadow: `0 0 0 3px ${theme.palette.primary.main}30`,
+                                                backgroundColor: `${theme.palette.primary.main}10`
                                             }
                                         }}
                                     >
@@ -125,9 +138,32 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
                                                 maxHeight: '65%',
                                                 objectFit: 'contain'
                                             }}
+                                            onError={(e) => {
+                                                console.error(`Failed to load image for ${item.network}:`, e);
+                                            }}
                                         />
                                     </Box>
                                 </motion.div>
+                                {/* Add selected indicator */}
+                                {isSelected && (
+                                    <Box sx={{
+                                        position: 'absolute',
+                                        top: -5,
+                                        right: -5,
+                                        width: 24,
+                                        height: 24,
+                                        borderRadius: '50%',
+                                        backgroundColor: theme.palette.primary.main,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: 'white',
+                                        fontSize: '12px',
+                                        fontWeight: 'bold'
+                                    }}>
+                                        ✓
+                                    </Box>
+                                )}
                             </Box>
                         </Tooltip>
                     );
@@ -135,7 +171,7 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
             </Box>
             <Box sx={{ mt: 2, borderTop: `1px solid ${theme.palette.divider}`, pt: 1, textAlign: 'center' }}>
                 <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
-                    Select a card network to continue
+                    {selectedNetwork ? `Selected: ${selectedNetwork}` : "Select a card network to continue"}
                 </Typography>
             </Box>
         </Box>
