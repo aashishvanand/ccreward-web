@@ -21,7 +21,7 @@ import CardNetworkSelector from "./CardNetworkSelector";
 
 const BILLING_DATES = Array.from({ length: 31 }, (_, i) => i + 1);
 
-const CardDetailsModal = ({ open, onClose, card, onSave }) => {
+const CardDetailsModal = ({ open, onClose, card, onSave, onDelete }) => {
   const { region } = useRegion();
   const currentYear = new Date().getFullYear();
   const [cardDetails, setCardDetails] = useState({
@@ -63,6 +63,19 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
     },
   };
 
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const generateYearOptions = () => {
+    const years = [];
+    for (let i = currentYear; i >= currentYear - 30; i--) {
+      years.push(i);
+    }
+    return years;
+  };
+
   useEffect(() => {
     if (card) {
       const { network, billingDate, limit, since } = card;
@@ -79,90 +92,72 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
         since: since || `${selectedMonth}, ${selectedYear}`,
       });
     }
-  }, [card, region]);
+  }, [card, region, selectedMonth, selectedYear]);
+
+  useEffect(() => {
+    setCardDetails(prev => ({
+      ...prev,
+      since: `${selectedMonth}, ${selectedYear}`,
+    }));
+  }, [selectedMonth, selectedYear]);
 
   const handleSave = () => {
-    const updatedCard = {
-      ...card,
-      network: cardDetails.network,
-      billingDate: cardDetails.billingDate,
-      limit: cardDetails.limit,
-      since: `${selectedMonth}, ${selectedYear}`,
-    };
-
-    onSave(updatedCard);
+    onSave({ ...cardDetails });
     onClose();
   };
 
-  const generateYearOptions = () => {
-    return Array.from({ length: 10 }, (_, i) => currentYear - i);
+  const handleDelete = () => {
+    if (onDelete && card) {
+      onDelete(card.bank, card.cardName);
+      onClose();
+    }
   };
 
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  if (!card) return null;
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Card Details</DialogTitle>
       <DialogContent>
-        <Box sx={{ py: 2 }}>
-          {/* Card Network */}
-          <Typography variant="h6" gutterBottom>
+        <Box sx={{ mt: 2 }}>
+          {/* Card Network Selector */}
+          <Typography variant="h6" sx={{ mb: 2 }}>
             Card Network
           </Typography>
           <CardNetworkSelector
             selectedNetwork={cardDetails.network}
-            onNetworkChange={(networkName) =>
-              setCardDetails((prev) => ({
-                ...prev,
-                network: networkName,
-              }))
+            onNetworkChange={(network) =>
+              setCardDetails({ ...cardDetails, network })
             }
           />
 
           {/* Billing Date */}
-          <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+          <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
             Billing Date
           </Typography>
           <ToggleButtonGroup
             value={cardDetails.billingDate}
             exclusive
-            onChange={(e, newValue) => {
-              if (newValue !== null) {
-                setCardDetails({ ...cardDetails, billingDate: newValue });
+            onChange={(e, newBillingDate) => {
+              if (newBillingDate !== null) {
+                setCardDetails({ ...cardDetails, billingDate: newBillingDate });
               }
             }}
-            fullWidth
-            sx={{ flexWrap: "wrap", mb: 2 }}
+            aria-label="billing date"
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 1,
+              "& .MuiToggleButton-root": {
+                border: "1px solid",
+                borderRadius: 1,
+                minWidth: "60px",
+                height: "40px",
+              },
+            }}
           >
             {BILLING_DATES.map((date) => (
-              <ToggleButton
-                key={date}
-                value={date}
-                sx={{
-                  flexBasis: `${100 / 7}%`,
-                  borderRadius: 1,
-                  "&.Mui-selected": {
-                    bgcolor: "primary.main",
-                    color: "primary.contrastText",
-                    "&:hover": {
-                      bgcolor: "primary.dark",
-                    },
-                  },
-                }}
-              >
+              <ToggleButton key={date} value={date} aria-label={`${date}`}>
                 {date}
               </ToggleButton>
             ))}
@@ -176,8 +171,8 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
             <Slider
               value={cardDetails.limit}
               min={limitConfig[region]?.min || 1000}
-              max={limitConfig[region]?.max || 500000}
-              step={1000}
+              max={limitConfig[region]?.max || 1000000}
+              step={region === "IN" ? 1000 : 100}
               valueLabelDisplay="auto"
               valueLabelFormat={(value) =>
                 `${region === "IN" ? "₹" : "$"}${value.toLocaleString()}`
@@ -229,11 +224,23 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
           </Grid>
         </Box>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSave} variant="contained">
-          Save Details
+      <DialogActions sx={{ justifyContent: "space-between", px: 3, pb: 2 }}>
+        {/* Delete button on the left */}
+        <Button 
+          onClick={handleDelete}
+          color="error"
+          variant="outlined"
+        >
+          Delete Card
         </Button>
+        
+        {/* Cancel and Save buttons on the right */}
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={handleSave} variant="contained">
+            Save Details
+          </Button>
+        </Box>
       </DialogActions>
     </Dialog>
   );
