@@ -4,24 +4,6 @@ import { motion } from "framer-motion";
 import { useRegion } from "../../../core/providers/RegionContext";
 import PropTypes from 'prop-types';
 
-const regionNetworks = {
-    IN: {
-        include: ["Visa", "Mastercard", "Rupay", "Diners Club", "AmEx"],
-        exclude: ["UnionPay"],
-        popular: ["Rupay", "Visa", "Mastercard"]
-    },
-    SG: {
-        include: ["Visa", "Mastercard", "UnionPay", "Diners Club", "AmEx"],
-        exclude: ["Rupay"],
-        popular: ["Visa", "Mastercard", "UnionPay"]
-    },
-    default: {
-        include: ["Visa", "Mastercard", "Diners Club", "AmEx"],
-        exclude: [],
-        popular: ["Visa", "Mastercard"]
-    }
-};
-
 const networkItemVariants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: i => ({
@@ -55,7 +37,6 @@ const networkItemVariants = {
 export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }) {
     const theme = useTheme();
     const { region } = useRegion();
-
     const [cardNetworks, setCardNetworks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -82,28 +63,6 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
         fetchCardNetworks();
     }, [region]);
 
-    const regionConfig = regionNetworks[region] || regionNetworks.default;
-
-    const filteredNetworks = cardNetworks.filter(item =>
-        regionConfig.include.includes(item.network) &&
-        !regionConfig.exclude.includes(item.network)
-    );
-
-    const sortedNetworks = [...filteredNetworks].sort((a, b) => {
-        const aPopularIndex = regionConfig.popular.indexOf(a.network);
-        const bPopularIndex = regionConfig.popular.indexOf(b.network);
-        if (aPopularIndex !== -1 && bPopularIndex !== -1) return aPopularIndex - bPopularIndex;
-        if (aPopularIndex !== -1) return -1;
-        if (bPopularIndex !== -1) return 1;
-        return 0;
-    });
-
-    const getRegionSpecificLabel = () => {
-        if (region === "IN") return "Popular in India";
-        if (region === "SG") return "Popular in Singapore";
-        return "Popular Options";
-    };
-
     if (isLoading) {
         return (
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, justifyContent: "center", mt: 1 }}>
@@ -123,8 +82,7 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
                 justifyContent: "center",
                 mt: 1
             }}>
-                {sortedNetworks.map((item, index) => {
-                    const isPopular = regionConfig.popular.includes(item.network);
+                {cardNetworks.map((item, index) => {
                     const isSelected = selectedNetwork === item.network;
 
                     return (
@@ -170,11 +128,6 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
                                         />
                                     </Box>
                                 </motion.div>
-                                {isPopular && (
-                                    <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5, display: 'block', color: theme.palette.primary.main, fontWeight: 'medium' }}>
-                                        Popular
-                                    </Typography>
-                                )}
                             </Box>
                         </Tooltip>
                     );
@@ -182,7 +135,7 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
             </Box>
             <Box sx={{ mt: 2, borderTop: `1px solid ${theme.palette.divider}`, pt: 1, textAlign: 'center' }}>
                 <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
-                    {getRegionSpecificLabel()} • Select to continue
+                    Select a card network to continue
                 </Typography>
             </Box>
         </Box>
