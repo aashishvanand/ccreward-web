@@ -79,10 +79,6 @@ export const getCardsForUser = async (userId) => {
     const selectedCountry = localStorage.getItem('app-region')?.toLowerCase() || 'in';
     console.log("📍 Selected country/region:", selectedCountry);
     
-    // Skip cache temporarily for debugging
-    localStorage.removeItem(`${CACHE_KEY}_${userId}`);
-    localStorage.removeItem(`${CACHE_TIMESTAMP_KEY}_${userId}`);
-    
     // If not in cache, fetch from Firebase
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);

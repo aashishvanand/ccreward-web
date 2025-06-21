@@ -1,8 +1,10 @@
 import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useRegion } from "../../../core/providers/RegionContext";
 
-const CACHE_KEY = "referralData";
-const CACHE_DURATION = 24 * 60 * 60 * 1000;
+// Use a prefix for the cache key to make it dynamic
+const CACHE_KEY_PREFIX = "referralData_";
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
 const ReferralButton = ({
   bank,
@@ -10,13 +12,22 @@ const ReferralButton = ({
   userCards,
   calculationPerformed,
 }) => {
+  // Get the current region from the context
+  const { region } = useRegion();
   const [referralLink, setReferralLink] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Create a dynamic cache key based on the region
+  const cacheKey = `${CACHE_KEY_PREFIX}${region.toLowerCase()}`;
+
   useEffect(() => {
     const fetchReferralData = async () => {
+      // Reset state when dependencies change
+      setIsLoading(true);
+      setReferralLink(null);
+
       try {
-        const cachedData = localStorage.getItem(CACHE_KEY);
+        const cachedData = localStorage.getItem(cacheKey);
         if (cachedData) {
           const { data, timestamp } = JSON.parse(cachedData);
           if (Date.now() - timestamp < CACHE_DURATION) {
@@ -30,13 +41,23 @@ const ReferralButton = ({
           }
         }
 
-        const response = await fetch(
-          "https://files.ccreward.app/referral.json"
-        );
+        // Construct the URL dynamically using the current region
+        const url = `https://files.ccreward.app/referral_${region.toLowerCase()}.json`;
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            // Handle cases where a region-specific file might not exist
+            console.warn(`Referral file for region "${region}" not found.`);
+            // Set empty data in cache to avoid refetching on every render
+            localStorage.setItem(cacheKey, JSON.stringify({ data: [], timestamp: Date.now() }));
+            return;
+        }
+
         const data = await response.json();
 
+        // Use the dynamic cache key to store the data
         localStorage.setItem(
-          CACHE_KEY,
+          cacheKey,
           JSON.stringify({
             data,
             timestamp: Date.now(),
@@ -55,10 +76,11 @@ const ReferralButton = ({
       }
     };
 
-    if (bank && cardName) {
+    if (bank && cardName && region) {
       fetchReferralData();
     }
-  }, [bank, cardName]);
+  // Add region and cacheKey to the dependency array
+  }, [bank, cardName, region, cacheKey]);
 
   if (!calculationPerformed || !referralLink || isLoading) {
     return null;

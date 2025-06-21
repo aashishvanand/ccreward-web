@@ -783,13 +783,6 @@ const BestCardCalculator = () => {
                   </ToggleButton>
                   <ToggleButton value="value" aria-label="sort by value">
                     Ranking by Value ({getCurrencySymbol()})
-                    <Tooltip
-                      title={`For comparison purposes, we assume 1 mile = ${getCurrencySymbol()}1`}
-                    >
-                      <IconButton size="small" sx={{ ml: 1 }}>
-                        <InfoIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
                   </ToggleButton>
                   <ToggleButton value="miles" aria-label="sort by miles">
                     Ranking by Miles
