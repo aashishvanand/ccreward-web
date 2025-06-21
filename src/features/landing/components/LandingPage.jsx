@@ -751,25 +751,23 @@ const DesktopView = ({
           <StatsSection />
         </Box>
 
-        {region === "IN" && (
-          <>
-            <Box
-              component="section"
-              data-section="top-cards"
-              sx={{ bgcolor: "background.default" }}
-            >
-              <TopCardsSection />
-            </Box>
+        <>
+          <Box
+            component="section"
+            data-section="top-cards"
+            sx={{ bgcolor: "background.default" }}
+          >
+            <TopCardsSection />
+          </Box>
 
-            <Box
-              component="section"
-              data-section="trending"
-              sx={{ bgcolor: "background.paper" }}
-            >
-              <TopSearchs />
-            </Box>
-          </>
-        )}
+          <Box
+            component="section"
+            data-section="trending"
+            sx={{ bgcolor: "background.paper" }}
+          >
+            <TopSearchs />
+          </Box>
+        </>
 
         <Box
           component="section"
