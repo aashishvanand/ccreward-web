@@ -15,6 +15,7 @@ import {
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import useCardCategories from "../../../../core/hooks/useCardCategories";
+import { useRegion } from "../../../../core/providers/RegionContext";
 
 const categoryNames = [
   "Education",
