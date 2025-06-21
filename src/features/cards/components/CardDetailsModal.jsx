@@ -4,7 +4,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   Button,
   Typography,
   Box,
@@ -18,11 +17,7 @@ import {
   Grid,
 } from "@mui/material";
 import { useRegion } from "../../../core/providers/RegionContext";
-
-const NETWORK_OPTIONS = {
-  IN: ["Visa", "Mastercard", "RuPay", "DinersClub", "AmEx"],
-  SG: ["Visa", "Mastercard", "DinersClub", "AmEx", "UnionPay"],
-};
+import CardNetworkSelector from "./CardNetworkSelector";
 
 const BILLING_DATES = Array.from({ length: 31 }, (_, i) => i + 1);
 
@@ -46,20 +41,24 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
   const limitConfig = {
     IN: {
       min: 1000,
-      max: 500000,
+      max: 1000000,
       steps: [
         { label: "1-50k", min: 1000, max: 50000 },
-        { label: "50k-2L", min: 50000, max: 200000 },
-        { label: "2L-5L", min: 200000, max: 500000 },
+        { label: "50k-1L", min: 50000, max: 100000 },
+        { label: "1L-5L", min: 100000, max: 500000 },
+        { label: "5L-10L", min: 500000, max: 1000000 },
       ],
     },
     SG: {
       min: 500,
       max: 50000,
       steps: [
-        { label: "500-10k", min: 500, max: 10000 },
-        { label: "10k-25k", min: 10000, max: 25000 },
-        { label: "25k-50k", min: 25000, max: 50000 },
+        { label: "500-1k", min: 500, max: 1000 },
+        { label: "1k-10k", min: 500, max: 10000 },
+        { label: "10k-20k", min: 10000, max: 20000 },
+        { label: "20k-30k", min: 20000, max: 30000 },
+        { label: "30k-40k", min: 30000, max: 40000 },
+        { label: "40k-50k", min: 40000, max: 50000 },
       ],
     },
   };
@@ -123,36 +122,18 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
           <Typography variant="h6" gutterBottom>
             Card Network
           </Typography>
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
-            {NETWORK_OPTIONS[region].map((network) => (
-              <Box
-                key={network}
-                onClick={() => setCardDetails({ ...cardDetails, network })}
-                sx={{
-                  p: 2,
-                  borderRadius: "50%",
-                  border: "2px solid",
-                  borderColor:
-                    cardDetails.network === network
-                      ? "primary.main"
-                      : "divider",
-                  textAlign: "center",
-                  cursor: "pointer",
-                  width: 80,
-                  height: 80,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Typography variant="body2">{network}</Typography>
-              </Box>
-            ))}
-          </Box>
+          <CardNetworkSelector
+            selectedNetwork={cardDetails.network}
+            onNetworkChange={(networkName) =>
+              setCardDetails((prev) => ({
+                ...prev,
+                network: networkName,
+              }))
+            }
+          />
 
           {/* Billing Date */}
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
             Billing Date
           </Typography>
           <ToggleButtonGroup
@@ -194,8 +175,8 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
           <Box sx={{ px: 2 }}>
             <Slider
               value={cardDetails.limit}
-              min={limitConfig[region].min}
-              max={limitConfig[region].max}
+              min={limitConfig[region]?.min || 1000}
+              max={limitConfig[region]?.max || 500000}
               step={1000}
               valueLabelDisplay="auto"
               valueLabelFormat={(value) =>
@@ -204,7 +185,7 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
               onChange={(e, newValue) =>
                 setCardDetails({ ...cardDetails, limit: newValue })
               }
-              marks={limitConfig[region].steps}
+              marks={limitConfig[region]?.steps}
             />
           </Box>
 
