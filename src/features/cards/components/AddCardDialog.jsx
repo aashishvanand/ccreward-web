@@ -82,80 +82,26 @@ const inputVariants = {
   },
 };
 
-const buttonVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      type: "spring",
-      stiffness: 300,
-      damping: 25,
-      delay: 0.3,
-    },
-  },
-  hover: {
-    scale: 1.05,
-    transition: {
-      type: "spring",
-      stiffness: 400,
-      damping: 10,
-    },
-  },
-  tap: { scale: 0.98 },
-};
-
-const accordionVariants = {
-  hidden: { opacity: 0, height: 0 },
-  visible: {
-    opacity: 1,
-    height: "auto",
-    transition: {
-      type: "spring",
-      stiffness: 200,
-      damping: 25,
-      delay: 0.2,
-    },
-  },
-  exit: {
-    opacity: 0,
-    height: 0,
-    transition: {
-      duration: 0.3,
-    },
-  },
-};
-
 // Default limit config for all regions
 const limitConfig = {
-  IN: {
-    min: 1000,
-    max: 500000,
-    steps: [
-      { value: 50000, label: "₹50K" },
-      { value: 200000, label: "₹2L" },
-      { value: 500000, label: "₹5L" },
-    ],
-  },
-  SG: {
-    min: 250,
-    max: 50000,
-    steps: [
-      { value: 10000, label: "$10K" },
-      { value: 25000, label: "$25K" },
-      { value: 50000, label: "$50K" },
-    ],
-  },
-  // Default fallback config
-  default: {
-    min: 1000,
-    max: 100000,
-    steps: [
-      { value: 10000, label: "10K" },
-      { value: 50000, label: "50K" },
-      { value: 100000, label: "100K" },
-    ],
-  },
+    IN: {
+      steps: [
+        { label: "1k-50k", min: 1000, max: 50000 },
+        { label: "50k-1L", min: 50000, max: 100000 },
+        { label: "1L-5L", min: 100000, max: 500000 },
+        { label: "5L-10L", min: 500000, max: 1000000 },
+      ],
+    },
+    SG: {
+      steps: [
+        { label: "500-1k", min: 500, max: 1000 },
+        { label: "1k-10k", min: 1000, max: 10000 },
+        { label: "10k-20k", min: 10000, max: 20000 },
+        { label: "20k-30k", min: 20000, max: 30000 },
+        { label: "30k-40k", min: 30000, max: 40000 },
+        { label: "40k-50k", min: 40000, max: 50000 },
+      ],
+    },
 };
 
 export default function AddCardDialog({ open, onClose, onAddCard }) {
