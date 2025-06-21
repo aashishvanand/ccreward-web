@@ -1,4 +1,3 @@
-// src/features/cards/components/MyCardsPage.jsx - Enhanced with Analytics
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Box,
@@ -36,6 +35,7 @@ import {
   useAnalytics,
   usePagePerformance,
   useEngagementTracking,
+  useJourneyTracking,
   useComponentAnalytics,
 } from "../../../core/hooks";
 

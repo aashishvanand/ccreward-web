@@ -12,7 +12,6 @@ export const metadata = generateMetadata({
 });
 
 export default function CalculatorPage() {
-  console.log("📄 [CalculatorPage] Rendering calculator page");
 
   return (
     <ThemeRegistry>

@@ -52,7 +52,6 @@ const StatsSection = () => {
         
         // Fetch data based on region
         const url = `https://files.ccreward.app/cardImages_${region.toLowerCase()}.json`;
-        console.log(`Fetching stats from: ${url}`);
         
         const response = await fetch(url);
         if (!response.ok) {
@@ -61,8 +60,6 @@ const StatsSection = () => {
         
         const cardData = await response.json();
         const uniqueBanks = new Set(cardData.map((card) => card.bank));
-        
-        console.log(`Fetched ${cardData.length} cards for ${region}`);
         
         setStats({
           cards: cardData.length,
