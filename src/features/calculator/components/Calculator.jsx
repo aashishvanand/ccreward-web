@@ -99,12 +99,6 @@ function Calculator() {
   const { trackFormStart, trackFormSubmission } =
     useFormTracking("reward-calculator");
 
-  console.log("🧮 [Calculator] Region context values:", {
-    region,
-    isInitialized,
-    isLoading,
-  });
-
   useEffect(() => {
     trackFeatureUsage("calculator_loaded", { region });
     trackFormStart();

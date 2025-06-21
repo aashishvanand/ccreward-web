@@ -77,7 +77,6 @@ export const getCardsForUser = async (userId) => {
   try {
     // Get current region/country directly from localStorage (don't use cached value)
     const selectedCountry = localStorage.getItem('app-region')?.toLowerCase() || 'in';
-    console.log("📍 Selected country/region:", selectedCountry);
 
     // If not in cache, fetch from Firebase
     const userRef = doc(db, 'users', userId);
@@ -91,7 +90,6 @@ export const getCardsForUser = async (userId) => {
 
     const userData = userDoc.data();
     const cards = userData.cards || {};
-    console.log("🔥 Raw Firebase data - cards object:", cards);
 
     // Convert to array for easier processing
     const cardList = Object.entries(cards).map(([key, value]) => ({
@@ -99,18 +97,11 @@ export const getCardsForUser = async (userId) => {
       ...value
     }));
 
-    // console.log("📊 ALL CARDS (unfiltered):", cardList);
-
     // Log each card's properties in detail
     cardList.forEach((card, index) => {
-      // console.log(`📌 Card ${index + 1}: ${card.bank} ${card.cardName}`);
-      // console.log(`   Country: ${card.country || 'undefined'} (type: ${typeof card.country})`);
-
       // Convert card country to lowercase for case-insensitive comparison
       const cardCountry = (card.country || '').toLowerCase();
       const shouldInclude = !card.country || cardCountry === selectedCountry;
-
-      console.log(`   Will be included for ${selectedCountry}? ${shouldInclude}`);
     });
 
     // Filter cards by country - using case-insensitive comparison
@@ -121,9 +112,6 @@ export const getCardsForUser = async (userId) => {
       // Otherwise do case-insensitive comparison
       return card.country.toLowerCase() === selectedCountry.toLowerCase();
     });
-
-    console.log(`🔍 FILTERED CARDS for region '${selectedCountry}':`, filteredCardList);
-    console.log(`📊 Stats: ${filteredCardList.length} of ${cardList.length} cards matched the current region`);
 
     // Update cache with unfiltered list
     setCachedData(userId, cardList);

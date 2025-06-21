@@ -304,11 +304,6 @@ const CalculatorForm = ({
 
   // Show loading state when region is not initialized
   if (!isInitialized) {
-    console.log("🔄 Calculator waiting for region to initialize:", {
-      region,
-      isInitialized,
-      isLoading,
-    });
     return (
       <Box
         sx={{

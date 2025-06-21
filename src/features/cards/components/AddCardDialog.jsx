@@ -256,7 +256,6 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
 
   const handleBankChange = (e) => {
     const selectedBank = e.target.value;
-    console.log("Bank selected:", selectedBank);
     setNewCard({
       ...newCard,
       bank: selectedBank,
@@ -271,7 +270,6 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
   };
 
   const handleCardChange = (e) => {
-    console.log("Card selected:", e.target.value);
     setNewCard((prev) => ({
       ...prev,
       cardName: e.target.value,

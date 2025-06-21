@@ -71,11 +71,6 @@ export const logAnalyticsEvent = (eventName, eventParams = {}) => {
         };
 
         logEvent(analytics, eventName, enrichedParams);
-
-        // Also log to console in development
-        if (process.env.NODE_ENV === 'development') {
-            console.log('📊 Analytics Event:', eventName, enrichedParams);
-        }
     } catch (error) {
         console.error('Error logging analytics event:', error);
     }

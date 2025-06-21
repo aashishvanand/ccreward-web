@@ -20,8 +20,6 @@ export const initializeCrashlytics = async () => {
         setupPerformanceMonitoring();
 
         isInitialized = true;
-
-        console.log('✅ Crashlytics-like error reporting initialized');
         return true;
     } catch (error) {
         console.error('❌ Error initializing crashlytics:', error);
@@ -249,9 +247,6 @@ export const logBreadcrumb = (message, category = 'info', data = {}) => {
 
         sessionStorage.setItem('crashlytics_breadcrumbs', JSON.stringify(breadcrumbs));
 
-        if (process.env.NODE_ENV === 'development') {
-            console.log('🍞 Breadcrumb:', breadcrumb);
-        }
     } catch (error) {
         console.error('Error logging breadcrumb:', error);
     }

@@ -184,8 +184,6 @@ export const fetchBanks = async () => {
     // Create a region-specific cache key
     const cacheKey = `banks_${region}`;
 
-    console.log(`Fetching banks for region: ${region} (Cache key: ${cacheKey})`);
-
     const cachedData = getFromCache(cacheKey);
     if (cachedData) {
         console.log(`Using cached banks for region ${region}`);
@@ -222,8 +220,6 @@ export const fetchCards = async (bank) => {
 
     // Create a region-specific cache key for this bank
     const cacheKey = `cards_${region}_${bank}`;
-
-    console.log(`Fetching cards for bank: ${bank} in region: ${region}`);
 
     const cachedData = getFromCache(cacheKey);
     if (cachedData) return cachedData;

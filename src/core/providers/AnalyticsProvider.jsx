@@ -31,31 +31,22 @@ export function AnalyticsProvider({ children }) {
     const initializeAllAnalytics = async () => {
       if (!initialized.current && typeof window !== "undefined") {
         try {
-          console.log("🚀 Initializing analytics services...");
-
           // Initialize Firebase Analytics
           let firebaseAnalyticsReady = false;
           if (await isSupported()) {
             getAnalytics(firebaseApp);
             firebaseAnalyticsReady = true;
-            console.log("✅ Firebase Analytics initialized");
           }
 
           // Initialize enhanced analytics
           const enhancedAnalyticsReady = await initializeAnalytics();
-          console.log(
-            "✅ Enhanced Analytics initialized:",
-            enhancedAnalyticsReady
-          );
 
           // Initialize Crashlytics-like error reporting
           const crashlyticsReady = await initializeCrashlytics();
-          console.log("✅ Crashlytics initialized:", crashlyticsReady);
 
           // Initialize Microsoft Clarity
           try {
             initializeClarity();
-            console.log("✅ Microsoft Clarity initialized");
           } catch (clarityError) {
             console.warn(
               "⚠️ Microsoft Clarity initialization failed:",
@@ -73,7 +64,6 @@ export function AnalyticsProvider({ children }) {
             crashlytics: crashlyticsReady,
           });
 
-          console.log("🎉 All analytics services initialized successfully");
         } catch (error) {
           console.error("❌ Failed to initialize analytics:", error);
           // Record this initialization error
@@ -116,8 +106,6 @@ export function AnalyticsProvider({ children }) {
           is_anonymous: user.isAnonymous,
           email_verified: user.emailVerified || false,
         });
-
-        console.log("👤 User analytics updated for:", user.uid);
       } catch (error) {
         console.error("Error updating user analytics:", error);
       }
@@ -143,8 +131,6 @@ export function AnalyticsProvider({ children }) {
             from: currentPath.current,
             to: newPath,
           });
-
-          console.log("📱 Route change tracked:", newPath);
         }
       };
 
@@ -212,9 +198,6 @@ export function AnalyticsProvider({ children }) {
       <Script
         src={`https://www.googletagmanager.com/gtag/js?l=dataLayer&id=${process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID}`}
         strategy="afterInteractive"
-        onLoad={() => {
-          console.log("📊 Google Analytics script loaded");
-        }}
         onError={(error) => {
           console.error("❌ Google Analytics script failed to load:", error);
         }}
@@ -240,8 +223,6 @@ export function AnalyticsProvider({ children }) {
             transport_type: 'beacon',
             anonymize_ip: true
           });
-          
-          console.log('🔧 Google Analytics configured');
         `}
       </Script>
 
@@ -253,8 +234,6 @@ export function AnalyticsProvider({ children }) {
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
           })(window, document, "clarity", "script", "ngsrwjccm4");
-          
-          console.log('🔍 Microsoft Clarity script loaded');
         `}
       </Script>
 
@@ -327,8 +306,6 @@ export function AnalyticsProvider({ children }) {
               });
             });
           }
-          
-          console.log('⚡ Performance monitoring initialized');
         `}
       </Script>
 

@@ -59,7 +59,6 @@ export function RegionProvider({ children }) {
   // Initialization effect
   useEffect(() => {
     async function initializeRegion() {
-      console.log("🔄 [RegionContext] Starting initialization");
 
       // Don't do anything during SSR
       if (typeof window === "undefined") {
@@ -75,24 +74,14 @@ export function RegionProvider({ children }) {
         const userSetRegion =
           localStorage.getItem("user-set-region") === "true";
 
-        console.log("🔍 [RegionContext] Checking localStorage:", {
-          savedRegion,
-          userSetRegion,
-        });
-
         if (savedRegion && isValidRegion(savedRegion)) {
           // If we have a valid saved region, use it
-          console.log("✅ [RegionContext] Using saved region:", savedRegion);
           setRegion(savedRegion.toUpperCase());
           setHasUserSetRegion(userSetRegion);
           setIsInitialized(true);
           setIsLoading(false);
           return;
         }
-
-        console.log(
-          "⚠️ [RegionContext] No valid region in localStorage, detecting from IP"
-        );
 
         // If no saved region, try to detect from IP
         try {
@@ -101,32 +90,15 @@ export function RegionProvider({ children }) {
             const data = await response.json();
             const countryCode = data.country?.toUpperCase();
 
-            console.log(
-              "🌎 [RegionContext] Detected country from IP:",
-              countryCode
-            );
-
             // Only set if it's a supported region
             if (Object.keys(REGIONS).includes(countryCode)) {
-              console.log(
-                "✅ [RegionContext] Setting detected region:",
-                countryCode
-              );
               localStorage.setItem("app-region", countryCode);
               setRegion(countryCode);
             } else {
-              // If not a supported region, use IN as default
-              console.log(
-                "ℹ️ [RegionContext] Detected region not supported, using default (IN)"
-              );
               localStorage.setItem("app-region", "IN");
               setRegion("IN");
             }
           } else {
-            // Fallback if IP detection fails
-            console.log(
-              "❌ [RegionContext] IP detection failed, using default (IN)"
-            );
             localStorage.setItem("app-region", "IN");
             setRegion("IN");
           }
@@ -144,10 +116,6 @@ export function RegionProvider({ children }) {
         // Set default values even on error
         setRegion("IN");
       } finally {
-        // Mark initialization as complete regardless of outcome
-        console.log(
-          "✅ [RegionContext] Initialization complete, setting flags"
-        );
         setIsInitialized(true);
         setIsLoading(false);
       }
