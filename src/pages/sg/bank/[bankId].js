@@ -20,7 +20,6 @@ const BankPage = dynamic(() => import('../../../features/bank/components/BankPag
     )
 });
 
-// This function now fetches the bank list and correctly maps the data
 export async function getStaticPaths() {
     const response = await fetch('https://files.ccreward.app/banks_sg.json');
     const banksData = await response.json();
@@ -29,10 +28,10 @@ export async function getStaticPaths() {
         params: { bankId: bankObject.bank.toLowerCase() },
     }));
 
-    return { paths, fallback: 'blocking' };
+    // Change fallback to 'false' to support static export
+    return { paths, fallback: false };
 }
 
-// This function correctly fetches card data for the specific bank
 export async function getStaticProps({ params }) {
     const { bankId } = params;
     const bankName = bankId.toUpperCase();
@@ -48,7 +47,7 @@ export async function getStaticProps({ params }) {
                 bank: bankName,
                 cards,
             },
-            revalidate: 86400, // Re-generate once a day
+            // Ensure the 'revalidate' key is not present here
         };
     } catch (error) {
         console.error(`Failed to fetch card data for ${bankName}:`, error);
@@ -56,7 +55,7 @@ export async function getStaticProps({ params }) {
     }
 }
 
-// The page component receives the data as props
+// The rest of your page component remains the same
 function BankRouteSG({ bank, cards }) {
     return (
         <ThemeRegistry>

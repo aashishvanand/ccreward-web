@@ -20,20 +20,18 @@ const BankPage = dynamic(() => import('../../../features/bank/components/BankPag
   )
 });
 
-// This function now fetches the bank list and correctly maps the data
 export async function getStaticPaths() {
   const response = await fetch('https://files.ccreward.app/banks_in.json');
-  const banksData = await response.json(); // This is an array of objects
+  const banksData = await response.json();
 
-  // Map over the array of objects and extract the 'bank' property for the path
   const paths = banksData.map((bankObject) => ({
     params: { bankId: bankObject.bank.toLowerCase() },
   }));
 
-  return { paths, fallback: 'blocking' };
+  // Change fallback to 'false' to support static export
+  return { paths, fallback: false };
 }
 
-// This function correctly fetches card data for the specific bank
 export async function getStaticProps({ params }) {
   const { bankId } = params;
   const bankName = bankId.toUpperCase();
@@ -42,7 +40,6 @@ export async function getStaticProps({ params }) {
     const response = await fetch('https://files.ccreward.app/cards_in.json');
     const data = await response.json();
 
-    // This logic is correct based on your cards_in.json format
     const cards = data.issuers[bankName]?.cards || [];
 
     return {
@@ -50,7 +47,7 @@ export async function getStaticProps({ params }) {
         bank: bankName,
         cards,
       },
-      revalidate: 86400, // Re-generate once a day
+      // Ensure the 'revalidate' key is not present here
     };
   } catch (error) {
     console.error(`Failed to fetch card data for ${bankName}:`, error);
@@ -58,7 +55,7 @@ export async function getStaticProps({ params }) {
   }
 }
 
-// The page component receives the data as props
+// The rest of your page component remains the same
 function BankRouteIN({ bank, cards }) {
   return (
     <ThemeRegistry>
