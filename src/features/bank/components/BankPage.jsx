@@ -24,12 +24,12 @@ import useCardImagesData from "../../../core/hooks/useCardImagesData";
 import { motion } from "framer-motion";
 
 // Add analytics imports
-import { 
-  useAnalytics, 
-  usePagePerformance, 
+import {
+  useAnalytics,
+  usePagePerformance,
   useEngagementTracking,
   useJourneyTracking,
-  useComponentAnalytics 
+  useComponentAnalytics,
 } from "../../../core/hooks";
 
 const pageVariants = {
@@ -58,19 +58,20 @@ const BankPage = ({ bank, cards }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
   const { user, signInWithGoogle } = useAuth();
-  
+
   // Analytics hooks
-  const { 
-    trackButtonClick, 
-    trackFeatureUsage, 
+  const {
+    trackButtonClick,
+    trackFeatureUsage,
     trackConversion,
     trackNavigation,
-    trackEvent 
+    trackEvent,
   } = useAnalytics();
-  const { recordCustomMetric } = usePagePerformance('bank-page');
+  const { recordCustomMetric } = usePagePerformance("bank-page");
   const { trackCustomEngagement } = useEngagementTracking();
   const { trackJourneyStep, trackJourneyCompletion } = useJourneyTracking();
-  const { trackComponentError, trackComponentInteraction } = useComponentAnalytics('BankPage');
+  const { trackComponentError, trackComponentInteraction } =
+    useComponentAnalytics("BankPage");
 
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
@@ -83,44 +84,56 @@ const BankPage = ({ bank, cards }) => {
 
   // Track page load and bank-specific analytics
   useEffect(() => {
-    trackFeatureUsage('bank_page_loaded', {
+    trackFeatureUsage("bank_page_loaded", {
       bank_name: bank,
       cards_count: cards?.length || 0,
       user_authenticated: !!user,
-      device_type: isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop'
+      device_type: isMobile ? "mobile" : isTablet ? "tablet" : "desktop",
     });
 
-    trackJourneyStep('bank_page_accessed', {
+    trackJourneyStep("bank_page_accessed", {
       bank_name: bank,
-      source: 'navigation',
-      cards_available: cards?.length || 0
+      source: "navigation",
+      cards_available: cards?.length || 0,
     });
 
-    recordCustomMetric('page_load_time', performance.now());
-    recordCustomMetric('bank_cards_count', cards?.length || 0);
+    recordCustomMetric("page_load_time", performance.now());
+    recordCustomMetric("bank_cards_count", cards?.length || 0);
 
     // Track bank popularity
-    trackEvent('bank_page_visit', {
+    trackEvent("bank_page_visit", {
       bank_name: bank,
       cards_available: cards?.length || 0,
-      visit_timestamp: new Date().toISOString()
+      visit_timestamp: new Date().toISOString(),
     });
-  }, [bank, cards, trackFeatureUsage, trackJourneyStep, trackEvent, recordCustomMetric, user, isMobile, isTablet]);
+  }, [
+    bank,
+    cards,
+    trackFeatureUsage,
+    trackJourneyStep,
+    trackEvent,
+    recordCustomMetric,
+    user,
+    isMobile,
+    isTablet,
+  ]);
 
   // Track card images loading
   useEffect(() => {
     if (cardImagesData?.length > 0) {
       const bankCardsWithImages = getCardsWithImages();
-      const imagesLoadedCount = bankCardsWithImages.filter(card => card.image).length;
-      
-      trackEvent('bank_card_images_loaded', {
+      const imagesLoadedCount = bankCardsWithImages.filter(
+        (card) => card.image
+      ).length;
+
+      trackEvent("bank_card_images_loaded", {
         bank_name: bank,
         total_cards: cards?.length || 0,
         images_loaded: imagesLoadedCount,
-        images_missing: (cards?.length || 0) - imagesLoadedCount
+        images_missing: (cards?.length || 0) - imagesLoadedCount,
       });
 
-      recordCustomMetric('card_images_loaded', imagesLoadedCount);
+      recordCustomMetric("card_images_loaded", imagesLoadedCount);
     }
   }, [cardImagesData, bank, cards, trackEvent, recordCustomMetric]);
 
@@ -142,41 +155,44 @@ const BankPage = ({ bank, cards }) => {
 
   // Enhanced card click handler with analytics
   const handleCardClick = (bank, cardName) => {
-    trackButtonClick('bank_page_card_click', {
+    trackButtonClick("bank_page_card_click", {
       bank_name: bank,
       card_name: cardName,
       user_authenticated: !!user,
-      device_type: isMobile ? 'mobile' : 'desktop',
-      source: 'bank_page'
+      device_type: isMobile ? "mobile" : "desktop",
+      source: "bank_page",
     });
 
-    trackCustomEngagement('card_selection_interaction', {
+    trackCustomEngagement("card_selection_interaction", {
       bank: bank,
-      card: cardName
+      card: cardName,
     });
 
     if (user) {
-      trackJourneyStep('card_selected_authenticated', {
+      trackJourneyStep("card_selected_authenticated", {
         bank_name: bank,
         card_name: cardName,
-        destination: 'calculator'
+        destination: "calculator",
       });
 
-      trackNavigation(`/calculator?bank=${bank}&card=${cardName}`, 'card_selection');
+      trackNavigation(
+        `/calculator?bank=${bank}&card=${cardName}`,
+        "card_selection"
+      );
       router.push(`/calculator?bank=${bank}&card=${cardName}`);
-      
-      trackConversion('bank_page_to_calculator', 1);
+
+      trackConversion("bank_page_to_calculator", 1);
     } else {
-      trackJourneyStep('card_selected_unauthenticated', {
+      trackJourneyStep("card_selected_unauthenticated", {
         bank_name: bank,
         card_name: cardName,
-        action_required: 'sign_in'
+        action_required: "sign_in",
       });
 
-      trackEvent('sign_in_required_from_bank_page', {
+      trackEvent("sign_in_required_from_bank_page", {
         bank_name: bank,
         card_name: cardName,
-        source: 'bank_page'
+        source: "bank_page",
       });
 
       setSelectedCard({ bank, cardName });
@@ -186,15 +202,17 @@ const BankPage = ({ bank, cards }) => {
 
   // Enhanced dialog handlers with analytics
   const handleCloseDialog = () => {
-    trackButtonClick('sign_in_dialog_close', {
+    trackButtonClick("sign_in_dialog_close", {
       bank_name: bank,
-      selected_card: selectedCard ? `${selectedCard.bank} ${selectedCard.cardName}` : 'none',
-      action: 'dismiss'
+      selected_card: selectedCard
+        ? `${selectedCard.bank} ${selectedCard.cardName}`
+        : "none",
+      action: "dismiss",
     });
 
-    trackJourneyStep('sign_in_dialog_dismissed', {
+    trackJourneyStep("sign_in_dialog_dismissed", {
       bank_name: bank,
-      selected_card: selectedCard?.cardName
+      selected_card: selectedCard?.cardName,
     });
 
     setOpenDialog(false);
@@ -202,38 +220,42 @@ const BankPage = ({ bank, cards }) => {
   };
 
   const handleSignIn = async () => {
-    trackButtonClick('sign_in_from_bank_page', {
+    trackButtonClick("sign_in_from_bank_page", {
       bank_name: bank,
-      selected_card: selectedCard ? `${selectedCard.bank} ${selectedCard.cardName}` : 'none',
-      source: 'bank_page_dialog'
+      selected_card: selectedCard
+        ? `${selectedCard.bank} ${selectedCard.cardName}`
+        : "none",
+      source: "bank_page_dialog",
     });
 
     const startTime = performance.now();
 
     try {
       await signInWithGoogle();
-      
+
       const signInDuration = performance.now() - startTime;
-      
-      trackConversion('bank_page_sign_in', 1);
-      trackJourneyCompletion('sign_in_success_bank_page', {
+
+      trackConversion("bank_page_sign_in", 1);
+      trackJourneyCompletion("sign_in_success_bank_page", {
         bank_name: bank,
         selected_card: selectedCard?.cardName,
-        sign_in_duration: Math.round(signInDuration)
+        sign_in_duration: Math.round(signInDuration),
       });
 
-      trackEvent('sign_in_success_bank_page', {
+      trackEvent("sign_in_success_bank_page", {
         bank_name: bank,
-        selected_card: selectedCard ? `${selectedCard.bank} ${selectedCard.cardName}` : 'none',
-        sign_in_duration: Math.round(signInDuration)
+        selected_card: selectedCard
+          ? `${selectedCard.bank} ${selectedCard.cardName}`
+          : "none",
+        sign_in_duration: Math.round(signInDuration),
       });
 
-      recordCustomMetric('sign_in_duration', Math.round(signInDuration));
-      
+      recordCustomMetric("sign_in_duration", Math.round(signInDuration));
+
       if (selectedCard) {
         trackNavigation(
           `/calculator?bank=${selectedCard.bank}&card=${selectedCard.cardName}`,
-          'post_signin_redirect'
+          "post_signin_redirect"
         );
         router.push(
           `/calculator?bank=${selectedCard.bank}&card=${selectedCard.cardName}`
@@ -241,12 +263,14 @@ const BankPage = ({ bank, cards }) => {
       }
     } catch (error) {
       const signInDuration = performance.now() - startTime;
-      
-      trackComponentError('sign_in_failed_bank_page', {
+
+      trackComponentError("sign_in_failed_bank_page", {
         bank_name: bank,
-        selected_card: selectedCard ? `${selectedCard.bank} ${selectedCard.cardName}` : 'none',
+        selected_card: selectedCard
+          ? `${selectedCard.bank} ${selectedCard.cardName}`
+          : "none",
         error_message: error.message,
-        sign_in_duration: Math.round(signInDuration)
+        sign_in_duration: Math.round(signInDuration),
       });
 
       setAlert({
@@ -259,10 +283,10 @@ const BankPage = ({ bank, cards }) => {
 
   // Track card grid interactions
   const handleCardGridInteraction = (interactionType, cardData = {}) => {
-    trackComponentInteraction('bank_card_grid_interaction', {
+    trackComponentInteraction("bank_card_grid_interaction", {
       interaction_type: interactionType,
       bank_name: bank,
-      ...cardData
+      ...cardData,
     });
   };
 
@@ -270,28 +294,30 @@ const BankPage = ({ bank, cards }) => {
   useEffect(() => {
     const handleScroll = () => {
       const scrollPercent = Math.round(
-        (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100
+        (window.scrollY /
+          (document.documentElement.scrollHeight - window.innerHeight)) *
+          100
       );
 
       if (scrollPercent > 0 && scrollPercent % 25 === 0) {
-        trackCustomEngagement('bank_page_scroll', {
+        trackCustomEngagement("bank_page_scroll", {
           scroll_percentage: scrollPercent,
           bank_name: bank,
-          cards_count: cards?.length || 0
+          cards_count: cards?.length || 0,
         });
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [bank, cards, trackCustomEngagement]);
 
   // Track page exit
   useEffect(() => {
     return () => {
-      trackJourneyStep('bank_page_exit', {
+      trackJourneyStep("bank_page_exit", {
         bank_name: bank,
-        time_on_page: performance.now()
+        time_on_page: performance.now(),
       });
     };
   }, [bank, trackJourneyStep]);

@@ -86,13 +86,13 @@ const getCountryCode = () => {
     if (typeof localStorage === 'undefined') {
         return null; // Return null during SSR
     }
-    
+
     const region = localStorage.getItem('app-region');
     if (!region) {
         console.warn('Region not initialized in localStorage');
         return null; // Return null if region not initialized
     }
-    
+
     return region.toLowerCase();
 };
 
@@ -125,7 +125,7 @@ api.interceptors.request.use(async (config) => {
         const token = await getToken();
         config.headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     // Only add country parameter if region is initialized
     const countryCode = getCountryCode();
     if (countryCode) {
@@ -139,12 +139,12 @@ api.interceptors.request.use(async (config) => {
         // Cancel the request
         return Promise.reject(new Error('Region not initialized'));
     }
-    
+
     // Ensure URL has versioning
     if (!config.url.startsWith('/v2/')) {
         config.url = `/v2${config.url}`;
     }
-    
+
     return config;
 }, (error) => Promise.reject(error));
 
@@ -178,14 +178,14 @@ export const fetchBanks = async () => {
         console.warn('Cannot fetch banks: Region not initialized');
         return [];
     }
-    
+
     const region = getCountryCode();
-    
+
     // Create a region-specific cache key
     const cacheKey = `banks_${region}`;
-    
+
     console.log(`Fetching banks for region: ${region} (Cache key: ${cacheKey})`);
-    
+
     const cachedData = getFromCache(cacheKey);
     if (cachedData) {
         console.log(`Using cached banks for region ${region}`);
@@ -196,10 +196,10 @@ export const fetchBanks = async () => {
         // Explicitly include region in request
         const response = await api.get(`/bank?country=${region}`);
         const data = response.data;
-        
+
         // Store with region-specific cache key
         setToCache(cacheKey, data);
-        
+
         return data;
     } catch (error) {
         // If error is about region not being initialized, return empty array
@@ -217,14 +217,14 @@ export const fetchCards = async (bank) => {
         console.warn('Cannot fetch cards: Region not initialized');
         return [];
     }
-    
+
     const region = getCountryCode();
-    
+
     // Create a region-specific cache key for this bank
     const cacheKey = `cards_${region}_${bank}`;
-    
+
     console.log(`Fetching cards for bank: ${bank} in region: ${region}`);
-    
+
     const cachedData = getFromCache(cacheKey);
     if (cachedData) return cachedData;
 
@@ -251,7 +251,7 @@ export const fetchMCC = async (search) => {
         console.warn('Cannot fetch MCC: Region not initialized');
         return [];
     }
-    
+
     if (mccCancelToken) {
         mccCancelToken.cancel('Operation canceled due to new request.');
     }
@@ -282,7 +282,7 @@ export const fetchCardQuestions = async (bank, card) => {
         console.warn('Cannot fetch card questions: Region not initialized');
         return [];
     }
-    
+
     const encodedBank = encodeURIComponent(bank);
     const encodedCard = encodeURIComponent(card);
     const cacheKey = `questions_${bank}_${card}`;
@@ -309,7 +309,7 @@ export const calculateRewards = async (data) => {
         console.warn('Cannot calculate rewards: Region not initialized');
         throw new Error('Region not initialized. Please refresh the page and try again.');
     }
-    
+
     try {
         const response = await api.post('/calculateRewards', data);
         return response.data;
@@ -329,7 +329,7 @@ export const fetchBestCardQuestions = async (cards) => {
         console.warn('Cannot fetch best card questions: Region not initialized');
         return [];
     }
-    
+
     try {
         const response = await authenticatedRequest('post', '/bestCardQuestions', { cards });
         return response;
@@ -349,7 +349,7 @@ export const calculateBestCard = async (data) => {
         console.warn('Cannot calculate best card: Region not initialized');
         throw new Error('Region not initialized. Please refresh the page and try again.');
     }
-    
+
     try {
         const response = await authenticatedRequest('post', '/calculateBestCard', data);
         return response;

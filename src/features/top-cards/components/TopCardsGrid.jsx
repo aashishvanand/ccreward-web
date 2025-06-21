@@ -26,7 +26,7 @@ import {
   Receipt as ReceiptIcon,
   AccountBalanceWallet as AccountBalanceWalletIcon,
 } from "@mui/icons-material";
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRegion } from "../../../core/providers/RegionContext";
 
@@ -35,18 +35,18 @@ const CACHE_KEY_PREFIX = "referralData_";
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
 const categoryIcons = {
-  "Education": <SchoolIcon sx={{ fontSize: 16 }} />,
-  "Entertainment": <TheatersIcon sx={{ fontSize: 16 }} />,
+  Education: <SchoolIcon sx={{ fontSize: 16 }} />,
+  Entertainment: <TheatersIcon sx={{ fontSize: 16 }} />,
   "Food & Dining": <RestaurantIcon sx={{ fontSize: 16 }} />,
   "Government/Tax": <AccountBalanceIcon sx={{ fontSize: 16 }} />,
-  "Groceries": <LocalGroceryStoreIcon sx={{ fontSize: 16 }} />,
+  Groceries: <LocalGroceryStoreIcon sx={{ fontSize: 16 }} />,
   "Healthcare & Medical": <LocalHospitalIcon sx={{ fontSize: 16 }} />,
-  "Insurance": <SecurityIcon sx={{ fontSize: 16 }} />,
+  Insurance: <SecurityIcon sx={{ fontSize: 16 }} />,
   "International Spends": <PublicIcon sx={{ fontSize: 16 }} />,
-  "Jewellery": <DiamondIcon sx={{ fontSize: 16 }} />,
+  Jewellery: <DiamondIcon sx={{ fontSize: 16 }} />,
   "Offline Shopping": <StoreIcon sx={{ fontSize: 16 }} />,
   "Online Shopping": <ShoppingCartIcon sx={{ fontSize: 16 }} />,
-  "Petrol": <LocalGasStationIcon sx={{ fontSize: 16 }} />,
+  Petrol: <LocalGasStationIcon sx={{ fontSize: 16 }} />,
   "Travel & Transportation": <DirectionsBusIcon sx={{ fontSize: 16 }} />,
   "Utility Bill": <ReceiptIcon sx={{ fontSize: 16 }} />,
   "Wallet Loading": <AccountBalanceWalletIcon sx={{ fontSize: 16 }} />,
@@ -86,10 +86,12 @@ const TopCardsGrid = ({
         // Construct the URL dynamically based on the current region
         const url = `https://files.ccreward.app/referral_${region.toLowerCase()}.json`;
         const response = await fetch(url);
-        
+
         if (!response.ok) {
-            console.warn(`Referral file for region "${region}" not found for TopCardsGrid.`);
-            return;
+          console.warn(
+            `Referral file for region "${region}" not found for TopCardsGrid.`
+          );
+          return;
         }
 
         const data = await response.json();
@@ -114,9 +116,9 @@ const TopCardsGrid = ({
     };
 
     if (region) {
-        fetchReferralData();
+      fetchReferralData();
     }
-  // Add region and cacheKey to the dependency array
+    // Add region and cacheKey to the dependency array
   }, [region, cacheKey]);
 
   const renderFees = (cardKey) => {
@@ -141,11 +143,19 @@ const TopCardsGrid = ({
             gap: 0.5,
           }}
         >
-          Card Fees {isLtf && <Chip label="Lifetime Free" size="small" color="success" sx={{ height: 16, fontSize: "0.6rem" }} />}
+          Card Fees{" "}
+          {isLtf && (
+            <Chip
+              label="Lifetime Free"
+              size="small"
+              color="success"
+              sx={{ height: 16, fontSize: "0.6rem" }}
+            />
+          )}
         </Typography>
-        <Stack 
-          spacing={0.5} 
-          sx={{ 
+        <Stack
+          spacing={0.5}
+          sx={{
             mt: 0.5,
             px: 1.5,
             py: 1,
@@ -154,11 +164,13 @@ const TopCardsGrid = ({
           }}
         >
           {joiningFees && (
-            <Box sx={{ 
-              display: "flex", 
-              justifyContent: "space-between",
-              textDecoration: isLtf ? "line-through" : "none",
-            }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                textDecoration: isLtf ? "line-through" : "none",
+              }}
+            >
               <Typography variant="caption" color="text.secondary">
                 Joining Fee:
               </Typography>
@@ -168,11 +180,13 @@ const TopCardsGrid = ({
             </Box>
           )}
           {renewalFees && (
-            <Box sx={{ 
-              display: "flex", 
-              justifyContent: "space-between",
-              textDecoration: isLtf ? "line-through" : "none",
-            }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                textDecoration: isLtf ? "line-through" : "none",
+              }}
+            >
               <Typography variant="caption" color="text.secondary">
                 Annual Fee:
               </Typography>
@@ -203,10 +217,10 @@ const TopCardsGrid = ({
         >
           Best For
         </Typography>
-        <Stack 
-          direction="row" 
-          spacing={0.5} 
-          sx={{ 
+        <Stack
+          direction="row"
+          spacing={0.5}
+          sx={{
             flexWrap: "wrap",
             gap: 0.5,
           }}
@@ -218,17 +232,17 @@ const TopCardsGrid = ({
               label={category}
               size="small"
               variant="outlined"
-              sx={{ 
+              sx={{
                 height: 20,
                 bgcolor: "background.default",
-                "& .MuiChip-icon": { 
+                "& .MuiChip-icon": {
                   marginLeft: "4px",
-                  marginRight: "-4px"
+                  marginRight: "-4px",
                 },
                 "& .MuiChip-label": {
                   fontSize: "0.65rem",
-                  padding: "0 8px"
-                }
+                  padding: "0 8px",
+                },
               }}
             />
           ))}
@@ -306,7 +320,10 @@ const TopCardsGrid = ({
                     <Typography
                       variant="subtitle2"
                       sx={{
-                        fontSize: card.orientation === "vertical" ? "0.75rem" : "0.875rem",
+                        fontSize:
+                          card.orientation === "vertical"
+                            ? "0.75rem"
+                            : "0.875rem",
                         fontWeight: 600,
                         lineHeight: 1.2,
                       }}
@@ -318,7 +335,10 @@ const TopCardsGrid = ({
                       variant="caption"
                       color="text.secondary"
                       sx={{
-                        fontSize: card.orientation === "vertical" ? "0.7rem" : "0.75rem",
+                        fontSize:
+                          card.orientation === "vertical"
+                            ? "0.7rem"
+                            : "0.75rem",
                         lineHeight: 1.2,
                       }}
                       noWrap
@@ -341,7 +361,10 @@ const TopCardsGrid = ({
                         }}
                         sx={{
                           flex: 1,
-                          fontSize: card.orientation === "vertical" ? "0.7rem" : "0.75rem",
+                          fontSize:
+                            card.orientation === "vertical"
+                              ? "0.7rem"
+                              : "0.75rem",
                         }}
                       >
                         Calculate Rewards
@@ -357,7 +380,10 @@ const TopCardsGrid = ({
                         onClick={(e) => e.stopPropagation()}
                         sx={{
                           flex: 1,
-                          fontSize: card.orientation === "vertical" ? "0.7rem" : "0.75rem",
+                          fontSize:
+                            card.orientation === "vertical"
+                              ? "0.7rem"
+                              : "0.75rem",
                         }}
                       >
                         Apply Now

@@ -21,22 +21,26 @@ import { useRegion } from "../../../core/providers/RegionContext";
 
 const NETWORK_OPTIONS = {
   IN: ["Visa", "Mastercard", "RuPay", "DinersClub", "AmEx"],
-  SG: ["Visa", "Mastercard", "DinersClub", "AmEx", "UnionPay"]
+  SG: ["Visa", "Mastercard", "DinersClub", "AmEx", "UnionPay"],
 };
 
-const BILLING_DATES = Array.from({length: 31}, (_, i) => i + 1);
+const BILLING_DATES = Array.from({ length: 31 }, (_, i) => i + 1);
 
 const CardDetailsModal = ({ open, onClose, card, onSave }) => {
   const { region } = useRegion();
   const currentYear = new Date().getFullYear();
   const [cardDetails, setCardDetails] = useState({
-    network: region === 'IN' ? "Visa" : "Mastercard",
+    network: region === "IN" ? "Visa" : "Mastercard",
     billingDate: 1,
-    limit: region === 'IN' ? 100000 : 500,
-    since: `${new Date().toLocaleString('default', { month: 'long' })}, ${currentYear}`,
+    limit: region === "IN" ? 100000 : 500,
+    since: `${new Date().toLocaleString("default", {
+      month: "long",
+    })}, ${currentYear}`,
   });
 
-  const [selectedMonth, setSelectedMonth] = useState(new Date().toLocaleString('default', { month: 'long' }));
+  const [selectedMonth, setSelectedMonth] = useState(
+    new Date().toLocaleString("default", { month: "long" })
+  );
   const [selectedYear, setSelectedYear] = useState(currentYear);
 
   const limitConfig = {
@@ -44,36 +48,36 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
       min: 1000,
       max: 500000,
       steps: [
-        { label: '1-50k', min: 1000, max: 50000 },
-        { label: '50k-2L', min: 50000, max: 200000 },
-        { label: '2L-5L', min: 200000, max: 500000 }
-      ]
+        { label: "1-50k", min: 1000, max: 50000 },
+        { label: "50k-2L", min: 50000, max: 200000 },
+        { label: "2L-5L", min: 200000, max: 500000 },
+      ],
     },
     SG: {
       min: 500,
       max: 50000,
       steps: [
-        { label: '500-10k', min: 500, max: 10000 },
-        { label: '10k-25k', min: 10000, max: 25000 },
-        { label: '25k-50k', min: 25000, max: 50000 }
-      ]
-    }
+        { label: "500-10k", min: 500, max: 10000 },
+        { label: "10k-25k", min: 10000, max: 25000 },
+        { label: "25k-50k", min: 25000, max: 50000 },
+      ],
+    },
   };
 
   useEffect(() => {
     if (card) {
       const { network, billingDate, limit, since } = card;
       if (since) {
-        const [month, year] = since.split(', ');
+        const [month, year] = since.split(", ");
         setSelectedMonth(month);
         setSelectedYear(parseInt(year));
       }
-      
+
       setCardDetails({
-        network: network || (region === 'IN' ? "Visa" : "Mastercard"),
+        network: network || (region === "IN" ? "Visa" : "Mastercard"),
         billingDate: billingDate || 1,
-        limit: limit || (region === 'IN' ? 100000 : 500),
-        since: since || `${selectedMonth}, ${selectedYear}`
+        limit: limit || (region === "IN" ? 100000 : 500),
+        since: since || `${selectedMonth}, ${selectedYear}`,
       });
     }
   }, [card, region]);
@@ -84,37 +88,41 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
       network: cardDetails.network,
       billingDate: cardDetails.billingDate,
       limit: cardDetails.limit,
-      since: `${selectedMonth}, ${selectedYear}`
+      since: `${selectedMonth}, ${selectedYear}`,
     };
-    
+
     onSave(updatedCard);
     onClose();
   };
 
   const generateYearOptions = () => {
-    return Array.from(
-      { length: 10 },
-      (_, i) => currentYear - i
-    );
+    return Array.from({ length: 10 }, (_, i) => currentYear - i);
   };
 
   const months = [
-    "January", "February", "March", "April", "May", "June", 
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      fullWidth 
-      maxWidth="sm"
-    >
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>Card Details</DialogTitle>
       <DialogContent>
         <Box sx={{ py: 2 }}>
           {/* Card Network */}
-          <Typography variant="h6" gutterBottom>Card Network</Typography>
+          <Typography variant="h6" gutterBottom>
+            Card Network
+          </Typography>
           <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
             {NETWORK_OPTIONS[region].map((network) => (
               <Box
@@ -124,7 +132,10 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
                   p: 2,
                   borderRadius: "50%",
                   border: "2px solid",
-                  borderColor: cardDetails.network === network ? "primary.main" : "divider",
+                  borderColor:
+                    cardDetails.network === network
+                      ? "primary.main"
+                      : "divider",
                   textAlign: "center",
                   cursor: "pointer",
                   width: 80,
@@ -141,7 +152,9 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
           </Box>
 
           {/* Billing Date */}
-          <Typography variant="h6" gutterBottom>Billing Date</Typography>
+          <Typography variant="h6" gutterBottom>
+            Billing Date
+          </Typography>
           <ToggleButtonGroup
             value={cardDetails.billingDate}
             exclusive
@@ -151,20 +164,20 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
               }
             }}
             fullWidth
-            sx={{ flexWrap: 'wrap', mb: 2 }}
+            sx={{ flexWrap: "wrap", mb: 2 }}
           >
             {BILLING_DATES.map((date) => (
-              <ToggleButton 
-                key={date} 
+              <ToggleButton
+                key={date}
                 value={date}
                 sx={{
-                  flexBasis: `${100/7}%`,
+                  flexBasis: `${100 / 7}%`,
                   borderRadius: 1,
-                  '&.Mui-selected': {
-                    bgcolor: 'primary.main',
-                    color: 'primary.contrastText',
-                    '&:hover': {
-                      bgcolor: 'primary.dark',
+                  "&.Mui-selected": {
+                    bgcolor: "primary.main",
+                    color: "primary.contrastText",
+                    "&:hover": {
+                      bgcolor: "primary.dark",
                     },
                   },
                 }}
@@ -175,7 +188,9 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
           </ToggleButtonGroup>
 
           {/* Credit Limit */}
-          <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>Credit Limit</Typography>
+          <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
+            Credit Limit
+          </Typography>
           <Box sx={{ px: 2 }}>
             <Slider
               value={cardDetails.limit}
@@ -183,14 +198,20 @@ const CardDetailsModal = ({ open, onClose, card, onSave }) => {
               max={limitConfig[region].max}
               step={1000}
               valueLabelDisplay="auto"
-              valueLabelFormat={(value) => `${region === 'IN' ? '₹' : '$'}${value.toLocaleString()}`}
-              onChange={(e, newValue) => setCardDetails({ ...cardDetails, limit: newValue })}
+              valueLabelFormat={(value) =>
+                `${region === "IN" ? "₹" : "$"}${value.toLocaleString()}`
+              }
+              onChange={(e, newValue) =>
+                setCardDetails({ ...cardDetails, limit: newValue })
+              }
               marks={limitConfig[region].steps}
             />
           </Box>
 
           {/* Card Member Since */}
-          <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>Card Member Since</Typography>
+          <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>
+            Card Member Since
+          </Typography>
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <FormControl fullWidth>

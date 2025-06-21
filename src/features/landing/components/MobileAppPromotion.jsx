@@ -16,7 +16,7 @@ const MobileAppPromotion = ({ isAndroid }) => {
         "3a8dc462-51ce-4367-8292-1e1ae594da00",
         "46f32a7a-d554-4897-deaa-440d69df4800",
         "970ac62d-57cf-4638-4aa6-9a2c351aaa00",
-        "2ccc7b3f-acda-4147-25f1-2b5806bce500"
+        "2ccc7b3f-acda-4147-25f1-2b5806bce500",
       ]
     : [
         "cc11f2c9-1423-4cf8-cc35-dd3264ac0600",

@@ -14,16 +14,16 @@ export const initializeAnalytics = async () => {
     try {
         // Initialize Analytics
         analytics = getAnalytics(firebaseApp);
-        
+
         // Initialize Performance Monitoring
         try {
             performance = getPerformance(firebaseApp);
         } catch (perfError) {
             console.warn('Performance monitoring not available:', perfError);
         }
-        
+
         isInitialized = true;
-        
+
         // Log initial app_open event
         logAnalyticsEvent('app_open', {
             timestamp: new Date().toISOString(),
@@ -33,7 +33,7 @@ export const initializeAnalytics = async () => {
             platform: navigator.platform,
             language: navigator.language
         });
-        
+
         return true;
     } catch (error) {
         console.error('Error initializing analytics:', error);
@@ -71,7 +71,7 @@ export const logAnalyticsEvent = (eventName, eventParams = {}) => {
         };
 
         logEvent(analytics, eventName, enrichedParams);
-        
+
         // Also log to console in development
         if (process.env.NODE_ENV === 'development') {
             console.log('📊 Analytics Event:', eventName, enrichedParams);
@@ -114,7 +114,7 @@ export const setUserAnalytics = (userId, userProperties = {}) => {
 
     try {
         setUserId(analytics, userId);
-        
+
         const enhancedProperties = {
             ...userProperties,
             first_visit: !localStorage.getItem('user_visited_before'),
@@ -124,12 +124,12 @@ export const setUserAnalytics = (userId, userProperties = {}) => {
             region: localStorage.getItem('app-region') || 'unknown',
             last_active: new Date().toISOString()
         };
-        
+
         setUserProperties(analytics, enhancedProperties);
-        
+
         // Mark user as visited
         localStorage.setItem('user_visited_before', 'true');
-        
+
         logAnalyticsEvent('user_identification', {
             user_id: userId,
             ...enhancedProperties
@@ -161,7 +161,7 @@ export const stopPerformanceTrace = (performanceTrace, customAttributes = {}) =>
         Object.entries(customAttributes).forEach(([key, value]) => {
             performanceTrace.putAttribute(key, String(value));
         });
-        
+
         performanceTrace.stop();
     } catch (error) {
         console.error('Error stopping performance trace:', error);
@@ -272,12 +272,12 @@ function generateSecureRandomString(length = 9) {
         // Node.js environment - use crypto module
         try {
             const crypto = require('crypto');
-            return crypto.randomBytes(Math.ceil(length * 3/4)).toString('base64').substr(0, length);
+            return crypto.randomBytes(Math.ceil(length * 3 / 4)).toString('base64').substr(0, length);
         } catch (error) {
             console.warn('Crypto module not available, falling back to timestamp-based ID');
         }
     }
-    
+
     // Fallback for environments without crypto support
     // This is less secure but better than Math.random()
     console.warn('Using fallback session ID generation - not cryptographically secure');
@@ -347,7 +347,7 @@ function getConnectionType() {
 
 function getElementPosition(element) {
     if (!element) return 'unknown';
-    
+
     try {
         const rect = element.getBoundingClientRect();
         return {
@@ -381,7 +381,7 @@ export const logSessionEnd = () => {
     const duration = getSessionDuration();
     const pageViews = getSessionPageViews();
     const features = getSessionFeatures();
-    
+
     logAnalyticsEvent('session_end', {
         session_duration: duration,
         page_views: pageViews,

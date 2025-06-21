@@ -203,33 +203,33 @@ export function AuthProvider({ children }) {
             }}
           >
             <Box mb={3}>
-              <CircularProgress 
-                size={60} 
-                thickness={4} 
+              <CircularProgress
+                size={60}
+                thickness={4}
                 color="primary"
                 variant="indeterminate"
               />
             </Box>
-            
-            <Typography 
-              variant="h6" 
-              sx={{ 
+
+            <Typography
+              variant="h6"
+              sx={{
                 mb: 1,
                 fontWeight: 500,
               }}
             >
               Checking authentication
             </Typography>
-            
+
             <Typography
               variant="body2"
               color="text.secondary"
             >
-              {loadingDuration > 5 
-                ? "This is taking longer than expected..." 
+              {loadingDuration > 5
+                ? "This is taking longer than expected..."
                 : "Just a moment while we prepare your experience"}
             </Typography>
-            
+
             {loadingDuration > 10 && (
               <motion.div
                 initial={{ opacity: 0 }}

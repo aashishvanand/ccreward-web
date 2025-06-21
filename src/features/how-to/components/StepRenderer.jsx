@@ -8,7 +8,7 @@ const StepRenderer = ({ steps, videoUrl, platformColor, isMobile, region }) => {
   // Function to get the correct image URL with region-specific support
   const getImageUrl = (imageId) => {
     if (!imageId) return null;
-  
+
     // Check if the image ID already contains the full URL to avoid duplication
     if (imageId.includes("http")) {
       try {
@@ -23,13 +23,13 @@ const StepRenderer = ({ steps, videoUrl, platformColor, isMobile, region }) => {
         console.warn("Invalid URL format for image:", imageId);
       }
     }
-  
+
     // Check if there's a region-specific image ID format
     const regionSpecificId =
       region && imageId.includes(":")
         ? imageId.split(":")[region === "SG" ? 1 : 0]
         : imageId;
-  
+
     // Create the proper URL, use different width for mobile
     return `https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/${regionSpecificId}/${
       isMobile ? "width=320" : "width=640"
@@ -107,19 +107,21 @@ const StepRenderer = ({ steps, videoUrl, platformColor, isMobile, region }) => {
             },
           }}
         >
-          <Box sx={{ 
-            p: { xs: 1.5, sm: 2.5 },
-            display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            justifyContent: "space-between",
-            alignItems: "flex-start"
-          }}>
+          <Box
+            sx={{
+              p: { xs: 1.5, sm: 2.5 },
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+            }}
+          >
             {/* Step number and description column */}
-            <Box 
-              sx={{ 
-                flex: "1 1 auto", 
+            <Box
+              sx={{
+                flex: "1 1 auto",
                 pr: { xs: 0, sm: 2 },
-                width: { xs: "100%", sm: "auto" }
+                width: { xs: "100%", sm: "auto" },
               }}
             >
               <Box
@@ -137,7 +139,8 @@ const StepRenderer = ({ steps, videoUrl, platformColor, isMobile, region }) => {
                     minWidth: 28,
                     height: 28,
                     borderRadius: "50%",
-                    backgroundColor: platformColor || theme.palette.primary.main,
+                    backgroundColor:
+                      platformColor || theme.palette.primary.main,
                     color: "#fff",
                     fontWeight: "bold",
                     mr: 1.5,
@@ -241,17 +244,15 @@ const StepRenderer = ({ steps, videoUrl, platformColor, isMobile, region }) => {
               <Box
                 sx={{
                   flex: "0 0 auto",
-                  width: { 
-                    xs: "100%", 
-                    sm: step.fullScreenImage ? "45%" : "320px" 
+                  width: {
+                    xs: "100%",
+                    sm: step.fullScreenImage ? "45%" : "320px",
                   },
                   mt: { xs: 2, sm: 0 },
                   alignSelf: { xs: "center", sm: "flex-start" },
                 }}
               >
-                <Box
-                  sx={getImageContainerStyle(step)}
-                >
+                <Box sx={getImageContainerStyle(step)}>
                   <Box
                     component="img"
                     src={getImageUrl(step.image)}

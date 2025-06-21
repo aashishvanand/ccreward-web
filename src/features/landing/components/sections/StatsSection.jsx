@@ -4,7 +4,7 @@ import Counter from "./Counter";
 import { useRegion } from "../../../../core/providers/RegionContext";
 
 const StatsSection = () => {
-  const { region } = useRegion();
+  const { region, regionName } = useRegion();
   const [stats, setStats] = useState({ cards: 0, banks: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [hasAnimated, setHasAnimated] = useState(false);
@@ -21,6 +21,12 @@ const StatsSection = () => {
     const rounded = Math.floor(num / 10) * 10;
     return rounded;
   };
+
+  const title = region === 'SG'
+    ? `${regionName} Credit Card Coverage`
+    : 'Comprehensive Credit Card Coverage';
+
+    const description = `With support for credit cards across major banks in ${regionName}, it's never been easier to optimize your credit card rewards.`;
 
   // Reset stats and loading state when region changes
   useEffect(() => {
@@ -118,12 +124,6 @@ const StatsSection = () => {
     setHasAnimated(false);
   }, [region]);
 
-  const getRegionSpecificTitle = () => {
-    return region === 'SG' 
-      ? "Singapore Credit Card Coverage" 
-      : "Comprehensive Credit Card Coverage";
-  };
-
   return (
     <Box ref={sectionRef} sx={{ py: 8, bgcolor: "background.paper" }}>
       <Container maxWidth="lg">
@@ -137,7 +137,7 @@ const StatsSection = () => {
             color: "text.primary",
           }}
         >
-          {getRegionSpecificTitle()}
+          {title}
         </Typography>
 
         <Typography
@@ -151,10 +151,7 @@ const StatsSection = () => {
             fontSize: { xs: "1.125rem", sm: "1.25rem" },
           }}
         >
-          {region === 'SG' 
-            ? "With support for credit cards across major banks in Singapore, optimize your credit card rewards easily"
-            : "With support for hundreds of credit cards across major banks in India, it's never been easier to optimize your credit card rewards"
-          }
+          {description}
         </Typography>
 
         <Grid container spacing={4} justifyContent="center">

@@ -22,6 +22,7 @@ import _ from "lodash";
 import PropTypes from "prop-types";
 import { useSearchParams } from "next/navigation";
 import { useRegion } from "../../../core/providers/RegionContext";
+import { getCurrencySymbol } from "../../../core/utils";
 
 const CalculatorForm = ({
   selectedBank,
@@ -463,7 +464,7 @@ const CalculatorForm = ({
           input: {
             startAdornment: (
               <InputAdornment position="start">
-                {getCurrencySymbol()}
+                {getCurrencySymbol(region)}
               </InputAdornment>
             ),
             inputProps: {
