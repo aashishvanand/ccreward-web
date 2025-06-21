@@ -48,6 +48,7 @@ const TopCardsSection = () => {
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
   );
+  const { regionName } = useRegion();
 
   const handleNext = () => {
     setCurrentPage((prev) => (prev + 1) % totalPages);
@@ -94,7 +95,7 @@ const TopCardsSection = () => {
               fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
             }}
           >
-            Top Credit Cards in India
+            Top Credit Cards in {regionName}
           </Typography>
           <Typography
             variant="h5"
@@ -118,7 +119,7 @@ const TopCardsSection = () => {
               fontSize: "1.1rem",
             }}
           >
-            Explore Top Cards in India
+            Explore Top Cards in {regionName}
           </Button>
         </Box>
 
