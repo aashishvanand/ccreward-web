@@ -1,0 +1,66 @@
+{
+    "issuers": {
+        "AMEX": {
+            "cards": ["Gold", "Membership Rewards", "Platinum", "Platinum Reserve", "Platinum Travel", "SmartEarn"]
+        },
+        "AU": {
+            "cards": ["Aditya Birla Capital Flex", "Aditya Birla Capital Nxt", "Aditya Birla Capital Pro", "Altura", "Altura Plus", "InstaPay", "ixigo", "LIT", "NOMO", "SPONT", "Vetta", "Zenith", "Zenith+"]
+        },
+        "Axis": {
+            "cards": ["ACE","Airtel","Atlas","Aura","Burgundy Private","Flipkart","Flipkart Super Elite","Freecharge","Freecharge Plus","Horizon","Indian Oil","Indian Oil Premium","Kiwi","LIC","Magnus","Miles & More World","Miles & More World Select","MyZone","Neo","Olympus","Privilege","Primus","Reserve","Rewards","Samsung Infinite","Samsung Signature","Select","Shoppers Stop","Vistara","Vistara Infinite","Vistara Signature","Voyage","Voyage Black"]
+        },
+        "BOB": {
+            "cards": ["CMA One", "Easy", "Eterna", "HPCL Energie", "ICAI Exclusive", "ICSI Diamond", "IRCTC", "Indian Coast Guard Rakshamah", "Indian Army Yoddha", "Indian Navy Varunah", "Nainital Renaissance", "Pragati", "Premier", "Prime", "Sentinel", "Select", "Snapdeal", "Tiara", "Vikram"]
+        },
+        "Canara": {
+            "cards": ["Classic","Gold","MasterCard World","MasterCard Standard","Platinum","Rupay Select"]
+        },
+        "DBS": {
+            "cards": ["Spark", "Vantage"]
+        },
+        "Federal": {
+            "cards": ["Celesta", "Imperio", "Scapia", "Signet", "Wave"]
+        },
+        "HDFC": {
+            "cards": ["6E Rewards","6E Rewards XL","Biz Black Metal Edition","Biz Power","Biz Grow","Biz First","Business Regalia","Business MoneyBack","Diners Club Black Metal","Diners Club Privilege","Diners Club Black","Freedom","Giga Business","H.O.G Diners","Harley Davidson","IndianOil","Infinia Metal","IRCTC","Marriott Bonvoy","Millennia","MoneyBack Plus","Paytm","Paytm Select","Paytm Mobile","Paytm Digital","Pixel Go","Pixel Play","Regalia","Regalia Gold","Regalia First","Shoppers Stop","Shoppers Stop Black","Swiggy","Tata Neu Infinity","Tata Neu Plus","Times","Times Platinum","UPI RuPay"]
+        },
+        "HSBC": {
+            "cards": ["Live+", "Platinum", "Premier", "T1", "Taj"]
+        },
+        "ICICI": {
+            "cards": ["AmazonPay","Chennai Super Kings","Coral","Emeralde Private","Emeralde","Emeralde Skywards","HPCL Coral","HPCL Super Saver","Manchester United Platinum","Manchester United Signature","MMT","MMT Signature","Mine","Parakram Select","Parakram","Platinum","Rubyx","Rubyx Skywards","Sapphiro","Sapphiro Skywards","Times Black"]
+        },
+        "IDBI": {
+            "cards": ["Aspire", "Eclat", "Euphoria", "Imperium", "Lumine", "Royale", "Winnings"]
+        },
+        "IDFCFirst": {
+            "cards": ["Ashva", "Classic", "Club Vistara", "LIC Classic", "LIC Select", "Mayura", "Millennia", "Power", "Power+", "Select", "SWYP", "Wealth", "WOW"]
+        },
+        "IndusInd": {
+            "cards": ["Avios", "Celesta", "Club Vistara Explorer", "Crest", "Duo", "EazyDiner Platinum", "EazyDiner Signature", "Indulge", "InterMiles Odyssey", "InterMiles Voyage", "Legend", "Nexxt", "Pinnacle", "Pioneer Heritage", "Pioneer Legacy", "Pioneer Private", "Platinum", "Platinum RuPay", "Platinum Aura Edge", "Samman", "Solitaire", "Tiger"]
+        },
+        "Kotak": {
+            "cards": ["6E Rewards","6E Rewards XL","811","811 #DreamDifferent","Indian Oil","League","Metro","MOJO","Myntra","Privy League Signature","PVR INOX","PVR INOX Gold","PVR INOX Platinum","Royale Signature","UPI Rupay","White","White Reserve","Zen"]
+        },
+        "OneCard": {
+            "cards": [
+                "One Card"
+            ]
+        },
+        "PNB": {
+            "cards": ["Platinum", "Gold", "Rakshak Platinum", "Rupay Platinum", "Patanjali Platinum", "Patanjali Select", "Select", "Signature", "Millennial", "Classic"]
+        },
+        "RBL": {
+            "cards": ["Bankbazaar Savemax","Bankbazaar Savemax Pro","Cookies","DMI Finance","IRCTC","IndianOil XTRA","IndianOil","Icon","Insignia Preferred Banking","LazyPay","MoneyTap Black","MoneyTap","Platinum Maxima Plus","Platinum Delight","Platinum Maxima","Play","ShopRite","World Safari","iGlobe"]
+        },
+        "SBI": {
+            "cards": ["Air India Platinum","Air India Signature","Apollo","Aurum","BPCL","BPCL Octane","Cashback","Elite","Elite Advantage","Etihad Guest","Etihad Guest Premier","IRCTC","IRCTC Platinum","IRCTC Premier","KrisFlyer","KrisFlyer Apex","Lifestyle","Lifestyle Prime","Lifestyle Select","Miles","Miles Elite","Miles Prime","Ola Money","PayTM","PayTM Select","Prime","Prime Advantage","Pulse","Reliance","Reliance Prime","SimplyClick","SimplySave","Tata","Tata Select","Titan","Tata Neu Infinity","Tata Neu Plus","Vistara","Vistara Prime","Yatra"]
+        },
+        "SC": {
+            "cards": ["EaseMyTrip", "Platinum Rewards", "Rewards", "Smart", "Ultimate"]
+        },
+        "YesBank": {
+            "cards": ["ACE", "BYOC", "Elite+", "First Preferred", "Marquee", "Prosperity", "Reserv", "Select", "Wellness Plus"]
+        }
+    }
+}
