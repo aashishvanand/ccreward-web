@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Box,
   Container,
@@ -13,8 +13,11 @@ import {
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import Image from "next/image";
 import useCardImagesData from "../../../../core/hooks/useCardImagesData";
+import { useRegion } from "../../../../core/providers/RegionContext";
 
 const TopSearchs = () => {
+  // Get the current region from the context
+  const { region } = useRegion();
   const [statsData, setStatsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,21 +29,36 @@ const TopSearchs = () => {
 
   useEffect(() => {
     const fetchStats = async () => {
+      // Reset state when region changes
+      setLoading(true);
+      setError(null);
+      setStatsData(null);
+      
       try {
-        const response = await fetch(
-          "https://files.ccreward.app/stats/latest.json"
-        );
+        // Construct the URL dynamically based on the current region
+        const url = `https://files.ccreward.app/stats/${region.toLowerCase()}/latest.json`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            console.warn(`Trending stats for region "${region}" not found.`);
+            throw new Error('Stats not available for this region.');
+        }
+
         const data = await response.json();
         setStatsData(data);
       } catch (err) {
-        setError("Failed to load stats");
+        setError(err.message);
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
-    fetchStats();
-  }, []);
+    
+    if (region) {
+      fetchStats();
+    }
+  // Add `region` to the dependency array to refetch when it changes
+  }, [region]);
 
   const handleTimeframeChange = (event, newValue) => {
     setTimeframe(newValue);
@@ -64,7 +82,8 @@ const TopSearchs = () => {
     );
   }
 
-  if (error) return null;
+  // Do not render the component if there was an error or no data
+  if (error || !statsData) return null;
 
   const currentStats = statsData?.[timeframe];
 

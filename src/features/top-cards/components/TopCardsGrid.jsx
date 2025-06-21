@@ -28,8 +28,10 @@ import {
 } from "@mui/icons-material";
 import { motion } from 'framer-motion';
 import Image from "next/image";
+import { useRegion } from "../../../core/providers/RegionContext";
 
-const CACHE_KEY = "referralData";
+// Use a prefix for the cache key to make it dynamic
+const CACHE_KEY_PREFIX = "referralData_";
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
 const categoryIcons = {
@@ -57,13 +59,18 @@ const TopCardsGrid = ({
   handleCardClick,
   theme,
 }) => {
+  // Get the current region from the context
+  const { region } = useRegion();
   const [referralData, setReferralData] = useState({});
   const cols = isMobile ? 2 : isTablet ? 3 : 4;
+
+  // Create a dynamic cache key based on the region
+  const cacheKey = `${CACHE_KEY_PREFIX}${region.toLowerCase()}`;
 
   useEffect(() => {
     const fetchReferralData = async () => {
       try {
-        const cachedData = localStorage.getItem(CACHE_KEY);
+        const cachedData = localStorage.getItem(cacheKey);
         if (cachedData) {
           const { data, timestamp } = JSON.parse(cachedData);
           if (Date.now() - timestamp < CACHE_DURATION) {
@@ -76,11 +83,20 @@ const TopCardsGrid = ({
           }
         }
 
-        const response = await fetch("https://files.ccreward.app/referral.json");
+        // Construct the URL dynamically based on the current region
+        const url = `https://files.ccreward.app/referral_${region.toLowerCase()}.json`;
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            console.warn(`Referral file for region "${region}" not found for TopCardsGrid.`);
+            return;
+        }
+
         const data = await response.json();
 
+        // Use the dynamic cache key to store the data
         localStorage.setItem(
-          CACHE_KEY,
+          cacheKey,
           JSON.stringify({
             data,
             timestamp: Date.now(),
@@ -97,8 +113,11 @@ const TopCardsGrid = ({
       }
     };
 
-    fetchReferralData();
-  }, []);
+    if (region) {
+        fetchReferralData();
+    }
+  // Add region and cacheKey to the dependency array
+  }, [region, cacheKey]);
 
   const renderFees = (cardKey) => {
     const referralInfo = referralData[cardKey];
