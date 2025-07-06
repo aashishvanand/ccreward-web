@@ -8,7 +8,7 @@ let performance = null;
 let isInitialized = false;
 
 // Initialize analytics and performance monitoring (client-side only)
-export const initializeAnalytics = async () => {
+const initializeAnalytics = async () => {
     // Only run on client-side
     if (typeof window === 'undefined') {
         console.log('🔧 Analytics initialization skipped (server-side)');
@@ -26,10 +26,10 @@ export const initializeAnalytics = async () => {
         // Initialize Performance Monitoring
         try {
             performance = getPerformance(firebaseApp);
-            
+
             // Set up automatic performance monitoring
             setupClientSidePerformanceMonitoring();
-            
+
             console.log('✅ Firebase Performance Monitoring initialized');
         } catch (perfError) {
             console.warn('⚠️ Performance monitoring not available:', perfError);
@@ -61,7 +61,7 @@ export const initializeAnalytics = async () => {
 };
 
 // Enhanced event logging (client-side only)
-export const logAnalyticsEvent = (eventName, eventParams = {}) => {
+const logAnalyticsEvent = (eventName, eventParams = {}) => {
     // Only run on client-side
     if (!analytics || typeof window === 'undefined' || !isInitialized) {
         if (typeof window === 'undefined') {
@@ -105,7 +105,7 @@ export const logAnalyticsEvent = (eventName, eventParams = {}) => {
 };
 
 // Create and manage performance traces (client-side only)
-export const createPerformanceTrace = (traceName) => {
+const createPerformanceTrace = (traceName) => {
     if (!performance || !isInitialized || typeof window === 'undefined') {
         return null;
     }
@@ -120,13 +120,13 @@ export const createPerformanceTrace = (traceName) => {
 };
 
 // Start performance trace
-export const startPerformanceTrace = (traceName, customAttributes = {}) => {
+const startPerformanceTrace = (traceName, customAttributes = {}) => {
     const traceObj = createPerformanceTrace(traceName);
     if (!traceObj) return null;
 
     try {
         traceObj.start();
-        
+
         // Add custom attributes with validation
         Object.entries(customAttributes).forEach(([key, value]) => {
             // Firebase Performance requires non-empty string values
@@ -150,7 +150,7 @@ export const startPerformanceTrace = (traceName, customAttributes = {}) => {
 };
 
 // Stop performance trace
-export const stopPerformanceTrace = (traceObj, customMetrics = {}) => {
+const stopPerformanceTrace = (traceObj, customMetrics = {}) => {
     if (!traceObj) return;
 
     try {
@@ -273,7 +273,7 @@ function setupVisibilityTracking() {
 
     const handleVisibilityChange = () => {
         const now = Date.now();
-        
+
         if (document.hidden && isPageVisible) {
             // Page became hidden
             const engagementTime = now - pageStartTime;
@@ -310,7 +310,7 @@ function setupVisibilityTracking() {
 }
 
 // Enhanced page view tracking (client-side only)
-export const trackPageView = (path, additionalData = {}) => {
+const trackPageView = (path, additionalData = {}) => {
     if (!analytics || typeof window === 'undefined') return;
 
     try {
@@ -348,7 +348,7 @@ export const trackPageView = (path, additionalData = {}) => {
 };
 
 // User identification and properties (client-side only)
-export const setUserAnalytics = (userId, userProperties = {}) => {
+const setUserAnalytics = (userId, userProperties = {}) => {
     if (!analytics || typeof window === 'undefined') return;
 
     try {
@@ -393,7 +393,7 @@ export const setUserAnalytics = (userId, userProperties = {}) => {
 // Client-side utility functions
 function getOrCreateSessionId() {
     if (typeof window === 'undefined') return 'server_session';
-    
+
     let sessionId = getStorageItem('analytics_session_id', 'session');
     if (!sessionId) {
         sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -416,7 +416,7 @@ function getClientPerformanceMetrics() {
 
     try {
         const memory = performance.memory;
-        
+
         return {
             memory_used: memory ? Math.round(memory.usedJSHeapSize / 1048576) : 0, // MB
             memory_total: memory ? Math.round(memory.totalJSHeapSize / 1048576) : 0, // MB
@@ -444,7 +444,7 @@ function getTotalSessions() {
 
 function getDeviceType() {
     if (typeof window === 'undefined') return 'unknown';
-    
+
     const userAgent = navigator.userAgent;
     if (/tablet|ipad|playbook|silk/i.test(userAgent)) return 'tablet';
     if (/mobile|iphone|ipod|android|blackberry|opera|mini|windows\sce|palm|smartphone|iemobile/i.test(userAgent)) return 'mobile';
@@ -453,7 +453,7 @@ function getDeviceType() {
 
 function getBrowserInfo() {
     if (typeof window === 'undefined') return 'unknown';
-    
+
     const userAgent = navigator.userAgent;
     if (userAgent.includes('Chrome')) return 'Chrome';
     if (userAgent.includes('Firefox')) return 'Firefox';
@@ -464,7 +464,7 @@ function getBrowserInfo() {
 
 function getOSInfo() {
     if (typeof window === 'undefined') return 'unknown';
-    
+
     const userAgent = navigator.userAgent;
     if (userAgent.includes('Windows')) return 'Windows';
     if (userAgent.includes('Mac')) return 'macOS';
@@ -476,7 +476,7 @@ function getOSInfo() {
 
 function getConnectionType() {
     if (typeof window === 'undefined') return 'unknown';
-    
+
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     return connection ? connection.effectiveType : 'unknown';
 }
@@ -488,7 +488,7 @@ function getDeviceMemory() {
 
 function getScrollPercentage() {
     if (typeof window === 'undefined') return 0;
-    
+
     try {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -500,7 +500,7 @@ function getScrollPercentage() {
 
 function getFirstPaint() {
     if (typeof window === 'undefined' || !window.performance || !window.performance.getEntriesByType) return 0;
-    
+
     try {
         const paintEntries = performance.getEntriesByType('paint');
         const firstPaint = paintEntries.find(entry => entry.name === 'first-paint');
@@ -512,7 +512,7 @@ function getFirstPaint() {
 
 function getFirstContentfulPaint() {
     if (typeof window === 'undefined' || !window.performance || !window.performance.getEntriesByType) return 0;
-    
+
     try {
         const paintEntries = performance.getEntriesByType('paint');
         const fcp = paintEntries.find(entry => entry.name === 'first-contentful-paint');
@@ -524,7 +524,7 @@ function getFirstContentfulPaint() {
 
 function getLargestContentfulPaint() {
     if (typeof window === 'undefined' || !window.performance || !window.performance.getEntriesByType) return 0;
-    
+
     try {
         const lcpEntries = performance.getEntriesByType('largest-contentful-paint');
         return lcpEntries.length > 0 ? Math.round(lcpEntries[lcpEntries.length - 1].startTime) : 0;
@@ -536,7 +536,7 @@ function getLargestContentfulPaint() {
 // Safe storage functions (client-side only)
 function getStorageItem(key, storageType = 'local') {
     if (typeof window === 'undefined') return null;
-    
+
     try {
         const storage = storageType === 'session' ? sessionStorage : localStorage;
         return storage.getItem(key);
@@ -548,7 +548,7 @@ function getStorageItem(key, storageType = 'local') {
 
 function setStorageItem(key, value, storageType = 'local') {
     if (typeof window === 'undefined') return;
-    
+
     try {
         const storage = storageType === 'session' ? sessionStorage : localStorage;
         storage.setItem(key, value);
@@ -577,7 +577,7 @@ function getCLSRating(value) {
 }
 
 // Specific helper functions for backward compatibility
-export const logButtonClick = (buttonName, additionalData = {}) => {
+const logButtonClick = (buttonName, additionalData = {}) => {
     logAnalyticsEvent('button_click', {
         button_name: buttonName,
         click_timestamp: new Date().toISOString(),
@@ -585,18 +585,18 @@ export const logButtonClick = (buttonName, additionalData = {}) => {
     });
 };
 
-export const logFeatureUsage = (featureName, additionalParams = {}) => {
+const logFeatureUsage = (featureName, additionalParams = {}) => {
     const featureTrace = startPerformanceTrace(`feature_${featureName}`);
-    
+
     logAnalyticsEvent('feature_use', {
         feature_name: featureName,
         feature_timestamp: new Date().toISOString(),
         user_session_features: getSessionFeatures(),
         ...additionalParams
     });
-    
+
     addSessionFeature(featureName);
-    
+
     if (featureTrace) {
         setTimeout(() => {
             stopPerformanceTrace(featureTrace, {
@@ -607,9 +607,9 @@ export const logFeatureUsage = (featureName, additionalParams = {}) => {
     }
 };
 
-export const logSearchQuery = (query, results = []) => {
+const logSearchQuery = (query, results = []) => {
     const searchTrace = startPerformanceTrace('search_query');
-    
+
     logAnalyticsEvent('search', {
         search_term: query,
         search_timestamp: new Date().toISOString(),
@@ -617,7 +617,7 @@ export const logSearchQuery = (query, results = []) => {
         has_results: results.length > 0,
         search_type: 'general_search'
     });
-    
+
     if (searchTrace) {
         setTimeout(() => {
             stopPerformanceTrace(searchTrace, {
@@ -628,7 +628,7 @@ export const logSearchQuery = (query, results = []) => {
     }
 };
 
-export const logConversion = (conversionType, value = 0, additionalData = {}) => {
+const logConversion = (conversionType, value = 0, additionalData = {}) => {
     logAnalyticsEvent('conversion', {
         conversion_type: conversionType,
         conversion_value: value,
@@ -637,7 +637,7 @@ export const logConversion = (conversionType, value = 0, additionalData = {}) =>
     });
 };
 
-export const logEngagementEvent = (eventType, engagementTime = 0, additionalData = {}) => {
+const logEngagementEvent = (eventType, engagementTime = 0, additionalData = {}) => {
     logAnalyticsEvent('engagement', {
         engagement_type: eventType,
         engagement_duration: engagementTime,
@@ -646,9 +646,9 @@ export const logEngagementEvent = (eventType, engagementTime = 0, additionalData
     });
 };
 
-export const logCalculation = (calculationData = {}) => {
+const logCalculation = (calculationData = {}) => {
     const calculationTrace = startPerformanceTrace('calculation_performed');
-    
+
     logAnalyticsEvent('calculation', {
         calculation_type: calculationData.type || 'rewards_calculation',
         calculation_timestamp: new Date().toISOString(),
@@ -659,7 +659,7 @@ export const logCalculation = (calculationData = {}) => {
         calculation_method: calculationData.method || 'standard',
         ...calculationData
     });
-    
+
     if (calculationTrace) {
         setTimeout(() => {
             stopPerformanceTrace(calculationTrace, {
@@ -672,12 +672,12 @@ export const logCalculation = (calculationData = {}) => {
 };
 
 // Backward compatibility alias for logPageView
-export const logPageView = (path, additionalData = {}) => {
+const logPageView = (path, additionalData = {}) => {
     trackPageView(path, additionalData);
 };
 
 // Setup network monitoring (client-side only)
-export const setupNetworkMonitoring = () => {
+const setupNetworkMonitoring = () => {
     // Only run on client-side
     if (typeof window === 'undefined') {
         console.log('🔧 Network monitoring setup skipped (server-side)');
@@ -687,7 +687,7 @@ export const setupNetworkMonitoring = () => {
     try {
         // Monitor fetch requests with safe timing
         const originalFetch = window.fetch;
-        window.fetch = function(...args) {
+        window.fetch = function (...args) {
             // Use Date.now() instead of performance.now() for better compatibility
             const startTime = Date.now();
             const url = typeof args[0] === 'string' ? args[0] : args[0]?.url || 'unknown';
@@ -767,21 +767,21 @@ export const setupNetworkMonitoring = () => {
         const originalXHROpen = XMLHttpRequest.prototype.open;
         const originalXHRSend = XMLHttpRequest.prototype.send;
 
-        XMLHttpRequest.prototype.open = function(method, url, ...args) {
+        XMLHttpRequest.prototype.open = function (method, url, ...args) {
             this._method = method;
             this._url = url;
             this._startTime = Date.now(); // Use Date.now() instead of performance.now()
             return originalXHROpen.apply(this, [method, url, ...args]);
         };
 
-        XMLHttpRequest.prototype.send = function(...args) {
+        XMLHttpRequest.prototype.send = function (...args) {
             const xhr = this;
-            
-            xhr.addEventListener('loadend', function() {
+
+            xhr.addEventListener('loadend', function () {
                 if (isInitialized && xhr._startTime) {
                     try {
                         const duration = Date.now() - xhr._startTime;
-                        
+
                         logAnalyticsEvent('xhr_request', {
                             url: (xhr._url || '').substring(0, 100),
                             method: xhr._method || 'GET',
@@ -844,7 +844,7 @@ export const setupNetworkMonitoring = () => {
 // Session feature tracking (client-side only)
 function getSessionFeatures() {
     if (typeof window === 'undefined') return [];
-    
+
     try {
         const features = getStorageItem('session_features', 'session');
         return features ? JSON.parse(features) : [];
@@ -855,7 +855,7 @@ function getSessionFeatures() {
 
 function addSessionFeature(featureName) {
     if (typeof window === 'undefined') return;
-    
+
     try {
         const features = getSessionFeatures();
         if (!features.includes(featureName)) {
