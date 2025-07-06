@@ -489,6 +489,18 @@ function MyCardsPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [cards.length, trackCustomEngagement]);
 
+  useEffect(() => {
+  // Only track when cards length is 0 and user is authenticated
+  if (cards.length === 0 && user?.uid) {
+    trackEvent("empty_portfolio_viewed", {
+      user_id: user?.uid,
+      is_new_user: isNewUser,
+      region,
+    });
+  }
+}, [cards.length, user?.uid, isNewUser, region, trackEvent]);
+
+
   const renderContent = () => {
     if (isLoading || loading) {
       return (
@@ -498,13 +510,6 @@ function MyCardsPage() {
       );
     }
     if (cards.length === 0) {
-      useEffect(() => {
-        trackEvent("empty_portfolio_viewed", {
-          user_id: user?.uid,
-          is_new_user: isNewUser,
-          region,
-        });
-      }, []);
       return (
         <Paper
           elevation={0}

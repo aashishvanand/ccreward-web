@@ -16,15 +16,23 @@ async function fetchCardCategories(region) {
 
 function useCardCategories() {
     // Get the current region from the context
-    const { region } = useRegion();
+    const { region, isInitialized } = useRegion();
     const [categories, setCategories] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Create a dynamic cache key based on the region
-    const cacheKey = `${CACHE_KEY_PREFIX}${region.toLowerCase()}`;
+    // Create a dynamic cache key based on the region (only if region exists)
+    const cacheKey = region ? `${CACHE_KEY_PREFIX}${region.toLowerCase()}` : null;
 
     useEffect(() => {
+        // Don't run if region is not initialized or not available
+        if (!isInitialized || !region) {
+            setIsLoading(true);
+            setCategories(null);
+            setError(null);
+            return;
+        }
+
         // Reset state when region changes to provide immediate feedback
         setIsLoading(true);
         setCategories(null);
@@ -33,13 +41,15 @@ function useCardCategories() {
         async function loadCategories() {
             try {
                 // Check region-specific cache first
-                const cachedData = localStorage.getItem(cacheKey);
-                if (cachedData) {
-                    const { data, timestamp } = JSON.parse(cachedData);
-                    if (Date.now() - timestamp < CACHE_EXPIRATION) {
-                        setCategories(data);
-                        setIsLoading(false);
-                        return;
+                if (cacheKey) {
+                    const cachedData = localStorage.getItem(cacheKey);
+                    if (cachedData) {
+                        const { data, timestamp } = JSON.parse(cachedData);
+                        if (Date.now() - timestamp < CACHE_EXPIRATION) {
+                            setCategories(data);
+                            setIsLoading(false);
+                            return;
+                        }
                     }
                 }
 
@@ -48,10 +58,12 @@ function useCardCategories() {
                 setCategories(freshData);
 
                 // Update the region-specific cache
-                localStorage.setItem(cacheKey, JSON.stringify({
-                    data: freshData,
-                    timestamp: Date.now()
-                }));
+                if (cacheKey) {
+                    localStorage.setItem(cacheKey, JSON.stringify({
+                        data: freshData,
+                        timestamp: Date.now()
+                    }));
+                }
 
             } catch (err) {
                 setError(err);
@@ -62,9 +74,9 @@ function useCardCategories() {
         }
 
         loadCategories();
-    // Add `region` and `cacheKey` to the dependency array
-    // This ensures the hook re-runs whenever the region changes
-    }, [region, cacheKey]);
+    // Add `region`, `cacheKey`, and `isInitialized` to the dependency array
+    // This ensures the hook re-runs whenever the region changes or is initialized
+    }, [region, cacheKey, isInitialized]);
 
     return { categories, isLoading, error };
 }

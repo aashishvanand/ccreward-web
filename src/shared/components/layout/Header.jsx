@@ -1,64 +1,45 @@
-// src/shared/components/layout/Header.jsx
 import React, { useState, useEffect } from "react";
-import { useRegion } from "../../../core/providers/RegionContext";
 import {
   AppBar,
   Toolbar,
   Typography,
-  IconButton,
   Button,
+  IconButton,
   Box,
+  useTheme,
+  useMediaQuery,
   Menu,
   MenuItem,
-  useMediaQuery,
-  useTheme,
+  ListItemIcon,
+  ListItemText,
   Tooltip,
-  Divider,
+  Badge,
 } from "@mui/material";
 import {
-  CreditCard,
-  DarkMode,
-  LightMode,
-  Logout as LogoutIcon,
+  Menu as MenuIcon,
   Home as HomeIcon,
   Calculate as CalculateIcon,
-  Menu as MenuIcon,
+  CreditCard,
   Stars as StarsIcon,
+  Logout as LogoutIcon,
+  Login as LoginIcon,
+  PersonAdd as PersonAddIcon,
+  LightMode as LightModeIcon,
+  DarkMode as DarkModeIcon,
 } from "@mui/icons-material";
-// For motion components
-import { motion } from 'framer-motion';
-
-// For AnimatePresence
-import { AnimatePresence } from 'framer-motion';
-import { useAppTheme } from "../../../core/providers/ThemeRegistry";
-import { useAuth } from "../../../core/providers/AuthContext";
-import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
+import { motion } from "framer-motion";
+import { useAuth } from "../../../core/providers/AuthContext";
+import { useAppTheme } from "../../../core/providers/ThemeRegistry";
+import { useRegion } from "../../../core/providers/RegionContext";
 import { getCardsForUser } from "../../../core/services/firebaseUtils";
 import { onCardUpdate } from "../../../core/utils/events";
 import { detectDevice } from "../../../core/utils/deviceUtils";
-import Image from "next/image";
-import ProfileMenu from "./ProfileMenu";
 import RegionSelector from "./RegionSelector";
 
-// Animation variants
-const appBarVariants = {
-  hidden: { y: -60 },
-  visible: { 
-    y: 0,
-    transition: {
-      type: "spring",
-      stiffness: 400,
-      damping: 30,
-      delay: 0.1,
-      when: "beforeChildren",
-      staggerChildren: 0.1
-    }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: -10 },
+const headerVariants = {
+  hidden: { opacity: 0, y: -20 },
   visible: { 
     opacity: 1, 
     y: 0,
@@ -116,6 +97,8 @@ const logoVariants = {
 
 function Header() {
   const { mode, toggleTheme } = useAppTheme();
+  // ✅ REMOVED: Direct localStorage access for currentRegion
+  // ✅ USE CONTEXT ONLY
   const { region } = useRegion();
   const { user, logout, isAuthenticated } = useAuth();
   const router = useRouter();
@@ -131,29 +114,9 @@ function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [userCardCount, setUserCardCount] = useState(0);
   const isHomePage = pathname === "/";
-  const [currentRegion, setCurrentRegion] = useState(() => localStorage.getItem("app-region")
-  );
 
-  useEffect(() => {
-    const updateRegionFromStorage = () => {
-      const storedRegion = localStorage.getItem("app-region");
-      setCurrentRegion(storedRegion);
-    };
-
-    // Listen for storage events (if another tab changes localStorage)
-    window.addEventListener("storage", updateRegionFromStorage);
-
-    // Listen for our custom event
-    const handleRegionChanged = () => {
-      updateRegionFromStorage();
-    };
-    window.addEventListener("region-changed", handleRegionChanged);
-
-    return () => {
-      window.removeEventListener("storage", updateRegionFromStorage);
-      window.removeEventListener("region-changed", handleRegionChanged);
-    };
-  }, []);
+  // ✅ REMOVED: All localStorage event listeners and region management
+  // RegionContext handles this now
 
   useEffect(() => {
     setDeviceInfo(detectDevice());
@@ -206,277 +169,162 @@ function Header() {
             disabled: userCardCount < 2,
             tooltip:
               userCardCount < 2
-                ? "Add at least two cards to use this feature"
-                : "",
+                ? "Add at least 2 cards to use this feature"
+                : undefined,
           },
         ]
       : []),
   ];
 
-  const renderMenuItems = () => {
-    return menuItems.map(
-      (item) =>
-        pathname !== item.href && (
-          <motion.div
-            key={item.label}
-            variants={menuItemVariants}
-            whileHover="hover"
-            whileTap="tap"
-          >
-            <MenuItem
-              onClick={handleMenuClose}
-              component={Link}
-              href={item.href}
-              disabled={item.disabled}
-            >
-              {item.icon}
-              <Typography sx={{ ml: 1 }}>{item.label}</Typography>
-            </MenuItem>
-          </motion.div>
-        )
-    );
-  };
-
-  // Now render based on device type
-  if (deviceInfo.isAndroid || deviceInfo.isIOS) {
-    return (
-      <motion.div
-        variants={appBarVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <AppBar position="static" color="default" elevation={0}>
-          <Toolbar sx={{ justifyContent: "space-between" }}>
-            <motion.div variants={logoVariants} whileHover="hover" whileTap="tap">
-              <Typography
-                variant="h6"
-                component="div"
-                sx={{ display: "flex", alignItems: "center" }}
-              >
-                <Box sx={{ position: "relative", width: 40, height: 40, mr: 1 }}>
-                  <Image
-                    src={
-                      mode === "dark"
-                        ? "f4bf16b1-527e-4d80-47b4-99989a1ded00"
-                        : "b6c3c6f1-a744-4e47-8c50-4c33c84c3900"
-                    }
-                    alt="CCReward Logo"
-                    width={40}
-                    height={40}
-                    priority
-                  />
-                </Box>
-                CCReward
-              </Typography>
-            </motion.div>
-
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <motion.div variants={itemVariants}>
-                <RegionSelector currentRegion={currentRegion} />
-              </motion.div>
-              <motion.div variants={itemVariants} whileHover={{ rotate: 180, transition: { duration: 0.5 } }}>
-                <IconButton
-                  onClick={toggleTheme}
-                  color="inherit"
-                  aria-label="toggle theme"
-                >
-                  {mode === "dark" ? <LightMode /> : <DarkMode />}
-                </IconButton>
-              </motion.div>
-            </Box>
-          </Toolbar>
-        </AppBar>
-      </motion.div>
-    );
-  }
-
-  const LogoContent = () => (
-    <>
-      <Box sx={{ position: "relative", width: 40, height: 40, mr: 1 }}>
-        <Image
-          src={
-            mode === "dark"
-              ? "f4bf16b1-527e-4d80-47b4-99989a1ded00"
-              : "b6c3c6f1-a744-4e47-8c50-4c33c84c3900"
-          }
-          alt="CCReward Logo"
-          width={40}
-          height={40}
-          priority
-        />
-      </Box>
-      <Typography
-        variant="h6"
-        component="div"
-        sx={{
-          fontWeight: 500,
-        }}
-      >
-        CCReward
-      </Typography>
-    </>
-  );
-
   return (
     <motion.div
-      variants={appBarVariants}
+      variants={headerVariants}
       initial="hidden"
       animate="visible"
     >
-      <AppBar position="static" color="default" elevation={0}>
-        <Toolbar
-          sx={{
-            justifyContent: "space-between",
-            "& .MuiButton-root": {
-              ml: 2,
-            },
-            "& .MuiAvatar-root": {
-              ml: 2,
-              width: 40,
-              height: 40,
-            },
-          }}
-        >
-          {isHomePage ? (
-            <motion.div 
-              variants={logoVariants}
-              whileHover="hover"
-              whileTap="tap"
-            >
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <LogoContent />
-              </Box>
-            </motion.div>
-          ) : (
-            <motion.div 
-              variants={logoVariants}
-              whileHover="hover"
-              whileTap="tap"
-            >
-              <Box
-                component={Link}
-                href="/"
+      <AppBar 
+        position="sticky" 
+        elevation={0}
+        sx={{
+          bgcolor: "background.paper",
+          borderBottom: 1,
+          borderColor: "divider",
+        }}
+      >
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          <motion.div
+            variants={logoVariants}
+            whileHover="hover"
+            whileTap="tap"
+          >
+            <Link href="/" style={{ textDecoration: "none" }}>
+              <Typography
+                variant="h5"
+                component="div"
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  textDecoration: "none",
-                  color: "inherit",
+                  fontWeight: "bold",
+                  color: "primary.main",
                   cursor: "pointer",
                 }}
               >
-                <LogoContent />
-              </Box>
-            </motion.div>
-          )}
+                CCReward
+              </Typography>
+            </Link>
+          </motion.div>
 
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <motion.div variants={itemVariants}>
-              <RegionSelector />
-            </motion.div>
-            
-            <motion.div 
-              variants={itemVariants}
-              whileHover={{ rotate: 180, transition: { duration: 0.5 } }}
-            >
-              <IconButton
-                onClick={toggleTheme}
-                color="inherit"
-                aria-label="toggle theme"
-              >
-                {mode === "dark" ? <LightMode /> : <DarkMode />}
-              </IconButton>
-            </motion.div>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            {/* Region Selector */}
+            <RegionSelector />
 
-            {isMobile ? (
-              <>
-                <motion.div variants={itemVariants}>
-                  <IconButton
-                    edge="end"
-                    color="inherit"
-                    aria-label="menu"
-                    onClick={handleMenuOpen}
-                  >
-                    <MenuIcon />
-                  </IconButton>
-                </motion.div>
-                <Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                  slots={{
-                    root: "div",
-                    backdrop: "div",
-                  }}
-                >
-                  <AnimatePresence>
-                    {Boolean(anchorEl) && (
-                      <motion.div
-                        initial="hidden"
-                        animate="visible"
-                        exit={{ opacity: 0, x: 20 }}
-                        variants={{
-                          hidden: {},
-                          visible: {
-                            transition: {
-                              staggerChildren: 0.05,
-                              delayChildren: 0.1
-                            }
-                          }
+            {/* Theme Toggle */}
+            <IconButton onClick={toggleTheme} color="inherit" size="small">
+              {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
+            </IconButton>
+
+            {!isMobile ? (
+              // Desktop Navigation
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                {menuItems.map((item) => (
+                  <Tooltip key={item.label} title={item.tooltip || ""}>
+                    <span>
+                      <Button
+                        component={Link}
+                        href={item.href}
+                        color="inherit"
+                        disabled={item.disabled}
+                        startIcon={item.icon}
+                        sx={{
+                          textTransform: "none",
+                          "&.Mui-disabled": {
+                            color: "text.disabled",
+                          },
                         }}
                       >
-                        {renderMenuItems()}
-                        {isAuthenticated() && (
-                          <motion.div
-                            variants={menuItemVariants}
-                            whileHover="hover"
-                            whileTap="tap"
-                          >
-                            <MenuItem onClick={handleLogout}>
-                              <LogoutIcon />
-                              <Typography sx={{ ml: 1 }}>Logout</Typography>
-                            </MenuItem>
-                          </motion.div>
+                        {item.label === "My Cards" && userCardCount > 0 ? (
+                          <Badge badgeContent={userCardCount} color="primary">
+                            {item.label}
+                          </Badge>
+                        ) : (
+                          item.label
                         )}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </Menu>
-              </>
-            ) : (
-              <>
-                {menuItems.map(
-                  (item) =>
-                    pathname !== item.href && (
-                      <Tooltip key={item.label} title={item.tooltip || ""} arrow>
-                        <Box>
-                          <motion.div 
-                            variants={itemVariants}
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                          >
-                            <Button
-                              color="inherit"
-                              startIcon={item.icon}
-                              component={Link}
-                              href={item.href}
-                              sx={{ ml: 2 }}
-                              disabled={item.disabled}
-                            >
-                              {item.label}
-                            </Button>
-                          </motion.div>
-                        </Box>
-                      </Tooltip>
-                    )
-                )}
+                      </Button>
+                    </span>
+                  </Tooltip>
+                ))}
 
-                {user && (
-                  <motion.div variants={itemVariants}>
-                    <ProfileMenu user={user} onLogout={handleLogout} />
-                  </motion.div>
+                {isAuthenticated() ? (
+                  <Button
+                    onClick={handleLogout}
+                    color="inherit"
+                    startIcon={<LogoutIcon />}
+                    sx={{ textTransform: "none" }}
+                  >
+                    Logout
+                  </Button>
+                ) : (
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Button
+                      component={Link}
+                      href="/auth"
+                      color="inherit"
+                      startIcon={<LoginIcon />}
+                      sx={{ textTransform: "none" }}
+                    >
+                      Login
+                    </Button>
+                  </Box>
                 )}
-              </>
+              </Box>
+            ) : (
+              // Mobile Navigation
+              <IconButton
+                color="inherit"
+                onClick={handleMenuOpen}
+                sx={{ ml: 1 }}
+              >
+                <MenuIcon />
+              </IconButton>
             )}
+
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              transformOrigin={{ horizontal: "right", vertical: "top" }}
+              anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+            >
+              {menuItems.map((item) => (
+                <MenuItem
+                  key={item.label}
+                  component={Link}
+                  href={item.href}
+                  onClick={handleMenuClose}
+                  disabled={item.disabled}
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText>
+                    {item.label === "My Cards" && userCardCount > 0 ? (
+                      <Badge badgeContent={userCardCount} color="primary">
+                        {item.label}
+                      </Badge>
+                    ) : (
+                      item.label
+                    )}
+                  </ListItemText>
+                </MenuItem>
+              ))}
+
+              <MenuItem
+                onClick={isAuthenticated() ? handleLogout : () => router.push("/auth")}
+              >
+                <ListItemIcon>
+                  {isAuthenticated() ? <LogoutIcon /> : <LoginIcon />}
+                </ListItemIcon>
+                <ListItemText>
+                  {isAuthenticated() ? "Logout" : "Login"}
+                </ListItemText>
+              </MenuItem>
+            </Menu>
           </Box>
         </Toolbar>
       </AppBar>

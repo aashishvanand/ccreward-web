@@ -9,9 +9,9 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   compiler:{
-    // removeConsole:{
-    //   exclude:["error"]
-    // }
+    removeConsole:{
+      exclude:["error"]
+    }
   },
   trailingSlash: false,
   serverExternalPackages: ['sharp'], // Previously serverComponentsExternalPackages
