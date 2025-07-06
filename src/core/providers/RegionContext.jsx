@@ -1,3 +1,5 @@
+// src/core/providers/RegionContext.jsx
+
 import {
   createContext,
   useContext,
@@ -15,7 +17,7 @@ export const REGIONS = {
 
 // Create the context with default values
 const RegionContext = createContext({
-  region: null, // Start with null to indicate uninitialized
+  region: null,
   setRegion: () => {},
   regionName: "Unknown",
   isLoading: true,
@@ -30,32 +32,27 @@ const isValidRegion = (regionCode) => {
 };
 
 export function RegionProvider({ children }) {
-  // Initialize states
-  const [region, setRegion] = useState(null); // Start with null
+  const [region, setRegion] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
   const [hasUserSetRegion, setHasUserSetRegion] = useState(false);
   const [showRegionModal, setShowRegionModal] = useState(false);
   const [detectedCountry, setDetectedCountry] = useState(null);
 
-  // Define updateRegion function
   const updateRegion = useCallback((newRegion) => {
     if (!newRegion || !isValidRegion(newRegion)) return;
 
     const upperCaseRegion = newRegion.toUpperCase();
 
-    // Save to localStorage
     localStorage.setItem("app-region", upperCaseRegion);
     localStorage.setItem("user-set-region", "true");
 
-    // Update state
     setRegion(upperCaseRegion);
     setHasUserSetRegion(true);
     setShowRegionModal(false);
     setIsInitialized(true);
     setIsLoading(false);
 
-    // Dispatch event for other components
     window.dispatchEvent(
       new CustomEvent("region-changed", {
         detail: { region: upperCaseRegion },
@@ -63,87 +60,50 @@ export function RegionProvider({ children }) {
     );
   }, []);
 
-  // Handle region selection from modal
   const handleRegionSelect = useCallback((selectedRegion) => {
     updateRegion(selectedRegion);
   }, [updateRegion]);
 
-  // Initialization effect
   useEffect(() => {
     async function initializeRegion() {
-      console.log("🔄 [RegionContext] Starting initialization");
-
-      // Don't do anything during SSR
       if (typeof window === "undefined") {
-        console.log("⚠️ [RegionContext] Window undefined, skipping initialization");
+        return;
+      }
+
+      const savedRegion = localStorage.getItem("app-region");
+      const userSetRegion = localStorage.getItem("user-set-region") === "true";
+
+      if (savedRegion && isValidRegion(savedRegion)) {
+        setRegion(savedRegion.toUpperCase());
+        setHasUserSetRegion(userSetRegion);
+        setIsInitialized(true);
+        setIsLoading(false);
         return;
       }
 
       try {
-        // First check if we already have a region in localStorage
-        const savedRegion = localStorage.getItem("app-region");
-        const userSetRegion = localStorage.getItem("user-set-region") === "true";
+        const response = await fetch("https://ipinfo.io/json");
+        if (response.ok) {
+          const data = await response.json();
+          const countryCode = data.country?.toUpperCase();
+          setDetectedCountry(countryCode);
 
-        console.log("🔍 [RegionContext] Checking localStorage:", {
-          savedRegion,
-          userSetRegion,
-        });
-
-        if (savedRegion && isValidRegion(savedRegion)) {
-          // If we have a valid saved region (either user-set or auto-detected), use it
-          console.log("✅ [RegionContext] Using saved region:", savedRegion);
-          setRegion(savedRegion.toUpperCase());
-          setHasUserSetRegion(userSetRegion);
-          setIsInitialized(true);
-          setIsLoading(false);
-          return;
-        }
-
-        console.log("⚠️ [RegionContext] No saved region, detecting from IP");
-
-        // If no saved region, try to detect from IP
-        try {
-          const response = await fetch("https://ipinfo.io/json");
-          if (response.ok) {
-            const data = await response.json();
-            const countryCode = data.country?.toUpperCase();
-            
-            console.log("🌎 [RegionContext] Detected country from IP:", countryCode);
-            setDetectedCountry(countryCode);
-
-            // Check if it's a supported region
-            if (Object.keys(REGIONS).includes(countryCode)) {
-              console.log("✅ [RegionContext] Seamlessly setting supported region:", countryCode);
-              localStorage.setItem("app-region", countryCode);
-              // Mark as NOT user-set since this was auto-detected
-              localStorage.setItem("user-set-region", "false");
-              setRegion(countryCode);
-              setHasUserSetRegion(false);
-              setIsInitialized(true);
-              setIsLoading(false);
-            } else {
-              // Show modal for unsupported regions - this is the key change
-              console.log("🚨 [RegionContext] Unsupported region detected, showing selection modal");
-              setShowRegionModal(true);
-              setIsLoading(false);
-              // Don't set isInitialized to true yet - wait for user selection
-            }
+          if (Object.keys(REGIONS).includes(countryCode)) {
+            localStorage.setItem("app-region", countryCode);
+            localStorage.setItem("user-set-region", "false");
+            setRegion(countryCode);
+            setHasUserSetRegion(false);
+            setIsInitialized(true);
           } else {
-            // IP detection failed - show modal
-            console.log("❌ [RegionContext] IP detection failed, showing selection modal");
             setShowRegionModal(true);
-            setIsLoading(false);
           }
-        } catch (error) {
-          console.error("❌ [RegionContext] Error detecting region:", error);
-          // Show modal on error
+        } else {
           setShowRegionModal(true);
-          setIsLoading(false);
         }
       } catch (error) {
-        console.error("❌ [RegionContext] Unexpected error during initialization:", error);
-        // Show modal on any error
+        console.error("Error detecting region:", error);
         setShowRegionModal(true);
+      } finally {
         setIsLoading(false);
       }
     }
@@ -173,7 +133,6 @@ export function RegionProvider({ children }) {
   );
 }
 
-// Custom hook
 export function useRegion() {
   const context = useContext(RegionContext);
   if (!context) {
