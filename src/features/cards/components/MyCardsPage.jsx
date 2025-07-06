@@ -523,8 +523,7 @@ function MyCardsPage() {
           }}
         >
           <Typography variant="h6" sx={{ mb: 2 }}>
-            Welcome! Let's start by adding your first credit card for the{" "}
-            {region} region.
+            Welcome! Let's start by adding your first credit card
           </Typography>
           <Typography color="text.secondary">
             Click the + button below to add your first card
