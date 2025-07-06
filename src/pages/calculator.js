@@ -1,8 +1,5 @@
 import dynamic from 'next/dynamic';
 import { generateMetadata, pageMetadata } from '../shared/components/seo';
-import { AuthProvider } from '../core/providers/AuthContext';
-import { ThemeRegistry } from '../core/providers/ThemeRegistry';
-import { RegionProvider } from '../core/providers/RegionContext';
 
 const CalculatorWrapper = dynamic(() => import('../features/calculator/components/Calculator'), { ssr: false });
 
@@ -12,14 +9,6 @@ export const metadata = generateMetadata({
 });
 
 export default function CalculatorPage() {
-
-  return (
-    <ThemeRegistry>
-      <RegionProvider>
-        <AuthProvider>
-          <CalculatorWrapper />
-        </AuthProvider>
-      </RegionProvider>
-    </ThemeRegistry>
-  );
+  // No providers needed - they're already in _app.js
+  return <CalculatorWrapper />;
 }

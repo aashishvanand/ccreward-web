@@ -1,11 +1,11 @@
-// src/core/providers/RegionContext.jsx
-
+// src/core/providers/RegionContext.jsx - FIXED: Single Modal Instance
 import {
   createContext,
   useContext,
   useState,
   useEffect,
   useCallback,
+  useRef,
 } from "react";
 import RegionSelectionModal from '../../shared/components/layout/RegionSelectionModal';
 
@@ -31,6 +31,10 @@ const isValidRegion = (regionCode) => {
   return regionCode && Object.keys(REGIONS).includes(regionCode.toUpperCase());
 };
 
+// Global flag to prevent multiple modal instances
+let modalShown = false;
+let initializationInProgress = false;
+
 export function RegionProvider({ children }) {
   const [region, setRegion] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +42,7 @@ export function RegionProvider({ children }) {
   const [hasUserSetRegion, setHasUserSetRegion] = useState(false);
   const [showRegionModal, setShowRegionModal] = useState(false);
   const [detectedCountry, setDetectedCountry] = useState(null);
+  const initRef = useRef(false);
 
   const updateRegion = useCallback((newRegion) => {
     if (!newRegion || !isValidRegion(newRegion)) return;
@@ -52,6 +57,9 @@ export function RegionProvider({ children }) {
     setShowRegionModal(false);
     setIsInitialized(true);
     setIsLoading(false);
+    
+    // Reset global flag when modal is closed
+    modalShown = false;
 
     window.dispatchEvent(
       new CustomEvent("region-changed", {
@@ -65,50 +73,112 @@ export function RegionProvider({ children }) {
   }, [updateRegion]);
 
   useEffect(() => {
+    // Prevent multiple initializations
+    if (initRef.current || initializationInProgress) {
+      return;
+    }
+    
+    initRef.current = true;
+    initializationInProgress = true;
+
     async function initializeRegion() {
+      console.log("🔄 [RegionContext] Starting initialization");
+      
       if (typeof window === "undefined") {
-        return;
-      }
-
-      const savedRegion = localStorage.getItem("app-region");
-      const userSetRegion = localStorage.getItem("user-set-region") === "true";
-
-      if (savedRegion && isValidRegion(savedRegion)) {
-        setRegion(savedRegion.toUpperCase());
-        setHasUserSetRegion(userSetRegion);
-        setIsInitialized(true);
-        setIsLoading(false);
+        initializationInProgress = false;
         return;
       }
 
       try {
-        const response = await fetch("https://ipinfo.io/json");
-        if (response.ok) {
-          const data = await response.json();
-          const countryCode = data.country?.toUpperCase();
-          setDetectedCountry(countryCode);
+        const savedRegion = localStorage.getItem("app-region");
+        const userSetRegion = localStorage.getItem("user-set-region") === "true";
 
-          if (Object.keys(REGIONS).includes(countryCode)) {
-            localStorage.setItem("app-region", countryCode);
-            localStorage.setItem("user-set-region", "false");
-            setRegion(countryCode);
-            setHasUserSetRegion(false);
-            setIsInitialized(true);
+        if (savedRegion && isValidRegion(savedRegion)) {
+          console.log("✅ [RegionContext] Found saved region:", savedRegion);
+          setRegion(savedRegion.toUpperCase());
+          setHasUserSetRegion(userSetRegion);
+          setIsInitialized(true);
+          setIsLoading(false);
+          initializationInProgress = false;
+          return;
+        }
+
+        console.log("🌍 [RegionContext] No saved region, detecting location...");
+        
+        try {
+          const response = await fetch("https://ipinfo.io/json");
+          if (response.ok) {
+            const data = await response.json();
+            const countryCode = data.country?.toUpperCase();
+            console.log("🗺️ [RegionContext] Detected country:", countryCode);
+            setDetectedCountry(countryCode);
+
+            if (Object.keys(REGIONS).includes(countryCode)) {
+              // Auto-detect supported region
+              localStorage.setItem("app-region", countryCode);
+              localStorage.setItem("user-set-region", "false");
+              setRegion(countryCode);
+              setHasUserSetRegion(false);
+              setIsInitialized(true);
+              console.log("✅ [RegionContext] Auto-selected region:", countryCode);
+            } else {
+              // Show modal only if not already shown
+              if (!modalShown) {
+                console.log("❓ [RegionContext] Unsupported region, showing modal");
+                modalShown = true;
+                setShowRegionModal(true);
+              }
+            }
           } else {
+            // Show modal only if not already shown
+            if (!modalShown) {
+              console.log("⚠️ [RegionContext] IP detection failed, showing modal");
+              modalShown = true;
+              setShowRegionModal(true);
+            }
+          }
+        } catch (error) {
+          console.error("❌ [RegionContext] Error detecting region:", error);
+          // Show modal only if not already shown
+          if (!modalShown) {
+            console.log("🆘 [RegionContext] Fallback to modal");
+            modalShown = true;
             setShowRegionModal(true);
           }
-        } else {
-          setShowRegionModal(true);
         }
       } catch (error) {
-        console.error("Error detecting region:", error);
-        setShowRegionModal(true);
+        console.error("❌ [RegionContext] Unexpected error:", error);
+        // Fallback to default
+        setRegion("IN");
+        setIsInitialized(true);
       } finally {
         setIsLoading(false);
+        initializationInProgress = false;
       }
     }
 
-    initializeRegion();
+    // Small delay to ensure DOM is ready and prevent race conditions
+    const timeoutId = setTimeout(initializeRegion, 100);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      initializationInProgress = false;
+    };
+  }, []);
+
+  // Global event listener to prevent multiple modals across different provider instances
+  useEffect(() => {
+    const handleRegionModalEvent = (event) => {
+      if (event.detail.action === 'close') {
+        setShowRegionModal(false);
+        modalShown = false;
+      }
+    };
+
+    window.addEventListener('region-modal-control', handleRegionModalEvent);
+    return () => {
+      window.removeEventListener('region-modal-control', handleRegionModalEvent);
+    };
   }, []);
 
   return (
@@ -124,11 +194,14 @@ export function RegionProvider({ children }) {
       }}
     >
       {children}
-      <RegionSelectionModal
-        open={showRegionModal}
-        onRegionSelect={handleRegionSelect}
-        detectedCountry={detectedCountry}
-      />
+      {/* Only render modal if this is the primary instance and modal should be shown */}
+      {showRegionModal && !initializationInProgress && (
+        <RegionSelectionModal
+          open={showRegionModal}
+          onRegionSelect={handleRegionSelect}
+          detectedCountry={detectedCountry}
+        />
+      )}
     </RegionContext.Provider>
   );
 }
