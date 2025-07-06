@@ -13,14 +13,20 @@ const ReferralButton = ({
   calculationPerformed,
 }) => {
   // Get the current region from the context
-  const { region } = useRegion();
+  const { region, isInitialized } = useRegion();
   const [referralLink, setReferralLink] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Create a dynamic cache key based on the region
-  const cacheKey = `${CACHE_KEY_PREFIX}${region.toLowerCase()}`;
+  // Create a dynamic cache key based on the region (only if region exists)
+  const cacheKey = region ? `${CACHE_KEY_PREFIX}${region.toLowerCase()}` : null;
 
   useEffect(() => {
+    // Don't fetch if region is not initialized or not available
+    if (!isInitialized || !region || !cacheKey) {
+      setIsLoading(false);
+      return;
+    }
+
     const fetchReferralData = async () => {
       // Reset state when dependencies change
       setIsLoading(true);
@@ -73,40 +79,61 @@ const ReferralButton = ({
         );
         setReferralLink(cardReferral?.link || null);
       } catch (error) {
-        console.error("Error fetching referral data:", error);
+        console.error(`Error fetching referral data for region ${region}:`, error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (bank && cardName && region) {
-      fetchReferralData();
+    fetchReferralData();
+  }, [bank, cardName, region, isInitialized, cacheKey]);
+
+  // Don't render button if loading, no referral link, or conditions not met
+  if (
+    isLoading ||
+    !referralLink ||
+    !calculationPerformed ||
+    userCards.some((card) => card.bank === bank && card.cardName === cardName)
+  ) {
+    return null;
+  }
+
+  const handleReferralClick = () => {
+    // Track the referral click if analytics are available
+    if (window.gtag) {
+      window.gtag('event', 'referral_click', {
+        bank: bank,
+        card_name: cardName,
+        region: region
+      });
     }
-    // Add region and cacheKey to the dependency array
-  }, [bank, cardName, region, cacheKey]);
-
-  if (!calculationPerformed || !referralLink || isLoading) {
-    return null;
-  }
-
-  const isCardInCollection = userCards?.some(
-    (card) => card.bank === bank && card.cardName === cardName
-  );
-
-  if (isCardInCollection) {
-    return null;
-  }
+    
+    // Open referral link in new tab
+    window.open(referralLink, '_blank', 'noopener,noreferrer');
+  };
 
   return (
     <Button
       variant="contained"
-      color="primary"
-      href={referralLink}
-      target="_blank"
-      rel="noopener noreferrer"
-      sx={{ mt: 2, width: "100%" }}
+      color="success"
+      size="large"
+      onClick={handleReferralClick}
+      sx={{
+        mt: 2,
+        fontWeight: "bold",
+        px: 4,
+        py: 1.5,
+        borderRadius: 2,
+        textTransform: "none",
+        boxShadow: 3,
+        "&:hover": {
+          boxShadow: 6,
+          transform: "translateY(-2px)",
+        },
+        transition: "all 0.3s ease",
+      }}
     >
-      Apply for {bank} {cardName}
+      Get This Card
     </Button>
   );
 };

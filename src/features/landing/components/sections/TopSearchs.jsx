@@ -17,7 +17,7 @@ import { useRegion } from "../../../../core/providers/RegionContext";
 
 const TopSearchs = () => {
   // Get the current region from the context
-  const { region } = useRegion();
+  const { region, isInitialized } = useRegion();
   const [statsData, setStatsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,6 +28,12 @@ const TopSearchs = () => {
   const { cardImagesData } = useCardImagesData();
 
   useEffect(() => {
+    // Don't fetch if region is not initialized or not available
+    if (!isInitialized || !region) {
+      setLoading(true);
+      return;
+    }
+
     const fetchStats = async () => {
       // Reset state when region changes
       setLoading(true);
@@ -54,11 +60,9 @@ const TopSearchs = () => {
       }
     };
 
-    if (region) {
-      fetchStats();
-    }
-    // Add `region` to the dependency array to refetch when it changes
-  }, [region]);
+    fetchStats();
+    // Add `region` and `isInitialized` to the dependency array to refetch when they change
+  }, [region, isInitialized]);
 
   const handleTimeframeChange = (event, newValue) => {
     setTimeframe(newValue);
@@ -85,169 +89,182 @@ const TopSearchs = () => {
   // Do not render the component if there was an error or no data
   if (error || !statsData) return null;
 
-  const currentStats = statsData?.[timeframe];
+  const currentStats = statsData?.stats?.[timeframe];
 
-  const CardsList = ({ data }) => (
-    <Box sx={{ position: "relative", mt: 4 }}>
-      <Typography variant="h6" gutterBottom sx={{ ml: 2 }}>
-        Top Cards
-      </Typography>
-
-      <Box sx={{ position: "relative", group: "slider" }}>
-        <IconButton
-          onClick={() => scroll("left")}
-          sx={{
-            position: "absolute",
-            left: -20,
-            top: "50%",
-            transform: "translateY(-50%)",
-            zIndex: 2,
-            bgcolor: "background.paper",
-            opacity: 0,
-            transition: "opacity 0.2s",
-            "&:hover": { opacity: 1 },
-            ".group:hover &": { opacity: 1 },
-          }}
-        >
-          <ChevronLeft />
-        </IconButton>
-
-        <Box
-          ref={sliderRef}
-          sx={{
-            display: "flex",
-            gap: 4,
-            overflowX: "auto",
-            overflowY: "hidden",
-            pb: 4,
-            scrollbarWidth: "none",
-            "&::-webkit-scrollbar": { display: "none" },
-            px: 2,
-            pt: 2,
-          }}
-        >
-          {data?.map((item, index) => {
-            const cardImage = cardImagesData?.find(
-              (img) => img.bank === item.bank && img.cardName === item.card
-            );
-            if (!cardImage) return null;
-
-            const isVertical = cardImage.orientation === "vertical";
-
-            return (
-              <Box
-                key={index}
-                sx={{
-                  position: "relative",
-                  flexShrink: 0,
-                  height: 150,
-                  display: "flex",
-                  alignItems: "flex-end",
-                }}
-              >
-                <Typography
-                  sx={{
-                    position: "absolute",
-                    left: index === 9 ? -32 : isVertical ? -16 : -20,
-                    bottom: -20,
-                    fontSize: "160px",
-                    fontWeight: 900,
-                    color: "background.paper",
-                    opacity: 0.5,
-                    WebkitTextStroke: "2px",
-                    WebkitTextStrokeColor: (theme) => theme.palette.divider,
-                    fontFamily: "Arial Black, sans-serif",
-                    lineHeight: 0.8,
-                    zIndex: 0,
-                    letterSpacing: index === 9 ? "-0.05em" : "normal",
-                  }}
-                >
-                  {index + 1}
-                </Typography>
-
-                <Box
-                  sx={{
-                    position: "relative",
-                    zIndex: 1,
-                    width: isVertical ? 150 : 240,
-                    height: 150,
-                    ml: index === 9 ? 8 : isVertical ? 4 : 6,
-                    transition: "transform 0.2s",
-                    "&:hover": {
-                      transform: "scale(1.05)",
-                    },
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: "100%",
-                      height: "100%",
-                      position: "relative",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <Image
-                      src={cardImage.id}
-                      alt={`${item.bank} ${item.card}`}
-                      layout="fill"
-                      objectFit="contain"
-                    />
-                  </Box>
-                </Box>
-              </Box>
-            );
-          })}
-        </Box>
-
-        <IconButton
-          onClick={() => scroll("right")}
-          sx={{
-            position: "absolute",
-            right: -20,
-            top: "50%",
-            transform: "translateY(-50%)",
-            zIndex: 2,
-            bgcolor: "background.paper",
-            opacity: 0,
-            transition: "opacity 0.2s",
-            "&:hover": { opacity: 1 },
-            ".group:hover &": { opacity: 1 },
-          }}
-        >
-          <ChevronRight />
-        </IconButton>
-      </Box>
-    </Box>
-  );
+  if (!currentStats?.length) return null;
 
   return (
-    <Box sx={{ py: 8 }}>
-      <Container maxWidth="lg">
+    <Container maxWidth="lg" sx={{ py: 6 }}>
+      <Box sx={{ textAlign: "center", mb: 4 }}>
         <Typography
-          variant="h3"
-          align="center"
+          variant="h4"
+          component="h2"
           gutterBottom
           sx={{
-            fontWeight: "bold",
-            fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
-            mb: 4,
+            fontWeight: 700,
+            background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
+            backgroundClip: "text",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
           }}
         >
-          Trending on CCReward
+          Trending Credit Cards
+        </Typography>
+        <Typography variant="h6" color="text.secondary" sx={{ mb: 3 }}>
+          Most searched cards this {timeframe.replace('ly', '')}
         </Typography>
 
         <Tabs
           value={timeframe}
           onChange={handleTimeframeChange}
           centered
-          sx={{ mb: 4 }}
+          variant={isMobile ? "scrollable" : "standard"}
+          scrollButtons="auto"
+          sx={{ mb: 3 }}
         >
-          <Tab label="Today" value="daily" />
-          <Tab label="This Month" value="monthly" />
+          <Tab label="Daily" value="daily" />
+          <Tab label="Weekly" value="weekly" />
+          <Tab label="Monthly" value="monthly" />
         </Tabs>
-        <CardsList data={currentStats?.cards} />
-      </Container>
-    </Box>
+      </Box>
+
+      <Box sx={{ position: "relative" }}>
+        {!isMobile && (
+          <>
+            <IconButton
+              onClick={() => scroll("left")}
+              sx={{
+                position: "absolute",
+                left: -20,
+                top: "50%",
+                transform: "translateY(-50%)",
+                zIndex: 1,
+                backgroundColor: "background.paper",
+                boxShadow: 2,
+                "&:hover": { backgroundColor: "primary.light" },
+              }}
+            >
+              <ChevronLeft />
+            </IconButton>
+            <IconButton
+              onClick={() => scroll("right")}
+              sx={{
+                position: "absolute",
+                right: -20,
+                top: "50%",
+                transform: "translateY(-50%)",
+                zIndex: 1,
+                backgroundColor: "background.paper",
+                boxShadow: 2,
+                "&:hover": { backgroundColor: "primary.light" },
+              }}
+            >
+              <ChevronRight />
+            </IconButton>
+          </>
+        )}
+
+        <Box
+          ref={sliderRef}
+          sx={{
+            display: "flex",
+            overflowX: "auto",
+            gap: 2,
+            pb: 2,
+            scrollbarWidth: "none",
+            "&::-webkit-scrollbar": { display: "none" },
+          }}
+        >
+          {currentStats.map((card, index) => {
+            const cardImage = cardImagesData.find(
+              (img) =>
+                img.bank.toLowerCase() === card.bank.toLowerCase() &&
+                img.cardName.toLowerCase() === card.cardName.toLowerCase()
+            );
+
+            return (
+              <Box
+                key={`${card.bank}-${card.cardName}`}
+                sx={{
+                  minWidth: isMobile ? 280 : 320,
+                  p: 2,
+                  border: 1,
+                  borderColor: "divider",
+                  borderRadius: 2,
+                  backgroundColor: "background.paper",
+                  position: "relative",
+                  "&:hover": {
+                    boxShadow: 3,
+                    borderColor: "primary.main",
+                  },
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontSize: "1.2rem",
+                      fontWeight: 600,
+                      color: "primary.main",
+                      mr: 1,
+                    }}
+                  >
+                    #{index + 1}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {card.searches} searches
+                  </Typography>
+                </Box>
+
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  {cardImage ? (
+                    <Image
+                      src={cardImage.id}
+                      alt={`${card.bank} ${card.cardName}`}
+                      width={cardImage.orientation === "horizontal" ? 80 : 50}
+                      height={cardImage.orientation === "horizontal" ? 50 : 80}
+                      style={{ objectFit: "contain" }}
+                    />
+                  ) : (
+                    <Box
+                      sx={{
+                        width: 60,
+                        height: 40,
+                        backgroundColor: "grey.200",
+                        borderRadius: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Typography variant="caption" color="text.secondary">
+                        {card.bank}
+                      </Typography>
+                    </Box>
+                  )}
+
+                  <Box sx={{ flex: 1 }}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ fontWeight: 600, lineHeight: 1.2 }}
+                    >
+                      {card.bank}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ lineHeight: 1.2 }}
+                    >
+                      {card.cardName}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+            );
+          })}
+        </Box>
+      </Box>
+    </Container>
   );
 };
 

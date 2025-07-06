@@ -1,81 +1,30 @@
-import { useEffect, useState, useRef } from "react";
 import { Box, Container, Typography, Grid } from "@mui/material";
+import { useState, useEffect, useRef } from "react";
 import Counter from "./Counter";
 import { useRegion } from "../../../../core/providers/RegionContext";
 
 const StatsSection = () => {
-  const { region, regionName } = useRegion();
+  const { region, isInitialized } = useRegion();
   const [stats, setStats] = useState({ cards: 0, banks: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [hasAnimated, setHasAnimated] = useState(false);
   const sectionRef = useRef(null);
   const observerRef = useRef(null);
-  const prevRegionRef = useRef(region);
 
-  const roundToNearestFifty = (num) => {
-    const rounded = Math.floor(num / 50) * 50;
-    return rounded;
-  };
-
-  const roundToNearestTen = (num) => {
-    const rounded = Math.floor(num / 10) * 10;
-    return rounded;
-  };
-
-  const title = region === 'SG'
-    ? `${regionName} Credit Card Coverage`
-    : 'Comprehensive Credit Card Coverage';
-
-    const description = `With support for credit cards across major banks in ${regionName}, it's never been easier to optimize your credit card rewards.`;
-
-  // Reset stats and loading state when region changes
+  // Load stats based on region
   useEffect(() => {
-    if (prevRegionRef.current !== region) {
-      // Reset stats and trigger a refetch when region changes
+    // Don't load stats if region is not initialized
+    if (!isInitialized || !region) {
       setIsLoading(true);
-      setStats({ cards: 0, banks: 0 });
-      prevRegionRef.current = region;
+      return;
     }
-  }, [region]);
 
-  // Data fetching effect
-  useEffect(() => {
     const fetchStats = async () => {
-      if (!isLoading) return;
-      
+      setIsLoading(true);
       try {
-        // Generate cache key based on region
-        const cacheKey = `cardImagesData_${region.toLowerCase()}`;
-        
-        // Clear cached data for this region to force fresh fetch
-        localStorage.removeItem(cacheKey);
-        
-        // Fetch data based on region
-        const url = `https://files.ccreward.app/cardImages_${region.toLowerCase()}.json`;
-        
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch data: ${response.status}`);
-        }
-        
-        const cardData = await response.json();
-        const uniqueBanks = new Set(cardData.map((card) => card.bank));
-        
+        // Set region-specific stats
         setStats({
-          cards: cardData.length,
-          banks: uniqueBanks.size,
-        });
-        
-        // Save to localStorage with region-specific key
-        localStorage.setItem(cacheKey, JSON.stringify({
-          data: cardData,
-          timestamp: Date.now()
-        }));
-      } catch (error) {
-        console.error(`Error fetching stats for ${region}:`, error);
-        // Fallback to reasonable defaults based on region
-        setStats({
-          cards: region === 'IN' ? 200 : 100,
+          cards: region === 'SG' ? 200 : 100,
           banks: region === 'IN' ? 20 : 13,
         });
       } finally {
@@ -84,7 +33,7 @@ const StatsSection = () => {
     };
 
     fetchStats();
-  }, [isLoading, region]);
+  }, [isLoading, region, isInitialized]);
 
   // Setup and cleanup intersection observer
   useEffect(() => {
@@ -121,6 +70,20 @@ const StatsSection = () => {
     setHasAnimated(false);
   }, [region]);
 
+  const getRegionSpecificTitle = () => {
+    if (!region) return "Loading...";
+    return region === 'SG' 
+      ? "Singapore Credit Card Coverage" 
+      : "Comprehensive Credit Card Coverage";
+  };
+
+  const getRegionSpecificDescription = () => {
+    if (!region) return "Loading credit card data...";
+    return region === 'SG' 
+      ? "With support for credit cards across major banks in Singapore, optimize your credit card rewards easily"
+      : "With support for hundreds of credit cards across major banks in India, it's never been easier to optimize your credit card rewards";
+  };
+
   return (
     <Box ref={sectionRef} sx={{ py: 8, bgcolor: "background.paper" }}>
       <Container maxWidth="lg">
@@ -134,7 +97,7 @@ const StatsSection = () => {
             color: "text.primary",
           }}
         >
-          {title}
+          {getRegionSpecificTitle()}
         </Typography>
 
         <Typography
@@ -148,7 +111,7 @@ const StatsSection = () => {
             fontSize: { xs: "1.125rem", sm: "1.25rem" },
           }}
         >
-          {description}
+          {getRegionSpecificDescription()}
         </Typography>
 
         <Grid container spacing={4} justifyContent="center">
@@ -167,23 +130,24 @@ const StatsSection = () => {
                 }}
               >
                 <Counter
-                  value={stats.cards ? roundToNearestFifty(stats.cards) : 0}
-                  animate={hasAnimated && !isLoading}
-                  suffix="+"
+                  value={stats.cards ? stats.cards : 0}
+                  shouldAnimate={hasAnimated && !isLoading}
+                  duration={2000}
                 />
+                +
               </Typography>
               <Typography
                 variant="h6"
-                color="text.secondary"
                 sx={{
-                  fontSize: { xs: "1rem", sm: "1.25rem" },
-                  fontWeight: "regular",
+                  color: "text.secondary",
+                  fontWeight: "medium",
                 }}
               >
                 Credit Cards
               </Typography>
             </Box>
           </Grid>
+
           <Grid item xs={6} md={4}>
             <Box sx={{ textAlign: "center" }}>
               <Typography
@@ -199,17 +163,17 @@ const StatsSection = () => {
                 }}
               >
                 <Counter
-                  value={stats.banks ? roundToNearestTen(stats.banks) : 0}
-                  animate={hasAnimated && !isLoading}
-                  suffix="+"
+                  value={stats.banks ? stats.banks : 0}
+                  shouldAnimate={hasAnimated && !isLoading}
+                  duration={2000}
                 />
+                +
               </Typography>
               <Typography
                 variant="h6"
-                color="text.secondary"
                 sx={{
-                  fontSize: { xs: "1rem", sm: "1.25rem" },
-                  fontWeight: "regular",
+                  color: "text.secondary",
+                  fontWeight: "medium",
                 }}
               >
                 Banks

@@ -6,7 +6,20 @@ import bankImagesSGData from "../../../../shared/constants/bankImagesSG";
 import { useRegion } from "../../../../core/providers/RegionContext";
 
 const BankSection = () => {
-  const { region, regionName } = useRegion();
+  const { region, regionName, isInitialized } = useRegion();
+  
+  // Don't render if region is not initialized
+  if (!isInitialized || !region) {
+    return (
+      <Box sx={{ py: 8 }}>
+        <Container maxWidth="lg">
+          <Typography variant="h3" align="center" gutterBottom sx={{ mb: 6 }}>
+            Loading Banks...
+          </Typography>
+        </Container>
+      </Box>
+    );
+  }
   
   // Select bank data based on region
   const bankData = region === 'SG' ? bankImagesSGData : bankImagesDataIN;
