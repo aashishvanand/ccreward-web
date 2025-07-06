@@ -22,8 +22,6 @@ import {
   CreditCard,
   Stars as StarsIcon,
   Logout as LogoutIcon,
-  Login as LoginIcon,
-  PersonAdd as PersonAddIcon,
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
 } from "@mui/icons-material";
@@ -51,28 +49,6 @@ const headerVariants = {
   }
 };
 
-const menuItemVariants = {
-  hidden: { opacity: 0, x: -10 },
-  visible: { 
-    opacity: 1, 
-    x: 0,
-    transition: {
-      type: "spring",
-      stiffness: 200,
-      damping: 20
-    }
-  },
-  hover: {
-    x: 5,
-    transition: {
-      type: "spring",
-      stiffness: 300,
-      damping: 10
-    }
-  },
-  tap: { scale: 0.98 }
-};
-
 const logoVariants = {
   hidden: { opacity: 0, scale: 0.8 },
   visible: { 
@@ -97,8 +73,6 @@ const logoVariants = {
 
 function Header() {
   const { mode, toggleTheme } = useAppTheme();
-  // ✅ REMOVED: Direct localStorage access for currentRegion
-  // ✅ USE CONTEXT ONLY
   const { region } = useRegion();
   const { user, logout, isAuthenticated } = useAuth();
   const router = useRouter();
@@ -113,10 +87,6 @@ function Header() {
   });
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [userCardCount, setUserCardCount] = useState(0);
-  const isHomePage = pathname === "/";
-
-  // ✅ REMOVED: All localStorage event listeners and region management
-  // RegionContext handles this now
 
   useEffect(() => {
     setDeviceInfo(detectDevice());
@@ -213,10 +183,8 @@ function Header() {
           </motion.div>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            {/* Region Selector */}
             <RegionSelector />
 
-            {/* Theme Toggle */}
             <IconButton onClick={toggleTheme} color="inherit" size="small">
               {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
             </IconButton>
@@ -252,7 +220,9 @@ function Header() {
                   </Tooltip>
                 ))}
 
-                {isAuthenticated() ? (
+                {/* --- CHANGE HERE --- */}
+                {/* Only show Logout button if authenticated */}
+                {isAuthenticated() && (
                   <Button
                     onClick={handleLogout}
                     color="inherit"
@@ -261,19 +231,8 @@ function Header() {
                   >
                     Logout
                   </Button>
-                ) : (
-                  <Box sx={{ display: "flex", gap: 1 }}>
-                    <Button
-                      component={Link}
-                      href="/auth"
-                      color="inherit"
-                      startIcon={<LoginIcon />}
-                      sx={{ textTransform: "none" }}
-                    >
-                      Login
-                    </Button>
-                  </Box>
                 )}
+                {/* --- END CHANGE --- */}
               </Box>
             ) : (
               // Mobile Navigation
@@ -313,17 +272,14 @@ function Header() {
                   </ListItemText>
                 </MenuItem>
               ))}
-
-              <MenuItem
-                onClick={isAuthenticated() ? handleLogout : () => router.push("/auth")}
-              >
-                <ListItemIcon>
-                  {isAuthenticated() ? <LogoutIcon /> : <LoginIcon />}
-                </ListItemIcon>
-                <ListItemText>
-                  {isAuthenticated() ? "Logout" : "Login"}
-                </ListItemText>
-              </MenuItem>
+              {isAuthenticated() && (
+                <MenuItem onClick={handleLogout}>
+                  <ListItemIcon>
+                    <LogoutIcon />
+                  </ListItemIcon>
+                  <ListItemText>Logout</ListItemText>
+                </MenuItem>
+              )}
             </Menu>
           </Box>
         </Toolbar>
