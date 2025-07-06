@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import Box from '@mui/material/Box';
 import { ThemeRegistry } from '../core/providers/ThemeRegistry';
 import { AuthProvider } from '../core/providers/AuthContext';
-import { RegionProvider } from '../core/providers/RegionContext';
 import { AnimatePresence } from 'framer-motion';
 import { initializeAnalytics, setupNetworkMonitoring } from '../core/services/analytics'; // Add this import
 import PerformanceWrapper from '../shared/components/PerformanceWrapper'; // Add this import
@@ -80,13 +79,11 @@ function WrappedHome() {
   
   return (
     <ThemeRegistry>
-      <RegionProvider>
         <AuthProvider>
           <AnimatePresence mode="wait">
             <Home key={pathname} />
           </AnimatePresence>
         </AuthProvider>
-      </RegionProvider>
     </ThemeRegistry>
   );
 }

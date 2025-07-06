@@ -1,8 +1,13 @@
-// src/pages/_app.js - Client-Side Only App for Cloudflare Pages
+// src/pages/_app.js - FIXED: Add RegionProvider for Pages Router
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { initializeAnalytics, trackPageView } from '../core/services/analytics';
 import { initializeErrorTracking } from '../core/services/errorTracking';
+// ADD: Import providers for Pages Router
+import { ThemeRegistry } from '../core/providers/ThemeRegistry';
+import { RegionProvider } from '../core/providers/RegionContext';
+import { AuthProvider } from '../core/providers/AuthContext';
+import { AnalyticsProvider } from '../core/providers/AnalyticsProvider';
 
 function MyApp({ Component, pageProps }) {
     const router = useRouter();
@@ -98,7 +103,18 @@ function MyApp({ Component, pageProps }) {
         }
     }, [router.pathname, analyticsInitialized]);
     
-    return <Component {...pageProps} />;
+    // FIXED: Wrap with providers for Pages Router
+    return (
+        <ThemeRegistry>
+            <RegionProvider>
+                <AuthProvider>
+                    <AnalyticsProvider>
+                        <Component {...pageProps} />
+                    </AnalyticsProvider>
+                </AuthProvider>
+            </RegionProvider>
+        </ThemeRegistry>
+    );
 }
 
 export default MyApp;

@@ -1,9 +1,6 @@
 import dynamic from 'next/dynamic';
 import { generateMetadata, pageMetadata } from '../shared/components/seo';
-import { ThemeRegistry } from '../core/providers/ThemeRegistry';
-import { AuthProvider } from '../core/providers/AuthContext';
-import { RegionProvider } from '../core/providers/RegionContext';
-import PerformanceWrapper from '../shared/components/PerformanceWrapper'; // Add this
+import PerformanceWrapper from '../shared/components/PerformanceWrapper';
 
 const MyCardsList = dynamic(() => import('../features/cards/components/MyCardsPage'), { ssr: false });
 
@@ -14,14 +11,8 @@ export const metadata = generateMetadata({
 
 export default function MyCardsPage() {
   return (
-    <ThemeRegistry>
-      <RegionProvider>
-        <AuthProvider>
-          <PerformanceWrapper name="my_cards_page">
-            <MyCardsList />
-          </PerformanceWrapper>
-        </AuthProvider>
-      </RegionProvider>
-    </ThemeRegistry>
+    <PerformanceWrapper name="my_cards_page">
+      <MyCardsList />
+    </PerformanceWrapper>
   );
 }
