@@ -7,7 +7,7 @@ let isInitialized = false;
  * Initialize client-side error tracking
  * @returns {boolean} - Success status
  */
-export const initializeErrorTracking = () => {
+const initializeErrorTracking = () => {
     // Only run on client-side
     if (typeof window === 'undefined') {
         console.log('🔧 Error tracking initialization skipped (server-side)');
@@ -22,16 +22,16 @@ export const initializeErrorTracking = () => {
     try {
         // Set up global error handlers
         setupGlobalErrorHandlers();
-        
+
         // Set up unhandled promise rejection handler
         setupUnhandledRejectionHandler();
-        
+
         // Set up performance monitoring for errors
         setupPerformanceErrorMonitoring();
-        
+
         isInitialized = true;
         console.log('✅ Client-side error tracking initialized');
-        
+
         return true;
     } catch (error) {
         console.error('❌ Error initializing error tracking:', error);
@@ -45,7 +45,7 @@ export const initializeErrorTracking = () => {
  * @param {Object} errorInfo - Additional error information
  * @param {boolean} isFatal - Whether the error is fatal
  */
-export const recordError = (errorName, errorInfo = {}, isFatal = false) => {
+const recordError = (errorName, errorInfo = {}, isFatal = false) => {
     if (typeof window === 'undefined') return;
 
     try {
@@ -79,7 +79,7 @@ export const recordError = (errorName, errorInfo = {}, isFatal = false) => {
         if (isFatal) {
             storeCriticalError(errorName, enhancedErrorInfo);
         }
-        
+
     } catch (error) {
         console.error('❌ Error recording error:', error);
     }
@@ -90,7 +90,7 @@ export const recordError = (errorName, errorInfo = {}, isFatal = false) => {
  * @param {string} errorName - Name of the error
  * @param {Object} errorInfo - Error details
  */
-export const recordNonFatalError = (errorName, errorInfo = {}) => {
+const recordNonFatalError = (errorName, errorInfo = {}) => {
     recordError(errorName, errorInfo, false);
 };
 
@@ -99,7 +99,7 @@ export const recordNonFatalError = (errorName, errorInfo = {}) => {
  * @param {string} errorName - Name of the error
  * @param {Object} errorInfo - Error details
  */
-export const recordFatalError = (errorName, errorInfo = {}) => {
+const recordFatalError = (errorName, errorInfo = {}) => {
     recordError(errorName, errorInfo, true);
 };
 
@@ -108,7 +108,7 @@ export const recordFatalError = (errorName, errorInfo = {}) => {
  * @param {string} issueName - Name of the performance issue
  * @param {Object} issueInfo - Issue details
  */
-export const recordPerformanceIssue = (issueName, issueInfo = {}) => {
+const recordPerformanceIssue = (issueName, issueInfo = {}) => {
     if (typeof window === 'undefined') return;
 
     try {
@@ -126,7 +126,7 @@ export const recordPerformanceIssue = (issueName, issueInfo = {}) => {
         if (process.env.NODE_ENV === 'development') {
             console.warn('🐌 Performance issue:', issueName, performanceInfo);
         }
-        
+
     } catch (error) {
         console.error('❌ Error recording performance issue:', error);
     }
@@ -136,13 +136,13 @@ export const recordPerformanceIssue = (issueName, issueInfo = {}) => {
  * Set custom attributes for error context
  * @param {Object} attributes - Custom attributes
  */
-export const setErrorAttributes = (attributes = {}) => {
+const setErrorAttributes = (attributes = {}) => {
     if (typeof window === 'undefined') return;
 
     try {
         const existingAttributes = getStorageItem('error_attributes');
         const currentAttributes = existingAttributes ? JSON.parse(existingAttributes) : {};
-        
+
         const updatedAttributes = {
             ...currentAttributes,
             ...attributes,
@@ -159,7 +159,7 @@ export const setErrorAttributes = (attributes = {}) => {
  * Set user ID for error tracking
  * @param {string} userId - User identifier
  */
-export const setErrorUserId = (userId) => {
+const setErrorUserId = (userId) => {
     if (typeof window === 'undefined') return;
     setStorageItem('error_user_id', userId);
 };
@@ -246,7 +246,7 @@ function setupPerformanceErrorMonitoring() {
 // Utility functions
 function getOrCreateSessionId() {
     if (typeof window === 'undefined') return 'server_session';
-    
+
     let sessionId = getStorageItem('error_session_id', 'session');
     if (!sessionId) {
         sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -257,7 +257,7 @@ function getOrCreateSessionId() {
 
 function getConnectionInfo() {
     if (typeof window === 'undefined') return {};
-    
+
     const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     return connection ? {
         effective_type: connection.effectiveType,
@@ -269,7 +269,7 @@ function getConnectionInfo() {
 
 function getMemoryInfo() {
     if (typeof window === 'undefined') return {};
-    
+
     const memory = performance.memory;
     return memory ? {
         used_heap_size: Math.round(memory.usedJSHeapSize / 1048576), // MB
@@ -280,7 +280,7 @@ function getMemoryInfo() {
 
 function getPerformanceContext() {
     if (typeof window === 'undefined') return {};
-    
+
     const navigation = performance.getEntriesByType('navigation')[0];
     return {
         load_time: navigation ? Math.round(navigation.loadEventEnd - navigation.navigationStart) : 0,
@@ -293,7 +293,7 @@ function getPerformanceContext() {
 function getMemoryPressure() {
     const memory = performance.memory;
     if (!memory) return 'unknown';
-    
+
     const usageRatio = memory.usedJSHeapSize / memory.jsHeapSizeLimit;
     if (usageRatio > 0.9) return 'high';
     if (usageRatio > 0.7) return 'medium';
@@ -303,12 +303,12 @@ function getMemoryPressure() {
 function storeCriticalError(errorName, errorInfo) {
     try {
         const criticalErrors = JSON.parse(getStorageItem('critical_errors') || '[]');
-        
+
         // Keep only last 10 critical errors
         if (criticalErrors.length >= 10) {
             criticalErrors.shift();
         }
-        
+
         criticalErrors.push({
             error_name: errorName,
             timestamp: errorInfo.timestamp,
@@ -316,7 +316,7 @@ function storeCriticalError(errorName, errorInfo) {
             message: errorInfo.message || errorInfo.reason,
             stack: errorInfo.stack
         });
-        
+
         setStorageItem('critical_errors', JSON.stringify(criticalErrors));
     } catch (error) {
         console.error('❌ Error storing critical error:', error);
@@ -326,7 +326,7 @@ function storeCriticalError(errorName, errorInfo) {
 // Safe storage functions
 function getStorageItem(key, storageType = 'local') {
     if (typeof window === 'undefined') return null;
-    
+
     try {
         const storage = storageType === 'session' ? sessionStorage : localStorage;
         return storage.getItem(key);
@@ -338,7 +338,7 @@ function getStorageItem(key, storageType = 'local') {
 
 function setStorageItem(key, value, storageType = 'local') {
     if (typeof window === 'undefined') return;
-    
+
     try {
         const storage = storageType === 'session' ? sessionStorage : localStorage;
         storage.setItem(key, value);
@@ -353,7 +353,7 @@ function setStorageItem(key, value, storageType = 'local') {
  * @param {string} category - Category (user, navigation, debug, etc.)
  * @param {Object} data - Additional data
  */
-export const logBreadcrumb = (message, category = 'info', data = {}) => {
+const logBreadcrumb = (message, category = 'info', data = {}) => {
     if (typeof window === 'undefined') return;
 
     try {
@@ -367,12 +367,12 @@ export const logBreadcrumb = (message, category = 'info', data = {}) => {
 
         // Store breadcrumbs locally
         const breadcrumbs = JSON.parse(getStorageItem('breadcrumbs', 'session') || '[]');
-        
+
         // Keep only last 50 breadcrumbs
         if (breadcrumbs.length >= 50) {
             breadcrumbs.shift();
         }
-        
+
         breadcrumbs.push(breadcrumb);
         setStorageItem('breadcrumbs', JSON.stringify(breadcrumbs), 'session');
 
@@ -402,7 +402,7 @@ export const logBreadcrumb = (message, category = 'info', data = {}) => {
  * @param {string} errorMessage - Error message
  * @param {Object} requestData - Request data
  */
-export const recordAPIError = (endpoint, statusCode, errorMessage, requestData = {}) => {
+const recordAPIError = (endpoint, statusCode, errorMessage, requestData = {}) => {
     if (typeof window === 'undefined') return;
 
     try {

@@ -1,9 +1,9 @@
 // src/core/hooks/useAnalytics.js - Client-Side Compatible Analytics Hooks
 import { useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '../providers/AuthContext';
-import { 
-  logAnalyticsEvent, 
-  logButtonClick, 
+import {
+  logAnalyticsEvent,
+  logButtonClick,
   logFeatureUsage,
   logSearchQuery,
   logConversion,
@@ -11,14 +11,14 @@ import {
   startPerformanceTrace,
   stopPerformanceTrace
 } from '../services/analytics';
-import { 
-  logBreadcrumb, 
+import {
+  logBreadcrumb,
   recordNonFatalError,
-  recordAPIError 
+  recordAPIError
 } from '../services/errorTracking';
 
 // Main analytics hook
-export const useAnalytics = () => {
+const useAnalytics = () => {
   const { user } = useAuth();
 
   // Track button clicks with enhanced context
@@ -30,7 +30,7 @@ export const useAnalytics = () => {
       page_path: window.location.pathname,
       ...additionalData
     });
-    
+
     logBreadcrumb(`Button clicked: ${buttonName}`, 'user', {
       button_name: buttonName,
       ...additionalData
@@ -59,7 +59,7 @@ export const useAnalytics = () => {
     if (typeof window === 'undefined') return;
 
     logSearchQuery(query, results);
-    
+
     logBreadcrumb(`Search performed: ${query}`, 'user', {
       query,
       results_count: results.length,
@@ -72,7 +72,7 @@ export const useAnalytics = () => {
     if (typeof window === 'undefined') return;
 
     logConversion(conversionType, value, additionalData);
-    
+
     logBreadcrumb(`Conversion: ${conversionType}`, 'conversion', {
       conversion_type: conversionType,
       conversion_value: value,
@@ -138,7 +138,7 @@ export const useAnalytics = () => {
 };
 
 // Hook for tracking page performance
-export const usePagePerformance = (pageName) => {
+const usePagePerformance = (pageName) => {
   const performanceTrace = useRef(null);
   const pageLoadTime = useRef(null);
 
@@ -166,7 +166,7 @@ export const usePagePerformance = (pageName) => {
       if (performanceTrace.current && window.performance && window.performance.now && pageLoadTime.current) {
         try {
           const loadDuration = performance.now() - pageLoadTime.current;
-          
+
           stopPerformanceTrace(performanceTrace.current, {
             page_name: pageName,
             load_duration: Math.round(loadDuration)
@@ -204,7 +204,7 @@ export const usePagePerformance = (pageName) => {
 };
 
 // Hook for tracking user engagement
-export const useEngagementTracking = () => {
+const useEngagementTracking = () => {
   const engagementStartTime = useRef(null);
   const isEngaged = useRef(false);
 
@@ -219,7 +219,7 @@ export const useEngagementTracking = () => {
       if (!isEngaged.current) {
         engagementStartTime.current = Date.now();
         isEngaged.current = true;
-        
+
         logBreadcrumb('User engagement started', 'user', {
           engagement_start: new Date().toISOString()
         });
@@ -229,13 +229,13 @@ export const useEngagementTracking = () => {
     const endEngagement = () => {
       if (isEngaged.current && engagementStartTime.current) {
         const engagementDuration = Date.now() - engagementStartTime.current;
-        
+
         logEngagementEvent('session_engagement', engagementDuration);
-        
+
         logBreadcrumb('User engagement ended', 'user', {
           engagement_duration: engagementDuration
         });
-        
+
         isEngaged.current = false;
       }
     };
@@ -243,7 +243,7 @@ export const useEngagementTracking = () => {
     const resetIdleTimer = () => {
       clearTimeout(idleTimer);
       startEngagement();
-      
+
       idleTimer = setTimeout(() => {
         endEngagement();
       }, 30000); // 30 seconds of inactivity
@@ -272,12 +272,12 @@ export const useEngagementTracking = () => {
     trackCustomEngagement: useCallback((eventType, customData = {}) => {
       if (typeof window === 'undefined') return;
 
-      const currentEngagementTime = engagementStartTime.current 
-        ? Date.now() - engagementStartTime.current 
+      const currentEngagementTime = engagementStartTime.current
+        ? Date.now() - engagementStartTime.current
         : 0;
-        
+
       logEngagementEvent(eventType, currentEngagementTime, customData);
-      
+
       logBreadcrumb(`Custom engagement: ${eventType}`, 'user', {
         engagement_duration: currentEngagementTime,
         ...customData
@@ -287,7 +287,7 @@ export const useEngagementTracking = () => {
 };
 
 // Hook for tracking form interactions
-export const useFormTracking = (formName) => {
+const useFormTracking = (formName) => {
   const formStartTime = useRef(null);
   const fieldInteractions = useRef({});
 
@@ -295,7 +295,7 @@ export const useFormTracking = (formName) => {
     if (typeof window === 'undefined') return;
 
     formStartTime.current = Date.now();
-    
+
     logAnalyticsEvent('form_start', {
       form_name: formName,
       timestamp: new Date().toISOString()
@@ -312,7 +312,7 @@ export const useFormTracking = (formName) => {
     if (!fieldInteractions.current[fieldName]) {
       fieldInteractions.current[fieldName] = [];
     }
-    
+
     fieldInteractions.current[fieldName].push({
       type: interactionType,
       timestamp: Date.now()
@@ -329,7 +329,7 @@ export const useFormTracking = (formName) => {
     if (typeof window === 'undefined') return;
 
     const formDuration = formStartTime.current ? Date.now() - formStartTime.current : 0;
-    
+
     logAnalyticsEvent('form_submit', {
       form_name: formName,
       success,
@@ -355,7 +355,7 @@ export const useFormTracking = (formName) => {
     if (typeof window === 'undefined') return;
 
     const formDuration = formStartTime.current ? Date.now() - formStartTime.current : 0;
-    
+
     logAnalyticsEvent('form_abandon', {
       form_name: formName,
       form_duration: formDuration,
@@ -384,7 +384,7 @@ export const useFormTracking = (formName) => {
 };
 
 // Hook for tracking component-specific analytics
-export const useComponentAnalytics = (componentName) => {
+const useComponentAnalytics = (componentName) => {
   const { trackEvent, trackError } = useAnalytics();
   const mountTime = useRef(Date.now());
 
@@ -405,7 +405,7 @@ export const useComponentAnalytics = (componentName) => {
     return () => {
       // Track component unmount
       const componentLifetime = Date.now() - mountTime.current;
-      
+
       trackEvent('component_unmount', {
         component_name: componentName,
         component_lifetime: componentLifetime,
@@ -443,7 +443,7 @@ export const useComponentAnalytics = (componentName) => {
 };
 
 // Hook for tracking user journey/funnel
-export const useJourneyTracking = (journeyName) => {
+const useJourneyTracking = (journeyName) => {
   const journeyStep = useRef(0);
   const journeyStartTime = useRef(null);
 
@@ -451,7 +451,7 @@ export const useJourneyTracking = (journeyName) => {
     if (typeof window === 'undefined') return;
 
     journeyStep.current += 1;
-    
+
     if (!journeyStartTime.current) {
       journeyStartTime.current = Date.now();
     }
@@ -507,7 +507,7 @@ export const useJourneyTracking = (journeyName) => {
 };
 
 // Hook for tracking API calls
-export const useAPITracking = () => {
+const useAPITracking = () => {
   const trackAPICall = useCallback(async (apiCall, options = {}) => {
     if (typeof window === 'undefined') return apiCall();
 
@@ -566,7 +566,7 @@ export const useAPITracking = () => {
 };
 
 // Hook for tracking experiments/A-B tests
-export const useExperimentTracking = () => {
+const useExperimentTracking = () => {
   const trackExperimentExposure = useCallback((experimentName, variantName, additionalData = {}) => {
     if (typeof window === 'undefined') return;
 
