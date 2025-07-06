@@ -3,6 +3,7 @@ import { generateMetadata, pageMetadata } from '../shared/components/seo';
 import { AuthProvider } from '../core/providers/AuthContext';
 import { ThemeRegistry } from '../core/providers/ThemeRegistry';
 import { RegionProvider } from '../core/providers/RegionContext';
+import PerformanceWrapper from '../shared/components/PerformanceWrapper'; // Add this
 
 const TopCardsWrapper = dynamic(() => import('../features/top-cards/components/TopCardsPage'), { ssr: false });
 
@@ -16,7 +17,9 @@ export default function TopCards() {
     <ThemeRegistry>
       <RegionProvider>
         <AuthProvider>
-          <TopCardsWrapper />
+          <PerformanceWrapper name="top_cards_page">
+            <TopCardsWrapper />
+          </PerformanceWrapper>
         </AuthProvider>
       </RegionProvider>
     </ThemeRegistry>
