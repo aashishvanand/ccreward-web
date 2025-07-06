@@ -3,6 +3,7 @@ import { generateMetadata, pageMetadata } from '../shared/components/seo';
 import { ThemeRegistry } from '../core/providers/ThemeRegistry';
 import { AuthProvider } from '../core/providers/AuthContext';
 import { RegionProvider } from '../core/providers/RegionContext';
+import PerformanceWrapper from '../shared/components/PerformanceWrapper'; // Add this
 
 const MyCardsList = dynamic(() => import('../features/cards/components/MyCardsPage'), { ssr: false });
 
@@ -16,7 +17,9 @@ export default function MyCardsPage() {
     <ThemeRegistry>
       <RegionProvider>
         <AuthProvider>
-          <MyCardsList />
+          <PerformanceWrapper name="my_cards_page">
+            <MyCardsList />
+          </PerformanceWrapper>
         </AuthProvider>
       </RegionProvider>
     </ThemeRegistry>

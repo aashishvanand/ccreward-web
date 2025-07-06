@@ -3,6 +3,7 @@ import { generateMetadata, pageMetadata } from '../shared/components/seo';
 import { ThemeRegistry } from '../core/providers/ThemeRegistry';
 import { AuthProvider } from '../core/providers/AuthContext';
 import { RegionProvider } from '../core/providers/RegionContext';
+import PerformanceWrapper from '../shared/components/PerformanceWrapper'; // Add this
 
 const HowToPage = dynamic(() => import('../features/how-to/HowToGuide'), { ssr: false });
 
@@ -17,7 +18,9 @@ export default function HowToRoute() {
     <ThemeRegistry>
       <RegionProvider>
         <AuthProvider>
-          <HowToPage />
+          <PerformanceWrapper name="how_to_page">
+            <HowToPage />
+          </PerformanceWrapper>
         </AuthProvider>
       </RegionProvider>
     </ThemeRegistry>
