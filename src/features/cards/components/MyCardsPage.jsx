@@ -258,129 +258,129 @@ function MyCardsPage() {
   };
 
   const handleUpdateCard = async (updatedCard) => {
-    trackButtonClick("card_update_attempt", {
+  trackButtonClick("card_update_attempt", {
+    card_bank: updatedCard.bank,
+    card_name: updatedCard.cardName,
+    has_network: !!updatedCard.network,
+    // REMOVE: has_limit: !!updatedCard.limit,
+  });
+  trackJourneyStep("card_update_initiated", {
+    card_bank: updatedCard.bank,
+    update_type: "details",
+  });
+  try {
+    await updateCardForUser(user.uid, updatedCard);
+    setCards((prevCards) =>
+      prevCards.map((card) =>
+        card.id === updatedCard.id ? updatedCard : card
+      )
+    );
+    notifyCardUpdate();
+    trackEvent("card_update_success", {
+      user_id: user.uid,
       card_bank: updatedCard.bank,
       card_name: updatedCard.cardName,
-      has_network: !!updatedCard.network,
-      has_limit: !!updatedCard.limit,
-    });
-    trackJourneyStep("card_update_initiated", {
-      card_bank: updatedCard.bank,
-      update_type: "details",
-    });
-    try {
-      await updateCardForUser(user.uid, updatedCard);
-      setCards((prevCards) =>
-        prevCards.map((card) =>
-          card.id === updatedCard.id ? updatedCard : card
-        )
-      );
-      notifyCardUpdate();
-      trackEvent("card_update_success", {
-        user_id: user.uid,
-        card_bank: updatedCard.bank,
-        card_name: updatedCard.cardName,
-        updated_fields: Object.keys(updatedCard).filter(
-          (key) => !["id", "bank", "cardName"].includes(key)
-        ),
-      });
-      trackJourneyCompletion("card_update_success", {
-        card_bank: updatedCard.bank,
-      });
-      showAlert("Card updated successfully", "success");
-    } catch (error) {
-      trackComponentError("card_update_failed", {
-        card_bank: updatedCard.bank,
-        error_message: error.message,
-        user_id: user.uid,
-      });
-      console.error("Error updating card:", error);
-      showAlert("Error updating card. Please try again later.", "error");
-    }
-  };
-
-  const handleAddCard = async (newCard) => {
-    trackButtonClick("add_card_attempt", {
-      card_bank: newCard.bank,
-      card_name: newCard.cardName,
-      user_cards_count: cards.length,
-      has_additional_details: !!(
-        newCard.network ||
-        newCard.limit ||
-        newCard.billingDate
+      updated_fields: Object.keys(updatedCard).filter(
+        (key) => !["id", "bank", "cardName"].includes(key)
       ),
     });
-    trackJourneyStep("add_card_initiated", {
+    trackJourneyCompletion("card_update_success", {
+      card_bank: updatedCard.bank,
+    });
+    showAlert("Card updated successfully", "success");
+  } catch (error) {
+    trackComponentError("card_update_failed", {
+      card_bank: updatedCard.bank,
+      error_message: error.message,
+      user_id: user.uid,
+    });
+    console.error("Error updating card:", error);
+    showAlert("Error updating card. Please try again later.", "error");
+  }
+};
+
+  const handleAddCard = async (newCard) => {
+  trackButtonClick("add_card_attempt", {
+    card_bank: newCard.bank,
+    card_name: newCard.cardName,
+    user_cards_count: cards.length,
+    // CHANGE: Remove limit and billingDate references, only check for network
+    has_additional_details: !!(newCard.network),
+  });
+  
+  trackJourneyStep("add_card_initiated", {
+    card_bank: newCard.bank,
+    card_name: newCard.cardName,
+    current_portfolio_size: cards.length,
+  });
+  
+  try {
+    const existingCards = await getCardsForUser(user.uid);
+    const isDuplicate = existingCards.some(
+      (card) =>
+        card.bank === newCard.bank && card.cardName === newCard.cardName
+    );
+    if (isDuplicate) {
+      trackEvent("add_card_duplicate_prevented", {
+        card_bank: newCard.bank,
+        card_name: newCard.cardName,
+        user_id: user.uid,
+      });
+      showAlert("This card is already in your collection.", "info");
+      return;
+    }
+    await addCardForUser(user.uid, newCard);
+    await fetchUserCards();
+    notifyCardUpdate();
+    trackConversion("card_added", 1);
+    trackJourneyCompletion("add_card_success", {
       card_bank: newCard.bank,
       card_name: newCard.cardName,
-      current_portfolio_size: cards.length,
+      new_portfolio_size: cards.length + 1,
     });
-    try {
-      const existingCards = await getCardsForUser(user.uid);
-      const isDuplicate = existingCards.some(
-        (card) =>
-          card.bank === newCard.bank && card.cardName === newCard.cardName
-      );
-      if (isDuplicate) {
-        trackEvent("add_card_duplicate_prevented", {
-          card_bank: newCard.bank,
-          card_name: newCard.cardName,
-          user_id: user.uid,
-        });
-        showAlert("This card is already in your collection.", "info");
-        return;
-      }
-      await addCardForUser(user.uid, newCard);
-      await fetchUserCards();
-      notifyCardUpdate();
-      trackConversion("card_added", 1);
-      trackJourneyCompletion("add_card_success", {
-        card_bank: newCard.bank,
-        card_name: newCard.cardName,
-        new_portfolio_size: cards.length + 1,
-      });
-      trackEvent("card_add_success", {
+    trackEvent("card_add_success", {
+      user_id: user.uid,
+      card_bank: newCard.bank,
+      card_name: newCard.cardName,
+      new_total_cards: cards.length + 1,
+      card_network: newCard.network,
+      // CHANGE: Remove limit reference, only check for network
+      has_custom_details: !!(newCard.network),
+      region,
+    });
+    recordCustomMetric("user_portfolio_growth", cards.length + 1);
+    const newCount = cards.length + 1;
+    if ([1, 2, 5, 10, 15, 20].includes(newCount)) {
+      trackEvent("portfolio_milestone_reached", {
+        milestone: newCount,
         user_id: user.uid,
-        card_bank: newCard.bank,
-        card_name: newCard.cardName,
-        new_total_cards: cards.length + 1,
-        card_network: newCard.network,
-        has_custom_details: !!(newCard.network || newCard.limit),
-        region,
+        card_added: `${newCard.bank} ${newCard.cardName}`,
       });
-      recordCustomMetric("user_portfolio_growth", cards.length + 1);
-      const newCount = cards.length + 1;
-      if ([1, 2, 5, 10, 15, 20].includes(newCount)) {
-        trackEvent("portfolio_milestone_reached", {
-          milestone: newCount,
-          user_id: user.uid,
-          card_added: `${newCard.bank} ${newCard.cardName}`,
-        });
-      }
-      showAlert("Card added successfully", "success");
-      if (isNewUser) {
-        trackEvent("first_card_added_new_user", {
-          user_id: user.uid,
-          card_bank: newCard.bank,
-          time_to_first_card:
-            Date.now() -
-            (user.metadata?.creationTime
-              ? new Date(user.metadata.creationTime).getTime()
-              : Date.now()),
-        });
-        markUserAsNotNew();
-      }
-    } catch (error) {
-      trackComponentError("add_card_failed", {
-        card_bank: newCard.bank,
-        card_name: newCard.cardName,
-        error_message: error.message,
-        user_id: user.uid,
-      });
-      console.error("Error adding card:", error);
-      showAlert("Failed to add card. Please try again.", "error");
     }
-  };
+    showAlert("Card added successfully", "success");
+    if (isNewUser) {
+      trackEvent("first_card_added_new_user", {
+        user_id: user.uid,
+        card_bank: newCard.bank,
+        time_to_first_card:
+          Date.now() -
+          (user.metadata?.creationTime
+            ? new Date(user.metadata.creationTime).getTime()
+            : Date.now()),
+      });
+      markUserAsNotNew();
+    }
+  } catch (error) {
+    trackComponentError("add_card_failed", {
+      card_bank: newCard.bank,
+      card_name: newCard.cardName,
+      error_message: error.message,
+      user_id: user.uid,
+    });
+    console.error("Error adding card:", error);
+    showAlert("Failed to add card. Please try again.", "error");
+  }
+};
 
   const handleDeleteCard = async (bank, cardName) => {
     trackButtonClick("delete_card_attempt", {
