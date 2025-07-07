@@ -1,5 +1,5 @@
+import { useEffect, useState, useRef } from "react";
 import { Box, Container, Typography, Grid } from "@mui/material";
-import { useState, useEffect, useRef } from "react";
 import Counter from "./Counter";
 import { useRegion } from "../../../../core/providers/RegionContext";
 
@@ -10,38 +10,137 @@ const StatsSection = () => {
   const [hasAnimated, setHasAnimated] = useState(false);
   const sectionRef = useRef(null);
   const observerRef = useRef(null);
+  const prevRegionRef = useRef(region);
 
-  // Load stats based on region
+  const roundToNearestFifty = (num) => {
+    const rounded = Math.floor(num / 50) * 50;
+    return rounded;
+  };
+
+  const roundToNearestTen = (num) => {
+    const rounded = Math.floor(num / 10) * 10;
+    return rounded;
+  };
+
+  // Reset stats and loading state when region changes
   useEffect(() => {
-    // Don't load stats if region is not initialized
-    if (!isInitialized || !region) {
+    if (prevRegionRef.current !== region) {
+      // Reset stats and trigger a refetch when region changes
       setIsLoading(true);
-      return;
+      setStats({ cards: 0, banks: 0 });
+      setHasAnimated(false);
+      prevRegionRef.current = region;
     }
+  }, [region]);
 
+  // Data fetching effect - only run when region is initialized
+  useEffect(() => {
     const fetchStats = async () => {
-      setIsLoading(true);
+      // Don't fetch if region is not initialized or not available
+      if (!isInitialized || !region) {
+        setIsLoading(true);
+        return;
+      }
+
       try {
-        // Set region-specific stats
+        console.log(`Fetching stats for region: ${region}`);
+        setIsLoading(true);
+        
+        // Generate cache key for cards data
+        const cacheKey = `cardsData_${region.toLowerCase()}`;
+        
+        // Check if we have recent cached cards data first
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+          try {
+            const { data: cardsData, timestamp } = JSON.parse(cachedData);
+            const cacheAge = Date.now() - timestamp;
+            const cacheExpirationTime = 24 * 60 * 60 * 1000; // 24 hours
+            
+            if (cacheAge < cacheExpirationTime && cardsData && cardsData.issuers) {
+              console.log(`Using cached cards data for ${region}`);
+              
+              // Count total cards and banks from the cached data
+              const issuers = Object.keys(cardsData.issuers);
+              const totalCards = Object.values(cardsData.issuers).reduce((total, issuer) => {
+                return total + (issuer.cards ? issuer.cards.length : 0);
+              }, 0);
+              
+              setStats({
+                cards: totalCards,
+                banks: issuers.length,
+              });
+              setIsLoading(false);
+              return;
+            }
+          } catch (cacheError) {
+            console.warn('Error parsing cached cards data:', cacheError);
+            localStorage.removeItem(cacheKey);
+          }
+        }
+        
+        // Fetch fresh cards data from the API
+        const url = `https://files.ccreward.app/cards_${region.toLowerCase()}.json`;
+        console.log(`Fetching fresh cards data from: ${url}`);
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch cards data: ${response.status} ${response.statusText}`);
+        }
+        
+        const cardsData = await response.json();
+        
+        if (!cardsData || !cardsData.issuers) {
+          throw new Error('Invalid cards data format received');
+        }
+        
+        // Count total cards and banks from all issuers
+        const issuers = Object.keys(cardsData.issuers);
+        const totalCards = Object.values(cardsData.issuers).reduce((total, issuer) => {
+          return total + (issuer.cards ? issuer.cards.length : 0);
+        }, 0);
+        
+        console.log(`Successfully fetched ${totalCards} cards and ${issuers.length} banks for ${region}`);
+        
         setStats({
-          cards: region === 'SG' ? 200 : 100,
-          banks: region === 'IN' ? 20 : 13,
+          cards: totalCards,
+          banks: issuers.length,
         });
+        
+        // Save cards data to localStorage with region-specific key
+        localStorage.setItem(cacheKey, JSON.stringify({
+          data: cardsData,
+          timestamp: Date.now()
+        }));
+        
+      } catch (error) {
+        console.error(`Error fetching stats for ${region}:`, error);
+        
+        // Fallback to reasonable defaults based on region
+        const fallbackStats = {
+          cards: region === 'SG' ? 200 : region === 'IN' ? 300 : 100,
+          banks: region === 'SG' ? 13 : region === 'IN' ? 20 : 15,
+        };
+        
+        console.log(`Using fallback stats for ${region}:`, fallbackStats);
+        setStats(fallbackStats);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchStats();
-  }, [isLoading, region, isInitialized]);
+  }, [region, isInitialized]);
 
   // Setup and cleanup intersection observer
   useEffect(() => {
     const setupObserver = () => {
       if (!sectionRef.current || observerRef.current) return;
+      
       observerRef.current = new IntersectionObserver(
         (entries) => {
-          if (entries[0].isIntersecting && !hasAnimated) {
+          if (entries[0].isIntersecting && !hasAnimated && !isLoading) {
+            console.log('Element came into view, triggering animation');
             setHasAnimated(true);
           }
         },
@@ -63,12 +162,7 @@ const StatsSection = () => {
         observerRef.current = null;
       }
     };
-  }, [hasAnimated]);
-
-  // Reset animation state when region changes
-  useEffect(() => {
-    setHasAnimated(false);
-  }, [region]);
+  }, [hasAnimated, isLoading]);
 
   const getRegionSpecificTitle = () => {
     if (!region) return "Loading...";
@@ -130,24 +224,24 @@ const StatsSection = () => {
                 }}
               >
                 <Counter
-                  value={stats.cards ? stats.cards : 0}
-                  shouldAnimate={hasAnimated && !isLoading}
-                  duration={2000}
+                  value={stats.cards ? roundToNearestFifty(stats.cards) : 0}
+                  animate={hasAnimated && !isLoading}
+                  suffix="+"
                 />
-                +
               </Typography>
               <Typography
                 variant="h6"
+                color="text.secondary"
                 sx={{
-                  color: "text.secondary",
-                  fontWeight: "medium",
+                  fontSize: { xs: "1rem", sm: "1.25rem" },
+                  fontWeight: "regular",
                 }}
               >
                 Credit Cards
               </Typography>
             </Box>
           </Grid>
-
+          
           <Grid item xs={6} md={4}>
             <Box sx={{ textAlign: "center" }}>
               <Typography
@@ -163,17 +257,17 @@ const StatsSection = () => {
                 }}
               >
                 <Counter
-                  value={stats.banks ? stats.banks : 0}
-                  shouldAnimate={hasAnimated && !isLoading}
-                  duration={2000}
+                  value={stats.banks ? roundToNearestTen(stats.banks) : 0}
+                  animate={hasAnimated && !isLoading}
+                  suffix="+"
                 />
-                +
               </Typography>
               <Typography
                 variant="h6"
+                color="text.secondary"
                 sx={{
-                  color: "text.secondary",
-                  fontWeight: "medium",
+                  fontSize: { xs: "1rem", sm: "1.25rem" },
+                  fontWeight: "regular",
                 }}
               >
                 Banks
