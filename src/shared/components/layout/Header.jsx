@@ -373,7 +373,7 @@ function Header() {
               <Box
                 component="img"
                 src={ccrewardIconUrl}
-                alt="CCReward"
+                alt="ccreward"
                 sx={{
                   height: { xs: 32, sm: 36 },
                   width: "auto",
@@ -394,7 +394,7 @@ function Header() {
                   textShadow: '0 1px 2px rgba(0,0,0,0.1)',
                 }}
               >
-                CCReward
+                ccreward
               </Typography>
             </Box>
           </motion.div>
