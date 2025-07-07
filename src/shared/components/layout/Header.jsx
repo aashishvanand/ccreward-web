@@ -177,7 +177,7 @@ function Header() {
                   cursor: "pointer",
                 }}
               >
-                CCReward
+                ccreward
               </Typography>
             </Link>
           </motion.div>

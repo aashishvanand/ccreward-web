@@ -183,7 +183,7 @@ function Footer() {
                 color="text.secondary"
                 sx={{ mb: 1 }}
               >
-                © {new Date().getFullYear()} CCReward. All rights reserved.
+                © {new Date().getFullYear()} ccreward. All rights reserved.
               </Typography>
               
               <motion.div

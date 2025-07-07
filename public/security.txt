@@ -1,4 +1,4 @@
-# This is a security.txt file for CCReward.app
+# This is a security.txt file for ccreward.app
 # More info: https://securitytxt.org/
 
 # Contact email for security issues

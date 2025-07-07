@@ -570,7 +570,7 @@ const MobileView = ({
                 mb: 2,
               }}
             >
-              Get the CCReward App
+              Get the ccreward App
             </Typography>
             <Typography
               variant="h5"

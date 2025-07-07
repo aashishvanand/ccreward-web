@@ -32,7 +32,7 @@ const PortfolioShare = forwardRef(({ cards }, ref) => {
   };
 
   const handleSocialShare = (platform) => {
-    const shareText = "Check out my credit card collection on CCReward! 💳";
+    const shareText = "Check out my credit card collection on ccreward! 💳";
     const url = "https://ccreward.app";
 
     const shareUrls = {
@@ -117,7 +117,7 @@ const PortfolioShare = forwardRef(({ cards }, ref) => {
       ctx.fillStyle = theme.palette.mode === "dark" ? "#121212" : "#ffffff";
       ctx.fillRect(0, 0, width, maxHeight);
 
-      // Add CCReward logo
+      // Add ccreward logo
       const logo = new Image();
       logo.crossOrigin = "anonymous";
       logo.src =
@@ -181,7 +181,7 @@ const PortfolioShare = forwardRef(({ cards }, ref) => {
       ctx.font = "bold 20px Inter";
       ctx.textAlign = "center";
       ctx.fillText(
-        "Get CCReward App on Your Device",
+        "Get ccreward App on Your Device",
         width / 2,
         maxHeight - footerHeight + 30
       );

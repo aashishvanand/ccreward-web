@@ -55,7 +55,7 @@ const RegionSelectionModal = ({ open, onRegionSelect, detectedCountry }) => {
 
   const getNoticeMessage = () => {
     if (detectedCountry) {
-      return `We detected you're browsing from ${detectedCountry}. Since CCReward currently supports India and Singapore, please select the region most relevant to you.`;
+      return `We detected you're browsing from ${detectedCountry}. Since ccreward currently supports India and Singapore, please select the region most relevant to you.`;
     }
     return "We couldn't detect your location. Please select your region to continue.";
   };

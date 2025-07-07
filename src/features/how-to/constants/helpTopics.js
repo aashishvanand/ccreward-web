@@ -35,13 +35,13 @@ export const HELP_TOPICS = {
 
   PROFILE_MANAGEMENT: {
     id: 'profile-management',
-    title: 'Managing Your CCReward Profile',
+    title: 'Managing Your ccreward Profile',
     keywords: [
       'user profile', 'account settings', 'preferences', 'personalization'
     ],
     difficulty: 'beginner',
     estimatedTime: '2-3 minutes',
-    description: 'Learn how to set up and customize your CCReward profile, manage preferences, and link accounts seamlessly.'
+    description: 'Learn how to set up and customize your ccreward profile, manage preferences, and link accounts seamlessly.'
   },
 
   SMS_IMPORT: {
@@ -52,6 +52,6 @@ export const HELP_TOPICS = {
     ],
     difficulty: 'intermediate',
     estimatedTime: '5-7 minutes',
-    description: 'Learn how to configure your iPhone to automatically import credit card transaction SMS messages into CCReward for effortless tracking.'
+    description: 'Learn how to configure your iPhone to automatically import credit card transaction SMS messages into ccreward for effortless tracking.'
   }
 };

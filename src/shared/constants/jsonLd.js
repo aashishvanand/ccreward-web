@@ -3,7 +3,7 @@ export const baseJsonLd = {
     "@graph": [
       {
         "@type": "Organization",
-        "name": "CCReward",
+        "name": "ccreward",
         "url": "https://ccreward.app",
         "logo": {
           "@type": "ImageObject",
@@ -13,12 +13,12 @@ export const baseJsonLd = {
       {
         "@type": "WebSite",
         "url": "https://ccreward.app",
-        "name": "CCReward",
+        "name": "ccreward",
         "description": "A comprehensive credit card rewards calculator for finding the best credit cards and maximizing rewards in India."
       },
       {
         "@type": "SoftwareApplication",
-        "name": "CCReward iOS",
+        "name": "ccreward iOS",
         "operatingSystem": "iOS",
         "applicationCategory": "FinanceApplication",
         "description": "Calculate and maximize your credit card rewards with our comprehensive calculator. Compare cards from major banks in India.",
@@ -26,7 +26,7 @@ export const baseJsonLd = {
       },
       {
         "@type": "SoftwareApplication",
-        "name": "CCReward Android",
+        "name": "ccreward Android",
         "operatingSystem": "Android",
         "applicationCategory": "FinanceApplication",
         "description": "Calculate and maximize your credit card rewards with our comprehensive calculator. Compare cards from major banks in India.",
@@ -37,10 +37,10 @@ export const baseJsonLd = {
         "mainEntity": [
           {
             "@type": "Question",
-            "name": "What is CCReward?",
+            "name": "What is ccreward?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "CCReward is a comprehensive tool designed to help users optimize their credit card rewards across multiple banks and credit cards in India. It helps calculate rewards based on specific Merchant Category Codes (MCCs) and finds the best card for various spending patterns."
+              "text": "ccreward is a comprehensive tool designed to help users optimize their credit card rewards across multiple banks and credit cards in India. It helps calculate rewards based on specific Merchant Category Codes (MCCs) and finds the best card for various spending patterns."
             }
           },
           {
@@ -48,39 +48,39 @@ export const baseJsonLd = {
             "name": "Which banks are supported?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "CCReward supports major banks including AMEX, AU, Axis, BOB, Federal, Canara, DBS, HDFC, HSBC, ICICI, IDBI, IDFCFirst, IndusInd, Kotak, OneCard, SBI, SC, RBL, YesBank"
+              "text": "ccreward supports major banks including AMEX, AU, Axis, BOB, Federal, Canara, DBS, HDFC, HSBC, ICICI, IDBI, IDFCFirst, IndusInd, Kotak, OneCard, SBI, SC, RBL, YesBank"
             }
           },
           {
             "@type": "Question",
-            "name": "Is CCReward free to use?",
+            "name": "Is ccreward free to use?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Yes, CCReward is free for personal use. We offer both a web application and an iOS app that you can use to calculate and maximize your credit card rewards."
+              "text": "Yes, ccreward is free for personal use. We offer both a web application and an iOS app that you can use to calculate and maximize your credit card rewards."
             }
           },
           {
             "@type": "Question",
-            "name": "Does CCReward support Android?",
+            "name": "Does ccreward support Android?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Yes, CCReward is available on both Android and iOS platforms, as well as a web application."
+              "text": "Yes, ccreward is available on both Android and iOS platforms, as well as a web application."
             }
           },
           {
             "@type": "Question",
-            "name": "Can CCReward track my reward points?",
+            "name": "Can ccreward track my reward points?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Not yet. At the moment, CCReward focuses on helping users find the best card for transactions and calculate rewards. Tracking accumulated reward points is a feature we may add in the future."
+              "text": "Not yet. At the moment, ccreward focuses on helping users find the best card for transactions and calculate rewards. Tracking accumulated reward points is a feature we may add in the future."
             }
           },
           {
             "@type": "Question",
-            "name": "How does CCReward handle my data?",
+            "name": "How does ccreward handle my data?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "CCReward values user privacy. If you use Google or Apple Sign-In, we collect only basic info like email."
+              "text": "ccreward values user privacy. If you use Google or Apple Sign-In, we collect only basic info like email."
             }
           },
           {
@@ -93,7 +93,7 @@ export const baseJsonLd = {
           },
           {
             "@type": "Question",
-            "name": "Can CCReward suggest the best credit card to apply for?",
+            "name": "Can ccreward suggest the best credit card to apply for?",
             "acceptedAnswer": {
               "@type": "Answer",
               "text": "Yes! The 'Suggest Me a Card' feature is in development and will help users identify the top cards based on their spending habits and preferred rewards."
@@ -125,15 +125,15 @@ export const baseJsonLd = {
           },
           {
             "@type": "Question",
-            "name": "Does CCReward support international cards?",
+            "name": "Does ccreward support international cards?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Currently, CCReward focuses on Indian credit cards. Support for international cards may be added in future updates."
+              "text": "Currently, ccreward focuses on Indian credit cards. Support for international cards may be added in future updates."
             }
           },
           {
             "@type": "Question",
-            "name": "Can CCReward tell me the best card for each transaction?",
+            "name": "Can ccreward tell me the best card for each transaction?",
             "acceptedAnswer": {
               "@type": "Answer",
               "text": "Yes, the 'Find Best Card' feature helps you choose the ideal card based on transaction type, category, and amount to maximize your rewards."
@@ -141,10 +141,10 @@ export const baseJsonLd = {
           },
           {
             "@type": "Question",
-            "name": "Does CCReward offer reminders for payment due dates?",
+            "name": "Does ccreward offer reminders for payment due dates?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Not currently. CCReward is focused on rewards optimization and does not include payment reminders. This feature may be considered in the future."
+              "text": "Not currently. ccreward is focused on rewards optimization and does not include payment reminders. This feature may be considered in the future."
             }
           }
         ]

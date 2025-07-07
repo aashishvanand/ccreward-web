@@ -21,7 +21,7 @@ const AppStoreSection = ({ isMobile, theme }) => {
               fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
             }}
           >
-            Get CCReward App on Your Device
+            Get ccreward App on Your Device
           </Typography>
           <Typography
             variant="h5"

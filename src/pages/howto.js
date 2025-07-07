@@ -5,8 +5,8 @@ import PerformanceWrapper from '../shared/components/PerformanceWrapper';
 const HowToPage = dynamic(() => import('../features/how-to/HowToGuide'), { ssr: false });
 
 export const metadata = generateMetadata({
-  title: "How To Guide - CCReward",
-  description: "Comprehensive guides for using the CCReward app across different platforms",
+  title: "How To Guide - ccreward",
+  description: "Comprehensive guides for using the ccreward app across different platforms",
   path: '/howto'
 });
 
