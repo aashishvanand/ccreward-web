@@ -16,7 +16,7 @@ The Credit Card Rewards is a comprehensive tool designed to help users optimize 
 
 ## Mobile Apps
 
-CCReward is available on both iOS and Android platforms:
+ccreward is available on both iOS and Android platforms:
 
 [![Download on the App Store](https://img.shields.io/badge/App_Store-0D96F6?logo=app-store&logoColor=white)](https://apps.apple.com/in/app/ccreward/id6736835206)
 

@@ -130,7 +130,7 @@ const TermsOfServicePage = () => {
             <div onFocus={() => handleSectionInteraction("acceptance")}>
               <h2>1. Acceptance of Terms</h2>
               <p>
-                By accessing or using the CCReward application (&quot;the
+                By accessing or using the ccreward application (&quot;the
                 Service&quot;), you agree to be bound by these Terms of Service
                 (&quot;Terms&quot;). If you disagree with any part of the terms,
                 you may not access the Service.
@@ -142,7 +142,7 @@ const TermsOfServicePage = () => {
             >
               <h2>2. Description of Service</h2>
               <p>
-                CCReward is a credit card rewards calculator for India, allowing
+                ccreward is a credit card rewards calculator for India, allowing
                 users to compare cards, calculate rewards, and manage their
                 credit card information.
               </p>
@@ -153,7 +153,7 @@ const TermsOfServicePage = () => {
             >
               <h2>3. Service Infrastructure</h2>
               <p>
-                3.1. CCReward utilizes multiple service providers to deliver its
+                3.1. ccreward utilizes multiple service providers to deliver its
                 functionality:
               </p>
               <ul>
@@ -202,13 +202,13 @@ const TermsOfServicePage = () => {
               <h2>5. Intellectual Property</h2>
               <p>
                 5.1. The Service and its original content, features, and
-                functionality are owned by CCReward and are protected by
+                functionality are owned by ccreward and are protected by
                 international copyright, trademark, patent, trade secret, and
                 other intellectual property or proprietary rights laws.
               </p>
 
               <p>
-                5.2. The source code for CCReward is available at{" "}
+                5.2. The source code for ccreward is available at{" "}
                 <a
                   href="https://github.com/aashishvanand/ccreward-web"
                   target="_blank"
@@ -270,11 +270,11 @@ const TermsOfServicePage = () => {
               </p>
               <p>
                 5.3. All bank logos, credit card images, and related visual
-                assets displayed on CCReward.app are the property of their
+                assets displayed on ccreward.app are the property of their
                 respective financial institutions and are used solely for
                 representational purposes. The display of these assets does not
                 imply any endorsement, sponsorship, or official relationship
-                between CCReward.app and the financial institutions.
+                between ccreward.app and the financial institutions.
               </p>
               <p>
                 5.4. Financial institutions may request the removal of their
@@ -312,7 +312,7 @@ const TermsOfServicePage = () => {
                 respective banks.
               </p>
               <p>
-                6.4. CCReward.app makes no guarantees about the accuracy of
+                6.4. ccreward.app makes no guarantees about the accuracy of
                 calculations and shall not be held liable for any discrepancies
                 between calculated and actual rewards.
               </p>
@@ -331,13 +331,13 @@ const TermsOfServicePage = () => {
             <div onFocus={() => handleSectionInteraction("liability")}>
               <h2>8. Limitation of Liability</h2>
               <p>
-                In no event shall CCReward, nor its directors, employees,
+                In no event shall ccreward, nor its directors, employees,
                 partners, agents, suppliers, or affiliates, be liable for any
                 indirect, incidental, special, consequential or punitive
                 damages, including without limitation, loss of profits, data,
                 use, goodwill, or other intangible losses, resulting from your
                 access to or use of or inability to access or use the Service.
-                CCReward is not liable for any actions, inaccuracies, or data
+                ccreward is not liable for any actions, inaccuracies, or data
                 collection practices by third-party advertisers, including
                 Google Ads. Users are encouraged to review the respective
                 advertiser&apos;s privacy policies and terms of service.
@@ -376,7 +376,7 @@ const TermsOfServicePage = () => {
             <div onFocus={() => handleSectionInteraction("mobile_apps")}>
               <h2>11. Mobile Applications</h2>
               <p>
-                11.1. <strong>App Availability:</strong> CCReward provides
+                11.1. <strong>App Availability:</strong> ccreward provides
                 mobile applications available through:
               </p>
               <ul>
@@ -393,7 +393,7 @@ const TermsOfServicePage = () => {
                       )
                     }
                   >
-                    CCReward for iOS
+                    ccreward for iOS
                   </a>
                 </li>
                 <li>
@@ -409,7 +409,7 @@ const TermsOfServicePage = () => {
                       )
                     }
                   >
-                    CCReward for Android
+                    ccreward for Android
                   </a>
                 </li>
               </ul>

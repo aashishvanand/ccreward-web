@@ -107,7 +107,7 @@ class ErrorBoundary extends React.Component {
     };
 
     const emailBody = `
-Error Report for CCReward
+Error Report for ccreward
 
 Error ID: ${errorDetails.errorId}
 Timestamp: ${errorDetails.timestamp}
@@ -119,7 +119,7 @@ Please describe what you were doing when this error occurred:
 [Your description here]
     `.trim();
 
-    const emailSubject = `CCReward Error Report - ${errorDetails.errorId}`;
+    const emailSubject = `ccreward Error Report - ${errorDetails.errorId}`;
     const emailUrl = `mailto:support@ccreward.app?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
     
     if (typeof window !== 'undefined') {

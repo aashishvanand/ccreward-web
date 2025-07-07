@@ -255,7 +255,7 @@ const PrivacyPolicyPage = () => {
             >
               <h2>6. Accuracy of Information</h2>
               <p>
-                6.1. The reward calculations provided by CCReward are based on
+                6.1. The reward calculations provided by ccreward are based on
                 publicly available information and are for reference purposes
                 only.
               </p>
@@ -308,13 +308,13 @@ const PrivacyPolicyPage = () => {
                 <li>
                   Apple App Store:{" "}
                   <a href="https://apps.apple.com/in/app/ccreward/id6736835206">
-                    CCReward for iOS
+                    ccreward for iOS
                   </a>
                 </li>
                 <li>
                   Google Play Store:{" "}
                   <a href="https://play.google.com/store/apps/details?id=app.ccreward">
-                    CCReward for Android
+                    ccreward for Android
                   </a>
                 </li>
               </ul>
@@ -386,7 +386,7 @@ const PrivacyPolicyPage = () => {
               </ul>
 
               <h2>Platform Compatibility</h2>
-              <p>CCReward.app is accessible through:</p>
+              <p>ccreward.app is accessible through:</p>
               <ul>
                 <li>Web browsers at https://ccreward.app</li>
                 <li>iOS devices through the App Store (iOS 15.0 or later)</li>

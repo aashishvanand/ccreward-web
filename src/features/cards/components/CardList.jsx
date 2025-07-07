@@ -221,7 +221,7 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
             <Box
               component="img"
               src="https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/c68cca10-3860-4546-74e7-06ea7aa8e000/public"
-              alt="CCReward Logo"
+              alt="ccreward Logo"
               sx={{
                 mt: 4,
                 width: 100,

@@ -6,8 +6,8 @@ import { ThemeRegistry } from '../core/providers/ThemeRegistry';
 const TermsOfServiceWrapper = dynamic(() => import('../features/legal/components/TermsOfServicePage'), { ssr: false });
 
 export const metadata = generateMetadata({
-  title: "Terms of Service - CCReward",
-  description: "Read CCReward's terms of service and user agreement for our credit card rewards calculator and comparison tools.",
+  title: "Terms of Service - ccreward",
+  description: "Read ccreward's terms of service and user agreement for our credit card rewards calculator and comparison tools.",
   path: '/terms'
 });
 

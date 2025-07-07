@@ -16,7 +16,7 @@ export function generateMetadata({
             title,
             description,
             url,
-            siteName: "CCReward",
+            siteName: "ccreward",
             type: "website",
             images: [{
                 url: commonMetadata.defaultOgImage,
@@ -35,9 +35,9 @@ export function generateMetadata({
             canonical: url,
         },
         keywords: commonMetadata.keywords,
-        applicationName: "CCReward",
+        applicationName: "ccreward",
         appleWebApp: {
-            title: "CCReward",
+            title: "ccreward",
             statusBarStyle: "default",
         },
         formatDetection: {
