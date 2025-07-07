@@ -181,6 +181,25 @@ function setupGlobalErrorHandlers() {
     });
 }
 
+function generateSecureRandomString(length = 9) {
+    const randomBytes = new Uint8Array(length);
+
+    // Use crypto.getRandomValues for cryptographically secure randomness
+    if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+        window.crypto.getRandomValues(randomBytes);
+    } else if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+        crypto.getRandomValues(randomBytes);
+    } else {
+        // Fallback for environments without crypto API (should be rare)
+        throw new Error('Crypto API not available for secure random generation');
+    }
+
+    // Convert bytes to base36 string (0-9, a-z)
+    return Array.from(randomBytes)
+        .map(byte => (byte % 36).toString(36))
+        .join('');
+}
+
 // Setup unhandled promise rejection handler
 function setupUnhandledRejectionHandler() {
     window.addEventListener('unhandledrejection', (event) => {
@@ -249,7 +268,9 @@ function getOrCreateSessionId() {
 
     let sessionId = getStorageItem('error_session_id', 'session');
     if (!sessionId) {
-        sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        const timestamp = Date.now();
+        const randomString = generateSecureRandomString(9);
+        sessionId = `session_${timestamp}_${randomString}`;
         setStorageItem('error_session_id', sessionId, 'session');
     }
     return sessionId;
