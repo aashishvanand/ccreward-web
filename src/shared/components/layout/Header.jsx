@@ -39,7 +39,7 @@ import RegionSelector from "./RegionSelector";
 // Icon mapping based on theme and region
 const CCREWARD_ICONS = {
   light: {
-    dollar: "fcceba9aa-3612-4b9c-bb28-b751cf9e3d00", // ccreward_light_dollar.webp
+    dollar: "cceba9aa-3612-4b9c-bb28-b751cf9e3d00", // ccreward_light_dollar.webp
     rupee: "74a7a71f-9603-4843-cbb9-366d30bc8800",  // ccreward_light_rupee.webp
   },
   dark: {
@@ -198,7 +198,7 @@ function Header() {
     }] : []),
     { 
       label: "Best Cards", 
-      path: "/best-cards", 
+      path: "/best-card", 
       icon: StarsIcon,
       description: "Top recommendations"
     },
