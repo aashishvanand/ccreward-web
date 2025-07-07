@@ -191,7 +191,7 @@ function Header() {
     },
     ...(isAuthenticated ? [{
       label: "My Cards",
-      path: "/cards",
+      path: "/my-cards",
       icon: CreditCard,
       badge: cardCount,
       description: "Manage your cards"
