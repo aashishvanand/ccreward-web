@@ -32,7 +32,7 @@ import { useRegion } from "../../../core/providers/RegionContext";
 
 // Use a prefix for the cache key to make it dynamic
 const CACHE_KEY_PREFIX = "referralData_";
-const CACHE_DURATION = 24 * 60 * 60 * 1000;
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
 const categoryIcons = {
   Education: <SchoolIcon sx={{ fontSize: 16 }} />,
@@ -139,7 +139,6 @@ const TopCardsGrid = ({
               <Paper
                 elevation={2}
                 sx={{
-                  p: 2,
                   borderRadius: 2,
                   cursor: "pointer",
                   transition: "all 0.3s ease",
@@ -172,8 +171,6 @@ const TopCardsGrid = ({
                     position: "relative",
                     width: "100%",
                     aspectRatio: card.orientation === "vertical" ? "0.63/1" : "1.59/1",
-                    mb: 2, 
-                    textAlign: "center" 
                 }}>
                   <Image
                     src={card.image}
@@ -184,80 +181,82 @@ const TopCardsGrid = ({
                   />
                 </Box>
 
-                <Typography
-                  variant="h6"
-                  component="h3"
-                  sx={{
-                    fontWeight: 600,
-                    mb: 1,
-                    fontSize: isMobile ? "1rem" : "1.1rem",
-                    lineHeight: 1.2,
-                  }}
-                >
-                  {card.bank}
-                </Typography>
+                <Box sx={{ p: 2 }}>
+                    <Typography
+                    variant="h6"
+                    component="h3"
+                    sx={{
+                        fontWeight: 600,
+                        mb: 1,
+                        fontSize: isMobile ? "1rem" : "1.1rem",
+                        lineHeight: 1.2,
+                    }}
+                    >
+                    {card.bank}
+                    </Typography>
 
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{
-                    mb: 2,
-                    fontSize: isMobile ? "0.8rem" : "0.875rem",
-                    lineHeight: 1.3,
-                  }}
-                >
-                  {card.cardName}
-                </Typography>
+                    <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{
+                        mb: 2,
+                        fontSize: isMobile ? "0.8rem" : "0.875rem",
+                        lineHeight: 1.3,
+                    }}
+                    >
+                    {card.cardName}
+                    </Typography>
 
-                {card.categories && card.categories.length > 0 && (
-                  <Stack direction="row" spacing={0.5} sx={{ mb: 2, flexWrap: "wrap", gap: 0.5 }}>
-                    {card.categories.slice(0, isMobile ? 2 : 3).map((category, catIndex) => (
-                      <Chip
-                        key={catIndex}
-                        icon={categoryIcons[category]}
-                        label={category}
-                        size="small"
-                        variant="outlined"
-                        sx={{
-                          fontSize: isMobile ? "0.6rem" : "0.7rem",
-                          height: "auto",
-                          "& .MuiChip-label": {
-                            padding: "2px 4px",
-                          },
-                        }}
-                      />
-                    ))}
-                    {card.categories.length > (isMobile ? 2 : 3) && (
-                      <Chip
-                        label={`+${card.categories.length - (isMobile ? 2 : 3)}`}
-                        size="small"
-                        variant="outlined"
-                        sx={{
-                          fontSize: isMobile ? "0.6rem" : "0.7rem",
-                          height: "auto",
-                          "& .MuiChip-label": {
-                            padding: "2px 4px",
-                          },
-                        }}
-                      />
+                    {card.categories && card.categories.length > 0 && (
+                    <Stack direction="row" spacing={0.5} sx={{ mb: 2, flexWrap: "wrap", gap: 0.5 }}>
+                        {card.categories.slice(0, isMobile ? 2 : 3).map((category, catIndex) => (
+                        <Chip
+                            key={catIndex}
+                            icon={categoryIcons[category]}
+                            label={category}
+                            size="small"
+                            variant="outlined"
+                            sx={{
+                            fontSize: isMobile ? "0.6rem" : "0.7rem",
+                            height: "auto",
+                            "& .MuiChip-label": {
+                                padding: "2px 4px",
+                            },
+                            }}
+                        />
+                        ))}
+                        {card.categories.length > (isMobile ? 2 : 3) && (
+                        <Chip
+                            label={`+${card.categories.length - (isMobile ? 2 : 3)}`}
+                            size="small"
+                            variant="outlined"
+                            sx={{
+                            fontSize: isMobile ? "0.6rem" : "0.7rem",
+                            height: "auto",
+                            "& .MuiChip-label": {
+                                padding: "2px 4px",
+                            },
+                            }}
+                        />
+                        )}
+                    </Stack>
                     )}
-                  </Stack>
-                )}
 
-                <Button
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  sx={{
-                    mt: "auto",
-                    borderRadius: 1.5,
-                    textTransform: "none",
-                    fontSize: isMobile ? "0.8rem" : "0.875rem",
-                  }}
-                  onClick={() => handleCardClick(card.bank, card.cardName)}
-                >
-                  Calculate Rewards
-                </Button>
+                    <Button
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                    sx={{
+                        mt: "auto",
+                        borderRadius: 1.5,
+                        textTransform: "none",
+                        fontSize: isMobile ? "0.8rem" : "0.875rem",
+                    }}
+                    onClick={() => handleCardClick(card.bank, card.cardName)}
+                    >
+                    View Details
+                    </Button>
+                </Box>
               </Paper>
             </motion.div>
           </ImageListItem>
