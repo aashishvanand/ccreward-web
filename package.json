@@ -2,7 +2,7 @@
   "name": "ccreward.app",
   "version": "0.4.0",
   "private": true,
-  "description": "A comprehensive tool to calculate and optimize credit card rewards across multiple banks in India",
+  "description": "A comprehensive tool to calculate and optimize credit card rewards across multiple banks in India & Singapore",
   "author": "Aashish Vivekanand",
   "license": "SEE LICENSE IN LICENSE",
   "repository": {
@@ -32,7 +32,7 @@
     "@mui/material-nextjs": "^7.2.0",
     "axios": "^1.10.0",
     "firebase": "^11.10.0",
-    "framer-motion": "^12.23.0",
+    "framer-motion": "^12.23.3",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "next": "^15.3.5",
@@ -42,7 +42,7 @@
     "react-dom": "19.1.0",
     "react-share": "^5.2.2",
     "react-tweet": "^3.2.2",
-    "sharp": "^0.34.2"
+    "sharp": "^0.34.3"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.3.3",
@@ -55,8 +55,8 @@
   "resolutions": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
   },
   "engines": {
     "node": ">=18.18.0",
