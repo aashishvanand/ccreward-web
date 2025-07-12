@@ -254,7 +254,7 @@ const TopCardsGrid = ({
                     }}
                     onClick={() => handleCardClick(card.bank, card.cardName)}
                     >
-                    View Details
+                    Calculate Reward
                     </Button>
                 </Box>
               </Paper>
