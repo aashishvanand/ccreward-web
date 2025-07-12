@@ -1,69 +1,79 @@
 const bankImagesData = [
+	{
+		"id": "5125ad4b-e9bd-4390-8daa-511aae120900",
+		"filename": "amex.webp",
+		"bank": "amex"
+	},
+	{
+		"id": "d7e59be4-483c-4623-a7a0-19174e774200",
+		"filename": "boc.webp",
+		"bank": "boc"
+	},
+	{
+		"id": "39ade7e3-2aa8-418a-941a-d0f4b7b3a800",
+		"filename": "cimb.webp",
+		"bank": "cimb"
+	},
+	{
+		"id": "143d396a-be4e-426c-09ed-35d6b439dc00",
+		"filename": "citi.webp",
+		"bank": "citi"
+	},
+	{
+		"id": "c328a1b1-255c-4129-2ed6-2ce25f4b5b00",
+		"filename": "dbs.webp",
+		"bank": "dbs"
+	},
+	{
+		"id": "0e665c13-277e-40f6-07bf-58bf020fb300",
+		"filename": "dcs.webp",
+		"bank": "dcs"
+	},
     {
-        "id": "c328a1b1-255c-4129-2ed6-2ce25f4b5b00",
-        "filename": "dbs.webp",
-        "bank": "dbs"
-    },
+		"id": "caf55e3b-5ed0-49cd-208f-555c50dc3300",
+		"filename": "gxs.webp",
+		"bank": "gxs"
+	},
+	{
+		"id": "db73f785-a86e-439f-2cd3-d3d8e9484d00",
+		"filename": "hsbc.webp",
+		"bank": "hsbc"
+	},
+	{
+		"id": "26d3a701-d0bd-4073-3956-046249e92100",
+		"filename": "maybank.webp",
+		"bank": "maybank"
+	},
     {
-        "id": "5125ad4b-e9bd-4390-8daa-511aae120900",
-        "filename": "amex.webp",
-        "bank": "amex"
-    },
-    {
-        "id": "db73f785-a86e-439f-2cd3-d3d8e9484d00",
-        "filename": "hsbc.webp",
-        "bank": "hsbc"
-    },
-    {
-        "id": "3aee03ea-ea20-491f-bae8-04119628ea00",
-        "filename": "sc.webp",
-        "bank": "sc"
-    },
-    {
-        "id": "26d3a701-d0bd-4073-3956-046249e92100",
-        "filename": "maybank.webp",
-        "bank": "maybank"
-    },
-    {
-        "id": "0e665c13-277e-40f6-07bf-58bf020fb300",
-        "filename": "dcs.webp",
-        "bank": "dcs"
-    },
-    {
-        "id": "06512233-8d05-4dc6-44ac-a2ec3d767100",
-        "filename": "posb.webp",
-        "bank": "posb"
-    },
-    {
-        "id": "143d396a-be4e-426c-09ed-35d6b439dc00",
-        "filename": "citi.webp",
-        "bank": "citi"
-    },
-    {
-        "id": "d7e59be4-483c-4623-a7a0-19174e774200",
-        "filename": "boc.webp",
-        "bank": "boc"
-    },
-    {
-        "id": "26d44933-ccbd-4dbc-e02a-379b09bb8500",
-        "filename": "trust.webp",
-        "bank": "trust"
-    },
-    {
-        "id": "629ec007-20a7-4a0e-69b5-b978b32ca500",
-        "filename": "ocbc.webp",
-        "bank": "ocbc"
-    },
-    {
-        "id": "d6a15663-6c56-4996-217d-68a83765c100",
-        "filename": "uob.webp",
-        "bank": "uob"
-    },
-    {
-        "id": "39ade7e3-2aa8-418a-941a-d0f4b7b3a800",
-        "filename": "cimb.webp",
-        "bank": "cimb"
-    },
+		"id": "b0426c4f-d275-4c29-6ff4-9da05dc28c00",
+		"filename": "maribank.webp",
+		"bank": "maribank"
+	},
+	{
+		"id": "629ec007-20a7-4a0e-69b5-b978b32ca500",
+		"filename": "ocbc.webp",
+		"bank": "ocbc"
+	},
+	{
+		"id": "06512233-8d05-4dc6-44ac-a2ec3d767100",
+		"filename": "posb.webp",
+		"bank": "posb"
+	},
+	{
+		"id": "3aee03ea-ea20-491f-bae8-04119628ea00",
+		"filename": "sc.webp",
+		"bank": "sc"
+	},
+	{
+		"id": "26d44933-ccbd-4dbc-e02a-379b09bb8500",
+		"filename": "trust.webp",
+		"bank": "trust"
+	},
+	{
+		"id": "d6a15663-6c56-4996-217d-68a83765c100",
+		"filename": "uob.webp",
+		"bank": "uob"
+	}
 ];
 
 export default bankImagesData;
