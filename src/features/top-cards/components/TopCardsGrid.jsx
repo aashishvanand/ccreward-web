@@ -150,7 +150,7 @@ const TopCardsGrid = ({
                   position: "relative",
                   overflow: "hidden",
                 }}
-                onClick={() => handleCardClick(card)}
+                onClick={() => handleCardClick(card.bank, card.cardName)}
               >
                 {/* Referral badge */}
                 {referralInfo && (
@@ -168,16 +168,18 @@ const TopCardsGrid = ({
                   />
                 )}
 
-                <Box sx={{ mb: 2, textAlign: "center" }}>
+                <Box sx={{ 
+                    position: "relative",
+                    width: "100%",
+                    aspectRatio: card.orientation === "vertical" ? "0.63/1" : "1.59/1",
+                    mb: 2, 
+                    textAlign: "center" 
+                }}>
                   <Image
                     src={card.image}
                     alt={`${card.bank} ${card.cardName}`}
-                    width={card.orientation === "horizontal" ? 120 : 80}
-                    height={card.orientation === "horizontal" ? 80 : 120}
-                    style={{
-                      objectFit: "contain",
-                      borderRadius: "8px",
-                    }}
+                    layout="fill"
+                    objectFit="contain"
                     loading="lazy"
                   />
                 </Box>
@@ -252,9 +254,9 @@ const TopCardsGrid = ({
                     textTransform: "none",
                     fontSize: isMobile ? "0.8rem" : "0.875rem",
                   }}
-                  onClick={() => handleCardClick(card)}
+                  onClick={() => handleCardClick(card.bank, card.cardName)}
                 >
-                  View Details
+                  Calculate Rewards
                 </Button>
               </Paper>
             </motion.div>
