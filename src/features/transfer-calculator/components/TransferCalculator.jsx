@@ -21,6 +21,7 @@ import {
   ListItemIcon,
   Divider,
 } from "@mui/material";
+import Image from "next/image";
 import {
   Flight as FlightIcon,
   Hotel as HotelIcon,
@@ -41,6 +42,7 @@ import {
   useAnalytics,
   usePagePerformance,
   useFormTracking,
+  usePartnerLogos,
 } from "../../../core/hooks";
 
 const pageVariants = {
@@ -193,82 +195,150 @@ const TransferCalculator = () => {
       recordCustomMetric("transfer_partners_found", result.total_partners);
     } catch (error) {
       console.error("Error calculating transfers:", error);
-      showAlert(
-        error.message || "Error calculating transfers. Please try again.",
-        "error"
-      );
+      if (error.response?.data?.code === "NO_TRANSFER_CURRENCY") {
+        showAlert(
+          error.response.data.error ||
+            "The selected card does not have a transferable points currency.",
+          "info"
+        );
+      } else {
+        // Handle other errors
+        showAlert(
+          error.message || "Error calculating transfers. Please try again.",
+          "error"
+        );
+      }
       trackFormSubmission(false, error.message);
     } finally {
       setIsCalculating(false);
     }
   };
 
-  const renderPartnerList = (partners, type) => (
-    <List
-      subheader={
-        <Typography
-          variant="h6"
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            my: 2,
-          }}
-        >
-          {type === "airline" ? <FlightIcon /> : <HotelIcon />}
-          {type === "airline" ? "Airlines" : "Hotels"} ({partners.length})
-        </Typography>
-      }
-    >
-      {partners.map((partner) => (
-        <Paper
-          key={partner.partner_name}
-          elevation={2}
-          sx={{ mb: 2, borderRadius: 2, overflow: "hidden" }}
-        >
-          <ListItem sx={{ display: "flex", flexWrap: "wrap", gap: 2, p: 2 }}>
-            <Box sx={{ flex: "1 1 200px" }}>
-              <Typography variant="body1" fontWeight="bold">
-                {partner.brand_name} ({partner.partner_name})
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {partner.partner_points_received.toLocaleString()} points
-              </Typography>
-            </Box>
-            <Box sx={{ flex: "1 1 150px" }}>
-              <Typography variant="body2" color="text.secondary">
-                Est. Value:{" "}
-                <Typography component="span" fontWeight="bold">
-                  {getCurrencySymbol(region)}
-                  {partner.estimated_value_inr.toLocaleString()}
-                </Typography>
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Value/Point:{" "}
-                <Typography component="span" fontWeight="bold">
-                  {getCurrencySymbol(region)}
-                  {partner.value_per_point_inr.toFixed(2)}
-                </Typography>
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                flex: "1 1 150px",
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-              }}
+  const renderPartnerList = (partners, type) => {
+    // Get currency from the API response, fallback to region
+    const currency = calculationResult?.value_currency || region;
+    return (
+      <List
+        subheader={
+          <Typography
+            variant="h6"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              my: 2,
+            }}
+          >
+            {type === "airline" ? <FlightIcon /> : <HotelIcon />}
+            {type === "airline" ? "Airlines" : "Hotels"} ({partners.length})
+          </Typography>
+        }
+      >
+        {partners.map((partner) => {
+          // --- LOGO LOGIC ---
+          let logoId = null;
+          if (type === "airline" && partner.iata) {
+            logoId = logos.airline[partner.iata];
+          } else if (type === "hotel" && partner.brand_name) {
+            // Try to find a match by checking if the brand_name includes a key
+            const hotelKey = Object.keys(logos.hotel).find((key) =>
+              partner.brand_name.toLowerCase().includes(key)
+            );
+            if (hotelKey) {
+              logoId = logos.hotel[hotelKey];
+            }
+          }
+          // --- END LOGO LOGIC ---
+
+          return (
+            <Paper
+              key={partner.partner_name}
+              elevation={2}
+              sx={{ mb: 2, borderRadius: 2, overflow: "hidden" }}
             >
-              <AccessTimeIcon fontSize="small" color="action" />
-              <Typography variant="body2" color="text.secondary">
-                {partner.transfer_time_display}
-              </Typography>
-            </Box>
-          </ListItem>
-        </Paper>
-      ))}
-    </List>
-  );
+              <ListItem
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 2,
+                  p: 2,
+                  alignItems: "center",
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: 50, mr: { xs: 0, sm: 1 } }}>
+                  {isLoadingLogos ? (
+                    <CircularProgress size={24} />
+                  ) : logoId ? (
+                    <Image
+                      src={`https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/${logoId}/public`}
+                      alt={`${partner.brand_name} logo`}
+                      width={40}
+                      height={40}
+                      style={{ objectFit: "contain" }}
+                    />
+                  ) : (
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {type === "airline" ? (
+                        <FlightIcon color="action" />
+                      ) : (
+                        <HotelIcon color="action" />
+                      )}
+                    </Box>
+                  )}
+                </ListItemIcon>
+
+                <Box sx={{ flex: "1 1 200px" }}>
+                  <Typography variant="body1" fontWeight="bold">
+                    {partner.brand_name} ({partner.partner_name})
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {partner.partner_points_received.toLocaleString()} points
+                  </Typography>
+                </Box>
+                <Box sx={{ flex: "1 1 150px" }}>
+                <Typography variant="body2" color="text.secondary">
+                  Est. Value:{" "}
+                  <Typography component="span" fontWeight="bold">
+                    {getCurrencySymbol(currency)}
+                    {partner.estimated_value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </Typography>
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Value/Point:{" "}
+                  <Typography component="span" fontWeight="bold">
+                    {getCurrencySymbol(currency)}
+                    {partner.value_per_point.toFixed(2)}
+                  </Typography>
+                </Typography>
+              </Box>
+                <Box
+                  sx={{
+                    flex: "1 1 150px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
+                >
+                  <AccessTimeIcon fontSize="small" color="action" />
+                  <Typography variant="body2" color="text.secondary">
+                    {partner.transfer_time_display}
+                  </Typography>
+                </Box>
+              </ListItem>
+            </Paper>
+          );
+        })}
+      </List>
+    );
+  };
 
   return (
     <motion.div
@@ -388,6 +458,12 @@ const TransferCalculator = () => {
                 )}
               </Stack>
             </Paper>
+
+            {logosError && (
+              <Alert severity="warning" sx={{ mt: 2 }}>
+                Could not load all partner logos.
+              </Alert>
+            )}
 
             {calculationResult && (
               <Box>
