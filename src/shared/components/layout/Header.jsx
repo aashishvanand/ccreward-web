@@ -24,6 +24,7 @@ import {
   Logout as LogoutIcon,
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
+  SwapHoriz as SwapHorizIcon,
 } from "@mui/icons-material";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
@@ -40,54 +41,54 @@ import RegionSelector from "./RegionSelector";
 const CCREWARD_ICONS = {
   light: {
     dollar: "cceba9aa-3612-4b9c-bb28-b751cf9e3d00", // ccreward_light_dollar.webp
-    rupee: "74a7a71f-9603-4843-cbb9-366d30bc8800",  // ccreward_light_rupee.webp
+    rupee: "74a7a71f-9603-4843-cbb9-366d30bc8800", // ccreward_light_rupee.webp
   },
   dark: {
     dollar: "9577f34c-20ab-4932-80cb-9306bbc32000", // ccreward_dark_dollar.webp
-    rupee: "31538947-9523-4088-85e6-15010a4d7a00",  // ccreward_dark_rupee.webp
-  }
+    rupee: "31538947-9523-4088-85e6-15010a4d7a00", // ccreward_dark_rupee.webp
+  },
 };
 
 // Region to currency mapping
 const REGION_CURRENCY_MAP = {
-  'IN': 'rupee',
-  'SG': 'dollar',
+  IN: "rupee",
+  SG: "dollar",
   // Add more regions as needed
 };
 
 const headerVariants = {
   hidden: { opacity: 0, y: -20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: {
       type: "spring",
       stiffness: 300,
       damping: 20,
-    }
-  }
+    },
+  },
 };
 
 const logoVariants = {
   hidden: { opacity: 0, scale: 0.8 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     scale: 1,
     transition: {
       type: "spring",
       stiffness: 400,
-      damping: 20
-    }
+      damping: 20,
+    },
   },
-  hover: { 
+  hover: {
     scale: 1.1,
     transition: {
       type: "spring",
       stiffness: 400,
-      damping: 8
-    }
+      damping: 8,
+    },
   },
-  tap: { scale: 0.95 }
+  tap: { scale: 0.95 },
 };
 
 function Header() {
@@ -109,7 +110,7 @@ function Header() {
 
   // Get the appropriate CCReward icon based on theme and region
   const ccrewardIconId = useMemo(() => {
-    const currency = REGION_CURRENCY_MAP[region] || 'dollar'; // Default to dollar if region not found
+    const currency = REGION_CURRENCY_MAP[region] || "dollar"; // Default to dollar if region not found
     return CCREWARD_ICONS[mode]?.[currency] || CCREWARD_ICONS.light.dollar; // Fallback to light dollar
   }, [mode, region]);
 
@@ -177,30 +178,40 @@ function Header() {
   };
 
   const navItems = [
-    { 
-      label: "Home", 
-      path: "/", 
+    {
+      label: "Home",
+      path: "/",
       icon: HomeIcon,
-      description: "Main dashboard"
+      description: "Main dashboard",
     },
-    { 
-      label: "Calculator", 
-      path: "/calculator", 
+    {
+      label: "Reward Calculator",
+      path: "/calculator",
       icon: CalculateIcon,
-      description: "Calculate rewards"
+      description: "Calculate rewards",
     },
-    ...(isAuthenticated ? [{
-      label: "My Cards",
-      path: "/my-cards",
-      icon: CreditCard,
-      badge: cardCount,
-      description: "Manage your cards"
-    }] : []),
-    { 
-      label: "Best Cards", 
-      path: "/best-card", 
+    {
+      label: "Transfer Calculator",
+      path: "/transfer-calculator",
+      icon: SwapHorizIcon,
+      description: "Calculate point transfers",
+    },
+    ...(isAuthenticated
+      ? [
+          {
+            label: "My Cards",
+            path: "/my-cards",
+            icon: CreditCard,
+            badge: cardCount,
+            description: "Manage your cards",
+          },
+        ]
+      : []),
+    {
+      label: "Best Cards",
+      path: "/best-card",
       icon: StarsIcon,
-      description: "Top recommendations"
+      description: "Top recommendations",
     },
   ];
 
@@ -208,22 +219,27 @@ function Header() {
     return navItems.map((item) => {
       const Icon = item.icon;
       const active = isActive(item.path);
-      
+
       return (
-        <Tooltip key={item.path} title={item.description} arrow placement="bottom">
+        <Tooltip
+          key={item.path}
+          title={item.description}
+          arrow
+          placement="bottom"
+        >
           <Button
             component={Link}
             href={item.path}
             color="inherit"
             startIcon={
               item.badge ? (
-                <Badge 
-                  badgeContent={item.badge} 
+                <Badge
+                  badgeContent={item.badge}
                   color="secondary"
                   max={99}
                   anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
+                    vertical: "top",
+                    horizontal: "right",
                   }}
                 >
                   <Icon />
@@ -239,13 +255,15 @@ function Header() {
               borderRadius: 2,
               textTransform: "none",
               fontWeight: active ? 600 : 400,
-              backgroundColor: active ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
-              color: active ? 'inherit' : 'rgba(255, 255, 255, 0.8)',
-              transition: 'all 0.3s ease-in-out',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                color: 'inherit',
-                transform: 'translateY(-1px)',
+              backgroundColor: active
+                ? "rgba(255, 255, 255, 0.1)"
+                : "transparent",
+              color: active ? "inherit" : "rgba(255, 255, 255, 0.8)",
+              transition: "all 0.3s ease-in-out",
+              "&:hover": {
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                color: "inherit",
+                transform: "translateY(-1px)",
               },
             }}
           >
@@ -267,17 +285,17 @@ function Header() {
             mt: 1,
             borderRadius: 2,
             minWidth: 200,
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-            backdropFilter: 'blur(10px)',
-          }
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+            backdropFilter: "blur(10px)",
+          },
         }}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.path);
-          
+
           return (
             <MenuItem
               key={item.path}
@@ -285,44 +303,44 @@ function Header() {
               sx={{
                 py: 1.5,
                 px: 2,
-                backgroundColor: active ? 'rgba(25, 118, 210, 0.08)' : 'transparent',
-                '&:hover': {
-                  backgroundColor: 'rgba(25, 118, 210, 0.04)',
+                backgroundColor: active
+                  ? "rgba(25, 118, 210, 0.08)"
+                  : "transparent",
+                "&:hover": {
+                  backgroundColor: "rgba(25, 118, 210, 0.04)",
                 },
               }}
             >
               <ListItemIcon>
                 {item.badge ? (
-                  <Badge 
-                    badgeContent={item.badge} 
-                    color="secondary"
-                    max={99}
-                  >
-                    <Icon color={active ? 'primary' : 'inherit'} />
+                  <Badge badgeContent={item.badge} color="secondary" max={99}>
+                    <Icon color={active ? "primary" : "inherit"} />
                   </Badge>
                 ) : (
-                  <Icon color={active ? 'primary' : 'inherit'} />
+                  <Icon color={active ? "primary" : "inherit"} />
                 )}
               </ListItemIcon>
-              <ListItemText 
+              <ListItemText
                 primary={item.label}
                 primaryTypographyProps={{
                   fontWeight: active ? 600 : 400,
-                  color: active ? 'primary.main' : 'text.primary',
+                  color: active ? "primary.main" : "text.primary",
                 }}
               />
             </MenuItem>
           );
         })}
-        
-        <Box sx={{ borderTop: 1, borderColor: 'divider', mt: 1, pt: 1 }}>
+
+        <Box sx={{ borderTop: 1, borderColor: "divider", mt: 1, pt: 1 }}>
           <MenuItem onClick={toggleTheme} sx={{ py: 1.5, px: 2 }}>
             <ListItemIcon>
-              {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+              {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
             </ListItemIcon>
-            <ListItemText primary={`${mode === 'dark' ? 'Light' : 'Dark'} Mode`} />
+            <ListItemText
+              primary={`${mode === "dark" ? "Light" : "Dark"} Mode`}
+            />
           </MenuItem>
-          
+
           {isAuthenticated && (
             <MenuItem onClick={handleLogout} sx={{ py: 1.5, px: 2 }}>
               <ListItemIcon>
@@ -337,27 +355,19 @@ function Header() {
   };
 
   return (
-    <motion.div
-      variants={headerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <AppBar 
-        position="sticky" 
+    <motion.div variants={headerVariants} initial="hidden" animate="visible">
+      <AppBar
+        position="sticky"
         elevation={0}
         sx={{
-          backdropFilter: 'blur(20px)',
-          backgroundColor: 'rgba(25, 118, 210, 0.9)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          backdropFilter: "blur(20px)",
+          backgroundColor: "rgba(25, 118, 210, 0.9)",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
         }}
       >
         <Toolbar sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
           {/* Logo Section */}
-          <motion.div
-            variants={logoVariants}
-            whileHover="hover"
-            whileTap="tap"
-          >
+          <motion.div variants={logoVariants} whileHover="hover" whileTap="tap">
             <Box
               component={Link}
               href="/"
@@ -378,7 +388,7 @@ function Header() {
                   height: { xs: 32, sm: 36 },
                   width: "auto",
                   mr: 1.5,
-                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+                  filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
                 }}
               />
               <Typography
@@ -387,11 +397,12 @@ function Header() {
                 sx={{
                   fontWeight: 700,
                   fontSize: { xs: "1.1rem", sm: "1.25rem" },
-                  background: 'linear-gradient(45deg, #ffffff 30%, #e3f2fd 90%)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  textShadow: '0 1px 2px rgba(0,0,0,0.1)',
+                  background:
+                    "linear-gradient(45deg, #ffffff 30%, #e3f2fd 90%)",
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  textShadow: "0 1px 2px rgba(0,0,0,0.1)",
                 }}
               >
                 ccreward
@@ -406,39 +417,42 @@ function Header() {
 
           {/* Desktop Navigation */}
           {!isMobile && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               {renderNavItems()}
-              
+
               {/* Theme Toggle */}
-              <Tooltip title={`Switch to ${mode === 'dark' ? 'light' : 'dark'} mode`} arrow>
-                <IconButton 
-                  onClick={toggleTheme} 
+              <Tooltip
+                title={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
+                arrow
+              >
+                <IconButton
+                  onClick={toggleTheme}
                   color="inherit"
                   sx={{
                     ml: 1,
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    '&:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                      transform: 'rotate(180deg)',
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    "&:hover": {
+                      backgroundColor: "rgba(255, 255, 255, 0.2)",
+                      transform: "rotate(180deg)",
                     },
-                    transition: 'all 0.3s ease-in-out',
+                    transition: "all 0.3s ease-in-out",
                   }}
                 >
-                  {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+                  {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
                 </IconButton>
               </Tooltip>
 
               {/* Logout Button for Desktop */}
               {isAuthenticated && (
                 <Tooltip title="Logout" arrow>
-                  <IconButton 
-                    onClick={handleLogout} 
+                  <IconButton
+                    onClick={handleLogout}
                     color="inherit"
                     sx={{
                       ml: 1,
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      '&:hover': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      "&:hover": {
+                        backgroundColor: "rgba(255, 255, 255, 0.2)",
                       },
                     }}
                   >
@@ -456,9 +470,9 @@ function Header() {
               aria-label="menu"
               onClick={handleMenuOpen}
               sx={{
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
                 },
               }}
             >

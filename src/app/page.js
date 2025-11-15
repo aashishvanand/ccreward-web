@@ -13,6 +13,7 @@ const LandingPage = dynamic(() => import('../features/landing/components/Landing
 const MyCardsPage = dynamic(() => import('../features/cards/components/MyCardsPage'), { ssr: false });
 const Calculator = dynamic(() => import('../features/calculator/components/Calculator'), { ssr: false });
 const HowToGuide = dynamic(() => import('../features/how-to/HowToGuide'), { ssr: false });
+const TransferCalculator = dynamic(() => import('../features/transfer-calculator/components/TransferCalculator'), { ssr: false });
 
 function Home() {
   const pathname = usePathname();
@@ -27,7 +28,7 @@ function Home() {
         console.error('Failed to initialize performance monitoring:', error);
       }
     };
-    
+
     initPerformanceMonitoring();
   }, []);
 
@@ -49,6 +50,12 @@ function Home() {
         return (
           <PerformanceWrapper name="calculator_page">
             <Calculator />
+          </PerformanceWrapper>
+        );
+      case '/transfer-calculator':
+        return (
+          <PerformanceWrapper name="transfer_calculator_page">
+            <TransferCalculator />
           </PerformanceWrapper>
         );
       case '/how-to':
@@ -76,14 +83,14 @@ function Home() {
 // Rest of your component remains the same
 function WrappedHome() {
   const pathname = usePathname();
-  
+
   return (
     <ThemeRegistry>
-        <AuthProvider>
-          <AnimatePresence mode="wait">
-            <Home key={pathname} />
-          </AnimatePresence>
-        </AuthProvider>
+      <AuthProvider>
+        <AnimatePresence mode="wait">
+          <Home key={pathname} />
+        </AnimatePresence>
+      </AuthProvider>
     </ThemeRegistry>
   );
 }
