@@ -141,7 +141,7 @@ api.interceptors.request.use(async (config) => {
     }
 
     // Ensure URL has versioning
-    if (!config.url.startsWith('/v2/')) {
+    if (!config.url.startsWith('/v2/') && !config.url.startsWith('/v3/')) {
         config.url = `/v2${config.url}`;
     }
 
@@ -348,6 +348,27 @@ export const calculateBestCard = async (data) => {
 
     try {
         const response = await authenticatedRequest('post', '/calculateBestCard', data);
+        return response;
+    } catch (error) {
+        // If error is about region not being initialized, throw specific error
+        if (error.message === 'Region not initialized') {
+            throw new Error('Region not initialized. Please refresh the page and try again.');
+        }
+        return handleApiError(error);
+    }
+};
+
+// Calculate transfer partners based on provided data
+export const calculateTransferPartners = async (data) => {
+    // Check if region is initialized
+    if (!isRegionInitialized()) {
+        console.warn('Cannot calculate transfer partners: Region not initialized');
+        throw new Error('Region not initialized. Please refresh the page and try again.');
+    }
+
+    try {
+        // Use v3 endpoint as requested
+        const response = await authenticatedRequest('post', '/v3/transfer', data);
         return response;
     } catch (error) {
         // If error is about region not being initialized, throw specific error
