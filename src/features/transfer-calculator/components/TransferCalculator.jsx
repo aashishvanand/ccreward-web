@@ -273,7 +273,7 @@ const TransferCalculator = () => {
                     <CircularProgress size={24} />
                   ) : logoId ? (
                     <Image
-                      src={`https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/${logoId}/public`}
+                      src={`${logoId}/public`}
                       alt={`${partner.brand_name} logo`}
                       width={40}
                       height={40}
