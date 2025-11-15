@@ -96,6 +96,9 @@ const TransferCalculator = () => {
   // Result State
   const [calculationResult, setCalculationResult] = useState(null);
 
+  // Logo State
+  const { logos, isLoadingLogos, logosError } = usePartnerLogos();
+
   useEffect(() => {
     trackFeatureUsage("transfer_calculator_loaded", { region });
     trackFormStart();
@@ -304,21 +307,24 @@ const TransferCalculator = () => {
                   </Typography>
                 </Box>
                 <Box sx={{ flex: "1 1 150px" }}>
-                <Typography variant="body2" color="text.secondary">
-                  Est. Value:{" "}
-                  <Typography component="span" fontWeight="bold">
-                    {getCurrencySymbol(currency)}
-                    {partner.estimated_value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <Typography variant="body2" color="text.secondary">
+                    Est. Value:{" "}
+                    <Typography component="span" fontWeight="bold">
+                      {getCurrencySymbol(currency)}
+                      {partner.estimated_value.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </Typography>
                   </Typography>
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Value/Point:{" "}
-                  <Typography component="span" fontWeight="bold">
-                    {getCurrencySymbol(currency)}
-                    {partner.value_per_point.toFixed(2)}
+                  <Typography variant="body2" color="text.secondary">
+                    Value/Point:{" "}
+                    <Typography component="span" fontWeight="bold">
+                      {getCurrencySymbol(currency)}
+                      {partner.value_per_point.toFixed(2)}
+                    </Typography>
                   </Typography>
-                </Typography>
-              </Box>
+                </Box>
                 <Box
                   sx={{
                     flex: "1 1 150px",
