@@ -621,7 +621,7 @@ const BestCardCalculator = () => {
           sx={{
             mt: 4,
             mb: 4,
-            flexGrow: 1, // --- THIS IS THE FIX ---
+            flexGrow: 1,
           }}
         >
           {showConfetti && <Confetti />}
@@ -631,13 +631,12 @@ const BestCardCalculator = () => {
             sx={{
               fontWeight: "bold",
               fontSize: { xs: "1.75rem", sm: "2.125rem" },
-              mb: 4, // Added margin bottom
+              mb: 4, 
             }}
           >
             Know Your Best Card
           </Typography>
 
-          {/* --- MODIFICATION START --- */}
           <Paper
             elevation={2}
             sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2 }}
@@ -819,7 +818,6 @@ const BestCardCalculator = () => {
               </List>
             </Stack>
           </Paper>
-          {/* --- MODIFICATION END --- */}
         </Container>
         {alert.open && (
           <Alert

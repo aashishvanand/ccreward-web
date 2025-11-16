@@ -7,7 +7,7 @@ import {
   Stack,
   useTheme,
   CircularProgress,
-  Paper, // Added Paper import
+  Paper,
 } from "@mui/material";
 import { useAuth } from "../../../core/providers/AuthContext";
 import {
@@ -189,7 +189,7 @@ function Calculator() {
       mcc: selectedMcc ? selectedMcc.mcc : null,
       amount: parseFloat(spentAmount),
       additionalInputs,
-      country: region.toLowerCase(), // Add country parameter
+      country: region.toLowerCase(),
     };
 
     if (
@@ -207,7 +207,7 @@ function Calculator() {
         mcc: selectedMcc ? selectedMcc.mcc : null,
         amount: parseFloat(spentAmount),
         answers: additionalInputs,
-        country: region.toLowerCase(), // Add country parameter
+        country: region.toLowerCase(),
       });
 
       trackFormSubmission(true);
@@ -220,7 +220,7 @@ function Calculator() {
         card: selectedCard,
         mcc: selectedMcc?.mcc,
         amount: parseFloat(spentAmount),
-        country: region.toLowerCase(), // Add to analytics logging
+        country: region.toLowerCase(),
       });
 
       setCalculationResult(result);
@@ -249,7 +249,7 @@ function Calculator() {
     hasCalculated,
     lastCalculationInputs,
     isLoadingQuestions,
-    region, // Add region as dependency
+    region,
   ]);
 
   const handleCalculationError = (error) => {
@@ -301,7 +301,7 @@ function Calculator() {
             mt: 4,
             mb: 4,
             px: { xs: 2, sm: 3 },
-            flexGrow: 1, // --- THIS IS THE FIX ---
+            flexGrow: 1,
           }}
         >
           {showConfetti && <Confetti />}
@@ -315,13 +315,11 @@ function Calculator() {
                 textAlign: { xs: "center", sm: "left" },
               }}
             >
-              Credit Card Reward Calculator
+              Reward Calculator
             </Typography>
 
             <ErrorAlert message={error} onClose={() => setError(null)} />
 
-            {/* --- MODIFICATION START --- */}
-            {/* Added Paper component to wrap the calculator content */}
             <Paper
               elevation={2}
               sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2 }}
@@ -384,10 +382,9 @@ function Calculator() {
                 </Stack>
               )}
             </Paper>
-            {/* --- MODIFICATION END --- */}
           </Stack>
         </Container>
-
+        <Footer />
         <AnonymousConversionPrompt />
 
         <MissingBankCardForm
@@ -415,8 +412,6 @@ function Calculator() {
             calculationResult,
           }}
         />
-
-        <Footer />
 
         {alert.open && (
           <Alert
