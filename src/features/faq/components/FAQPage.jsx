@@ -23,6 +23,7 @@ import {
   useAnalytics,
   usePagePerformance,
   useEngagementTracking,
+  useJourneyTracking,
   useComponentAnalytics,
 } from "../../../core/hooks";
 
