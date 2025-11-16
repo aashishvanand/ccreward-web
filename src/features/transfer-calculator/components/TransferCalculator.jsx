@@ -362,7 +362,13 @@ const TransferCalculator = () => {
         }}
       >
         <Header />
-        <Container component="main" maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+        {/* --- MODIFICATION START --- */}
+        <Container
+          component="main"
+          maxWidth="md"
+          sx={{ mt: 4, mb: 4, flexGrow: 1 }}
+        >
+          {/* --- MODIFICATION END --- */}
           <Stack spacing={4}>
             <Typography
               variant="h4"

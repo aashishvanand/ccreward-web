@@ -21,6 +21,7 @@ import {
   Stack,
   useTheme,
   InputAdornment,
+  Paper, // Added Paper
 } from "@mui/material";
 import {
   Info as InfoIcon,
@@ -615,7 +616,14 @@ const BestCardCalculator = () => {
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
         <Header />
-        <Container component="main" sx={{ mt: 4, mb: 4 }}>
+        <Container
+          component="main"
+          sx={{
+            mt: 4,
+            mb: 4,
+            flexGrow: 1, // --- THIS IS THE FIX ---
+          }}
+        >
           {showConfetti && <Confetti />}
           <Typography
             variant="h4"
@@ -623,185 +631,195 @@ const BestCardCalculator = () => {
             sx={{
               fontWeight: "bold",
               fontSize: { xs: "1.75rem", sm: "2.125rem" },
+              mb: 4, // Added margin bottom
             }}
           >
             Know Your Best Card
           </Typography>
 
-          <Stack spacing={3}>
-            <Autocomplete
-              options={mccOptions}
-              value={selectedMcc}
-              onChange={(event, newValue) => {
-                setSelectedMcc(newValue);
-                trackFieldInteraction("mcc_selection", "select");
+          {/* --- MODIFICATION START --- */}
+          <Paper
+            elevation={2}
+            sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2 }}
+          >
+            <Stack spacing={3}>
+              <Autocomplete
+                options={mccOptions}
+                value={selectedMcc}
+                onChange={(event, newValue) => {
+                  setSelectedMcc(newValue);
+                  trackFieldInteraction("mcc_selection", "select");
 
-                if (newValue) {
-                  trackEvent("mcc_selected", {
-                    mcc_code: newValue.mcc,
-                    mcc_name: newValue.name,
-                  });
-                }
-              }}
-              inputValue={mccInputValue}
-              onInputChange={handleMccInputChange}
-              getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
-              loading={isLoadingMcc}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Search Merchant or MCC (Optional)"
-                  fullWidth
-                  slotProps={{
-                    input: {
+                  if (newValue) {
+                    trackEvent("mcc_selected", {
+                      mcc_code: newValue.mcc,
+                      mcc_name: newValue.name,
+                    });
+                  }
+                }}
+                inputValue={mccInputValue}
+                onInputChange={handleMccInputChange}
+                getOptionLabel={(option) => `${option.mcc} - ${option.name}`}
+                loading={isLoadingMcc}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Search Merchant or MCC (Optional)"
+                    fullWidth
+                    InputProps={{
                       ...params.InputProps,
                       endAdornment: (
                         <>
-                          {isLoadingMcc ? <CircularProgress size={20} /> : null}
+                          {isLoadingMcc ? (
+                            <CircularProgress size={20} />
+                          ) : null}
                           {params.InputProps.endAdornment}
                         </>
                       ),
-                    },
-                  }}
-                />
-              )}
-              renderOption={(props, option) => (
-                <li {...props}>
-                  <Box>
-                    <Typography variant="body1">
-                      {option.mcc} - {option.name}
-                    </Typography>
-                    {option.knownMerchants?.length > 0 && (
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: "text.secondary",
-                        }}
-                      >
-                        Known merchants: {option.knownMerchants.join(", ")}
-                      </Typography>
-                    )}
-                  </Box>
-                </li>
-              )}
-              filterOptions={(options) => options}
-              noOptionsText={
-                mccInputValue.length < 2
-                  ? "Type at least 2 characters to search"
-                  : "No options found"
-              }
-            />
-
-            <TextField
-              fullWidth
-              label="Spent Amount"
-              type="number"
-              value={spentAmount}
-              onChange={(e) => {
-                const value = Math.max(1, Number(e.target.value));
-                setSpentAmount(value.toString());
-                trackFieldInteraction("spent_amount", "input");
-              }}
-              required
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    {getCurrencySymbol()}
-                  </InputAdornment>
-                ),
-                inputProps: {
-                  min: 1,
-                  step: 1,
-                },
-              }}
-            />
-
-            <Accordion
-              expanded={advancedMode}
-              onChange={handleAdvancedModeToggle}
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Advanced Mode</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                {cardQuestions.length === 0 ? (
-                  <Typography>No additional questions available.</Typography>
-                ) : (
-                  Object.entries(
-                    _.groupBy(cardQuestions, (q) => `${q.bank}-${q.cardName}`)
-                  ).map(([cardKey, questions]) => (
-                    <Box key={cardKey} sx={{ mb: 4 }}>
-                      <Typography variant="h6" sx={{ mb: 2 }}>
-                        {cardKey.replace("-", " - ")}
-                      </Typography>
-                      <DynamicCardInputs
-                        cardConfig={questions}
-                        onChange={(inputKey, value) =>
-                          handleAdditionalInputChange(
-                            cardKey.replace("-", " - "),
-                            inputKey,
-                            value
-                          )
-                        }
-                        currentInputs={
-                          additionalInputs[cardKey.replace("-", " - ")] || {}
-                        }
-                        selectedMcc={selectedMcc}
-                      />
-                      <Divider sx={{ my: 2 }} />
-                    </Box>
-                  ))
+                    }}
+                  />
                 )}
-              </AccordionDetails>
-            </Accordion>
-
-            <Button
-              variant="contained"
-              onClick={handleCalculate}
-              disabled={
-                !spentAmount || parseFloat(spentAmount) <= 0 || isLoading
-              }
-              sx={{ height: 48 }}
-            >
-              {isLoading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Calculate Best Card"
-              )}
-            </Button>
-
-            {isCalculated && (
-              <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-                <ToggleButtonGroup
-                  value={sortMethod}
-                  exclusive
-                  onChange={handleSortMethodChange}
-                  aria-label="sort method"
-                >
-                  <ToggleButton value="points" aria-label="sort by points">
-                    Ranking by Points/Cashback
-                  </ToggleButton>
-                  <ToggleButton value="value" aria-label="sort by value">
-                    Ranking by Value ({getCurrencySymbol()})
-                  </ToggleButton>
-                  <ToggleButton value="miles" aria-label="sort by miles">
-                    Ranking by Miles
-                  </ToggleButton>
-                </ToggleButtonGroup>
-              </Box>
-            )}
-
-            <List sx={{ width: "100%" }}>
-              <CardListRenderer
-                isCardListLoading={isCardListLoading}
-                isCalculated={isCalculated}
-                cardRewards={currentRanking}
-                userCards={userCards}
-                failedImages={failedImages}
-                handleImageError={handleImageError}
+                renderOption={(props, option) => (
+                  <li {...props}>
+                    <Box>
+                      <Typography variant="body1">
+                        {option.mcc} - {option.name}
+                      </Typography>
+                      {option.knownMerchants?.length > 0 && (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: "text.secondary",
+                          }}
+                        >
+                          Known merchants: {option.knownMerchants.join(", ")}
+                        </Typography>
+                      )}
+                    </Box>
+                  </li>
+                )}
+                filterOptions={(options) => options}
+                noOptionsText={
+                  mccInputValue.length < 2
+                    ? "Type at least 2 characters to search"
+                    : "No options found"
+                }
               />
-            </List>
-          </Stack>
+
+              <TextField
+                fullWidth
+                label="Spent Amount"
+                type="number"
+                value={spentAmount}
+                onChange={(e) => {
+                  const value = Math.max(1, Number(e.target.value));
+                  setSpentAmount(value.toString());
+                  trackFieldInteraction("spent_amount", "input");
+                }}
+                required
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      {getCurrencySymbol()}
+                    </InputAdornment>
+                  ),
+                  inputProps: {
+                    min: 1,
+                    step: 1,
+                  },
+                }}
+              />
+
+              <Accordion
+                expanded={advancedMode}
+                onChange={handleAdvancedModeToggle}
+              >
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography>Advanced Mode</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  {cardQuestions.length === 0 ? (
+                    <Typography>No additional questions available.</Typography>
+                  ) : (
+                    Object.entries(
+                      _.groupBy(cardQuestions, (q) => `${q.bank}-${q.cardName}`)
+                    ).map(([cardKey, questions]) => (
+                      <Box key={cardKey} sx={{ mb: 4 }}>
+                        <Typography variant="h6" sx={{ mb: 2 }}>
+                          {cardKey.replace("-", " - ")}
+                        </Typography>
+                        <DynamicCardInputs
+                          cardConfig={questions}
+                          onChange={(inputKey, value) =>
+                            handleAdditionalInputChange(
+                              cardKey.replace("-", " - "),
+                              inputKey,
+                              value
+                            )
+                          }
+                          currentInputs={
+                            additionalInputs[cardKey.replace("-", " - ")] || {}
+                          }
+                          selectedMcc={selectedMcc}
+                        />
+                        <Divider sx={{ my: 2 }} />
+                      </Box>
+                    ))
+                  )}
+                </AccordionDetails>
+              </Accordion>
+
+              <Button
+                variant="contained"
+                onClick={handleCalculate}
+                disabled={
+                  !spentAmount || parseFloat(spentAmount) <= 0 || isLoading
+                }
+                sx={{ height: 48 }}
+              >
+                {isLoading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  "Calculate Best Card"
+                )}
+              </Button>
+
+              {isCalculated && (
+                <Box
+                  sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}
+                >
+                  <ToggleButtonGroup
+                    value={sortMethod}
+                    exclusive
+                    onChange={handleSortMethodChange}
+                    aria-label="sort method"
+                  >
+                    <ToggleButton value="points" aria-label="sort by points">
+                      Ranking by Points/Cashback
+                    </ToggleButton>
+                    <ToggleButton value="value" aria-label="sort by value">
+                      Ranking by Value ({getCurrencySymbol()})
+                    </ToggleButton>
+                    <ToggleButton value="miles" aria-label="sort by miles">
+                      Ranking by Miles
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </Box>
+              )}
+
+              <List sx={{ width: "100%" }}>
+                <CardListRenderer
+                  isCardListLoading={isCardListLoading}
+                  isCalculated={isCalculated}
+                  cardRewards={currentRanking}
+                  userCards={userCards}
+                  failedImages={failedImages}
+                  handleImageError={handleImageError}
+                />
+              </List>
+            </Stack>
+          </Paper>
+          {/* --- MODIFICATION END --- */}
         </Container>
         {alert.open && (
           <Alert

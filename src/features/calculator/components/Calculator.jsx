@@ -7,6 +7,7 @@ import {
   Stack,
   useTheme,
   CircularProgress,
+  Paper, // Added Paper import
 } from "@mui/material";
 import { useAuth } from "../../../core/providers/AuthContext";
 import {
@@ -300,6 +301,7 @@ function Calculator() {
             mt: 4,
             mb: 4,
             px: { xs: 2, sm: 3 },
+            flexGrow: 1, // --- THIS IS THE FIX ---
           }}
         >
           {showConfetti && <Confetti />}
@@ -318,63 +320,71 @@ function Calculator() {
 
             <ErrorAlert message={error} onClose={() => setError(null)} />
 
-            {isFetchingUserData ? (
-              <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-                <CircularProgress />
-              </Box>
-            ) : (
-              <Stack spacing={3}>
-                <CalculatorForm
-                  selectedBank={selectedBank}
-                  selectedCard={selectedCard}
-                  selectedMcc={selectedMcc}
-                  spentAmount={spentAmount}
-                  additionalInputs={additionalInputs}
-                  onBankChange={handleBankChange}
-                  onCardChange={handleCardChange}
-                  onMccChange={handleMccChange}
-                  onSpentAmountChange={handleSpentAmountChange}
-                  onAdditionalInputChange={handleAdditionalInputChange}
-                  onCalculate={handleCalculate}
-                  onClear={handleClearAll}
-                  isLoadingQuestions={isLoadingQuestions}
-                  setIsLoadingQuestions={setIsLoadingQuestions}
-                  isCalculating={isCalculating}
-                />
+            {/* --- MODIFICATION START --- */}
+            {/* Added Paper component to wrap the calculator content */}
+            <Paper
+              elevation={2}
+              sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2 }}
+            >
+              {isFetchingUserData ? (
+                <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+                  <CircularProgress />
+                </Box>
+              ) : (
+                <Stack spacing={3}>
+                  <CalculatorForm
+                    selectedBank={selectedBank}
+                    selectedCard={selectedCard}
+                    selectedMcc={selectedMcc}
+                    spentAmount={spentAmount}
+                    additionalInputs={additionalInputs}
+                    onBankChange={handleBankChange}
+                    onCardChange={handleCardChange}
+                    onMccChange={handleMccChange}
+                    onSpentAmountChange={handleSpentAmountChange}
+                    onAdditionalInputChange={handleAdditionalInputChange}
+                    onCalculate={handleCalculate}
+                    onClear={handleClearAll}
+                    isLoadingQuestions={isLoadingQuestions}
+                    setIsLoadingQuestions={setIsLoadingQuestions}
+                    isCalculating={isCalculating}
+                  />
 
-                <ReportButtons
-                  calculationPerformed={calculationPerformed}
-                  onMissingFormOpen={() => setMissingFormOpen(true)}
-                  onIncorrectRewardOpen={() =>
-                    setIncorrectRewardReportOpen(true)
-                  }
-                />
+                  <ReportButtons
+                    calculationPerformed={calculationPerformed}
+                    onMissingFormOpen={() => setMissingFormOpen(true)}
+                    onIncorrectRewardOpen={() =>
+                      setIncorrectRewardReportOpen(true)
+                    }
+                  />
 
-                {calculationPerformed && calculationResult && (
-                  <>
-                    <CalculationResults
-                      result={calculationResult}
-                      isLoading={isCalculating}
-                    />
-                    <ReferralButton
-                      bank={selectedBank}
-                      cardName={selectedCard}
-                      userCards={userCards}
-                      calculationPerformed={calculationPerformed}
-                    />
-                    {user && (
-                      <AddToMyCardsButton
-                        user={user}
-                        selectedBank={selectedBank}
-                        selectedCard={selectedCard}
-                        userCards={userCards}
-                        onAddCard={handleAddCard}
+                  {calculationPerformed && calculationResult && (
+                    <>
+                      <CalculationResults
+                        result={calculationResult}
+                        isLoading={isCalculating}
                       />
-                    )}
-                  </>
-                )}
-              </Stack>
-            )}
+                      <ReferralButton
+                        bank={selectedBank}
+                        cardName={selectedCard}
+                        userCards={userCards}
+                        calculationPerformed={calculationPerformed}
+                      />
+                      {user && (
+                        <AddToMyCardsButton
+                          user={user}
+                          selectedBank={selectedBank}
+                          selectedCard={selectedCard}
+                          userCards={userCards}
+                          onAddCard={handleAddCard}
+                        />
+                      )}
+                    </>
+                  )}
+                </Stack>
+              )}
+            </Paper>
+            {/* --- MODIFICATION END --- */}
           </Stack>
         </Container>
 
