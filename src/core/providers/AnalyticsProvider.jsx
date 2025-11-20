@@ -237,77 +237,7 @@ export function AnalyticsProvider({ children }) {
         `}
       </Script>
 
-      {/* Performance monitoring script */}
-      <Script id="performance-monitoring" strategy="afterInteractive">
-        {`
-          // Monitor Core Web Vitals
-          function getCLS(onReport) {
-            let clsValue = 0;
-            let clsEntries = [];
-            
-            const observer = new PerformanceObserver((list) => {
-              for (const entry of list.getEntries()) {
-                if (!entry.hadRecentInput) {
-                  clsValue += entry.value;
-                  clsEntries.push(entry);
-                }
-              }
-              onReport({name: 'CLS', value: clsValue, entries: clsEntries});
-            });
-            
-            observer.observe({entryTypes: ['layout-shift']});
-          }
-          
-          function getFID(onReport) {
-            const observer = new PerformanceObserver((list) => {
-              for (const entry of list.getEntries()) {
-                onReport({name: 'FID', value: entry.processingStart - entry.startTime, entries: [entry]});
-              }
-            });
-            
-            observer.observe({entryTypes: ['first-input']});
-          }
-          
-          function getLCP(onReport) {
-            const observer = new PerformanceObserver((list) => {
-              const entries = list.getEntries();
-              const lastEntry = entries[entries.length - 1];
-              onReport({name: 'LCP', value: lastEntry.startTime, entries: [lastEntry]});
-            });
-            
-            observer.observe({entryTypes: ['largest-contentful-paint']});
-          }
-          
-          // Report Web Vitals
-          if (typeof PerformanceObserver !== 'undefined') {
-            getCLS((metric) => {
-              if (metric.value > 0.1) {
-                gtag('event', 'web_vitals', {
-                  metric_name: metric.name,
-                  metric_value: Math.round(metric.value * 1000),
-                  metric_rating: metric.value > 0.25 ? 'poor' : metric.value > 0.1 ? 'needs-improvement' : 'good'
-                });
-              }
-            });
-            
-            getFID((metric) => {
-              gtag('event', 'web_vitals', {
-                metric_name: metric.name,
-                metric_value: Math.round(metric.value),
-                metric_rating: metric.value > 300 ? 'poor' : metric.value > 100 ? 'needs-improvement' : 'good'
-              });
-            });
-            
-            getLCP((metric) => {
-              gtag('event', 'web_vitals', {
-                metric_name: metric.name,
-                metric_value: Math.round(metric.value),
-                metric_rating: metric.value > 4000 ? 'poor' : metric.value > 2500 ? 'needs-improvement' : 'good'
-              });
-            });
-          }
-        `}
-      </Script>
+
 
       {children}
     </>

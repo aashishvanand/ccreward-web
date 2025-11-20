@@ -198,11 +198,12 @@ const StatsSection = () => {
           variant="h5"
           align="center"
           sx={{
-            mb: 8,
+            mb: 10,
             maxWidth: "800px",
             mx: "auto",
             color: "text.secondary",
             fontSize: { xs: "1.125rem", sm: "1.25rem" },
+            lineHeight: 1.6,
           }}
         >
           {getRegionSpecificDescription()}
@@ -214,13 +215,14 @@ const StatsSection = () => {
               <Typography
                 variant="h2"
                 sx={{
-                  fontWeight: "regular",
-                  fontSize: { xs: "2.5rem", sm: "3.5rem", md: "4rem" },
+                  fontWeight: 800,
+                  fontSize: { xs: "3.5rem", sm: "4.5rem", md: "5rem" },
                   color: "primary.main",
                   mb: 1,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  lineHeight: 1,
                 }}
               >
                 <Counter
@@ -247,13 +249,14 @@ const StatsSection = () => {
               <Typography
                 variant="h2"
                 sx={{
-                  fontWeight: "regular",
-                  fontSize: { xs: "2.5rem", sm: "3.5rem", md: "4rem" },
+                  fontWeight: 800,
+                  fontSize: { xs: "3.5rem", sm: "4.5rem", md: "5rem" },
                   color: "primary.main",
                   mb: 1,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  lineHeight: 1,
                 }}
               >
                 <Counter

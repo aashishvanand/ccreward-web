@@ -30,6 +30,7 @@
     "@mui/material": "^7.3.5",
     "@mui/material-nextjs": "^7.3.5",
     "axios": "^1.13.2",
+    "axios-retry": "^4.5.0",
     "firebase": "^12.6.0",
     "framer-motion": "^12.23.24",
     "jwt-decode": "^4.0.0",

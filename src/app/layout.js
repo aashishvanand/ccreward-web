@@ -1,14 +1,24 @@
-// src/app/layout.js
+
 import './globals.css'
 import PropTypes from 'prop-types';
-import { Inter } from 'next/font/google'
+import { Inter, Outfit } from "next/font/google";
 import Script from "next/script";
 import Providers from './providers'
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import { baseJsonLd } from '../shared/constants/jsonLd';
 import ErrorBoundary from '../shared/components/ErrorBoundary';
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+  subsets: ["latin"],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: '--font-outfit',
+  display: 'swap',
+});
 
 function RootLayout({ children }) {
   return (
@@ -49,7 +59,7 @@ function RootLayout({ children }) {
           key="jsonld"
         />
       </head>
-      <body className={inter.className} suppressHydrationWarning>
+      <body className={`${inter.variable} ${outfit.variable} `} suppressHydrationWarning>
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ErrorBoundary componentName="RootLayout">
             <Providers>
@@ -61,17 +71,17 @@ function RootLayout({ children }) {
         {/* Load analytics script with proper strategy */}
         <Script id="network-monitoring" strategy="beforeInteractive">
           {`
-            // First Input Delay polyfill (required for FID measurement)
-            !function(n,e){var t,o,i,c=[],f={passive:!0,capture:!0},r=new Date,a="pointerup",u="pointercancel";function p(n,c){t||(t=c,o=n,i=new Date,w(e),s())}function s(){o>=0&&o<i-r&&(c.forEach(function(n){n(o,t)}),c=[])}function l(t){if(t.cancelable){var o=(t.timeStamp||new Date)-r;o<0||(t.type==a?p(o,t):t.type==u&&(o=-1,p(o,t)))}}function w(n){["click","mousedown","keydown","touchstart","pointerdown"].forEach(function(e){n(e,l,f)})}w(n),self.perfMetrics=self.perfMetrics||{},self.perfMetrics.onFID=function(n){c.push(n)}}(document,document.addEventListener);
-            
-            // Network monitoring wrapper
-            if (typeof window !== 'undefined') {
-              window.addEventListener('DOMContentLoaded', function() {
-                // This will be set up by the analytics service
-                window.networkMonitoringEnabled = true;
-              });
-            }
-          `}
+// First Input Delay polyfill (required for FID measurement)
+!function (n, e) { var t, o, i, c = [], f = { passive: !0, capture: !0 }, r = new Date, a = "pointerup", u = "pointercancel"; function p(n, c) { t || (t = c, o = n, i = new Date, w(e), s()) } function s() { o >= 0 && o < i - r && (c.forEach(function (n) { n(o, t) }), c = []) } function l(t) { if (t.cancelable) { var o = (t.timeStamp || new Date) - r; o < 0 || (t.type == a ? p(o, t) : t.type == u && (o = -1, p(o, t))) } } function w(n) { ["click", "mousedown", "keydown", "touchstart", "pointerdown"].forEach(function (e) { n(e, l, f) }) } w(n), self.perfMetrics = self.perfMetrics || {}, self.perfMetrics.onFID = function (n) { c.push(n) } }(document, document.addEventListener);
+
+// Network monitoring wrapper
+if (typeof window !== 'undefined') {
+  window.addEventListener('DOMContentLoaded', function () {
+    // This will be set up by the analytics service
+    window.networkMonitoringEnabled = true;
+  });
+}
+`}
         </Script>
 
         {/* Load analytics script with proper strategy */}
@@ -80,12 +90,12 @@ function RootLayout({ children }) {
           strategy="lazyOnload"
         >
           {`
-            (function(c,l,a,r,i,t,y){
-              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            })(window, document, "clarity", "script", "ngsrwjccm4");
-          `}
+  (function (c, l, a, r, i, t, y) {
+    c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+    t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+    y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+  })(window, document, "clarity", "script", "ngsrwjccm4");
+`}
         </Script>
       </body>
     </html>

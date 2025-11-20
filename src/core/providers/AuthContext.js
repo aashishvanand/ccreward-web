@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 const AuthContext = createContext();
 
 // Define which routes require authentication
-const PROTECTED_ROUTES = ['/my-cards', '/calculator', '/best-card'];
+const PROTECTED_ROUTES = ['/my-cards', '/calculator', '/best-card', '/transfer-calculator'];
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);

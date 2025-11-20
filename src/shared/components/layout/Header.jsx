@@ -25,6 +25,7 @@ import {
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
   SwapHoriz as SwapHorizIcon,
+  Login as LoginIcon,
 } from "@mui/icons-material";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
@@ -94,7 +95,7 @@ const logoVariants = {
 function Header() {
   const { mode, toggleTheme } = useAppTheme();
   const { region } = useRegion();
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, signInWithGoogle } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const theme = useTheme();
@@ -161,6 +162,15 @@ function Header() {
       console.error("Logout error:", error);
     }
     handleMenuClose();
+  };
+
+  const handleLogin = async () => {
+    try {
+      await signInWithGoogle();
+      handleMenuClose();
+    } catch (error) {
+      console.error("Login error:", error);
+    }
   };
 
   const handleNavigation = (path) => {
@@ -349,6 +359,15 @@ function Header() {
               <ListItemText primary="Logout" />
             </MenuItem>
           )}
+
+          {!isAuthenticated && (
+            <MenuItem onClick={handleLogin} sx={{ py: 1.5, px: 2 }}>
+              <ListItemIcon>
+                <LoginIcon />
+              </ListItemIcon>
+              <ListItemText primary="Sign In" />
+            </MenuItem>
+          )}
         </Box>
       </Menu>
     );
@@ -459,6 +478,27 @@ function Header() {
                     <LogoutIcon />
                   </IconButton>
                 </Tooltip>
+              )}
+
+              {/* Login Button for Desktop */}
+              {!isAuthenticated && (
+                <Button
+                  variant="outlined"
+                  color="inherit"
+                  startIcon={<LoginIcon />}
+                  onClick={handleLogin}
+                  sx={{
+                    ml: 1,
+                    borderColor: "rgba(255, 255, 255, 0.5)",
+                    color: "inherit",
+                    "&:hover": {
+                      borderColor: "white",
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    },
+                  }}
+                >
+                  Sign In
+                </Button>
               )}
             </Box>
           )}

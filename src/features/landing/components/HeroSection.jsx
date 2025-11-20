@@ -29,11 +29,14 @@ const HeroSection = ({
     <Box
       sx={{
         bgcolor: "background.default",
-        minHeight: { md: "60vh" }, // Set minimum height for desktop
+        background: theme => theme.palette.mode === 'light' 
+          ? `radial-gradient(circle at 50% 0%, ${theme.palette.primary.light}15 0%, transparent 50%), ${theme.palette.background.default}`
+          : `radial-gradient(circle at 50% 0%, ${theme.palette.primary.dark}20 0%, transparent 50%), ${theme.palette.background.default}`,
+        minHeight: { md: "80vh" }, // Increased height for impact
         display: "flex",
         alignItems: "center",
-        pt: { xs: 4, md: 0 }, // Remove top padding on desktop
-        pb: { xs: 4, md: 0 }, // Remove bottom padding on desktop
+        pt: { xs: 8, md: 0 }, 
+        pb: { xs: 8, md: 0 }, 
         position: "relative",
         overflow: "hidden",
       }}
@@ -52,13 +55,18 @@ const HeroSection = ({
             }}
           >
             <Typography
-              variant="h2"
+              variant="h1" // Upgraded to h1
               sx={{
-                fontSize: { xs: "2.5rem", md: "3.75rem" },
-                fontWeight: "bold",
-                mb: 2,
-                lineHeight: 1.2,
-                color: "text.primary", // Use theme text color
+                fontSize: { xs: "2.5rem", md: "4.5rem" }, // Larger font size
+                fontWeight: 800, // Extra bold
+                mb: 3,
+                lineHeight: 1.1,
+                background: theme => theme.palette.mode === 'light'
+                  ? `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`
+                  : `linear-gradient(90deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.light} 100%)`,
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                letterSpacing: "-0.02em",
               }}
             >
               Maximize Your Rewards with the Right Credit Card
