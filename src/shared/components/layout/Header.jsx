@@ -125,7 +125,7 @@ function Header() {
   }, []);
 
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated() && user) {
       const updateCardCount = async () => {
         try {
           const userCards = await getCardsForUser(user.uid);
@@ -206,7 +206,7 @@ function Header() {
       icon: SwapHorizIcon,
       description: "Calculate point transfers",
     },
-    ...(isAuthenticated
+    ...(isAuthenticated()
       ? [
           {
             label: "My Cards",
@@ -462,7 +462,7 @@ function Header() {
               </Tooltip>
 
               {/* Logout Button for Desktop */}
-              {isAuthenticated && (
+              {isAuthenticated() && (
                 <Tooltip title="Logout" arrow>
                   <IconButton
                     onClick={handleLogout}
@@ -481,7 +481,7 @@ function Header() {
               )}
 
               {/* Login Button for Desktop */}
-              {!isAuthenticated && (
+              {!isAuthenticated() && (
                 <Button
                   variant="outlined"
                   color="inherit"
