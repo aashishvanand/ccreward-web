@@ -295,7 +295,6 @@ function Calculator() {
 
         <Container
           component="main"
-          slots={{ root: "main" }}
           maxWidth="lg"
           sx={{
             mt: 4,

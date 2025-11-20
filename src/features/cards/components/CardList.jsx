@@ -49,8 +49,8 @@ const cardVariants = {
     transition: { duration: 0.3 },
   },
   hover: {
-    y: -8,
-    boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
+    y: -12,
+    boxShadow: "0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)",
     transition: {
       type: "spring",
       stiffness: 400,
@@ -333,22 +333,27 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                             }}
                           >
                             <Tooltip title="Remove Card">
-                              <IconButton
-                                sx={{
-                                  position: "absolute",
-                                  top: 8,
-                                  right: 8,
-                                  bgcolor: "rgba(0, 0, 0, 0.5)",
-                                  "&:hover": {
-                                    bgcolor: "rgba(0, 0, 0, 0.7)",
-                                  },
-                                }}
-                                size="small"
-                              >
-                                <DeleteIcon
-                                  sx={{ color: "white", fontSize: "1.25rem" }}
-                                />
-                              </IconButton>
+                                <IconButton
+                                  sx={{
+                                    position: "absolute",
+                                    top: 8,
+                                    right: 8,
+                                    bgcolor: "rgba(255, 255, 255, 0.9)",
+                                    color: "error.main",
+                                    boxShadow: 2,
+                                    "&:hover": {
+                                      bgcolor: "white",
+                                      color: "error.dark",
+                                      transform: "scale(1.1)",
+                                    },
+                                    transition: "all 0.2s",
+                                  }}
+                                  size="small"
+                                >
+                                  <DeleteIcon
+                                    sx={{ fontSize: "1.25rem" }}
+                                  />
+                                </IconButton>
                             </Tooltip>
                           </motion.div>
                         </Box>
