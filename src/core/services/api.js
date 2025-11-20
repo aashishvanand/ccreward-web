@@ -1,4 +1,5 @@
 import axios from 'axios';
+import axiosRetry from 'axios-retry';
 import { getAuth, getIdToken } from "firebase/auth";
 import { jwtDecode } from "jwt-decode";
 
@@ -11,6 +12,16 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000;
 // Create an axios instance with the base URL
 const api = axios.create({
     baseURL: API_BASE_URL,
+    timeout: 10000, // 10 seconds timeout
+});
+
+// Configure retries
+axiosRetry(api, {
+    retries: 3,
+    retryDelay: axiosRetry.exponentialDelay,
+    retryCondition: (error) => {
+        return axiosRetry.isNetworkOrIdempotentRequestError(error) || error.code === 'ECONNABORTED';
+    }
 });
 
 let currentToken = null;
@@ -57,9 +68,14 @@ const getFromCache = (key) => {
     }
     const cached = localStorage.getItem(key);
     if (cached) {
-        const { data, timestamp } = JSON.parse(cached);
-        if (Date.now() - timestamp < CACHE_DURATION) {
-            return data;
+        try {
+            const { data, timestamp } = JSON.parse(cached);
+            if (Date.now() - timestamp < CACHE_DURATION) {
+                return data;
+            }
+        } catch (e) {
+            // If cache is corrupted, ignore it
+            return null;
         }
     }
     return null;
@@ -151,10 +167,45 @@ api.interceptors.request.use(async (config) => {
 // Handle API errors
 const handleApiError = (error) => {
     console.error("API Error:", error.response ? error.response.data : error.message);
+
+    if (error.code === 'ECONNABORTED') {
+        throw new Error("Request timed out. Please check your internet connection and try again.");
+    }
+
     if (error.response && error.response.status === 429) {
         throw new Error("You've made too many requests. Please take a coffee break and try again later.");
     }
+
+    if (!error.response && error.request) {
+        throw new Error("Network error. Please check your internet connection.");
+    }
+
     throw error;
+};
+
+// Generic fetch with cache helper
+const fetchWithCache = async (key, apiCall) => {
+    // Check if region is initialized
+    if (!isRegionInitialized()) {
+        console.warn(`Cannot fetch ${key}: Region not initialized`);
+        return [];
+    }
+
+    const cachedData = getFromCache(key);
+    if (cachedData) {
+        return cachedData;
+    }
+
+    try {
+        const data = await apiCall();
+        setToCache(key, data);
+        return data;
+    } catch (error) {
+        if (error.message === 'Region not initialized') {
+            return [];
+        }
+        return handleApiError(error);
+    }
 };
 
 // Helper function for making authenticated requests
@@ -173,68 +224,29 @@ const authenticatedRequest = async (method, url, data = null) => {
 
 // Fetch banks with region initialization check
 export const fetchBanks = async () => {
-    // Check if region is initialized
-    if (!isRegionInitialized()) {
-        console.warn('Cannot fetch banks: Region not initialized');
-        return [];
-    }
-
     const region = getCountryCode();
+    if (!region) return []; // Early exit if no region
 
-    // Create a region-specific cache key
     const cacheKey = `banks_${region}`;
 
-    const cachedData = getFromCache(cacheKey);
-    if (cachedData) {
-        console.log(`Using cached banks for region ${region}`);
-        return cachedData;
-    }
-
-    try {
+    return fetchWithCache(cacheKey, async () => {
         // Explicitly include region in request
         const response = await api.get(`/bank?country=${region}`);
-        const data = response.data;
-
-        // Store with region-specific cache key
-        setToCache(cacheKey, data);
-
-        return data;
-    } catch (error) {
-        // If error is about region not being initialized, return empty array
-        if (error.message === 'Region not initialized') {
-            return [];
-        }
-        return handleApiError(error);
-    }
+        return response.data;
+    });
 };
 
 // Fetch cards for a specific bank
 export const fetchCards = async (bank) => {
-    // Check if region is initialized
-    if (!isRegionInitialized()) {
-        console.warn('Cannot fetch cards: Region not initialized');
-        return [];
-    }
-
     const region = getCountryCode();
+    if (!region) return [];
 
-    // Create a region-specific cache key for this bank
     const cacheKey = `cards_${region}_${bank}`;
 
-    const cachedData = getFromCache(cacheKey);
-    if (cachedData) return cachedData;
-
-    try {
+    return fetchWithCache(cacheKey, async () => {
         const response = await api.get(`/card?bank=${bank}&country=${region}`);
-        setToCache(cacheKey, response.data);
         return response.data;
-    } catch (error) {
-        // If error is about region not being initialized, return empty array
-        if (error.message === 'Region not initialized') {
-            return [];
-        }
-        return handleApiError(error);
-    }
+    });
 };
 
 // Cancel token for MCC requests
@@ -261,41 +273,29 @@ export const fetchMCC = async (search) => {
         return response.data;
     } catch (error) {
         if (axios.isCancel(error)) {
-            console.log('Request canceled:', error.message);
-        } else if (error.message === 'Region not initialized') {
+            // Request canceled
             return [];
-        } else {
-            console.error('Error fetching MCC data:', error);
         }
+
+        if (error.message === 'Region not initialized') {
+            return [];
+        }
+
+        console.error('Error fetching MCC data:', error);
         return [];
     }
 };
 
 // Fetch card questions for a specific bank and card
 export const fetchCardQuestions = async (bank, card) => {
-    // Check if region is initialized
-    if (!isRegionInitialized()) {
-        console.warn('Cannot fetch card questions: Region not initialized');
-        return [];
-    }
-
     const encodedBank = encodeURIComponent(bank);
     const encodedCard = encodeURIComponent(card);
     const cacheKey = `questions_${bank}_${card}`;
-    const cachedData = getFromCache(cacheKey);
-    if (cachedData) return cachedData;
 
-    try {
+    return fetchWithCache(cacheKey, async () => {
         const response = await api.get(`/cardQuestions?bank=${encodedBank}&card=${encodedCard}`);
-        setToCache(cacheKey, response.data);
         return response.data;
-    } catch (error) {
-        // If error is about region not being initialized, return empty array
-        if (error.message === 'Region not initialized') {
-            return [];
-        }
-        return handleApiError(error);
-    }
+    });
 };
 
 // Calculate rewards based on provided data

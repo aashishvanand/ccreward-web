@@ -11,7 +11,9 @@ let isInitialized = false;
 const initializeAnalytics = async () => {
     // Only run on client-side
     if (typeof window === 'undefined') {
-        console.log('🔧 Analytics initialization skipped (server-side)');
+        if (process.env.NODE_ENV === 'development') {
+            console.log('🔧 Analytics initialization skipped (server-side)');
+        }
         return false;
     }
 
@@ -21,7 +23,9 @@ const initializeAnalytics = async () => {
     try {
         // Initialize Analytics
         analytics = getAnalytics(firebaseApp);
-        console.log('✅ Firebase Analytics initialized');
+        if (process.env.NODE_ENV === 'development') {
+            console.log('✅ Firebase Analytics initialized');
+        }
 
         // Initialize Performance Monitoring
         try {
@@ -30,7 +34,9 @@ const initializeAnalytics = async () => {
             // Set up automatic performance monitoring
             setupClientSidePerformanceMonitoring();
 
-            console.log('✅ Firebase Performance Monitoring initialized');
+            if (process.env.NODE_ENV === 'development') {
+                console.log('✅ Firebase Performance Monitoring initialized');
+            }
         } catch (perfError) {
             console.warn('⚠️ Performance monitoring not available:', perfError);
         }
@@ -84,7 +90,9 @@ const logAnalyticsEvent = (eventName, eventParams = {}) => {
     // Only run on client-side
     if (!analytics || typeof window === 'undefined' || !isInitialized) {
         if (typeof window === 'undefined') {
-            console.log(`🔧 Analytics event skipped (server-side): ${eventName}`);
+            if (process.env.NODE_ENV === 'development') {
+                console.log(`🔧 Analytics event skipped (server-side): ${eventName}`);
+            }
         }
         return;
     }
@@ -701,7 +709,9 @@ const logPageView = (path, additionalData = {}) => {
 const setupNetworkMonitoring = () => {
     // Only run on client-side
     if (typeof window === 'undefined') {
-        console.log('🔧 Network monitoring setup skipped (server-side)');
+        if (process.env.NODE_ENV === 'development') {
+            console.log('🔧 Network monitoring setup skipped (server-side)');
+        }
         return false;
     }
 

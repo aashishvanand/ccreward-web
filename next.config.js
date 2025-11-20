@@ -8,10 +8,10 @@ const nextConfig = {
     // Warnings are treated as warnings, not errors during build
     ignoreDuringBuilds: true,
   },
-  compiler:{
-    removeConsole:{
-      exclude:["error"]
-    }
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production" ? {
+      exclude: ["error"],
+    } : false,
   },
   trailingSlash: false,
   serverExternalPackages: ['sharp'], // Previously serverComponentsExternalPackages

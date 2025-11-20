@@ -82,8 +82,6 @@ export function RegionProvider({ children }) {
     initializationInProgress = true;
 
     async function initializeRegion() {
-      console.log("🔄 [RegionContext] Starting initialization");
-      
       if (typeof window === "undefined") {
         initializationInProgress = false;
         return;
@@ -94,7 +92,6 @@ export function RegionProvider({ children }) {
         const userSetRegion = localStorage.getItem("user-set-region") === "true";
 
         if (savedRegion && isValidRegion(savedRegion)) {
-          console.log("✅ [RegionContext] Found saved region:", savedRegion);
           setRegion(savedRegion.toUpperCase());
           setHasUserSetRegion(userSetRegion);
           setIsInitialized(true);
@@ -103,14 +100,11 @@ export function RegionProvider({ children }) {
           return;
         }
 
-        console.log("🌍 [RegionContext] No saved region, detecting location...");
-        
         try {
           const response = await fetch("https://ipinfo.io/json");
           if (response.ok) {
             const data = await response.json();
             const countryCode = data.country?.toUpperCase();
-            console.log("🗺️ [RegionContext] Detected country:", countryCode);
             setDetectedCountry(countryCode);
 
             if (Object.keys(REGIONS).includes(countryCode)) {
@@ -120,11 +114,9 @@ export function RegionProvider({ children }) {
               setRegion(countryCode);
               setHasUserSetRegion(false);
               setIsInitialized(true);
-              console.log("✅ [RegionContext] Auto-selected region:", countryCode);
             } else {
               // Show modal only if not already shown
               if (!modalShown) {
-                console.log("❓ [RegionContext] Unsupported region, showing modal");
                 modalShown = true;
                 setShowRegionModal(true);
               }
@@ -132,7 +124,6 @@ export function RegionProvider({ children }) {
           } else {
             // Show modal only if not already shown
             if (!modalShown) {
-              console.log("⚠️ [RegionContext] IP detection failed, showing modal");
               modalShown = true;
               setShowRegionModal(true);
             }
@@ -141,7 +132,6 @@ export function RegionProvider({ children }) {
           console.error("❌ [RegionContext] Error detecting region:", error);
           // Show modal only if not already shown
           if (!modalShown) {
-            console.log("🆘 [RegionContext] Fallback to modal");
             modalShown = true;
             setShowRegionModal(true);
           }

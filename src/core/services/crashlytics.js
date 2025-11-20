@@ -22,7 +22,9 @@ export const initializeCrashlytics = async () => {
         isInitialized = true;
         return true;
     } catch (error) {
-        console.error('❌ Error initializing crashlytics:', error);
+        if (process.env.NODE_ENV === 'development') {
+            console.error('❌ Error initializing crashlytics:', error);
+        }
         return false;
     }
 };
@@ -81,7 +83,9 @@ function setupPerformanceMonitoring() {
             });
             longTaskObserver.observe({ entryTypes: ['longtask'] });
         } catch (error) {
-            console.warn('Long task observer not supported');
+            if (process.env.NODE_ENV === 'development') {
+                console.warn('Long task observer not supported');
+            }
         }
 
         // Monitor Layout Shifts
@@ -99,7 +103,9 @@ function setupPerformanceMonitoring() {
             });
             clsObserver.observe({ entryTypes: ['layout-shift'] });
         } catch (error) {
-            console.warn('Layout shift observer not supported');
+            if (process.env.NODE_ENV === 'development') {
+                console.warn('Layout shift observer not supported');
+            }
         }
     }
 }
@@ -145,7 +151,9 @@ export const recordError = (errorName, errorInfo = {}) => {
         storeCriticalError(errorName, enhancedErrorInfo);
 
     } catch (error) {
-        console.error('Error recording crash:', error);
+        if (process.env.NODE_ENV === 'development') {
+            console.error('Error recording crash:', error);
+        }
     }
 };
 
@@ -185,7 +193,9 @@ export const recordPerformanceIssue = (issueName, issueInfo = {}) => {
             console.warn('⚠️ Performance Issue:', issueName, performanceInfo);
         }
     } catch (error) {
-        console.error('Error recording performance issue:', error);
+        if (process.env.NODE_ENV === 'development') {
+            console.error('Error recording performance issue:', error);
+        }
     }
 };
 
@@ -201,7 +211,9 @@ export const setCrashlyticsUserId = (userId) => {
             });
         }
     } catch (error) {
-        console.error('Error setting crashlytics user ID:', error);
+        if (process.env.NODE_ENV === 'development') {
+            console.error('Error setting crashlytics user ID:', error);
+        }
     }
 };
 
@@ -212,7 +224,9 @@ export const setCrashlyticsCustomKey = (key, value) => {
         customKeys[key] = value;
         sessionStorage.setItem('crashlytics_custom_keys', JSON.stringify(customKeys));
     } catch (error) {
-        console.error('Error setting crashlytics custom key:', error);
+        if (process.env.NODE_ENV === 'development') {
+            console.error('Error setting crashlytics custom key:', error);
+        }
     }
 };
 
@@ -248,7 +262,9 @@ export const logBreadcrumb = (message, category = 'info', data = {}) => {
         sessionStorage.setItem('crashlytics_breadcrumbs', JSON.stringify(breadcrumbs));
 
     } catch (error) {
-        console.error('Error logging breadcrumb:', error);
+        if (process.env.NODE_ENV === 'development') {
+            console.error('Error logging breadcrumb:', error);
+        }
     }
 };
 
@@ -344,7 +360,9 @@ function storeCriticalError(errorName, errorInfo) {
 
         localStorage.setItem('critical_errors', JSON.stringify(criticalErrors));
     } catch (error) {
-        console.error('Error storing critical error:', error);
+        if (process.env.NODE_ENV === 'development') {
+            console.error('Error storing critical error:', error);
+        }
     }
 }
 
@@ -363,6 +381,8 @@ export const clearStoredErrors = () => {
         localStorage.removeItem('critical_errors');
         sessionStorage.removeItem('crashlytics_breadcrumbs');
     } catch (error) {
-        console.error('Error clearing stored errors:', error);
+        if (process.env.NODE_ENV === 'development') {
+            console.error('Error clearing stored errors:', error);
+        }
     }
 };
