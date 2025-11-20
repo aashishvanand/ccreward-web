@@ -9,8 +9,9 @@ import {
   Stack,
   useTheme,
   useScrollTrigger,
+  Button,
 } from "@mui/material";
-import { Add as AddIcon } from "@mui/icons-material";
+import { Add as AddIcon, CreditCard as CreditCardIcon } from "@mui/icons-material";
 import { useAuth } from "../../../core/providers/AuthContext";
 import {
   getCardsForUser,
@@ -514,20 +515,55 @@ function MyCardsPage() {
         <Paper
           elevation={0}
           sx={{
-            p: 4,
+            p: 8,
             textAlign: "center",
             bgcolor: "background.paper",
-            borderRadius: 2,
-            border: 1,
+            borderRadius: 4,
+            border: "1px dashed",
             borderColor: "divider",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 2,
           }}
         >
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Welcome! Let's start by adding your first credit card
+          <Box
+            sx={{
+              width: 80,
+              height: 80,
+              borderRadius: "50%",
+              bgcolor: "primary.light",
+              color: "primary.main",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              mb: 2,
+              opacity: 0.1,
+            }}
+          >
+            <CreditCardIcon sx={{ fontSize: 48, opacity: 1 }} />
+          </Box>
+          <Typography variant="h5" fontWeight="bold" gutterBottom>
+            No cards yet
           </Typography>
-          <Typography color="text.secondary">
-            Click the + button below to add your first card
+          <Typography color="text.secondary" sx={{ maxWidth: 400, mb: 3 }}>
+            Start building your portfolio by adding your first credit card. 
+            We'll help you track rewards and benefits.
           </Typography>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleOpenAddDialog}
+            sx={{
+              px: 4,
+              py: 1.5,
+              borderRadius: 2,
+              background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.light} 90%)`,
+              boxShadow: '0 3px 5px 2px rgba(33, 203, 243, .3)',
+            }}
+          >
+            Add Your First Card
+          </Button>
         </Paper>
       );
     }
@@ -604,6 +640,21 @@ function MyCardsPage() {
               >
                 My Cards
               </Typography>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleOpenAddDialog}
+                sx={{
+                  display: { xs: "none", md: "flex" },
+                  px: 3,
+                  py: 1,
+                  borderRadius: 2,
+                  background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.light} 90%)`,
+                  boxShadow: '0 3px 5px 2px rgba(33, 203, 243, .3)',
+                }}
+              >
+                Add New Card
+              </Button>
             </Box>
             {renderContent()}
           </Stack>
