@@ -36,27 +36,6 @@ const CallToActionSection = ({
           >
             Start comparing cards and maximizing your rewards today.
           </Typography>
-          {!isAuthenticated && (
-            <Button
-              variant="contained"
-              size="large"
-              onClick={() => handleSignIn(signInWithGoogle)}
-              sx={{
-                mt: 4,
-                bgcolor: "background.paper",
-                color: "primary.main",
-                fontSize: "1.125rem",
-                py: 1.5,
-                px: 4,
-                "&:hover": {
-                  bgcolor: "background.paper",
-                  opacity: 0.9,
-                },
-              }}
-            >
-              Get Started Now
-            </Button>
-          )}
         </Stack>
       </Container>
     </Box>

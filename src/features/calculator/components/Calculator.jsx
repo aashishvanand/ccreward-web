@@ -383,7 +383,6 @@ function Calculator() {
             </Paper>
           </Stack>
         </Container>
-        <Footer />
         <AnonymousConversionPrompt />
 
         <MissingBankCardForm
@@ -430,6 +429,7 @@ function Calculator() {
             {alert.message}
           </Alert>
         )}
+        <Footer />
       </Box>
     </motion.div>
   );
