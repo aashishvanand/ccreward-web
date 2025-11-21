@@ -66,7 +66,7 @@ const pageVariants = {
 const TransferCalculator = () => {
   const theme = useTheme();
   const { region, isInitialized } = useRegion();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
   const [alert, setAlert] = useState({
     open: false,
     message: "",
@@ -363,11 +363,24 @@ const TransferCalculator = () => {
       >
         <Header />
         {/* --- MODIFICATION START --- */}
-        <Container
-          component="main"
-          maxWidth="md"
-          sx={{ mt: 4, mb: 4, flexGrow: 1 }}
-        >
+        {loading ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexGrow: 1,
+              minHeight: "50vh",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : (
+          <Container
+            component="main"
+            maxWidth="md"
+            sx={{ mt: 4, mb: 4, flexGrow: 1 }}
+          >
           {/* --- MODIFICATION END --- */}
           <Stack spacing={4}>
             <Typography
@@ -449,20 +462,35 @@ const TransferCalculator = () => {
                     },
                   }}
                 />
-                <Button
-                  variant="contained"
-                  onClick={handleCalculate}
-                  disabled={
-                    isCalculating || !isAuthenticated() || !isInitialized
-                  }
-                  sx={{ height: 48 }}
-                >
-                  {isCalculating ? (
-                    <CircularProgress size={24} color="inherit" />
-                  ) : (
-                    "Calculate Transfers"
-                  )}
-                </Button>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                  <Button
+                    variant="contained"
+                    onClick={handleCalculate}
+                    disabled={
+                      isCalculating || !isAuthenticated() || !isInitialized
+                    }
+                    sx={{ flex: 1, height: 48 }}
+                  >
+                    {isCalculating ? (
+                      <CircularProgress size={24} color="inherit" />
+                    ) : (
+                      "Calculate Transfers"
+                    )}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      setSelectedBank("");
+                      setSelectedCard("");
+                      setPoints("");
+                      setCards([]);
+                      setCalculationResult(null);
+                    }}
+                    sx={{ flex: 1, height: 48 }}
+                  >
+                    Clear
+                  </Button>
+                </Stack>
                 {!isAuthenticated() && (
                   <Alert severity="warning">
                     Please sign in to calculate transfer partners.
@@ -514,7 +542,8 @@ const TransferCalculator = () => {
               </Box>
             )}
           </Stack>
-        </Container>
+          </Container>
+        )}
 
         {alert.open && (
           <Alert

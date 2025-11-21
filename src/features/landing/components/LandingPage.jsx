@@ -551,23 +551,35 @@ const MobileView = ({
       }}
     >
       <Box sx={{ position: "relative", zIndex: 10 }}>
-        <Header />
+        <Header hideNavigation={true} />
         <Box
           component="main"
           sx={{
             flexGrow: 1,
             bgcolor: "background.default",
+            background: (theme) =>
+              theme.palette.mode === "light"
+                ? `radial-gradient(circle at 50% 0%, ${theme.palette.primary.light}15 0%, transparent 50%), ${theme.palette.background.default}`
+                : `radial-gradient(circle at 50% 0%, ${theme.palette.primary.dark}20 0%, transparent 50%), ${theme.palette.background.default}`,
             backdropFilter: "blur(2px)",
           }}
         >
-          <Container maxWidth="lg" sx={{ pt: { xs: 4, sm: 6 }, pb: 3 }}>
+          <Container maxWidth="lg" sx={{ pt: { xs: 6, sm: 8 }, pb: 4 }}>
             <Typography
-              variant="h2"
+              variant="h1"
               align="center"
               sx={{
-                fontSize: { xs: "2rem", sm: "2.5rem" },
-                fontWeight: "bold",
+                fontSize: { xs: "2.5rem", sm: "3.5rem" },
+                fontWeight: 800,
                 mb: 2,
+                lineHeight: 1.1,
+                background: (theme) =>
+                  theme.palette.mode === "light"
+                    ? `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`
+                    : `linear-gradient(90deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.light} 100%)`,
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                letterSpacing: "-0.02em",
               }}
             >
               Get the ccreward App
@@ -578,9 +590,14 @@ const MobileView = ({
               sx={{
                 fontSize: { xs: "1.125rem", sm: "1.25rem" },
                 color: "text.secondary",
+                maxWidth: "600px",
+                mx: "auto",
+                mb: 4,
+                lineHeight: 1.5,
               }}
             >
-              Download our app for the best credit card rewards experience
+              Download our app for the best credit card rewards experience.
+              Maximize your benefits on the go.
             </Typography>
           </Container>
 

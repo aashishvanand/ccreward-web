@@ -115,7 +115,7 @@ const BestCardCalculator = () => {
     severity: "info",
   });
   const [mccOptions, setMccOptions] = useState([]);
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [advancedMode, setAdvancedMode] = useState(false);
   const [cardQuestions, setCardQuestions] = useState([]);
   const [additionalInputs, setAdditionalInputs] = useState({});
@@ -616,14 +616,27 @@ const BestCardCalculator = () => {
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
         <Header />
-        <Container
-          component="main"
-          sx={{
-            mt: 4,
-            mb: 4,
-            flexGrow: 1,
-          }}
-        >
+        {loading ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexGrow: 1,
+              minHeight: "50vh",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : (
+          <Container
+            component="main"
+            sx={{
+              mt: 4,
+              mb: 4,
+              flexGrow: 1,
+            }}
+          >
           {showConfetti && <Confetti />}
           <Typography
             variant="h4"
@@ -634,7 +647,7 @@ const BestCardCalculator = () => {
               mb: 4, 
             }}
           >
-            Know Your Best Card
+            Best Card Calculator
           </Typography>
 
           <Paper
@@ -768,20 +781,40 @@ const BestCardCalculator = () => {
                 </AccordionDetails>
               </Accordion>
 
-              <Button
-                variant="contained"
-                onClick={handleCalculate}
-                disabled={
-                  !spentAmount || parseFloat(spentAmount) <= 0 || isLoading
-                }
-                sx={{ height: 48 }}
-              >
-                {isLoading ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  "Calculate Best Card"
-                )}
-              </Button>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                  <Button
+                    variant="contained"
+                    onClick={handleCalculate}
+                    disabled={
+                      !spentAmount || parseFloat(spentAmount) <= 0 || isLoading
+                    }
+                    sx={{ flex: 1, height: 48 }}
+                  >
+                    {isLoading ? (
+                      <CircularProgress size={24} color="inherit" />
+                    ) : (
+                      "Calculate Best Card"
+                    )}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      setSelectedMcc(null);
+                      setSpentAmount("");
+                      setAdditionalInputs({});
+                      setIsCalculated(false);
+                      setPointsRanking([]);
+                      setRankingByValue([]);
+                      setRankingByMiles([]);
+                      setLastCalculationParams(null);
+                      setMccInputValue("");
+                    }}
+                    sx={{ flex: 1, height: 48 }}
+                  >
+                    Clear
+                  </Button>
+                </Stack>
+
 
               {isCalculated && (
                 <Box
@@ -819,6 +852,7 @@ const BestCardCalculator = () => {
             </Stack>
           </Paper>
         </Container>
+      )}
         {alert.open && (
           <Alert
             severity={alert.severity}
