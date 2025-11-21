@@ -92,7 +92,7 @@ const logoVariants = {
   tap: { scale: 0.95 },
 };
 
-function Header() {
+function Header({ hideNavigation = false }) {
   const { mode, toggleTheme } = useAppTheme();
   const { region } = useRegion();
   const { user, logout, isAuthenticated, signInWithGoogle } = useAuth();
@@ -302,44 +302,45 @@ function Header() {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.path);
+        {!hideNavigation &&
+          navItems.map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item.path);
 
-          return (
-            <MenuItem
-              key={item.path}
-              onClick={() => handleNavigation(item.path)}
-              sx={{
-                py: 1.5,
-                px: 2,
-                backgroundColor: active
-                  ? "rgba(25, 118, 210, 0.08)"
-                  : "transparent",
-                "&:hover": {
-                  backgroundColor: "rgba(25, 118, 210, 0.04)",
-                },
-              }}
-            >
-              <ListItemIcon>
-                {item.badge ? (
-                  <Badge badgeContent={item.badge} color="secondary" max={99}>
-                    <Icon color={active ? "primary" : "inherit"} />
-                  </Badge>
-                ) : (
-                  <Icon color={active ? "primary" : "inherit"} />
-                )}
-              </ListItemIcon>
-              <ListItemText
-                primary={item.label}
-                primaryTypographyProps={{
-                  fontWeight: active ? 600 : 400,
-                  color: active ? "primary.main" : "text.primary",
+            return (
+              <MenuItem
+                key={item.path}
+                onClick={() => handleNavigation(item.path)}
+                sx={{
+                  py: 1.5,
+                  px: 2,
+                  backgroundColor: active
+                    ? "rgba(25, 118, 210, 0.08)"
+                    : "transparent",
+                  "&:hover": {
+                    backgroundColor: "rgba(25, 118, 210, 0.04)",
+                  },
                 }}
-              />
-            </MenuItem>
-          );
-        })}
+              >
+                <ListItemIcon>
+                  {item.badge ? (
+                    <Badge badgeContent={item.badge} color="secondary" max={99}>
+                      <Icon color={active ? "primary" : "inherit"} />
+                    </Badge>
+                  ) : (
+                    <Icon color={active ? "primary" : "inherit"} />
+                  )}
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.label}
+                  primaryTypographyProps={{
+                    fontWeight: active ? 600 : 400,
+                    color: active ? "primary.main" : "text.primary",
+                  }}
+                />
+              </MenuItem>
+            );
+          })}
 
         <Box sx={{ borderTop: 1, borderColor: "divider", mt: 1, pt: 1 }}>
           <MenuItem onClick={toggleTheme} sx={{ py: 1.5, px: 2 }}>
@@ -503,8 +504,32 @@ function Header() {
             </Box>
           )}
 
+          {/* Mobile Minimal Header (Theme Toggle only) */}
+          {isMobile && hideNavigation && (
+            <Tooltip
+              title={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
+              arrow
+            >
+              <IconButton
+                onClick={toggleTheme}
+                color="inherit"
+                sx={{
+                  ml: 1,
+                  backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.2)",
+                    transform: "rotate(180deg)",
+                  },
+                  transition: "all 0.3s ease-in-out",
+                }}
+              >
+                {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
+              </IconButton>
+            </Tooltip>
+          )}
+
           {/* Mobile Menu Button */}
-          {isMobile && (
+          {isMobile && !hideNavigation && (
             <IconButton
               color="inherit"
               aria-label="menu"
@@ -521,7 +546,7 @@ function Header() {
           )}
 
           {/* Mobile Menu */}
-          {isMobile && renderMobileMenu()}
+          {isMobile && !hideNavigation && renderMobileMenu()}
         </Toolbar>
       </AppBar>
     </motion.div>

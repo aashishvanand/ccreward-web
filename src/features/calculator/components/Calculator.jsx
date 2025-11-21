@@ -60,7 +60,7 @@ const pageVariants = {
 function Calculator() {
   const theme = useTheme();
   const { region, isInitialized, isLoading } = useRegion();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
   const [userCards, setUserCards] = useState([]);
   const [isFetchingUserData, setIsFetchingUserData] = useState(true);
   const [isCalculating, setIsCalculating] = useState(false);
@@ -124,10 +124,14 @@ function Calculator() {
       }
     };
 
-    if (isAuthenticated()) {
-      fetchUserCards();
+    if (!loading) {
+      if (isAuthenticated()) {
+        fetchUserCards();
+      } else {
+        setIsFetchingUserData(false);
+      }
     }
-  }, [user, isAuthenticated]);
+  }, [user, isAuthenticated, loading]);
 
   const handleAddCard = useCallback(async () => {
     if (user) {
@@ -323,7 +327,8 @@ function Calculator() {
               elevation={2}
               sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2 }}
             >
-              {isFetchingUserData ? (
+
+              {loading || isFetchingUserData ? (
                 <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
                   <CircularProgress />
                 </Box>
