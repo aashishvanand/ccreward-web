@@ -190,7 +190,6 @@ const TransferCalculator = () => {
         bank: selectedBank,
         card: selectedCard,
         points: Number(points),
-        region: region.toLowerCase(),
       });
       setCalculationResult(result);
       trackFormSubmission(true);
