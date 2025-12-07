@@ -19,14 +19,14 @@ const MobileAppPromotion = ({ isAndroid }) => {
         "2ccc7b3f-acda-4147-25f1-2b5806bce500",
       ]
     : [
-        "cc11f2c9-1423-4cf8-cc35-dd3264ac0600",
-        "75b6651c-dee3-497a-6f8f-b3dcf6d88100",
-        "ac414eb8-1f97-4178-5c22-6c1a9b2cf400",
-        "cc0ec534-3d57-4b87-7b43-426510ad1c00",
-        "16f92704-1e8a-43f1-77a0-380dfd407e00",
-        "d66ff993-81c8-4de8-3a50-0f62d0700800",
-        "e1300447-5ee8-400b-38ff-60a202621500",
-        "3dc86490-32bf-4560-6bf5-97766ebe4a00",
+        "66261793-c3fd-4631-5886-12aeb832f200",
+        "732a2090-e94b-4897-89fa-804d31a31800",
+        "8f508b1f-a5e6-4808-dcc9-be7e12788600",
+        "924202b4-200d-4b0e-01bb-77128c8cdb00",
+        "a4afaadf-1fda-417c-1a3e-ad1b6e789100",
+        "bfd9d1cf-c210-4f24-20cf-bbc8d5e78a00",
+        "9ec2fdcf-af33-4376-4ade-dfdf211f2b00",
+        "c6646a5d-8012-41f2-7536-faecaece9100",
       ];
 
   return (
