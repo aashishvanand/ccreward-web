@@ -26,6 +26,7 @@ import {
   DarkMode as DarkModeIcon,
   SwapHoriz as SwapHorizIcon,
   Login as LoginIcon,
+  Search as SearchIcon,
 } from "@mui/icons-material";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
@@ -205,6 +206,12 @@ function Header({ hideNavigation = false }) {
       path: "/transfer-calculator",
       icon: SwapHorizIcon,
       description: "Calculate point transfers",
+    },
+    {
+      label: "MCC Lookup",
+      path: "/mcc-lookup",
+      icon: SearchIcon,
+      description: "Lookup Merchant Category Codes",
     },
     ...(isAuthenticated()
       ? [
