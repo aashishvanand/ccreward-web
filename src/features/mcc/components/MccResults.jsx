@@ -21,27 +21,28 @@ import {
 } from '@mui/icons-material';
 
 // Map industry names to icons
+// All icons return without color props to inherit from parent
 const getIndustryIcon = (industryName) => {
-    if (!industryName) return <CategoryOutlined color="action" />;
+    if (!industryName) return <CategoryOutlined />;
     
     const lowerName = industryName.toLowerCase();
     
-    if (lowerName.includes('agricultural')) return <AgricultureOutlined color="success" />;
-    if (lowerName.includes('contracted')) return <BuildOutlined color="secondary" />;
-    if (lowerName.includes('transportation')) return <DirectionsBusOutlined color="primary" />;
-    if (lowerName.includes('utilities')) return <ElectricalServicesOutlined color="warning" />;
-    if (lowerName.includes('retail')) return <ShoppingBagOutlined color="secondary" />;
-    if (lowerName.includes('automobiles')) return <DirectionsCarOutlined color="primary" />;
-    if (lowerName.includes('clothing')) return <CheckroomOutlined color="secondary" />;
-    if (lowerName.includes('miscellaneous')) return <StorefrontOutlined color="action" />;
-    if (lowerName.includes('service providers')) return <RoomServiceOutlined color="info" />;
-    if (lowerName.includes('business')) return <BusinessCenterOutlined color="primary" />;
-    if (lowerName.includes('repair')) return <HomeRepairServiceOutlined color="error" />;
-    if (lowerName.includes('amusement') || lowerName.includes('entertainment')) return <TheaterComedyOutlined color="secondary" />;
-    if (lowerName.includes('professional')) return <WorkOutlineOutlined color="primary" />;
+    if (lowerName.includes('agricultural')) return <AgricultureOutlined />;
+    if (lowerName.includes('contracted')) return <BuildOutlined />;
+    if (lowerName.includes('transportation')) return <DirectionsBusOutlined />;
+    if (lowerName.includes('utilities')) return <ElectricalServicesOutlined />;
+    if (lowerName.includes('retail')) return <ShoppingBagOutlined />;
+    if (lowerName.includes('automobiles')) return <DirectionsCarOutlined />;
+    if (lowerName.includes('clothing')) return <CheckroomOutlined />;
+    if (lowerName.includes('miscellaneous')) return <StorefrontOutlined />;
+    if (lowerName.includes('service providers')) return <RoomServiceOutlined />;
+    if (lowerName.includes('business')) return <BusinessCenterOutlined />;
+    if (lowerName.includes('repair')) return <HomeRepairServiceOutlined />;
+    if (lowerName.includes('amusement') || lowerName.includes('entertainment')) return <TheaterComedyOutlined />;
+    if (lowerName.includes('professional')) return <WorkOutlineOutlined />;
     if (lowerName.includes('government')) return <AccountBalanceOutlined />;
     
-    return <StoreOutlined color="primary" />;
+    return <StoreOutlined />;
 };
 
 const ResultCard = ({ item }) => {
@@ -67,10 +68,7 @@ const ResultCard = ({ item }) => {
                 border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
                 '& .icon-box': {
                     transform: 'scale(1.1) rotate(5deg)',
-                    // Darker gradient for better white text/icon contrast
-                    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
-                    color: '#ffffff',
-                    boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.4)}`,
+                    boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.5)}`,
                 }
             }
         }}>
@@ -82,8 +80,9 @@ const ResultCard = ({ item }) => {
                         sx={{ 
                             p: 1.5, 
                             borderRadius: 3, 
-                            bgcolor: alpha(theme.palette.primary.main, 0.08),
-                            color: theme.palette.primary.main,
+                            // Gradient background to make white icon visible
+                            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                            color: '#ffffff',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -91,7 +90,8 @@ const ResultCard = ({ item }) => {
                             transition: 'all 0.3s ease',
                             width: 56,
                             height: 56,
-                            flexShrink: 0
+                            flexShrink: 0,
+                            boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`
                         }}>
                         {IndustryIcon}
                     </Box>
