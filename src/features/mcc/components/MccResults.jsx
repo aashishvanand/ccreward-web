@@ -1,48 +1,47 @@
 import { Grid, Card, CardContent, Typography, Chip, Box, Skeleton, Divider, Tooltip, useTheme, alpha } from '@mui/material';
 import { 
-    Category, 
-    Business, 
-    Store,
-    Agriculture,
-    Build,
-    DirectionsBus,
-    ElectricalServices,
-    ShoppingBag,
-    DirectionsCar,
-    Checkroom,
-    Storefront,
-    RoomService,
-    BusinessCenter,
-    HomeRepairService,
-    TheaterComedy,
-    Work,
-    AccountBalance,
-    Info,
-    Verified
+    CategoryOutlined, 
+    BusinessOutlined, 
+    StoreOutlined,
+    AgricultureOutlined,
+    BuildOutlined,
+    DirectionsBusOutlined,
+    ElectricalServicesOutlined,
+    ShoppingBagOutlined,
+    DirectionsCarOutlined,
+    CheckroomOutlined,
+    StorefrontOutlined,
+    RoomServiceOutlined,
+    BusinessCenterOutlined,
+    HomeRepairServiceOutlined,
+    TheaterComedyOutlined,
+    WorkOutlineOutlined,
+    AccountBalanceOutlined,
+    VerifiedOutlined
 } from '@mui/icons-material';
 
 // Map industry names to icons
 const getIndustryIcon = (industryName) => {
-    if (!industryName) return <Category color="action" />;
+    if (!industryName) return <CategoryOutlined color="action" />;
     
     const lowerName = industryName.toLowerCase();
     
-    if (lowerName.includes('agricultural')) return <Agriculture color="success" />;
-    if (lowerName.includes('contracted')) return <Build color="secondary" />;
-    if (lowerName.includes('transportation')) return <DirectionsBus color="primary" />;
-    if (lowerName.includes('utilities')) return <ElectricalServices color="warning" />;
-    if (lowerName.includes('retail')) return <ShoppingBag color="secondary" />;
-    if (lowerName.includes('automobiles')) return <DirectionsCar color="primary" />;
-    if (lowerName.includes('clothing')) return <Checkroom color="secondary" />;
-    if (lowerName.includes('miscellaneous')) return <Storefront color="action" />;
-    if (lowerName.includes('service providers')) return <RoomService color="info" />;
-    if (lowerName.includes('business')) return <BusinessCenter color="primary" />;
-    if (lowerName.includes('repair')) return <HomeRepairService color="error" />;
-    if (lowerName.includes('amusement') || lowerName.includes('entertainment')) return <TheaterComedy color="secondary" />;
-    if (lowerName.includes('professional')) return <Work color="primary" />;
-    if (lowerName.includes('government')) return <AccountBalance />;
+    if (lowerName.includes('agricultural')) return <AgricultureOutlined color="success" />;
+    if (lowerName.includes('contracted')) return <BuildOutlined color="secondary" />;
+    if (lowerName.includes('transportation')) return <DirectionsBusOutlined color="primary" />;
+    if (lowerName.includes('utilities')) return <ElectricalServicesOutlined color="warning" />;
+    if (lowerName.includes('retail')) return <ShoppingBagOutlined color="secondary" />;
+    if (lowerName.includes('automobiles')) return <DirectionsCarOutlined color="primary" />;
+    if (lowerName.includes('clothing')) return <CheckroomOutlined color="secondary" />;
+    if (lowerName.includes('miscellaneous')) return <StorefrontOutlined color="action" />;
+    if (lowerName.includes('service providers')) return <RoomServiceOutlined color="info" />;
+    if (lowerName.includes('business')) return <BusinessCenterOutlined color="primary" />;
+    if (lowerName.includes('repair')) return <HomeRepairServiceOutlined color="error" />;
+    if (lowerName.includes('amusement') || lowerName.includes('entertainment')) return <TheaterComedyOutlined color="secondary" />;
+    if (lowerName.includes('professional')) return <WorkOutlineOutlined color="primary" />;
+    if (lowerName.includes('government')) return <AccountBalanceOutlined />;
     
-    return <Store color="primary" />;
+    return <StoreOutlined color="primary" />;
 };
 
 const ResultCard = ({ item }) => {
@@ -68,8 +67,9 @@ const ResultCard = ({ item }) => {
                 border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
                 '& .icon-box': {
                     transform: 'scale(1.1) rotate(5deg)',
-                    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                    color: 'white',
+                    // Darker gradient for better white text/icon contrast
+                    background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+                    color: '#ffffff',
                     boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.4)}`,
                 }
             }
@@ -82,7 +82,7 @@ const ResultCard = ({ item }) => {
                         sx={{ 
                             p: 1.5, 
                             borderRadius: 3, 
-                            bgcolor: alpha(theme.palette.primary.main, 0.1),
+                            bgcolor: alpha(theme.palette.primary.main, 0.08),
                             color: theme.palette.primary.main,
                             display: 'flex',
                             alignItems: 'center',
@@ -129,7 +129,7 @@ const ResultCard = ({ item }) => {
                     {(item.industryname || item.industry) && (
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                             <Box sx={{ color: 'text.secondary', display: 'flex' }}>
-                                <Business fontSize="small" />
+                                <BusinessOutlined fontSize="small" />
                             </Box>
                             <Box>
                                 <Typography variant="caption" color="text.secondary" fontWeight="600" display="block" sx={{ letterSpacing: 0.5, textTransform: 'uppercase', fontSize: '0.7rem' }}>
@@ -146,7 +146,7 @@ const ResultCard = ({ item }) => {
                     {category && (
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                              <Box sx={{ color: 'text.secondary', display: 'flex' }}>
-                                <Category fontSize="small" />
+                                <CategoryOutlined fontSize="small" />
                             </Box>
                             <Box>
                                 <Typography variant="caption" color="text.secondary" fontWeight="600" display="block" sx={{ letterSpacing: 0.5, textTransform: 'uppercase', fontSize: '0.7rem' }}>
@@ -169,7 +169,7 @@ const ResultCard = ({ item }) => {
                             border: `1px solid ${alpha(theme.palette.divider, 0.05)}`
                         }}>
                             <Typography variant="caption" color="text.secondary" fontWeight="600" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1.5 }}>
-                                <Verified fontSize="inherit" color="action" /> SIMILAR MERCHANTS
+                                <VerifiedOutlined fontSize="inherit" color="action" /> SIMILAR MERCHANTS
                             </Typography>
                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
                                 {knownMerchants.slice(0, 5).map((merchant, idx) => (
@@ -256,7 +256,7 @@ const MccResults = ({ results, isLoading, hasSearched }) => {
                     bgcolor: (theme) => alpha(theme.palette.action.disabledBackground, 0.3),
                     mb: 3
                 }}>
-                    <Category sx={{ fontSize: 64, color: 'text.secondary' }} />
+                    <CategoryOutlined sx={{ fontSize: 64, color: 'text.secondary' }} />
                 </Box>
                 <Typography variant="h5" color="text.primary" fontWeight="600" gutterBottom>
                     No merchants found
@@ -272,7 +272,7 @@ const MccResults = ({ results, isLoading, hasSearched }) => {
         return (
             <Box sx={{ textAlign: 'center', py: 12, opacity: 0.6 }}>
                  <Box sx={{ mb: 3 }}>
-                    <Storefront sx={{ fontSize: 80, color: 'action.disabled' }} />
+                    <StorefrontOutlined sx={{ fontSize: 80, color: 'action.disabled' }} />
                 </Box>
                 <Typography variant="h6" color="text.secondary" fontWeight="500">
                     Start typing to search for Merchant Category Codes
