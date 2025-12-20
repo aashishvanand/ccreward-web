@@ -76,7 +76,7 @@ const ResultCard = ({ item }) => {
                     </Box>
                     <Box>
                         <Typography variant="h6" fontWeight="bold" lineHeight={1.2}>
-                            {item.merchantName || item.merchant || "Unknown Merchant"}
+                            {item.name || item.merchantName || item.merchant || "Unknown Merchant"}
                         </Typography>
                         {item.mcc && (
                             <Chip 
