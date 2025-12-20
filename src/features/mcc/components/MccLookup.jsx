@@ -4,6 +4,8 @@ import { Flag, Search } from '@mui/icons-material';
 import MccSearch from './MccSearch';
 import MccResults from './MccResults';
 import ReportMccForm from './ReportMccForm';
+import Header from '../../../shared/components/layout/Header';
+import Footer from '../../../shared/components/layout/Footer';
 import { fetchMCC } from '../../../core/services/api';
 
 const MccLookup = () => {
@@ -43,11 +45,12 @@ const MccLookup = () => {
     };
 
     return (
-        <Box sx={{ position: 'relative', overflow: 'hidden', minHeight: '90vh' }}>
+        <Box sx={{ position: 'relative', overflow: 'hidden', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <Header />
             {/* Ambient Background Elements */}
             <Box sx={{
                 position: 'absolute',
-                top: -100,
+                top: 0,
                 left: '20%',
                 width: 500,
                 height: 500,
@@ -59,7 +62,7 @@ const MccLookup = () => {
             }} />
              <Box sx={{
                 position: 'absolute',
-                top: 100,
+                top: 200,
                 right: '10%',
                 width: 400,
                 height: 400,
@@ -69,7 +72,7 @@ const MccLookup = () => {
                 zIndex: 0
             }} />
 
-            <Container maxWidth="lg" sx={{ py: 6, position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', minHeight: '80vh' }}>
+            <Container maxWidth="lg" sx={{ py: 6, position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                 <Box sx={{ mb: 8, textAlign: 'center' }}>
                     <Typography variant="h2" component="h1" gutterBottom fontWeight="800"
                         sx={{ 
@@ -86,7 +89,7 @@ const MccLookup = () => {
                         MCC Lookup Tool
                     </Typography>
                     <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 650, mx: 'auto', mb: 5, lineHeight: 1.6, fontWeight: 400 }}>
-                        Discover Merchant Category Codes instantly. Search by merchant name to uncover detailed codes, categories, and industry insights.
+                        Search by merchant name to find category codes and industry details.
                     </Typography>
 
                     <Box sx={{ maxWidth: 700, mx: 'auto', position: 'relative' }}>
@@ -165,6 +168,7 @@ const MccLookup = () => {
                     onSubmitSuccess={handleReportSuccess}
                 />
             </Container>
+            <Footer />
         </Box>
     );
 };
