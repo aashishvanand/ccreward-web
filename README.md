@@ -132,7 +132,7 @@ Regardless of whether you are using the project under the open source or commerc
 Example attribution:
 
 ```
-This project is based on the Credit Card Rewards (https://github.com/aashishvanand/ccreward-web) by Aashish Vivekanand.
+This project is based on the ccreward (https://github.com/aashishvanand/ccreward-web) by Aashish Vivekanand.
 ```
 
 ---
