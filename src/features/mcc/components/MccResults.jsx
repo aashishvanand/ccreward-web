@@ -103,6 +103,7 @@ const ResultCard = ({ item }) => {
                             display: '-webkit-box',
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: 'vertical',
+                            minHeight: '2.6em', // Fixed height for 2 lines
                         }}>
                             {item.name || item.merchantName || item.merchant || "Unknown Merchant"}
                         </Typography>
