@@ -1,4 +1,4 @@
-import { Box, Container, Typography, Button, Paper } from "@mui/material";
+import { Box, Container, Typography, Button } from "@mui/material";
 import SmartToyIcon from "@mui/icons-material/SmartToy"; // Robot icon for GPT
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
@@ -6,17 +6,8 @@ const CustomGPTSection = ({ theme }) => {
   return (
     <Box sx={{ py: 8 }}>
       <Container maxWidth="md">
-        <Paper
-          elevation={0}
+        <Box
           sx={{
-            p: { xs: 4, md: 6 },
-            borderRadius: 4,
-            background:
-              theme.palette.mode === "dark"
-                ? "linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)"
-                : "linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%)",
-            border: "1px solid",
-            borderColor: "divider",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -107,7 +98,7 @@ const CustomGPTSection = ({ theme }) => {
           >
             Chat with ccreward GPT
           </Button>
-        </Paper>
+        </Box>
       </Container>
     </Box>
   );
