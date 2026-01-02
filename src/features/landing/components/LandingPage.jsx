@@ -99,17 +99,37 @@ const LandingPage = () => {
 
   const { cardImagesData } = useCardImagesData();
 
+  const [allTweets, setAllTweets] = useState([]);
+  
+  // Randomize tweets on mount
+  useEffect(() => {
+    setAllTweets([...tweets].sort(() => Math.random() - 0.5));
+  }, []);
+
   const tweetsPerPage = isMobile ? 1 : isTablet ? 2 : 3;
-  const totalPages = Math.ceil(tweets.length / tweetsPerPage);
+  // Use allTweets for total pages calculation to avoid mismatch during initial render/shuffle
+  const totalPages = Math.ceil((allTweets.length > 0 ? allTweets : tweets).length / tweetsPerPage);
 
   const visibleTweets = useMemo(
-    () =>
-      tweets.slice(
+    () => {
+      // Use shuffled tweets if available, otherwise fallback to default order
+      const sourceTweets = allTweets.length > 0 ? allTweets : tweets;
+      return sourceTweets.slice(
         currentPage * tweetsPerPage,
         (currentPage + 1) * tweetsPerPage
-      ),
-    [currentPage, tweetsPerPage]
+      );
+    },
+    [currentPage, tweetsPerPage, allTweets]
   );
+
+  // Auto-scroll testimonials
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPage((prev) => (prev + 1) % totalPages);
+    }, 5000); // Scroll every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [totalPages]);
 
   // Track landing page visit
   useEffect(() => {
