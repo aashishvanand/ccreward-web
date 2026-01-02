@@ -7,12 +7,12 @@ import { useAuth } from '../../../core/providers/AuthContext';
 import { useRegion } from '../../../core/providers/RegionContext';
 
 const GoogleOneTap = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { showRegionModal } = useRegion();
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
   useEffect(() => {
-    if (user || !scriptLoaded || !window.google?.accounts?.id || showRegionModal) return;
+    if (loading || user || !scriptLoaded || !window.google?.accounts?.id || showRegionModal) return;
 
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     if (!clientId) {
@@ -47,7 +47,12 @@ const GoogleOneTap = () => {
     } catch (e) {
       console.error('One Tap initialization error', e);
     }
-  }, [user, scriptLoaded, showRegionModal]);
+
+    return () => {
+      // Cancel the prompt if the component unmounts or dependencies change (e.g. user signs in)
+      window.google?.accounts?.id?.cancel();
+    };
+  }, [user, loading, scriptLoaded, showRegionModal]);
 
   return (
     <Script
