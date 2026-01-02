@@ -4,13 +4,15 @@ import Script from 'next/script';
 import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { auth } from '../../../../firebase';
 import { useAuth } from '../../../core/providers/AuthContext';
+import { useRegion } from '../../../core/providers/RegionContext';
 
 const GoogleOneTap = () => {
   const { user } = useAuth();
+  const { showRegionModal } = useRegion();
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
   useEffect(() => {
-    if (user || !scriptLoaded || !window.google?.accounts?.id) return;
+    if (user || !scriptLoaded || !window.google?.accounts?.id || showRegionModal) return;
 
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     if (!clientId) {
@@ -21,6 +23,7 @@ const GoogleOneTap = () => {
     try {
       window.google.accounts.id.initialize({
         client_id: clientId,
+        use_fedcm_for_prompt: true,
         callback: async (response) => {
           try {
             const { credential } = response;
@@ -44,7 +47,7 @@ const GoogleOneTap = () => {
     } catch (e) {
       console.error('One Tap initialization error', e);
     }
-  }, [user, scriptLoaded]);
+  }, [user, scriptLoaded, showRegionModal]);
 
   return (
     <Script
