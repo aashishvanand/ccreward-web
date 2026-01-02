@@ -119,57 +119,113 @@ const PrivacyPolicyPage = () => {
           sx={{ mt: 4, mb: 4, flexGrow: 1 }}
           slots={{ root: "main" }}
         >
-          <Typography variant="h4" component="h1" gutterBottom>
+          <Typography 
+            variant="h4" 
+            component="h1" 
+            gutterBottom
+          >
             Privacy Policy
           </Typography>
-          <Typography variant="body1" component="div">
-            <div
-              onFocus={() => handleSectionInteraction("information_collection")}
-            >
+          <Typography variant="subtitle1" gutterBottom sx={{ mb: 4, color: 'text.secondary' }}>
+            Last Updated: January 2, 2026
+          </Typography>
+          <Typography 
+            variant="body1" 
+            component="div"
+            sx={{ 
+              '& a': { 
+                color: 'primary.light',
+                textDecoration: 'none',
+                '&:hover': {
+                  textDecoration: 'underline'
+                }
+              }
+            }}
+          >
+            <div onFocus={() => handleSectionInteraction("information_collection")}>
               <h2>1. Information We Collect</h2>
               <p>
                 1.1. <strong>Personal Information:</strong> When you create an
-                account, we collect information provided by Google
-                Authentication, which may include your name and email address.
-              </p>
-              <p>
-                1.2. <strong>User Content:</strong> We collect and store
-                information about the credit cards you add to your account.
-              </p>
-              <p>
-                1.3. <strong>Usage Data:</strong> We may collect information on
-                how the Service is accessed and used, including your
-                device&apos;s Internet Protocol address, browser type, browser
-                version, the pages of our Service that you visit, the time and
-                date of your visit, the time spent on those pages, and other
-                diagnostic data.
-              </p>
-              <p>
-                1.4. <strong>Advertising Data:</strong> Our app integrates
-                Google Ads to display advertisements. Google Ads may collect
-                information such as:
+                account via Google Authentication, we collect only the following
+                information:
               </p>
               <ul>
-                <li>Device identifiers (e.g., advertising ID)</li>
-                <li>Interaction data with ads (e.g., clicks, impressions)</li>
+                <li>Name</li>
+                <li>Email Address</li>
+              </ul>
+              <p>
+                We explicitly do not collect phone numbers, physical addresses,
+                passwords, or any other personal identifiers.
+              </p>
+
+              <p>
+                1.2. <strong>Financial Data (Card Selection):</strong> We do not
+                collect, store, or process sensitive financial information such
+                as Credit Card Numbers (PAN), CVV/CVC codes, PINs, or One-Time
+                Passwords (OTPs).
+              </p>
+              <ul>
                 <li>
-                  General demographic and interest data based on your app usage
-                  and ad interactions
+                  <strong>Card Management:</strong> When you add a card to your
+                  portfolio, we only store the Bank Name and Card Name that you
+                  select from our predefined list.
+                </li>
+                <li>
+                  <strong>No Verification:</strong> We do not verify card
+                  ownership or link to your actual bank accounts.
+                </li>
+              </ul>
+
+              <p>
+                1.3. <strong>Usage Data:</strong> We may collect information on
+                how the Service is accessed and used to improve performance.
+                This includes your device&apos;s Internet Protocol (IP) address,
+                browser type, pages visited, time spent on pages, and diagnostic
+                data.
+              </p>
+
+              <p>
+                1.4. <strong>Advertising Data:</strong> Our app integrates
+                Google Ads. Google may collect:
+              </p>
+              <ul>
+                <li>Device identifiers (e.g., Advertising ID).</li>
+                <li>Interaction data (e.g., clicks, impressions).</li>
+                <li>
+                  General demographic/interest data based on app usage.
                 </li>
               </ul>
             </div>
 
             <div onFocus={() => handleSectionInteraction("data_usage")}>
               <h2>2. How We Use Your Information</h2>
-              <p>We use the information we collect to:</p>
+              <p>
+                We use the limited information we collect strictly for the
+                following purposes:
+              </p>
               <ul>
-                <li>Provide, maintain, and improve the Service</li>
-                <li>Communicate with you about the Service</li>
-                <li>Monitor the usage of the Service</li>
-                <li>Detect, prevent, and address technical issues</li>
                 <li>
-                  Serve relevant advertisements through Google Ads and measure
-                  their effectiveness
+                  <strong>Service Provision:</strong> To provide the core
+                  functionality of the credit card rewards calculator and card
+                  management tools.
+                </li>
+                <li>
+                  <strong>Improvement:</strong> To analyze usage patterns to
+                  maintain, optimize, and enhance the Service.
+                </li>
+                <li>
+                  <strong>Communication:</strong> To contact you regarding
+                  critical service updates or support inquiries (we do not use
+                  your email for marketing spam).
+                </li>
+                <li>
+                  <strong>Security:</strong> To detect, prevent, and address
+                  technical issues or fraud.
+                </li>
+                <li>
+                  <strong>Advertising:</strong> To serve relevant advertisements
+                  through Google Ads and measure their effectiveness, which
+                  supports the free availability of the Service.
                 </li>
               </ul>
             </div>
@@ -177,47 +233,57 @@ const PrivacyPolicyPage = () => {
             <div onFocus={() => handleSectionInteraction("data_storage")}>
               <h2>3. Data Storage and Processing</h2>
               <p>
-                3.1. <strong>User Data Storage:</strong> Your account
-                information and card details are stored in Firebase, a Google
-                Cloud service. We implement appropriate data collection,
-                storage, and processing practices and security measures to
-                protect against unauthorized access, alteration, disclosure, or
-                destruction of your personal information.
+                3.1. <strong>Secure Storage:</strong> Your account profile
+                (Name, Email) and card portfolio (List of Card Names) are stored
+                in Firebase, a Google Cloud service. We rely on Google&apos;s
+                industry-leading security measures to protect this data.
               </p>
               <p>
-                3.2. <strong>Computation and Processing:</strong> All reward
-                calculations and computational operations are performed on
-                Cloudflare&apos;s infrastructure. These calculations are
-                performed in real-time and are not stored permanently.
+                3.2. <strong>Computation (No Retention):</strong> All reward
+                calculations, MCC lookups, and transfer ratio computations are
+                processed on Cloudflare&apos;s global infrastructure. These
+                calculations are performed in real-time and the specific
+                transaction details entered for calculation are not permanently
+                stored.
               </p>
               <p>
-                3.3. We do not store users&apos; data other than the single copy
-                of your account and card information in the Firebase database.
-              </p>
-              <p>
-                3.4. <strong>Data Processing Locations:</strong> While user data
-                is stored in Firebase, calculations are processed through
-                Cloudflare&apos;s global network, ensuring fast and reliable
-                service delivery.
+                3.3. <strong>Processing Locations:</strong> While user data is
+                stored securely in Firebase, calculations utilize
+                Cloudflare&apos;s global network to ensure fast, low-latency
+                service delivery regardless of your location.
               </p>
             </div>
 
             <div onFocus={() => handleSectionInteraction("data_retention")}>
               <h2>4. Data Retention and Deletion</h2>
               <p>
-                4.1. We retain your personal information only for as long as
-                necessary to provide you with our Service and as described in
-                this Privacy Policy.
+                4.1. <strong>Retention:</strong> We retain your basic profile
+                information only as long as you maintain an active account to
+                provide you with the Service.
               </p>
               <p>
-                4.2. You can delete all the cards you&apos;ve added to your
-                account directly through the Service.
+                4.2. <strong>Card Deletion:</strong> You can delete individual
+                cards from your portfolio at any time directly through the app
+                or website interface.
               </p>
               <p>
-                4.3. To request the deletion of your account, please email
-                support@ccreward.app. Upon request, we will disable your account
-                for 30 days and then delete it after this period.
+                4.3. <strong>Immediate Account Deletion:</strong> We provide a
+                Delete Account button within the application and website
+                settings.
               </p>
+              <ul>
+                <li>
+                  <strong>Immediate Effect:</strong> Clicking this button
+                  immediately wipes your profile and associated data from our
+                  Firebase database.
+                </li>
+                <li>
+                  <strong>Verification:</strong> You can verify this by
+                  attempting to log in again; the system will treat you as a
+                  completely new user with no prior history.
+                </li>
+                <li>No email request or waiting period is required.</li>
+              </ul>
             </div>
 
             <div
@@ -225,58 +291,43 @@ const PrivacyPolicyPage = () => {
             >
               <h2>5. Third-Party Services</h2>
               <p>
-                5.1. Our Service uses Google Firebase for authentication and
-                data storage. Please refer to Google&apos;s Privacy Policy for
-                information on how they handle your data.
+                5.1. <strong>Google Firebase:</strong> Used for secure
+                authentication and database storage. (See Google Privacy
+                Policy).
               </p>
               <p>
-                5.2. Bank logos and card images displayed in our Service are the
-                property of their respective financial institutions and are used
-                for representational purposes only.
+                5.2. <strong>Google Ads:</strong> Used to display
+                advertisements. (See Google Advertising Privacy Policy).
               </p>
               <p>
-                5.3. <strong>Advertising:</strong> Our app integrates Google
-                Ads, a service provided by Google, to display ads within the
-                app. Please refer to Google&apos;s Advertising Privacy Policy
-                for more details on how they collect, use, and process data:{" "}
-                <a
-                  href="https://policies.google.com/technologies/ads"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Google Advertising Privacy Policy
-                </a>
-                .
+                5.3. <strong>Bank Assets:</strong> Bank logos and card images
+                are property of their respective institutions and are used
+                solely for identification.
               </p>
             </div>
 
-            <div
-              onFocus={() => handleSectionInteraction("information_accuracy")}
-            >
+            <div onFocus={() => handleSectionInteraction("information_accuracy")}>
               <h2>6. Accuracy of Information</h2>
               <p>
-                6.1. The reward calculations provided by ccreward are based on
-                publicly available information and are for reference purposes
-                only.
+                6.1. Reward calculations are based on publicly available data
+                and are for reference only.
               </p>
               <p>
-                6.2. Banks may change their reward structures and terms at any
-                time without notice. In all cases, the bank&apos;s official
-                terms and conditions, and their calculation of rewards, shall be
-                considered final and binding.
+                6.2. Banks may change terms without notice. The bank&apos;s
+                official terms are always final and binding.
               </p>
               <p>
-                6.3. Users should verify reward calculations with their
-                respective banks.
+                6.3. Users are responsible for verifying calculations with their
+                bank before making financial decisions.
               </p>
             </div>
 
             <div onFocus={() => handleSectionInteraction("childrens_privacy")}>
               <h2>7. Children&apos;s Privacy</h2>
               <p>
-                7. Our Service does not address anyone under the age of 13. We
-                do not knowingly collect personally identifiable information
-                from children under 13.
+                Our Service does not address anyone under the age of 13. We do
+                not knowingly collect personally identifiable information from
+                children under 13.
               </p>
             </div>
 
@@ -285,8 +336,7 @@ const PrivacyPolicyPage = () => {
               <p>
                 We may update our Privacy Policy from time to time. We will
                 notify you of any changes by posting the new Privacy Policy on
-                this page and updating the &quot;effective date&quot; at the top
-                of this Privacy Policy.
+                this page and updating the &quot;Last Updated&quot; date.
               </p>
             </div>
 
@@ -294,105 +344,71 @@ const PrivacyPolicyPage = () => {
               <h2>9. Contact Us</h2>
               <p>
                 If you have any questions about this Privacy Policy, please
-                contact us at support@ccreward.app
+                contact us at{" "}
+                <a href="mailto:support@ccreward.app">support@ccreward.app</a>.
               </p>
             </div>
 
             <div onFocus={() => handleSectionInteraction("mobile_privacy")}>
               <h2>10. Mobile Application Privacy</h2>
               <p>
-                10.1. <strong>App Stores:</strong> Our mobile applications are
-                available through:
+                10.1. <strong>Availability:</strong>
               </p>
               <ul>
                 <li>
-                  Apple App Store:{" "}
+                  iOS: Apple App Store{" "}
                   <a href="https://apps.apple.com/in/app/ccreward/id6736835206">
-                    ccreward for iOS
+                    https://apps.apple.com/in/app/ccreward/id6736835206
                   </a>
                 </li>
                 <li>
-                  Google Play Store:{" "}
+                  Android: Google Play Store{" "}
                   <a href="https://play.google.com/store/apps/details?id=app.ccreward">
-                    ccreward for Android
+                    https://play.google.com/store/apps/details?id=app.ccreward
                   </a>
                 </li>
               </ul>
 
               <p>
-                10.2. <strong>Mobile Device Access:</strong> The mobile app may
-                request access to:
+                10.2. <strong>Permissions:</strong>
               </p>
               <ul>
                 <li>
-                  Internet connectivity to perform calculations and sync data
-                </li>
-                <li>Google Sign-In capabilities for authentication</li>
-                <li>Device storage for caching purposes</li>
-              </ul>
-
-              <p>
-                10.3. <strong>Data Collection in Mobile Apps:</strong>
-              </p>
-              <ul>
-                <li>
-                  The mobile apps collect the same core user data as our web
-                  service
+                  <strong>Internet:</strong> Required for calculations and
+                  syncing.
                 </li>
                 <li>
-                  Device-specific information such as operating system version
-                  and device model
-                </li>
-                <li>App performance and usage statistics</li>
-                <li>Crash reports and diagnostic information</li>
-                <li>
-                  Our app uses Google Ads to display personalized
-                  advertisements. Google Ads may collect information such as
-                  your device&apos;s advertising ID and interaction with
-                  advertisements (e.g., clicks or impressions).
-                </li>
-                <li>
-                  You can manage your ad preferences through your device
-                  settings or Google&apos;s Ad Settings page.
+                  <strong>Storage:</strong> Minimal use for caching images
+                  (logos) to improve performance.
                 </li>
               </ul>
 
               <p>
-                10.4. <strong>Mobile Data Storage:</strong>
+                10.3. <strong>Mobile Data Sync:</strong>
               </p>
               <ul>
                 <li>
-                  App-specific data is stored locally on your device for offline
-                  access
+                  App data is stored locally for offline access where possible.
                 </li>
                 <li>
-                  User account data is synchronized with our Firebase database
+                  When online, user account data synchronizes immediately with
+                  our Firebase database.
                 </li>
                 <li>
-                  Cache data can be cleared through your device&apos;s settings
+                  Using the &quot;Delete Account&quot; feature in the mobile app
+                  performs the same immediate deletion as the web version.
                 </li>
               </ul>
 
               <p>
-                10.5. <strong>Third-Party Services in Mobile Apps:</strong>
+                10.4. <strong>Platform Compatibility:</strong>
               </p>
               <ul>
-                <li>Google Firebase for authentication and data storage</li>
-                <li>Google Analytics for Firebase for usage analytics</li>
                 <li>
-                  App store specific services (App Store/Play Store) for app
-                  distribution and updates
+                  Web: <a href="https://ccreward.app">https://ccreward.app</a>
                 </li>
-              </ul>
-
-              <h2>Platform Compatibility</h2>
-              <p>ccreward.app is accessible through:</p>
-              <ul>
-                <li>Web browsers at https://ccreward.app</li>
-                <li>iOS devices through the App Store (iOS 15.0 or later)</li>
-                <li>
-                  Android devices through the Play Store (Android 10.0 or later)
-                </li>
+                <li>iOS: iOS 18.0 or later</li>
+                <li>Android: Android 10.0 or later</li>
               </ul>
             </div>
 
@@ -408,19 +424,12 @@ const PrivacyPolicyPage = () => {
               </p>
               <ul>
                 <li>
-                  Adjusting the settings on their device (e.g., &quot;Limit Ad
-                  Tracking&quot; on iOS or &quot;Opt Out of Ads
-                  Personalization&quot; on Android)
+                  Adjusting device settings (e.g., &quot;Limit Ad Tracking&quot;
+                  on iOS or &quot;Opt Out of Ads Personalization&quot; on
+                  Android).
                 </li>
                 <li>
-                  Visiting Google&apos;s Ad Settings at{" "}
-                  <a
-                    href="https://adssettings.google.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Google Ad Settings
-                  </a>
+                  Visiting Google Ad Settings.
                 </li>
               </ul>
             </div>

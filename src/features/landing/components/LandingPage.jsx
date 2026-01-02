@@ -15,6 +15,7 @@ import FeaturesSection from "./sections/FeaturesSection";
 import BankSection from "./sections/BankSection";
 import CallToActionSection from "./sections/CallToActionSection";
 import AppStoreSection from "./sections/AppStoreSection";
+import CustomGPTSection from "./sections/CustomGPTSection";
 import TestimonialsSection from "./sections/TestimonialsSection";
 import MobileAppPromotion from "./MobileAppPromotion";
 import TopCardsSection from "./sections/TopCardsSection";
@@ -22,6 +23,7 @@ import { tweets } from "../../../shared/constants/testimonials";
 import { detectDevice } from "../../../core/utils/deviceUtils";
 import TopSearchs from "./sections/TopSearchs";
 import StatsSection from "./sections/StatsSection";
+import GoogleOneTap from "../../../shared/components/auth/GoogleOneTap";
 // FIXED: Use specific imports instead of export *
 import { motion } from "framer-motion";
 
@@ -57,7 +59,6 @@ const LandingPage = () => {
   const router = useRouter();
   const {
     signInWithGoogle,
-    signInAnonymously,
     user,
     isAuthenticated,
     loading,
@@ -292,10 +293,11 @@ const LandingPage = () => {
     trackNavigation,
   ]);
 
+
+  
   // Enhanced sign-in handler with analytics
   const handleSignIn = async (signInMethod) => {
-    const signInMethodName =
-      signInMethod === signInWithGoogle ? "google" : "anonymous";
+    const signInMethodName = "google";
 
     trackButtonClick("sign_in_attempt", {
       method: signInMethodName,
@@ -382,6 +384,8 @@ const LandingPage = () => {
       setIsLoading(false);
     }
   };
+
+
 
   // Enhanced testimonial navigation with tracking
   const handleNextPage = () => {
@@ -483,6 +487,7 @@ const LandingPage = () => {
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
+        <GoogleOneTap />
         {isMobileDevice ? (
           <MobileView {...commonProps} />
         ) : (
@@ -496,7 +501,6 @@ const LandingPage = () => {
             isAuthenticated={isAuthenticated()}
             loading={loading}
             signInWithGoogle={signInWithGoogle}
-            signInAnonymously={signInAnonymously}
           />
         )}
       </Box>
@@ -608,6 +612,10 @@ const MobileView = ({
             />
           </Box>
 
+          <Box component="section" data-section="custom-gpt">
+            <CustomGPTSection theme={theme} />
+          </Box>
+
           <Box component="section" data-section="features">
             <FeaturesSection />
           </Box>
@@ -695,7 +703,6 @@ const DesktopView = ({
   isAuthenticated,
   loading,
   signInWithGoogle,
-  signInAnonymously,
   visibleTweets,
   handlePrevPage,
   handleNextPage,
@@ -748,7 +755,6 @@ const DesktopView = ({
             isAuthenticated={isAuthenticated}
             loading={loading}
             signInWithGoogle={signInWithGoogle}
-            signInAnonymously={signInAnonymously}
           />
         </Box>
 
@@ -808,6 +814,14 @@ const DesktopView = ({
           sx={{ bgcolor: "background.default" }}
         >
           <AppStoreSection isMobile={isMobile} theme={theme} />
+        </Box>
+
+        <Box
+          component="section"
+          data-section="custom-gpt"
+          sx={{ bgcolor: "background.default" }}
+        >
+          <CustomGPTSection theme={theme} />
         </Box>
 
         <Box

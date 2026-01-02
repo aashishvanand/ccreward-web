@@ -21,7 +21,6 @@ const HeroSection = ({
   isAuthenticated,
   loading,
   signInWithGoogle,
-  signInAnonymously,
 }) => {
   const theme = useTheme();
 
@@ -103,19 +102,7 @@ const HeroSection = ({
                 >
                   Sign in with Google
                 </Button>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  onClick={() => handleSignIn(signInAnonymously)}
-                  disabled={isLoading}
-                  sx={{
-                    height: 48,
-                    px: 4,
-                    fontSize: "1.125rem",
-                  }}
-                >
-                  Continue Anonymously
-                </Button>
+
               </Stack>
             )}
           </Grid>
