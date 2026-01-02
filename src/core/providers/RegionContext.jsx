@@ -47,25 +47,36 @@ export function RegionProvider({ children }) {
   const updateRegion = useCallback((newRegion) => {
     if (!newRegion || !isValidRegion(newRegion)) return;
 
-    const upperCaseRegion = newRegion.toUpperCase();
+    try {
+      const upperCaseRegion = newRegion.toUpperCase();
 
-    localStorage.setItem("app-region", upperCaseRegion);
-    localStorage.setItem("user-set-region", "true");
+      try {
+        localStorage.setItem("app-region", upperCaseRegion);
+        localStorage.setItem("user-set-region", "true");
+      } catch (storageError) {
+        console.warn("Failed to save region to localStorage:", storageError);
+      }
 
-    setRegion(upperCaseRegion);
-    setHasUserSetRegion(true);
-    setShowRegionModal(false);
-    setIsInitialized(true);
-    setIsLoading(false);
-    
-    // Reset global flag when modal is closed
-    modalShown = false;
+      setRegion(upperCaseRegion);
+      setHasUserSetRegion(true);
+      setShowRegionModal(false);
+      setIsInitialized(true);
+      setIsLoading(false);
+      
+      // Reset global flag when modal is closed
+      modalShown = false;
 
-    window.dispatchEvent(
-      new CustomEvent("region-changed", {
-        detail: { region: upperCaseRegion },
-      })
-    );
+      window.dispatchEvent(
+        new CustomEvent("region-changed", {
+          detail: { region: upperCaseRegion },
+        })
+      );
+    } catch (error) {
+      console.error("Error updating region:", error);
+      // Fallback: forcefully close modal
+      setShowRegionModal(false);
+      modalShown = false;
+    }
   }, []);
 
   const handleRegionSelect = useCallback((selectedRegion) => {
