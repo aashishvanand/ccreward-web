@@ -2,7 +2,7 @@
 import PropTypes from 'prop-types';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth, googleProvider, firebaseApp } from '../../../firebase';
-import { onAuthStateChanged, signInWithPopup, signInAnonymously as firebaseSignInAnonymously, getIdToken, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signInWithPopup, getIdToken, signOut } from 'firebase/auth';
 import { getAnalytics, logEvent } from "firebase/analytics";
 import { useRouter, usePathname } from "next/navigation";
 import { Box, CircularProgress, Typography, Paper, useTheme } from "@mui/material";
@@ -91,28 +91,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const signInAnonymously = async () => {
-    try {
-      const result = await firebaseSignInAnonymously(auth);
-      if (typeof window !== 'undefined') {
-        const analytics = getAnalytics(firebaseApp);
-        logEvent(analytics, 'login', {
-          method: 'anonymous',
-        });
-      }
-      return result.user;
-    } catch (error) {
-      console.error("Error signing in anonymously", error);
-      if (typeof window !== 'undefined') {
-        const analytics = getAnalytics(firebaseApp);
-        logEvent(analytics, 'error', {
-          error_code: error.code,
-          error_message: error.message,
-        });
-      }
-      throw error;
-    }
-  };
+
 
   const logout = async () => {
     try {
@@ -158,7 +137,6 @@ export function AuthProvider({ children }) {
   const value = {
     user,
     signInWithGoogle,
-    signInAnonymously,
     logout,
     isAuthenticated,
     loading,
