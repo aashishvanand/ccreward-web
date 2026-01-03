@@ -507,7 +507,7 @@ const LandingPage = () => {
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
-        <GoogleOneTap />
+        {!isMobileDevice && <GoogleOneTap />}
         {isMobileDevice ? (
           <MobileView {...commonProps} />
         ) : (
