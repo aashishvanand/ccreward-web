@@ -1,8 +1,6 @@
 import PrivacyPolicyPage from '../features/legal/components/PrivacyPolicyPage';
 import SEOHead from '../shared/components/seo/SEOHead';
 import { generateMetadata } from '../shared/components/seo';
-import { AuthProvider } from '../core/providers/AuthContext';
-import { ThemeRegistry } from '../core/providers/ThemeRegistry';
 
 const metadata = generateMetadata({
   title: "Privacy Policy - ccreward",
@@ -12,11 +10,9 @@ const metadata = generateMetadata({
 
 export default function PrivacyPage() {
   return (
-    <ThemeRegistry>
-      <AuthProvider>
-        <SEOHead metadata={metadata} />
-        <PrivacyPolicyPage />
-      </AuthProvider>
-    </ThemeRegistry>
+    <>
+      <SEOHead metadata={metadata} />
+      <PrivacyPolicyPage />
+    </>
   );
 }
