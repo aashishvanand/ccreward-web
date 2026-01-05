@@ -16,7 +16,9 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "pages:build": "npx @opennextjs/cloudflare build",
+    "build:worker": "opennextjs-cloudflare build",
+    "preview": "npm run build:worker && wrangler dev",
+    "deploy": "npm run build:worker && wrangler deploy",
     "start": "next start",
     "postinstall": "npm install --include=optional sharp --legacy-peer-deps",
     "analyze": "cross-env ANALYZE=true npm run build",
