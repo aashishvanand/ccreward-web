@@ -1,23 +1,15 @@
 "use client";
-import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Box from '@mui/material/Box';
 import { ThemeRegistry } from '../core/providers/ThemeRegistry';
 import { AuthProvider } from '../core/providers/AuthContext';
-import { AnimatePresence } from 'framer-motion';
-import { initializeAnalytics, setupNetworkMonitoring } from '../core/services/analytics'; // Add this import
-import PerformanceWrapper from '../shared/components/PerformanceWrapper'; // Add this import
+import { initializeAnalytics, setupNetworkMonitoring } from '../core/services/analytics';
+import PerformanceWrapper from '../shared/components/PerformanceWrapper';
 
 const LandingPage = dynamic(() => import('../features/landing/components/LandingPage'), { ssr: false });
-const MyCardsPage = dynamic(() => import('../features/cards/components/MyCardsPage'), { ssr: false });
-const Calculator = dynamic(() => import('../features/calculator/components/Calculator'), { ssr: false });
-const HowToGuide = dynamic(() => import('../features/how-to/HowToGuide'), { ssr: false });
-const TransferCalculator = dynamic(() => import('../features/transfer-calculator/components/TransferCalculator'), { ssr: false });
 
 function Home() {
-  const pathname = usePathname();
-
   // Add this useEffect for performance monitoring
   useEffect(() => {
     const initPerformanceMonitoring = async () => {
@@ -32,64 +24,20 @@ function Home() {
     initPerformanceMonitoring();
   }, []);
 
-  const getComponent = () => {
-    switch (pathname) {
-      case '/':
-        return (
-          <PerformanceWrapper name="landing_page">
-            <LandingPage />
-          </PerformanceWrapper>
-        );
-      case '/my-cards':
-        return (
-          <PerformanceWrapper name="my_cards_page">
-            <MyCardsPage />
-          </PerformanceWrapper>
-        );
-      case '/calculator':
-        return (
-          <PerformanceWrapper name="calculator_page">
-            <Calculator />
-          </PerformanceWrapper>
-        );
-      case '/transfer-calculator':
-        return (
-          <PerformanceWrapper name="transfer_calculator_page">
-            <TransferCalculator />
-          </PerformanceWrapper>
-        );
-      case '/how-to':
-        return (
-          <PerformanceWrapper name="how_to_page">
-            <HowToGuide />
-          </PerformanceWrapper>
-        );
-      default:
-        return (
-          <PerformanceWrapper name="landing_page">
-            <LandingPage />
-          </PerformanceWrapper>
-        );
-    }
-  };
-
   return (
     <Box sx={{ minHeight: '100vh' }}>
-      {getComponent()}
+      <PerformanceWrapper name="landing_page">
+        <LandingPage />
+      </PerformanceWrapper>
     </Box>
   );
 }
 
-// Rest of your component remains the same
 function WrappedHome() {
-  const pathname = usePathname();
-
   return (
     <ThemeRegistry>
       <AuthProvider>
-        <AnimatePresence mode="wait">
-          <Home key={pathname} />
-        </AnimatePresence>
+        <Home />
       </AuthProvider>
     </ThemeRegistry>
   );
