@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { auth, googleProvider, firebaseApp } from '../../../firebase';
 import { onAuthStateChanged, signInWithPopup, getIdToken, signOut, deleteUser } from 'firebase/auth';
 import { deleteUserData } from '../services/firebaseUtils';
-import { getAnalytics, logEvent } from "firebase/analytics";
+// import { getAnalytics, logEvent } from "firebase/analytics"; // Removed for dynamic import
 import { useRouter, usePathname } from "next/navigation";
 import { Box, CircularProgress, Typography, Paper, useTheme } from "@mui/material";
 import { motion } from "framer-motion";
@@ -46,10 +46,12 @@ export function AuthProvider({ children }) {
         setIsNewUser(isNew);
         // Log sign_in event if it's a new user
         if (isNew && typeof window !== 'undefined') {
-          const analytics = getAnalytics(firebaseApp);
-          logEvent(analytics, 'sign_up', {
-            method: user.isAnonymous ? 'anonymous' : 'google',
-          });
+          import("firebase/analytics").then(({ getAnalytics, logEvent }) => {
+            const analytics = getAnalytics(firebaseApp);
+            logEvent(analytics, 'sign_up', {
+              method: user.isAnonymous ? 'anonymous' : 'google',
+            });
+          }).catch(e => console.warn("Analytics error", e));
         }
       } else {
         setUser(null);
@@ -73,6 +75,7 @@ export function AuthProvider({ children }) {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       if (typeof window !== 'undefined') {
+        const { getAnalytics, logEvent } = await import("firebase/analytics");
         const analytics = getAnalytics(firebaseApp);
         logEvent(analytics, 'login', {
           method: 'google',
@@ -82,11 +85,14 @@ export function AuthProvider({ children }) {
     } catch (error) {
       console.error("Error signing in with Google", error);
       if (typeof window !== 'undefined') {
-        const analytics = getAnalytics(firebaseApp);
-        logEvent(analytics, 'error', {
-          error_code: error.code,
-          error_message: error.message,
-        });
+        try {
+          const { getAnalytics, logEvent } = await import("firebase/analytics");
+          const analytics = getAnalytics(firebaseApp);
+          logEvent(analytics, 'error', {
+            error_code: error.code,
+            error_message: error.message,
+          });
+        } catch (e) { }
       }
       throw error;
     }
@@ -98,6 +104,7 @@ export function AuthProvider({ children }) {
     try {
       await signOut(auth);
       if (typeof window !== 'undefined') {
+        const { getAnalytics, logEvent } = await import("firebase/analytics");
         const analytics = getAnalytics(firebaseApp);
         logEvent(analytics, 'logout');
       }
@@ -117,11 +124,14 @@ export function AuthProvider({ children }) {
     } catch (error) {
       console.error("Error signing out", error);
       if (typeof window !== 'undefined') {
-        const analytics = getAnalytics(firebaseApp);
-        logEvent(analytics, 'error', {
-          error_code: error.code,
-          error_message: error.message,
-        });
+        try {
+          const { getAnalytics, logEvent } = await import("firebase/analytics");
+          const analytics = getAnalytics(firebaseApp);
+          logEvent(analytics, 'error', {
+            error_code: error.code,
+            error_message: error.message,
+          });
+        } catch (e) { }
       }
       throw error;
     }
@@ -141,6 +151,7 @@ export function AuthProvider({ children }) {
 
       // 3. Analytics
       if (typeof window !== 'undefined') {
+        const { getAnalytics, logEvent } = await import("firebase/analytics");
         const analytics = getAnalytics(firebaseApp);
         logEvent(analytics, 'delete_account');
       }
@@ -164,11 +175,14 @@ export function AuthProvider({ children }) {
     } catch (error) {
       console.error("Error deleting account", error);
       if (typeof window !== 'undefined') {
-        const analytics = getAnalytics(firebaseApp);
-        logEvent(analytics, 'error', {
-          error_code: error.code,
-          error_message: error.message,
-        });
+        try {
+          const { getAnalytics, logEvent } = await import("firebase/analytics");
+          const analytics = getAnalytics(firebaseApp);
+          logEvent(analytics, 'error', {
+            error_code: error.code,
+            error_message: error.message,
+          });
+        } catch (e) { }
       }
       throw error;
     }

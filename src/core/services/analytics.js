@@ -1,17 +1,20 @@
 // src/core/services/analytics.js - Client-Side Only Firebase Analytics & Performance
-import { getAnalytics, logEvent, setUserId, setUserProperties } from 'firebase/analytics';
-import { getPerformance, trace } from 'firebase/performance';
 import { firebaseApp } from '../../../firebase';
 
 let analytics = null;
 let firebasePerformance = null;
 let isInitialized = false;
 
+// Hold references to dynamically imported functions
+let logEventFn = null;
+let setUserIdFn = null;
+let setUserPropertiesFn = null;
+let traceFn = null;
+
 // Initialize analytics and performance monitoring (client-side only)
 const initializeAnalytics = async () => {
     // Only run on client-side
     if (typeof window === 'undefined') {
-
         return false;
     }
 
@@ -19,6 +22,16 @@ const initializeAnalytics = async () => {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     try {
+        // Dynamic imports
+        const { getAnalytics, logEvent, setUserId, setUserProperties } = await import('firebase/analytics');
+        const { getPerformance, trace } = await import('firebase/performance');
+
+        // Store functions for later use
+        logEventFn = logEvent;
+        setUserIdFn = setUserId;
+        setUserPropertiesFn = setUserProperties;
+        traceFn = trace;
+
         // Initialize Analytics
         analytics = getAnalytics(firebaseApp);
 
@@ -109,7 +122,9 @@ const logAnalyticsEvent = (eventName, eventParams = {}) => {
         };
 
         // Log to Firebase Analytics
-        logEvent(analytics, eventName, enrichedParams);
+        if (logEventFn) {
+            logEventFn(analytics, eventName, enrichedParams);
+        }
 
         // Development logging
 
@@ -126,7 +141,8 @@ const createPerformanceTrace = (traceName) => {
     }
 
     try {
-        const traceObj = trace(firebasePerformance, traceName);
+        if (!traceFn) return null;
+        const traceObj = traceFn(firebasePerformance, traceName);
         return traceObj;
     } catch (error) {
         console.error('❌ Error creating performance trace:', error);
@@ -367,7 +383,9 @@ const setUserAnalytics = (userId, userProperties = {}) => {
     if (!analytics || typeof window === 'undefined') return;
 
     try {
-        setUserId(analytics, userId);
+        if (setUserIdFn) {
+            setUserIdFn(analytics, userId);
+        }
 
         const enhancedProperties = {
             ...userProperties,
@@ -388,7 +406,9 @@ const setUserAnalytics = (userId, userProperties = {}) => {
             device_memory: getDeviceMemory()
         };
 
-        setUserProperties(analytics, enhancedProperties);
+        if (setUserPropertiesFn) {
+            setUserPropertiesFn(analytics, enhancedProperties);
+        }
 
         // Mark user as visited
         setStorageItem('user_visited_before', 'true');

@@ -1,5 +1,4 @@
-import { db } from '../../../firebase';
-import { doc, getDoc, setDoc, updateDoc, deleteField, serverTimestamp, deleteDoc } from 'firebase/firestore';
+import { firebaseApp } from '../../../firebase';
 
 const CACHE_KEY = 'userCardsCache';
 const CACHE_TIMESTAMP_KEY = 'userCardsCacheTimestamp';
@@ -7,6 +6,7 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
 // Helper function to get cached data
 const getCachedData = (userId) => {
+  if (typeof window === 'undefined') return null;
   const cachedData = localStorage.getItem(`${CACHE_KEY}_${userId}`);
   const cacheTimestamp = localStorage.getItem(`${CACHE_TIMESTAMP_KEY}_${userId}`);
 
@@ -21,13 +21,26 @@ const getCachedData = (userId) => {
 
 // Helper function to set cached data
 const setCachedData = (userId, data) => {
+  if (typeof window === 'undefined') return;
   localStorage.setItem(`${CACHE_KEY}_${userId}`, JSON.stringify(data));
   localStorage.setItem(`${CACHE_TIMESTAMP_KEY}_${userId}`, new Date().getTime().toString());
+};
+
+// Helper to load firestore dynamically
+const loadFirestore = async () => {
+  if (typeof window === 'undefined') return { db: null, funcs: null };
+  const funcs = await import('firebase/firestore');
+  const db = funcs.getFirestore(firebaseApp);
+  return { db, funcs };
 };
 
 // Function to add a card for a user
 export const addCardForUser = async (userId, cardData) => {
   try {
+    const { db, funcs } = await loadFirestore();
+    if (!db || !funcs) throw new Error("Firestore not initialized");
+    const { doc, getDoc, setDoc, serverTimestamp, updateDoc } = funcs;
+
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
 
@@ -75,8 +88,14 @@ export const addCardForUser = async (userId, cardData) => {
 // Function to get all cards for a user
 export const getCardsForUser = async (userId) => {
   try {
+    if (typeof window === 'undefined') return [];
+
     // Get current region/country directly from localStorage (don't use cached value)
     const selectedCountry = localStorage.getItem('app-region')?.toLowerCase() || 'in';
+
+    const { db, funcs } = await loadFirestore();
+    if (!db || !funcs) return [];
+    const { doc, getDoc } = funcs;
 
     // If not in cache, fetch from Firebase
     const userRef = doc(db, 'users', userId);
@@ -96,13 +115,6 @@ export const getCardsForUser = async (userId) => {
       id: key,
       ...value
     }));
-
-    // Log each card's properties in detail
-    cardList.forEach((card, index) => {
-      // Convert card country to lowercase for case-insensitive comparison
-      const cardCountry = (card.country || '').toLowerCase();
-      const shouldInclude = !card.country || cardCountry === selectedCountry;
-    });
 
     // Filter cards by country - using case-insensitive comparison
     const filteredCardList = cardList.filter(card => {
@@ -127,6 +139,10 @@ export const getCardsForUser = async (userId) => {
 //Add updateCardForUser function
 export const updateCardForUser = async (userId, cardData) => {
   try {
+    const { db, funcs } = await loadFirestore();
+    if (!db || !funcs) throw new Error("Firestore not initialized");
+    const { doc, updateDoc } = funcs;
+
     const userRef = doc(db, 'users', userId);
 
     // Destructure and remove unwanted fields
@@ -159,6 +175,10 @@ export const updateCardForUser = async (userId, cardData) => {
 // Function to delete a card for a user
 export const deleteCardForUser = async (userId, cardKey) => {
   try {
+    const { db, funcs } = await loadFirestore();
+    if (!db || !funcs) throw new Error("Firestore not initialized");
+    const { doc, updateDoc, deleteField } = funcs;
+
     const userRef = doc(db, 'users', userId);
     await updateDoc(userRef, {
       [`cards.${cardKey}`]: deleteField()
@@ -176,9 +196,15 @@ export const deleteCardForUser = async (userId, cardKey) => {
 // Function to force refresh the cache
 export const refreshCardCache = async (userId) => {
   try {
+    if (typeof window === 'undefined') return [];
+
     // Clear cache
     localStorage.removeItem(`${CACHE_KEY}_${userId}`);
     localStorage.removeItem(`${CACHE_TIMESTAMP_KEY}_${userId}`);
+
+    const { db, funcs } = await loadFirestore();
+    if (!db || !funcs) return [];
+    const { doc, getDoc } = funcs;
 
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
@@ -205,6 +231,10 @@ export const refreshCardCache = async (userId) => {
 // Function to delete user data
 export const deleteUserData = async (userId) => {
   try {
+    const { db, funcs } = await loadFirestore();
+    if (!db || !funcs) throw new Error("Firestore not initialized");
+    const { doc, deleteDoc } = funcs;
+
     const userRef = doc(db, 'users', userId);
     await deleteDoc(userRef);
 
