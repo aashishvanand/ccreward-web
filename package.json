@@ -16,6 +16,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "pages:build": "npx @opennextjs/cloudflare build",
     "start": "next start",
     "postinstall": "npm install --include=optional sharp --legacy-peer-deps",
     "analyze": "cross-env ANALYZE=true npm run build",
@@ -29,6 +30,7 @@
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.6",
     "@mui/material-nextjs": "^7.3.6",
+    "@opennextjs/cloudflare": "^1.14.7",
     "axios": "^1.13.2",
     "axios-retry": "^4.5.0",
     "firebase": "^12.7.0",
@@ -50,7 +52,8 @@
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.0",
     "jest": "^30.2.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wrangler": "^4.54.0"
   },
   "resolutions": {
     "@emotion/react": "^11.14.0",

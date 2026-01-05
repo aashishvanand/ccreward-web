@@ -75,7 +75,7 @@ const categories = [
   "Wallet Loading",
 ];
 
-const TopCardsPage = () => {
+const TopCardsPage = ({ initialCategories, initialCardImages }) => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -98,12 +98,12 @@ const TopCardsPage = () => {
     severity: "success",
   });
   const { cardImagesData, isLoading: isLoadingCardImages } =
-    useCardImagesData();
+    useCardImagesData(initialCardImages);
   const {
     categories: categoriesData,
     isLoading: isLoadingCategories,
     error: categoriesError,
-  } = useCardCategories();
+  } = useCardCategories(initialCategories);
   const [isValidating, setIsValidating] = useState(false);
   const searchParams = useSearchParams();
 

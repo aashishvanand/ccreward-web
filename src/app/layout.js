@@ -1,6 +1,6 @@
-
 import './globals.css'
 import PropTypes from 'prop-types';
+
 import { Inter, Outfit } from "next/font/google";
 import Script from "next/script";
 import Providers from './providers'
