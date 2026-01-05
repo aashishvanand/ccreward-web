@@ -1,5 +1,5 @@
 {
-    "name": "ccreward-web-dev",
+    "name": "ccreward-web",
     "main": ".open-next/worker.js",
     "compatibility_date": "2026-01-01",
     "compatibility_flags": [
@@ -9,10 +9,44 @@
         "directory": ".open-next/assets",
         "binding": "ASSETS"
     },
-    "kv_namespaces": [
-        {
-            "binding": "NEXT_CACHE_WORKERS_KV",
-            "id": "fa2bcf379a1741f5bfb33323e8cdafad"
+    "observability": {
+        "logs": {
+            "enabled": true,
+            "head_sampling_rate": 1,
+            "invocation_logs": true,
+            "persist": true
         }
-    ]
+    },
+    "env": {
+        "dev": {
+            "name": "ccreward-web-dev",
+            "routes": [
+                {
+                    "pattern": "dev.ccreward.app",
+                    "custom_domain": true
+                }
+            ],
+            "kv_namespaces": [
+                {
+                    "binding": "NEXT_CACHE_WORKERS_KV",
+                    "id": "fa2bcf379a1741f5bfb33323e8cdafad"
+                }
+            ]
+        },
+        "prod": {
+            "name": "ccreward-web",
+            "routes": [
+                {
+                    "pattern": "ccreward.app",
+                    "custom_domain": true
+                }
+            ],
+            "kv_namespaces": [
+                {
+                    "binding": "NEXT_CACHE_WORKERS_KV",
+                    "id": "fa2bcf379a1741f5bfb33323e8cdafad"
+                }
+            ]
+        }
+    }
 }
