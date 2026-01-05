@@ -20,7 +20,7 @@ let app;
 
 if (!getApps().length) {
     app = initializeApp(firebaseConfig);
-    
+
     // Initialize App Check for security (optional but recommended)
     if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
         try {
@@ -37,7 +37,9 @@ if (!getApps().length) {
 }
 
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Initialize Firestore only on client side to avoid EvalError in Cloudflare Workers
+// Initialize Firestore only on client side to avoid EvalError in Cloudflare Workers
+export const db = typeof window !== 'undefined' ? getFirestore(app) : null;
 export const googleProvider = new GoogleAuthProvider();
 export const firebaseApp = app;
 

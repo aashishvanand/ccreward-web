@@ -2,8 +2,6 @@
 import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Box from '@mui/material/Box';
-import { ThemeRegistry } from '../core/providers/ThemeRegistry';
-import { AuthProvider } from '../core/providers/AuthContext';
 import { initializeAnalytics, setupNetworkMonitoring } from '../core/services/analytics';
 import PerformanceWrapper from '../shared/components/PerformanceWrapper';
 
@@ -33,14 +31,4 @@ function Home() {
   );
 }
 
-function WrappedHome() {
-  return (
-    <ThemeRegistry>
-      <AuthProvider>
-        <Home />
-      </AuthProvider>
-    </ThemeRegistry>
-  );
-}
-
-export default WrappedHome;
+export default Home;
