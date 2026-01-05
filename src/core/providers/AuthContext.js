@@ -2,7 +2,8 @@
 import PropTypes from 'prop-types';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth, googleProvider, firebaseApp } from '../../../firebase';
-import { onAuthStateChanged, signInWithPopup, getIdToken, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signInWithPopup, getIdToken, signOut, deleteUser } from 'firebase/auth';
+import { deleteUserData } from '../services/firebaseUtils';
 import { getAnalytics, logEvent } from "firebase/analytics";
 import { useRouter, usePathname } from "next/navigation";
 import { Box, CircularProgress, Typography, Paper, useTheme } from "@mui/material";
@@ -126,6 +127,53 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const deleteAccount = async () => {
+    try {
+      if (!auth.currentUser) throw new Error("No user logged in");
+
+      const uid = auth.currentUser.uid;
+
+      // 1. Delete user data from Firestore
+      await deleteUserData(uid);
+
+      // 2. Delete user from Firebase Auth
+      await deleteUser(auth.currentUser);
+
+      // 3. Analytics
+      if (typeof window !== 'undefined') {
+        const analytics = getAnalytics(firebaseApp);
+        logEvent(analytics, 'delete_account');
+      }
+
+      // 4. Cleanup local state
+      setUser(null);
+      setToken(null);
+      setIsNewUser(false);
+
+      if (typeof window !== 'undefined') {
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('userCardsCache_') ||
+            key.startsWith('userCardsCacheTimestamp_')) {
+            localStorage.removeItem(key);
+          }
+        });
+        localStorage.removeItem('calculationCount');
+      }
+
+      router.push('/');
+    } catch (error) {
+      console.error("Error deleting account", error);
+      if (typeof window !== 'undefined') {
+        const analytics = getAnalytics(firebaseApp);
+        logEvent(analytics, 'error', {
+          error_code: error.code,
+          error_message: error.message,
+        });
+      }
+      throw error;
+    }
+  };
+
   const isAuthenticated = () => {
     return !!user;
   };
@@ -142,6 +190,7 @@ export function AuthProvider({ children }) {
     loading,
     isNewUser,
     markUserAsNotNew,
+    deleteAccount,
   };
 
 

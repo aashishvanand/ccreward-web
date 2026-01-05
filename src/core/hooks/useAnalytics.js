@@ -1,3 +1,4 @@
+"use client";
 // src/core/hooks/useAnalytics.js - Client-Side Compatible Analytics Hooks
 import { useCallback, useEffect, useRef } from 'react';
 import { useAuth } from '../providers/AuthContext';

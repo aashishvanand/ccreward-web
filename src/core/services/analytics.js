@@ -4,16 +4,14 @@ import { getPerformance, trace } from 'firebase/performance';
 import { firebaseApp } from '../../../firebase';
 
 let analytics = null;
-let performance = null;
+let firebasePerformance = null;
 let isInitialized = false;
 
 // Initialize analytics and performance monitoring (client-side only)
 const initializeAnalytics = async () => {
     // Only run on client-side
     if (typeof window === 'undefined') {
-        if (process.env.NODE_ENV === 'development') {
-            console.log('🔧 Analytics initialization skipped (server-side)');
-        }
+
         return false;
     }
 
@@ -23,20 +21,16 @@ const initializeAnalytics = async () => {
     try {
         // Initialize Analytics
         analytics = getAnalytics(firebaseApp);
-        if (process.env.NODE_ENV === 'development') {
-            console.log('✅ Firebase Analytics initialized');
-        }
+
 
         // Initialize Performance Monitoring
         try {
-            performance = getPerformance(firebaseApp);
+            firebasePerformance = getPerformance(firebaseApp);
 
             // Set up automatic performance monitoring
             setupClientSidePerformanceMonitoring();
 
-            if (process.env.NODE_ENV === 'development') {
-                console.log('✅ Firebase Performance Monitoring initialized');
-            }
+
         } catch (perfError) {
             console.warn('⚠️ Performance monitoring not available:', perfError);
         }
@@ -89,11 +83,7 @@ function generateSecureRandomString(length = 9) {
 const logAnalyticsEvent = (eventName, eventParams = {}) => {
     // Only run on client-side
     if (!analytics || typeof window === 'undefined' || !isInitialized) {
-        if (typeof window === 'undefined') {
-            if (process.env.NODE_ENV === 'development') {
-                console.log(`🔧 Analytics event skipped (server-side): ${eventName}`);
-            }
-        }
+
         return;
     }
 
@@ -122,9 +112,7 @@ const logAnalyticsEvent = (eventName, eventParams = {}) => {
         logEvent(analytics, eventName, enrichedParams);
 
         // Development logging
-        if (process.env.NODE_ENV === 'development') {
-            console.log(`📊 Analytics Event: ${eventName}`, enrichedParams);
-        }
+
 
     } catch (error) {
         console.error('❌ Error logging analytics event:', error);
@@ -133,12 +121,12 @@ const logAnalyticsEvent = (eventName, eventParams = {}) => {
 
 // Create and manage performance traces (client-side only)
 const createPerformanceTrace = (traceName) => {
-    if (!performance || !isInitialized || typeof window === 'undefined') {
+    if (!firebasePerformance || !isInitialized || typeof window === 'undefined') {
         return null;
     }
 
     try {
-        const traceObj = trace(performance, traceName);
+        const traceObj = trace(firebasePerformance, traceName);
         return traceObj;
     } catch (error) {
         console.error('❌ Error creating performance trace:', error);
@@ -209,7 +197,7 @@ function setupClientSidePerformanceMonitoring() {
     // Monitor page load performance
     window.addEventListener('load', () => {
         setTimeout(() => {
-            const navigation = performance.getEntriesByType('navigation')[0];
+            const navigation = window.performance.getEntriesByType('navigation')[0];
             if (navigation) {
                 logAnalyticsEvent('page_load_performance', {
                     load_time: Math.round(navigation.loadEventEnd - navigation.loadEventStart),
@@ -444,7 +432,7 @@ function getClientPerformanceMetrics() {
     }
 
     try {
-        const memory = performance.memory;
+        const memory = window.performance.memory;
 
         return {
             memory_used: memory ? Math.round(memory.usedJSHeapSize / 1048576) : 0, // MB
@@ -709,9 +697,7 @@ const logPageView = (path, additionalData = {}) => {
 const setupNetworkMonitoring = () => {
     // Only run on client-side
     if (typeof window === 'undefined') {
-        if (process.env.NODE_ENV === 'development') {
-            console.log('🔧 Network monitoring setup skipped (server-side)');
-        }
+
         return false;
     }
 

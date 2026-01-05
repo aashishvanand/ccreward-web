@@ -26,6 +26,7 @@ import {
 import {
   Info as InfoIcon,
   ExpandMore as ExpandMoreIcon,
+  Clear as ClearIcon,
 } from "@mui/icons-material";
 import Header from "../../../shared/components/layout/Header";
 import Footer from "../../../shared/components/layout/Footer";
@@ -733,6 +734,21 @@ const BestCardCalculator = () => {
                   startAdornment: (
                     <InputAdornment position="start">
                       {getCurrencySymbol()}
+                    </InputAdornment>
+                  ),
+                  endAdornment: spentAmount && (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="clear spent amount"
+                        onClick={() => {
+                          setSpentAmount("");
+                          trackFieldInteraction("spent_amount", "clear");
+                        }}
+                        edge="end"
+                        size="small"
+                      >
+                        <ClearIcon />
+                      </IconButton>
                     </InputAdornment>
                   ),
                   inputProps: {

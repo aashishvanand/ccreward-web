@@ -34,11 +34,12 @@ const BankSection = () => {
           {bankData.map((bank) => (
             <Grid
               key={bank.id}
-              item
-              xs={6}
-              sm={4}
-              md={3}
-              lg={2}
+              size={{
+                xs: 6,
+                sm: 4,
+                md: 3,
+                lg: 2
+              }}
             >
               <Link 
                 href={`/${region.toLowerCase()}/bank/${bank.bank.toLowerCase()}`}

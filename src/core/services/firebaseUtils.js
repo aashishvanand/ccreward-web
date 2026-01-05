@@ -1,5 +1,5 @@
 import { db } from '../../../firebase';
-import { doc, getDoc, setDoc, updateDoc, deleteField, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, deleteField, serverTimestamp, deleteDoc } from 'firebase/firestore';
 
 const CACHE_KEY = 'userCardsCache';
 const CACHE_TIMESTAMP_KEY = 'userCardsCacheTimestamp';
@@ -198,6 +198,21 @@ export const refreshCardCache = async (userId) => {
     return cardList;
   } catch (error) {
     console.error("Error refreshing card cache:", error);
+    throw error;
+  }
+};
+
+// Function to delete user data
+export const deleteUserData = async (userId) => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    await deleteDoc(userRef);
+
+    // Clear cache
+    localStorage.removeItem(`${CACHE_KEY}_${userId}`);
+    localStorage.removeItem(`${CACHE_TIMESTAMP_KEY}_${userId}`);
+  } catch (error) {
+    console.error("Error deleting user data:", error);
     throw error;
   }
 };

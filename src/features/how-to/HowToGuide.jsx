@@ -313,6 +313,7 @@ const HowToGuide = () => {
       animate="visible"
       exit="exit"
     >
+      <title>How to Guide - CCReward</title>
       <Box
         sx={{
           display: "flex",

@@ -1,3 +1,4 @@
+"use client";
 // src/shared/components/PerformanceWrapper.jsx
 import { useEffect } from 'react';
 import { startPerformanceTrace, stopPerformanceTrace } from '../../core/services/analytics';
