@@ -1,6 +1,6 @@
 {
   "name": "ccreward.app",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "private": true,
   "description": "A comprehensive tool to calculate and optimize credit card rewards across multiple banks in India & Singapore",
   "author": "Aashish Vivekanand",
@@ -15,6 +15,7 @@
   },
   "scripts": {
     "dev": "next dev --turbopack",
+    "build": "next build",
     "build:worker": "opennextjs-cloudflare build",
     "preview": "npm run build:worker && wrangler dev",
     "deploy:dev": "npm run build:worker && wrangler deploy --env dev",
