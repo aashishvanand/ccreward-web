@@ -8,6 +8,10 @@ const metadata = generateMetadata({
   path: '/privacy'
 });
 
+export async function getStaticProps() {
+  return { props: {} };
+}
+
 export default function PrivacyPage() {
   return (
     <>
