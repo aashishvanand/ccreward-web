@@ -14,6 +14,8 @@ import {
   ListItemText,
   Tooltip,
   Badge,
+  Avatar,
+  Divider,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -27,6 +29,8 @@ import {
   SwapHoriz as SwapHorizIcon,
   Login as LoginIcon,
   Search as SearchIcon,
+  Delete as DeleteIcon,
+  Person as PersonIcon,
 } from "@mui/icons-material";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
@@ -96,7 +100,7 @@ const logoVariants = {
 function Header({ hideNavigation = false }) {
   const { mode, toggleTheme } = useAppTheme();
   const { region } = useRegion();
-  const { user, logout, isAuthenticated, signInWithGoogle } = useAuth();
+  const { user, logout, deleteAccount, isAuthenticated, signInWithGoogle } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const theme = useTheme();
@@ -161,6 +165,19 @@ function Header({ hideNavigation = false }) {
       router.push("/");
     } catch (error) {
       console.error("Logout error:", error);
+    }
+    handleMenuClose();
+  };
+
+  const handleDeleteAccount = async () => {
+    if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+      try {
+        await deleteAccount();
+        setCardCount(0);
+        router.push("/");
+      } catch (error) {
+        console.error("Delete account error:", error);
+      }
     }
     handleMenuClose();
   };
@@ -359,16 +376,7 @@ function Header({ hideNavigation = false }) {
             />
           </MenuItem>
 
-          {isAuthenticated && (
-            <MenuItem onClick={handleLogout} sx={{ py: 1.5, px: 2 }}>
-              <ListItemIcon>
-                <LogoutIcon />
-              </ListItemIcon>
-              <ListItemText primary="Logout" />
-            </MenuItem>
-          )}
-
-          {!isAuthenticated && (
+          {!isAuthenticated() && (
             <MenuItem onClick={handleLogin} sx={{ py: 1.5, px: 2 }}>
               <ListItemIcon>
                 <LoginIcon />
@@ -376,6 +384,80 @@ function Header({ hideNavigation = false }) {
               <ListItemText primary="Sign In" />
             </MenuItem>
           )}
+        </Box>
+      </Menu>
+    );
+  };
+
+  const renderProfileMenu = () => {
+    return (
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+        PaperProps={{
+          sx: {
+            mt: 1.5,
+            borderRadius: 2,
+            minWidth: 220,
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+            backdropFilter: "blur(10px)",
+          },
+        }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+      >
+        {isAuthenticated() && (
+          <Box sx={{ px: 2, py: 1.5 }}>
+             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Avatar
+                src={user?.photoURL}
+                alt={user?.displayName || "User"}
+                 sx={{ width: 40, height: 40, mr: 1.5 }}
+              >
+                  {user?.displayName?.charAt(0) || <PersonIcon />}
+              </Avatar>
+              <Box sx={{ overflow: 'hidden' }}>
+                 <Typography variant="subtitle2" noWrap sx={{ fontWeight: 600 }}>
+                    {user?.displayName || "User"}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block' }}>
+                    {user?.email}
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+        )}
+        
+        <Divider />
+
+        <MenuItem onClick={handleLogout} sx={{ py: 1.5, px: 2 }}>
+          <ListItemIcon>
+            <LogoutIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary="Logout" />
+        </MenuItem>
+
+         <Divider />
+         
+        <Box sx={{ px: 2, py: 1 }}>
+             <Typography variant="caption" color="error" sx={{ fontWeight: 600, display: 'block', mb: 0.5 }}>
+                DANGER ZONE
+            </Typography>
+             <MenuItem 
+                onClick={handleDeleteAccount} 
+                sx={{ 
+                    py: 1, 
+                    px: 0, 
+                    color: 'error.main',
+                    '&:hover': { backgroundColor: 'rgba(211, 47, 47, 0.04)' }
+                }}
+            >
+              <ListItemIcon sx={{ minWidth: 36 }}>
+                <DeleteIcon fontSize="small" color="error" />
+              </ListItemIcon>
+              <ListItemText primary="Delete Account" />
+            </MenuItem>
         </Box>
       </Menu>
     );
@@ -469,23 +551,33 @@ function Header({ hideNavigation = false }) {
                 </IconButton>
               </Tooltip>
 
-              {/* Logout Button for Desktop */}
+              {/* Profile Button for Desktop */}
               {isAuthenticated() && (
-                <Tooltip title="Logout" arrow>
+                <>
+                <Tooltip title="Account settings">
                   <IconButton
-                    onClick={handleLogout}
-                    color="inherit"
+                    onClick={handleMenuOpen}
                     sx={{
                       ml: 1,
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
-                      "&:hover": {
-                        backgroundColor: "rgba(255, 255, 255, 0.2)",
-                      },
+                      p: 0,
+                      border: '2px solid rgba(255, 255, 255, 0.2)',
+                      transition: 'all 0.2s',
+                        '&:hover': {
+                         border: '2px solid rgba(255, 255, 255, 0.5)',
+                        }
                     }}
                   >
-                    <LogoutIcon />
+                   <Avatar 
+                        src={user?.photoURL} 
+                        alt={user?.displayName || "User"}
+                        sx={{ width: 32, height: 32 }}
+                    >
+                         {user?.displayName?.charAt(0) || <PersonIcon />}
+                    </Avatar>
                   </IconButton>
                 </Tooltip>
+                {renderProfileMenu()}
+                </>
               )}
 
               {/* Login Button for Desktop */}

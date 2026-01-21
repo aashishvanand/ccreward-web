@@ -1,3 +1,4 @@
+"use client";
 // src/core/providers/RegionContext.jsx - FIXED: Single Modal Instance
 import {
   createContext,
@@ -83,6 +84,9 @@ export function RegionProvider({ children }) {
     updateRegion(selectedRegion);
   }, [updateRegion]);
 
+  // Add this import at the top
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+
   useEffect(() => {
     // Prevent multiple initializations
     if (initRef.current || initializationInProgress) {
@@ -99,6 +103,24 @@ export function RegionProvider({ children }) {
       }
 
       try {
+        // 1. Check URL Parameter for SEO (Highest Priority)
+        // We use window.location because useSearchParams might not be available during initial hydration 
+        // effectively outside of Next.js router context in some edge cases compared to Providers
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlRegion = urlParams.get('region');
+
+        if (urlRegion && isValidRegion(urlRegion)) {
+           const upperUrlRegion = urlRegion.toUpperCase();
+           setRegion(upperUrlRegion);
+           // We do NOT set user-set-region to true for URL params to avoid persistent override from a temporary link
+           // But we treat it as initialized.
+           setHasUserSetRegion(false); 
+           setIsInitialized(true);
+           setIsLoading(false);
+           initializationInProgress = false;
+           return;
+        }
+
         const savedRegion = localStorage.getItem("app-region");
         const userSetRegion = localStorage.getItem("user-set-region") === "true";
 
@@ -120,6 +142,7 @@ export function RegionProvider({ children }) {
 
             if (Object.keys(REGIONS).includes(countryCode)) {
               // Auto-detect supported region
+              // Only save if we are auto-detecting, not overrides
               localStorage.setItem("app-region", countryCode);
               localStorage.setItem("user-set-region", "false");
               setRegion(countryCode);

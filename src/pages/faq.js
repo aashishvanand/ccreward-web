@@ -1,21 +1,22 @@
-import dynamic from 'next/dynamic';
+import FAQPage from '../features/faq/components/FAQPage';
+import SEOHead from '../shared/components/seo/SEOHead';
 import { generateMetadata, pageMetadata } from '../shared/components/seo';
-import { AuthProvider } from '../core/providers/AuthContext';
-import { ThemeRegistry } from '../core/providers/ThemeRegistry';
 
-const FAQ = dynamic(() => import('../features/faq/components/FAQPage'), { ssr: false });
-
-export const metadata = generateMetadata({
-    ...pageMetadata.faq,
+const metadata = generateMetadata({
+    title: "Frequently Asked Questions - ccreward",
+    description: "Find answers to common questions about ccreward.",
     path: '/faq'
 });
 
-export default function FAQPage() {
+export async function getStaticProps() {
+    return { props: {} };
+}
+
+export default function FAQWrapper() {
     return (
-        <ThemeRegistry>
-            <AuthProvider>
-                <FAQ />
-            </AuthProvider>
-        </ThemeRegistry>
+        <>
+            <SEOHead metadata={metadata} />
+            <FAQPage />
+        </>
     );
 }

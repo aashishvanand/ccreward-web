@@ -3,7 +3,7 @@
 
 import { useRef, useEffect, useState } from "react";
 import Script from "next/script";
-import { getAnalytics, isSupported } from "firebase/analytics";
+// import { getAnalytics, isSupported } from "firebase/analytics"; // Removed dynamic import
 import { firebaseApp } from "../../../firebase";
 import { initializeClarity } from "../services/clarity";
 import {
@@ -33,9 +33,15 @@ export function AnalyticsProvider({ children }) {
         try {
           // Initialize Firebase Analytics
           let firebaseAnalyticsReady = false;
-          if (await isSupported()) {
-            getAnalytics(firebaseApp);
-            firebaseAnalyticsReady = true;
+          
+          try {
+             const { getAnalytics, isSupported } = await import("firebase/analytics");
+             if (await isSupported()) {
+                getAnalytics(firebaseApp);
+                firebaseAnalyticsReady = true;
+             }
+          } catch (e) {
+             console.warn("Firebase analytics import failed", e);
           }
 
           // Initialize enhanced analytics

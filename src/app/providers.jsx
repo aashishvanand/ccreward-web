@@ -2,10 +2,20 @@
 "use client";
 
 import { memo } from "react";
+import dynamic from 'next/dynamic';
 import { ThemeRegistry } from "../core/providers/ThemeRegistry";
-import { AuthProvider } from "../core/providers/AuthContext";
-import { AnalyticsProvider } from "../core/providers/AnalyticsProvider";
 import { RegionProvider } from "../core/providers/RegionContext";
+
+// Dynamic imports to prevent server-side execution of Firebase dependencies (protobufjs eval error)
+const AuthProvider = dynamic(
+  () => import('../core/providers/AuthContext').then(mod => mod.AuthProvider),
+  { ssr: false }
+);
+
+const AnalyticsProvider = dynamic(
+  () => import('../core/providers/AnalyticsProvider').then(mod => mod.AnalyticsProvider),
+  { ssr: false }
+);
 
 // Add a provider tracking mechanism
 let providerMounted = false;

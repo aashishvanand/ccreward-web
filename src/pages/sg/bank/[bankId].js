@@ -4,8 +4,7 @@ import { AuthProvider } from '../../../core/providers/AuthContext';
 import { CircularProgress, Box } from '@mui/material';
 
 // --- Step 1: Import local data ---
-import bankImagesSG from '../../../shared/constants/bankImagesSG';
-import cardsDataSG from '../../../data/cards_sg.json'; // Create and import this file
+// removed local imports
 
 const BankPage = dynamic(() => import('../../../features/bank/components/BankPage'), {
     ssr: false,
@@ -18,9 +17,16 @@ const BankPage = dynamic(() => import('../../../features/bank/components/BankPag
 
 // --- Step 2: Use local data for getStaticPaths ---
 export async function getStaticPaths() {
-    const paths = bankImagesSG.map((bankObject) => ({
-        params: { bankId: bankObject.bank.toLowerCase() },
-    }));
+    let paths = [];
+    try {
+        const res = await fetch('https://files.ccreward.app/banks_sg.json');
+        const bankImagesSG = await res.json();
+        paths = bankImagesSG.map((bankObject) => ({
+            params: { bankId: bankObject.bank.toLowerCase() },
+        }));
+    } catch (error) {
+        console.error("Failed to fetch banks_sg.json", error);
+    }
 
     return { paths, fallback: false };
 }
@@ -29,9 +35,15 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params }) {
     const { bankId } = params;
     const bankName = bankId.toUpperCase();
-    
-    // No fetch needed, just access the imported JSON directly
-    const cards = cardsDataSG.issuers[bankName]?.cards || [];
+
+    let cards = [];
+    try {
+        const res = await fetch('https://files.ccreward.app/cards_sg.json');
+        const cardsDataSG = await res.json();
+        cards = cardsDataSG.issuers[bankName]?.cards || [];
+    } catch (error) {
+        console.error("Failed to fetch cards_sg.json", error);
+    }
 
     return {
         props: {

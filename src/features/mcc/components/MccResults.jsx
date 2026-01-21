@@ -239,7 +239,7 @@ const MccResults = ({ results, isLoading, hasSearched }) => {
         return (
             <Grid container spacing={3}>
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <Grid item xs={12} sm={6} md={4} key={i}>
+                    <Grid size={{ xs: 12, sm: 6, md: 4 }} key={i}>
                         <ResultSkeleton />
                     </Grid>
                 ))}
@@ -285,7 +285,7 @@ const MccResults = ({ results, isLoading, hasSearched }) => {
     return (
         <Grid container spacing={3}>
             {results.map((item, index) => (
-                <Grid item xs={12} sm={6} md={4} key={item.mcc + index}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={item.mcc + index}>
                     <ResultCard item={item} />
                 </Grid>
             ))}

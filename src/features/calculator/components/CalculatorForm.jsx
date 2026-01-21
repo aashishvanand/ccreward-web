@@ -10,7 +10,9 @@ import {
   useTheme,
   InputAdornment,
   Alert,
+  IconButton,
 } from "@mui/material";
+import { Clear } from "@mui/icons-material";
 import DynamicCardInputs from "../../../shared/components/ui/DynamicCardInputs";
 import {
   fetchBanks,
@@ -460,6 +462,18 @@ const CalculatorForm = ({
             startAdornment: (
               <InputAdornment position="start">
                 {getCurrencySymbol(region)}
+              </InputAdornment>
+            ),
+            endAdornment: spentAmount && (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="clear spent amount"
+                  onClick={() => onSpentAmountChange("")}
+                  edge="end"
+                  size="small"
+                >
+                  <Clear />
+                </IconButton>
               </InputAdornment>
             ),
             inputProps: {

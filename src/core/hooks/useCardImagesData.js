@@ -14,10 +14,10 @@ async function fetchCardImagesData(region) {
     return await response.json();
 }
 
-function useCardImagesData() {
+function useCardImagesData(initialData = null) {
     const { region, isInitialized } = useRegion();
-    const [cardImagesData, setCardImagesData] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [cardImagesData, setCardImagesData] = useState(initialData || []);
+    const [isLoading, setIsLoading] = useState(!initialData);
     const [error, setError] = useState(null);
 
     // Don't create cache key if region is not available
@@ -49,7 +49,7 @@ function useCardImagesData() {
                 // Fetch fresh data for the current region
                 const freshData = await fetchCardImagesData(region);
                 setCardImagesData(freshData);
-                
+
                 // Update cache with region-specific data
                 if (cacheKey) {
                     localStorage.setItem(cacheKey, JSON.stringify({
@@ -57,11 +57,11 @@ function useCardImagesData() {
                         timestamp: Date.now()
                     }));
                 }
-                
+
             } catch (err) {
                 console.error(`Error loading card images for region ${region}:`, err);
                 setError(err);
-                
+
                 // Fallback to cached data if available, even if expired
                 if (cacheKey) {
                     try {
@@ -78,7 +78,7 @@ function useCardImagesData() {
                 setIsLoading(false);
             }
         }
-        
+
         loadCardImagesData();
     }, [region, cacheKey, isInitialized]);
 

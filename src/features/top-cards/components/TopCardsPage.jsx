@@ -1,3 +1,4 @@
+"use client";
 // src/features/top-cards/components/TopCardsPage.jsx - Enhanced with Analytics
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -25,6 +26,7 @@ import {
   useTheme,
   CircularProgress,
 } from "@mui/material";
+import { useRegion } from "../../../core/providers/RegionContext";
 import { motion } from "framer-motion";
 
 // Add analytics imports
@@ -73,7 +75,7 @@ const categories = [
   "Wallet Loading",
 ];
 
-const TopCardsPage = () => {
+const TopCardsPage = ({ initialCategories, initialCardImages }) => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -96,12 +98,12 @@ const TopCardsPage = () => {
     severity: "success",
   });
   const { cardImagesData, isLoading: isLoadingCardImages } =
-    useCardImagesData();
+    useCardImagesData(initialCardImages);
   const {
     categories: categoriesData,
     isLoading: isLoadingCategories,
     error: categoriesError,
-  } = useCardCategories();
+  } = useCardCategories(initialCategories);
   const [isValidating, setIsValidating] = useState(false);
   const searchParams = useSearchParams();
 
@@ -384,6 +386,30 @@ const TopCardsPage = () => {
     );
   }
 
+  const { region, regionName } = useRegion(); // Get region name
+
+  const getSeoMetadata = () => {
+    let title = "Top Credit Cards - CCReward";
+    let description = "Discover the best credit cards for your spending needs.";
+
+    if (category) {
+      const regionText = regionName ? `in ${regionName}` : "";
+      title = `Top ${category} Credit Cards ${regionText} - CCReward`;
+      description = `Discover the best credit cards for ${category} spending ${regionText}. Compare rewards and benefits.`;
+    } else {
+      const regionText = regionName ? `in ${regionName}` : "";
+      title = `Top Credit Cards ${regionText} - CCReward`;
+      description = `Discover the best credit cards ${regionText}. Compare rewards across categories like Shopping, Travel, and Dining.`;
+    }
+
+    return (
+      <>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+      </>
+    );
+  };
+
   return (
     <motion.div
       variants={pageVariants}
@@ -391,6 +417,7 @@ const TopCardsPage = () => {
       animate="visible"
       exit="exit"
     >
+      {getSeoMetadata()}
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >

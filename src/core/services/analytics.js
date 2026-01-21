@@ -1,19 +1,20 @@
 // src/core/services/analytics.js - Client-Side Only Firebase Analytics & Performance
-import { getAnalytics, logEvent, setUserId, setUserProperties } from 'firebase/analytics';
-import { getPerformance, trace } from 'firebase/performance';
 import { firebaseApp } from '../../../firebase';
 
 let analytics = null;
-let performance = null;
+let firebasePerformance = null;
 let isInitialized = false;
+
+// Hold references to dynamically imported functions
+let logEventFn = null;
+let setUserIdFn = null;
+let setUserPropertiesFn = null;
+let traceFn = null;
 
 // Initialize analytics and performance monitoring (client-side only)
 const initializeAnalytics = async () => {
     // Only run on client-side
     if (typeof window === 'undefined') {
-        if (process.env.NODE_ENV === 'development') {
-            console.log('🔧 Analytics initialization skipped (server-side)');
-        }
         return false;
     }
 
@@ -21,22 +22,28 @@ const initializeAnalytics = async () => {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     try {
+        // Dynamic imports
+        const { getAnalytics, logEvent, setUserId, setUserProperties } = await import('firebase/analytics');
+        const { getPerformance, trace } = await import('firebase/performance');
+
+        // Store functions for later use
+        logEventFn = logEvent;
+        setUserIdFn = setUserId;
+        setUserPropertiesFn = setUserProperties;
+        traceFn = trace;
+
         // Initialize Analytics
         analytics = getAnalytics(firebaseApp);
-        if (process.env.NODE_ENV === 'development') {
-            console.log('✅ Firebase Analytics initialized');
-        }
+
 
         // Initialize Performance Monitoring
         try {
-            performance = getPerformance(firebaseApp);
+            firebasePerformance = getPerformance(firebaseApp);
 
             // Set up automatic performance monitoring
             setupClientSidePerformanceMonitoring();
 
-            if (process.env.NODE_ENV === 'development') {
-                console.log('✅ Firebase Performance Monitoring initialized');
-            }
+
         } catch (perfError) {
             console.warn('⚠️ Performance monitoring not available:', perfError);
         }
@@ -89,11 +96,7 @@ function generateSecureRandomString(length = 9) {
 const logAnalyticsEvent = (eventName, eventParams = {}) => {
     // Only run on client-side
     if (!analytics || typeof window === 'undefined' || !isInitialized) {
-        if (typeof window === 'undefined') {
-            if (process.env.NODE_ENV === 'development') {
-                console.log(`🔧 Analytics event skipped (server-side): ${eventName}`);
-            }
-        }
+
         return;
     }
 
@@ -119,12 +122,12 @@ const logAnalyticsEvent = (eventName, eventParams = {}) => {
         };
 
         // Log to Firebase Analytics
-        logEvent(analytics, eventName, enrichedParams);
+        if (logEventFn) {
+            logEventFn(analytics, eventName, enrichedParams);
+        }
 
         // Development logging
-        if (process.env.NODE_ENV === 'development') {
-            console.log(`📊 Analytics Event: ${eventName}`, enrichedParams);
-        }
+
 
     } catch (error) {
         console.error('❌ Error logging analytics event:', error);
@@ -133,12 +136,13 @@ const logAnalyticsEvent = (eventName, eventParams = {}) => {
 
 // Create and manage performance traces (client-side only)
 const createPerformanceTrace = (traceName) => {
-    if (!performance || !isInitialized || typeof window === 'undefined') {
+    if (!firebasePerformance || !isInitialized || typeof window === 'undefined') {
         return null;
     }
 
     try {
-        const traceObj = trace(performance, traceName);
+        if (!traceFn) return null;
+        const traceObj = traceFn(firebasePerformance, traceName);
         return traceObj;
     } catch (error) {
         console.error('❌ Error creating performance trace:', error);
@@ -209,7 +213,7 @@ function setupClientSidePerformanceMonitoring() {
     // Monitor page load performance
     window.addEventListener('load', () => {
         setTimeout(() => {
-            const navigation = performance.getEntriesByType('navigation')[0];
+            const navigation = window.performance.getEntriesByType('navigation')[0];
             if (navigation) {
                 logAnalyticsEvent('page_load_performance', {
                     load_time: Math.round(navigation.loadEventEnd - navigation.loadEventStart),
@@ -379,7 +383,9 @@ const setUserAnalytics = (userId, userProperties = {}) => {
     if (!analytics || typeof window === 'undefined') return;
 
     try {
-        setUserId(analytics, userId);
+        if (setUserIdFn) {
+            setUserIdFn(analytics, userId);
+        }
 
         const enhancedProperties = {
             ...userProperties,
@@ -400,7 +406,9 @@ const setUserAnalytics = (userId, userProperties = {}) => {
             device_memory: getDeviceMemory()
         };
 
-        setUserProperties(analytics, enhancedProperties);
+        if (setUserPropertiesFn) {
+            setUserPropertiesFn(analytics, enhancedProperties);
+        }
 
         // Mark user as visited
         setStorageItem('user_visited_before', 'true');
@@ -444,7 +452,7 @@ function getClientPerformanceMetrics() {
     }
 
     try {
-        const memory = performance.memory;
+        const memory = window.performance.memory;
 
         return {
             memory_used: memory ? Math.round(memory.usedJSHeapSize / 1048576) : 0, // MB
@@ -709,9 +717,7 @@ const logPageView = (path, additionalData = {}) => {
 const setupNetworkMonitoring = () => {
     // Only run on client-side
     if (typeof window === 'undefined') {
-        if (process.env.NODE_ENV === 'development') {
-            console.log('🔧 Network monitoring setup skipped (server-side)');
-        }
+
         return false;
     }
 

@@ -1,6 +1,6 @@
 {
   "name": "ccreward.app",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "private": true,
   "description": "A comprehensive tool to calculate and optimize credit card rewards across multiple banks in India & Singapore",
   "author": "Aashish Vivekanand",
@@ -16,6 +16,10 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:worker": "opennextjs-cloudflare build",
+    "preview": "npm run build:worker && wrangler dev",
+    "deploy:dev": "npm run build:worker && wrangler deploy --env dev",
+    "deploy:prod": "npm run build:worker && wrangler deploy --env prod",
     "start": "next start",
     "postinstall": "npm install --include=optional sharp --legacy-peer-deps",
     "analyze": "cross-env ANALYZE=true npm run build",
@@ -29,13 +33,14 @@
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.6",
     "@mui/material-nextjs": "^7.3.6",
+    "@opennextjs/cloudflare": "^1.14.7",
     "axios": "^1.13.2",
     "axios-retry": "^4.5.0",
     "firebase": "^12.7.0",
     "framer-motion": "^12.23.26",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
-    "next": "^16.1.0",
+    "next": "16.0.10",
     "prop-types": "^15.8.1",
     "react": "19.2.3",
     "react-confetti": "^6.4.0",
@@ -50,7 +55,8 @@
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.0",
     "jest": "^30.2.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wrangler": "^4.54.0"
   },
   "resolutions": {
     "@emotion/react": "^11.14.0",

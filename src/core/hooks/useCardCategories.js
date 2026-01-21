@@ -14,11 +14,13 @@ async function fetchCardCategories(region) {
     return await response.json();
 }
 
-function useCardCategories() {
+function useCardCategories(initialData = null) {
     // Get the current region from the context
     const { region, isInitialized } = useRegion();
-    const [categories, setCategories] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
+    // Use initialData if provided, but only if we don't have a region mismatch (though initially we might not know the region)
+    // For SSR hydration, we assume initialData is correct for the initial render.
+    const [categories, setCategories] = useState(initialData);
+    const [isLoading, setIsLoading] = useState(!initialData);
     const [error, setError] = useState(null);
 
     // Create a dynamic cache key based on the region (only if region exists)
@@ -74,8 +76,8 @@ function useCardCategories() {
         }
 
         loadCategories();
-    // Add `region`, `cacheKey`, and `isInitialized` to the dependency array
-    // This ensures the hook re-runs whenever the region changes or is initialized
+        // Add `region`, `cacheKey`, and `isInitialized` to the dependency array
+        // This ensures the hook re-runs whenever the region changes or is initialized
     }, [region, cacheKey, isInitialized]);
 
     return { categories, isLoading, error };

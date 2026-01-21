@@ -79,13 +79,13 @@ const PLATFORM_COLORS = {
   web: "#FF7300", // Web orange
 };
 
-const HowToGuide = () => {
+const HowToGuide = ({ initialGuidesData }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { region } = useRegion();
 
-  const [guidesData, setGuidesData] = useState({});
-  const [guidesLoaded, setGuidesLoaded] = useState(false);
+  const [guidesData, setGuidesData] = useState(initialGuidesData || {});
+  const [guidesLoaded, setGuidesLoaded] = useState(!!initialGuidesData);
   const [dataError, setDataError] = useState(null);
 
   const [selectedPlatform, setSelectedPlatform] = useState("");
@@ -313,6 +313,7 @@ const HowToGuide = () => {
       animate="visible"
       exit="exit"
     >
+      <title>How to Guide - CCReward</title>
       <Box
         sx={{
           display: "flex",

@@ -1,12 +1,7 @@
 const nextConfig = {
-  output: "export",
   images: {
     loader: 'custom',
     loaderFile: './imageLoader.js',
-  },
-  eslint: {
-    // Warnings are treated as warnings, not errors during build
-    ignoreDuringBuilds: true,
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === "production" ? {

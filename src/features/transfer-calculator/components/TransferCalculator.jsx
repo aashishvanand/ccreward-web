@@ -20,12 +20,14 @@ import {
   ListItemText,
   ListItemIcon,
   Divider,
+  IconButton,
 } from "@mui/material";
 import Image from "next/image";
 import {
   Flight as FlightIcon,
   Hotel as HotelIcon,
   AccessTime as AccessTimeIcon,
+  Clear as ClearIcon,
 } from "@mui/icons-material";
 import { useAuth } from "../../../core/providers/AuthContext";
 import { useRegion } from "../../../core/providers/RegionContext";
@@ -352,6 +354,7 @@ const TransferCalculator = () => {
       animate="visible"
       exit="exit"
     >
+      <title>Points Transfer Calculator - CCReward</title>
       <Box
         sx={{
           display: "flex",
@@ -454,6 +457,18 @@ const TransferCalculator = () => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">Pts</InputAdornment>
+                    ),
+                    endAdornment: points && (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="clear points"
+                          onClick={() => setPoints("")}
+                          edge="end"
+                          size="small"
+                        >
+                          <ClearIcon />
+                        </IconButton>
+                      </InputAdornment>
                     ),
                     inputProps: {
                       min: 1,

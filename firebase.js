@@ -1,8 +1,6 @@
 // firebase.js - Enhanced configuration with Crashlytics
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getAnalytics, isSupported } from 'firebase/analytics';
 import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 const firebaseConfig = {
@@ -20,7 +18,7 @@ let app;
 
 if (!getApps().length) {
     app = initializeApp(firebaseConfig);
-    
+
     // Initialize App Check for security (optional but recommended)
     if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
         try {
@@ -37,14 +35,22 @@ if (!getApps().length) {
 }
 
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Firestore is now initialized where needed to avoid server-side evaluation errors
+export const db = null;
 export const googleProvider = new GoogleAuthProvider();
 export const firebaseApp = app;
 
 // Initialize Analytics only on client side
 export const initializeFirebaseAnalytics = async () => {
-    if (typeof window !== 'undefined' && await isSupported()) {
-        return getAnalytics(app);
+    if (typeof window !== 'undefined') {
+        try {
+            const { getAnalytics, isSupported } = await import('firebase/analytics');
+            if (await isSupported()) {
+                return getAnalytics(app);
+            }
+        } catch (e) {
+            console.warn("Analytics import failed", e);
+        }
     }
     return null;
 };

@@ -1,15 +1,28 @@
 import { Box, Container, Typography, Grid, Card } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import bankImagesDataIN from "../../../../shared/constants/bankImagesIN";
-import bankImagesSGData from "../../../../shared/constants/bankImagesSG";
+import { useEffect, useState } from "react";
 import { useRegion } from "../../../../core/providers/RegionContext";
 
 const BankSection = () => {
   const { region, regionName, isInitialized } = useRegion();
+  const [bankData, setBankData] = useState([]);
   
-  // Don't render if region is not initialized
-  if (!isInitialized || !region) {
+  useEffect(() => {
+    if (region) {
+      const url = region === 'SG' 
+        ? 'https://files.ccreward.app/banks_sg.json'
+        : 'https://files.ccreward.app/banks_in.json';
+        
+      fetch(url)
+        .then(res => res.json())
+        .then(data => setBankData(data))
+        .catch(err => console.error("Failed to fetch bank data", err));
+    }
+  }, [region]);
+  
+  // Don't render if region is not initialized or bankData is empty
+  if (!isInitialized || !region || bankData.length === 0) {
     return (
       <Box sx={{ py: 8 }}>
         <Container maxWidth="lg">
@@ -21,8 +34,8 @@ const BankSection = () => {
     );
   }
   
-  // Select bank data based on region
-  const bankData = region === 'SG' ? bankImagesSGData : bankImagesDataIN;
+  // Select bank data based on region - already handled by state
+
 
   return (
     <Box sx={{ py: 8 }}>
@@ -34,11 +47,12 @@ const BankSection = () => {
           {bankData.map((bank) => (
             <Grid
               key={bank.id}
-              item
-              xs={6}
-              sm={4}
-              md={3}
-              lg={2}
+              size={{
+                xs: 6,
+                sm: 4,
+                md: 3,
+                lg: 2
+              }}
             >
               <Link 
                 href={`/${region.toLowerCase()}/bank/${bank.bank.toLowerCase()}`}
