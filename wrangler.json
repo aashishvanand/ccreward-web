@@ -34,7 +34,7 @@
             ]
         },
         "prod": {
-            "name": "ccreward-web",
+            "name": "ccreward-web-prod",
             "routes": [
                 {
                     "pattern": "ccreward.app",
