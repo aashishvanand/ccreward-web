@@ -34,7 +34,7 @@
             ]
         },
         "prod": {
-            "name": "ccreward-web",
+            "name": "ccreward-web-prod",
             "routes": [
                 {
                     "pattern": "ccreward.app",
@@ -44,7 +44,7 @@
             "kv_namespaces": [
                 {
                     "binding": "NEXT_CACHE_WORKERS_KV",
-                    "id": "fa2bcf379a1741f5bfb33323e8cdafad"
+                    "id": "0507c6cedd314f108fbf29f84212f141"
                 }
             ]
         }
