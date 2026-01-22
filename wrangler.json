@@ -9,6 +9,9 @@
         "directory": ".open-next/assets",
         "binding": "ASSETS"
     },
+    "images": {
+        "binding": "IMAGES"
+    },
     "observability": {
         "logs": {
             "enabled": true,
@@ -31,6 +34,16 @@
                     "binding": "NEXT_CACHE_WORKERS_KV",
                     "id": "fa2bcf379a1741f5bfb33323e8cdafad"
                 }
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "ccreward-next-cache-dev"
+                },
+                {
+                    "binding": "CCREWARD_BUCKET",
+                    "bucket_name": "ccreward"
+                }
             ]
         },
         "prod": {
@@ -46,7 +59,23 @@
                     "binding": "NEXT_CACHE_WORKERS_KV",
                     "id": "0507c6cedd314f108fbf29f84212f141"
                 }
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
+                    "bucket_name": "ccreward-next-cache-prod"
+                },
+                {
+                    "binding": "CCREWARD_BUCKET",
+                    "bucket_name": "ccreward"
+                }
             ]
         }
-    }
+    },
+    "services": [
+        {
+            "binding": "WORKER_SELF_REFERENCE",
+            "service": "ccreward-web"
+        }
+    ]
 }

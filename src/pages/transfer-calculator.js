@@ -1,10 +1,10 @@
 // src/pages/transfer-calculator.js
 import dynamic from 'next/dynamic';
-import SEOHead from '../shared/components/seo/SEOHead';
-import { generateMetadata, pageMetadata } from '../shared/components/seo';
-import PerformanceWrapper from '../shared/components/PerformanceWrapper';
+import SEOHead from '@/shared/components/seo/SEOHead';
+import { generateMetadata, pageMetadata } from '@/shared/components/seo';
+import PerformanceWrapper from '@/shared/components/PerformanceWrapper';
 
-const TransferCalculatorWrapper = dynamic(() => import('../features/transfer-calculator/components/TransferCalculator'), { ssr: false });
+const TransferCalculatorWrapper = dynamic(() => import('@/features/transfer-calculator/components/TransferCalculator'), { ssr: false });
 
 const metadata = generateMetadata({
     ...pageMetadata.transferCalculator,

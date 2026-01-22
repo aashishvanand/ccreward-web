@@ -1,8 +1,8 @@
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
-import { generateMetadata } from '../shared/components/seo';
+import { generateMetadata } from '@/shared/components/seo';
 
-const MccLookupWrapper = dynamic(() => import('../features/mcc/components/MccLookup'), { ssr: false });
+const MccLookupWrapper = dynamic(() => import('@/features/mcc/components/MccLookup'), { ssr: false });
 
 const metadata = {
     title: "MCC Code Lookup Tool - Find Merchant Category Codes | ccreward",

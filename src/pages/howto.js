@@ -1,8 +1,8 @@
-import HowToPage from '../features/how-to/HowToGuide';
+import HowToPage from '@/features/how-to/HowToGuide';
 import axios from 'axios';
-import SEOHead from '../shared/components/seo/SEOHead';
-import { generateMetadata } from '../shared/components/seo';
-import PerformanceWrapper from '../shared/components/PerformanceWrapper';
+import SEOHead from '@/shared/components/seo/SEOHead';
+import { generateMetadata } from '@/shared/components/seo';
+import PerformanceWrapper from '@/shared/components/PerformanceWrapper';
 
 export async function getServerSideProps(context) {
   // Attempt to get country from headers (Cloudflare or Vercel or standard)

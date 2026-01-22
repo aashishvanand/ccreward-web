@@ -1,6 +1,6 @@
-import PrivacyPolicyPage from '../features/legal/components/PrivacyPolicyPage';
-import SEOHead from '../shared/components/seo/SEOHead';
-import { generateMetadata } from '../shared/components/seo';
+import PrivacyPolicyPage from '@/features/legal/components/PrivacyPolicyPage';
+import SEOHead from '@/shared/components/seo/SEOHead';
+import { generateMetadata } from '@/shared/components/seo';
 
 const metadata = generateMetadata({
   title: "Privacy Policy - ccreward",
