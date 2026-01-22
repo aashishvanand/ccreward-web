@@ -31,7 +31,12 @@ export async function getStaticProps({ params }) {
     const bankName = bankId.toUpperCase();
 
     // No fetch needed, just access the imported JSON directly
-    const cards = cardsDataSG.issuers[bankName]?.cards || [];
+    // Fix: Perform case-insensitive lookup for the bank key
+    const issuerKey = Object.keys(cardsDataSG.issuers).find(
+        (key) => key.localeCompare(bankId, undefined, { sensitivity: 'base' }) === 0
+    );
+
+    const cards = (issuerKey && cardsDataSG.issuers[issuerKey]?.cards) || [];
 
     return {
         props: {
