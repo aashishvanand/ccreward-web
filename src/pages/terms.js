@@ -1,6 +1,6 @@
-import TermsOfServicePage from '../features/legal/components/TermsOfServicePage';
-import SEOHead from '../shared/components/seo/SEOHead';
-import { generateMetadata } from '../shared/components/seo';
+import TermsOfServicePage from '@/features/legal/components/TermsOfServicePage';
+import SEOHead from '@/shared/components/seo/SEOHead';
+import { generateMetadata } from '@/shared/components/seo';
 
 const metadata = generateMetadata({
   title: "Terms and Conditions - ccreward",

@@ -1,0 +1,173 @@
+{
+    "issuers": {
+        "AMEX": {
+            "cards": [
+                "CapitaCard",
+                "Gold",
+                "Personal",
+                "Platinum",
+                "Platinum Reserve",
+                "Singapore Airlines HighFlyer Business",
+                "Singapore Airlines KrisFlyer",
+                "Singapore Airlines KrisFlyer Ascend",
+                "Singapore Airlines PPS Club",
+                "Singapore Airlines Solitaire PPS",
+                "The Platinum",
+                "True Cashback"
+            ]
+        },
+        "BOC": {
+            "cards": [
+                "Elite Miles",
+                "Family",
+                "Sheng Siong",
+                "SplendorPlus",
+                "Visa Infinite",
+                "Zaobao"
+            ]
+        },
+        "CIMB": {
+            "cards": [
+                "AWSM",
+                "Visa Infinite",
+                "Visa Signature",
+                "World Mastercard"
+            ]
+        },
+        "Citi": {
+            "cards": [
+                "Cashback",
+                "CashBack+",
+                "Clear",
+                "M1",
+                "PremierMiles",
+                "Prestige",
+                "Rewards",
+                "SMRT"
+            ]
+        },
+        "DBS": {
+            "cards": [
+                "Altitude",
+                "Esso",
+                "Insignia",
+                "Live Fresh",
+                "Live Fresh Student",
+                "SAFRA",
+                "Takashimaya",
+                "Vantage",
+                "Woman's",
+                "Woman's World",
+                "Yuu"
+            ]
+        },
+        "DCS": {
+            "cards": [
+                "Cashback",
+                "Courts",
+                "DeCard",
+                "Diners Club International",
+                "Diners Club International Charge",
+                "Don Don Donki",
+                "Flex",
+                "Imperium",
+                "Mustafa",
+                "Ultimate",
+                "Vicom"
+            ]
+        },
+        "GXS": {
+            "cards": [
+                "Flexi"
+            ]
+        },
+        "HSBC": {
+            "cards": [
+                "Advance",
+                "Live+",
+                "Premier",
+                "Revolution",
+                "TravelOne",
+                "Visa Infinite"
+            ]
+        },
+        "Maribank": {
+            "cards": [
+                "Mari"
+            ]
+        },
+        "Maybank": {
+            "cards": [
+                "eVibes",
+                "Family & Friends",
+                "FC Barcelona",
+                "Horizon",
+                "Manchester United",
+                "Platinum Visa",
+                "Visa Infinite",
+                "World Mastercard",
+                "XL Cashback",
+                "XL Rewards"
+            ]
+        },
+        "OCBC": {
+            "cards": [
+                "365",
+                "90°N",
+                "Arts",
+                "Best",
+                "Frank",
+                "Great Eastern Cashflo",
+                "Infinity",
+                "NXT",
+                "Platinum",
+                "Premier",
+                "Premier Voyage",
+                "Rewards",
+                "Voyage"
+            ]
+        },
+        "POSB": {
+            "cards": [
+                "Everyday"
+            ]
+        },
+        "SC": {
+            "cards": [
+                "Beyond",
+                "Journey",
+                "Rewards+",
+                "Simply Cash",
+                "Smart",
+                "Visa Infinite"
+            ]
+        },
+        "TrustBank": {
+            "cards": [
+                "Cashback",
+                "Link"
+            ]
+        },
+        "UOB": {
+            "cards": [
+                "Absolute",
+                "EVOL",
+                "KrisFlyer",
+                "Lady's",
+                "Lady's Solitaire",
+                "Lady's Solitaire Metal",
+                "Lazada",
+                "Metro",
+                "One",
+                "Preferred Platinum",
+                "Privilege Banking",
+                "PRVI Miles",
+                "Reserve",
+                "Singtel",
+                "UnionPay",
+                "Visa Infinite",
+                "Visa Signature"
+            ]
+        }
+    }
+}
