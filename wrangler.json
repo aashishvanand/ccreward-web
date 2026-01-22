@@ -39,6 +39,10 @@
                 {
                     "binding": "NEXT_INC_CACHE_R2_BUCKET",
                     "bucket_name": "ccreward-next-cache-dev"
+                },
+                {
+                    "binding": "CCREWARD_BUCKET",
+                    "bucket_name": "ccreward"
                 }
             ]
         },
@@ -60,6 +64,10 @@
                 {
                     "binding": "NEXT_INC_CACHE_R2_BUCKET",
                     "bucket_name": "ccreward-next-cache-prod"
+                },
+                {
+                    "binding": "CCREWARD_BUCKET",
+                    "bucket_name": "ccreward"
                 }
             ]
         }

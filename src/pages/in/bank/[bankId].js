@@ -15,12 +15,31 @@ const BankPage = dynamic(() => import('../../../features/bank/components/BankPag
   )
 });
 
+const getData = async (filename) => {
+  try {
+    if (process.env.CCREWARD_BUCKET) {
+      const object = await process.env.CCREWARD_BUCKET.get(filename);
+      if (object) {
+        return await object.json();
+      }
+    }
+  } catch (e) {
+    console.error(`Failed to fetch ${filename} from R2`, e);
+  }
+
+  // Fallback to fetch
+  const res = await fetch(`https://files.ccreward.app/${filename}`);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch ${filename}: ${res.statusText}`);
+  }
+  return await res.json();
+};
+
 // --- Step 2: Use local data for getStaticPaths ---
 export async function getStaticPaths() {
   let paths = [];
   try {
-    const res = await fetch('https://files.ccreward.app/banks_in.json');
-    const bankImagesIN = await res.json();
+    const bankImagesIN = await getData('banks_in.json');
     paths = bankImagesIN.map((bankObject) => ({
       params: { bankId: bankObject.bank.toLowerCase() },
     }));
@@ -28,7 +47,7 @@ export async function getStaticPaths() {
     console.error("Failed to fetch banks_in.json", error);
   }
 
-  return { paths, fallback: false };
+  return { paths, fallback: 'blocking' };
 }
 
 // --- Step 3: Use local data for getStaticProps ---
@@ -38,8 +57,7 @@ export async function getStaticProps({ params }) {
 
   let cards = [];
   try {
-    const res = await fetch('https://files.ccreward.app/cards_in.json');
-    const cardsDataIN = await res.json();
+    const cardsDataIN = await getData('cards_in.json');
     cards = cardsDataIN.issuers[bankName]?.cards || [];
   } catch (error) {
     console.error("Failed to fetch cards_in.json", error);
@@ -50,6 +68,7 @@ export async function getStaticProps({ params }) {
       bank: bankName,
       cards,
     },
+    revalidate: 3600, // Revalidate every hour
   };
 }
 
