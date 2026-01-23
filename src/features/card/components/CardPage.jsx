@@ -51,7 +51,15 @@ const CardPage = ({ bankName, cardName, country }) => {
       setLoading(true);
       setError(null);
       try {
-        const token = await user.getIdToken();
+        // Use the auth object from firebase to get the token directly
+        // The user object from context might be a plain object stripped of methods
+        const { auth } = await import('../../../firebase');
+        const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+        
+        if (!token) {
+             throw new Error("Unable to authenticate. Please try signing in again.");
+        }
+
         const headers = {
           Authorization: `Bearer ${token}`,
         };
@@ -288,7 +296,7 @@ const CardPage = ({ bankName, cardName, country }) => {
         <DialogTitle>Sign In Required</DialogTitle>
         <DialogContent>
             <Typography>
-                You need to sign in to clear security checks and view detailed card benefits.
+                You need to sign in to view detailed card benefits.
             </Typography>
         </DialogContent>
         <DialogActions>

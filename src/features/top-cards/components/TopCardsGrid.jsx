@@ -244,7 +244,7 @@ const TopCardsGrid = ({
                     </Stack>
                     )}
 
-                    <Stack direction="row" spacing={1} sx={{ mt: "auto" }}>
+                    <Stack direction="column" spacing={1} sx={{ mt: "auto" }}>
                         <Button
                             variant="outlined"
                             size="small"
@@ -263,7 +263,7 @@ const TopCardsGrid = ({
                                 router.push(`/${country}/bank/${safeBank}/${safeCard}`);
                             }}
                         >
-                            View
+                            View Card Details
                         </Button>
                         <Button
                             variant="contained"
@@ -276,7 +276,7 @@ const TopCardsGrid = ({
                             }}
                             onClick={() => handleCardClick(card.bank, card.cardName)}
                         >
-                            Calc
+                            Calculate Rewards
                         </Button>
                     </Stack>
                 </Box>
