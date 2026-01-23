@@ -1,4 +1,4 @@
-import { firebaseApp } from '../../../firebase';
+import { firebaseApp } from '@/firebase';
 
 const CACHE_KEY = 'userCardsCache';
 const CACHE_TIMESTAMP_KEY = 'userCardsCacheTimestamp';

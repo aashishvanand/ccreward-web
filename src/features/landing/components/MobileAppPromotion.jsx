@@ -3,7 +3,7 @@ import Image from "next/image";
 import {
   getAppStoreUrl,
   getPlayStoreUrl,
-} from "../../../core/utils/deviceUtils";
+} from "@/core/utils/deviceUtils";
 
 const MobileAppPromotion = ({ isAndroid }) => {
   const theme = useTheme();

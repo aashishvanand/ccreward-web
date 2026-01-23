@@ -2,7 +2,7 @@ import { Box, Container, Typography, Grid, Card } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRegion } from "../../../../core/providers/RegionContext";
+import { useRegion } from "@/../core/providers/RegionContext";
 
 const BankSection = () => {
   const { region, regionName, isInitialized } = useRegion();

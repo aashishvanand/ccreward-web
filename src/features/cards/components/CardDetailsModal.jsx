@@ -14,7 +14,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { Close as CloseIcon, CreditCard as CreditCardIcon, Delete as DeleteIcon } from "@mui/icons-material";
-import { useRegion } from "../../../core/providers/RegionContext";
+import { useRegion } from "@/core/providers/RegionContext";
 import CardNetworkSelector from "./CardNetworkSelector";
 
 const CardDetailsModal = ({ open, onClose, card, onSave, onDelete }) => {

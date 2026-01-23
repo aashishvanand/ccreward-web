@@ -12,23 +12,23 @@ import {
   Button,
 } from "@mui/material";
 import { Add as AddIcon, CreditCard as CreditCardIcon } from "@mui/icons-material";
-import { useAuth } from "../../../core/providers/AuthContext";
+import { useAuth } from "@/core/providers/AuthContext";
 import {
   getCardsForUser,
   addCardForUser,
   deleteCardForUser,
   updateCardForUser,
-} from "../../../core/services/firebaseUtils";
-import { notifyCardUpdate } from "../../../core/utils/events";
-import Header from "../../../shared/components/layout/Header";
-import Footer from "../../../shared/components/layout/Footer";
+} from "@/core/services/firebaseUtils";
+import { notifyCardUpdate } from "@/core/utils/events";
+import Header from "@/shared/components/layout/Header";
+import Footer from "@/shared/components/layout/Footer";
 import CardList from "./CardList";
 import AddCardDialog from "./AddCardDialog";
 import { Share as ShareIcon } from "@mui/icons-material";
 import PortfolioShare from "./PortfolioShare";
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
 import ShareDialog from "./ShareDialog";
-import { useRegion } from "../../../core/providers/RegionContext";
+import { useRegion } from "@/core/providers/RegionContext";
 import { motion } from "framer-motion";
 import {
   useAnalytics,
@@ -36,7 +36,7 @@ import {
   useEngagementTracking,
   useJourneyTracking,
   useComponentAnalytics,
-} from "../../../core/hooks";
+} from "@/core/hooks";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },

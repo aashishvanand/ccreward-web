@@ -1,6 +1,6 @@
 // src/core/services/performance.js - Enhanced Firebase Performance Monitoring
 import { getPerformance, trace, connectPerformanceEmulator } from 'firebase/performance';
-import { firebaseApp } from '../../../firebase';
+import { firebaseApp } from '@/firebase';
 
 let firebasePerformance = null;
 let isInitialized = false;

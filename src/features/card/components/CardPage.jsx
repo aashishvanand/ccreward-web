@@ -19,9 +19,9 @@ import {
   DialogActions,
   useTheme,
 } from "@mui/material";
-import Header from "../../../shared/components/layout/Header";
-import Footer from "../../../shared/components/layout/Footer";
-import { useAuth } from "../../../core/providers/AuthContext";
+import Header from "@/shared/components/layout/Header";
+import Footer from "@/shared/components/layout/Footer";
+import { useAuth } from "@/core/providers/AuthContext";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
@@ -53,7 +53,7 @@ const CardPage = ({ bankName, cardName, country }) => {
       try {
         // Use the auth object from firebase to get the token directly
         // The user object from context might be a plain object stripped of methods
-        const { auth } = await import('../../../firebase');
+        const { auth } = await import('@/firebase');
         const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
         
         if (!token) {

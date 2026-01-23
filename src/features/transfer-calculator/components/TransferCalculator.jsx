@@ -29,23 +29,23 @@ import {
   AccessTime as AccessTimeIcon,
   Clear as ClearIcon,
 } from "@mui/icons-material";
-import { useAuth } from "../../../core/providers/AuthContext";
-import { useRegion } from "../../../core/providers/RegionContext";
+import { useAuth } from "@/core/providers/AuthContext";
+import { useRegion } from "@/core/providers/RegionContext";
 import {
   fetchBanks,
   fetchCards,
   calculateTransferPartners,
-} from "../../../core/services/api";
-import Header from "../../../shared/components/layout/Header";
-import Footer from "../../../shared/components/layout/Footer";
-import { getCurrencySymbol } from "../../../core/utils";
+} from "@/core/services/api";
+import Header from "@/shared/components/layout/Header";
+import Footer from "@/shared/components/layout/Footer";
+import { getCurrencySymbol } from "@/core/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   useAnalytics,
   usePagePerformance,
   useFormTracking,
   usePartnerLogos,
-} from "../../../core/hooks";
+} from "@/core/hooks";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },

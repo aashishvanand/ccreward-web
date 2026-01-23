@@ -29,7 +29,7 @@ import {
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useRegion } from "../../../core/providers/RegionContext";
+import { useRegion } from "@/core/providers/RegionContext";
 
 // Use a prefix for the cache key to make it dynamic
 const CACHE_KEY_PREFIX = "referralData_";

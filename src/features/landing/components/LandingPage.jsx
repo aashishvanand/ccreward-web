@@ -2,14 +2,14 @@
 import { useState, useEffect, useMemo } from "react";
 import { Box, Alert, Container, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../../core/providers/AuthContext";
+import { useAuth } from "@/core/providers/AuthContext";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { getCardsForUser } from "../../../core/services/firebaseUtils";
-import useCardImagesData from "../../../core/hooks/useCardImagesData";
-import { useRegion } from "../../../core/providers/RegionContext";
-import Header from "../../../shared/components/layout/Header";
-import Footer from "../../../shared/components/layout/Footer";
+import { getCardsForUser } from "@/core/services/firebaseUtils";
+import useCardImagesData from "@/core/hooks/useCardImagesData";
+import { useRegion } from "@/core/providers/RegionContext";
+import Header from "@/shared/components/layout/Header";
+import Footer from "@/shared/components/layout/Footer";
 import HeroSection from "./HeroSection";
 import FeaturesSection from "./sections/FeaturesSection";
 import BankSection from "./sections/BankSection";
@@ -19,11 +19,11 @@ import CustomGPTSection from "./sections/CustomGPTSection";
 import TestimonialsSection from "./sections/TestimonialsSection";
 import MobileAppPromotion from "./MobileAppPromotion";
 import TopCardsSection from "./sections/TopCardsSection";
-import { tweets } from "../../../shared/constants/testimonials";
-import { detectDevice } from "../../../core/utils/deviceUtils";
+import { tweets } from "@/shared/constants/testimonials";
+import { detectDevice } from "@/core/utils/deviceUtils";
 import TopSearchs from "./sections/TopSearchs";
 import StatsSection from "./sections/StatsSection";
-import GoogleOneTap from "../../../shared/components/auth/GoogleOneTap";
+import GoogleOneTap from "@/shared/components/auth/GoogleOneTap";
 // FIXED: Use specific imports instead of export *
 import { motion } from "framer-motion";
 
@@ -33,7 +33,7 @@ import {
   usePagePerformance,
   useEngagementTracking,
   useJourneyTracking,
-} from "../../../core/hooks";
+} from "@/core/hooks";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },

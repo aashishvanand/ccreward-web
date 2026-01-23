@@ -28,22 +28,22 @@ import {
   ExpandMore as ExpandMoreIcon,
   Clear as ClearIcon,
 } from "@mui/icons-material";
-import Header from "../../../shared/components/layout/Header";
-import Footer from "../../../shared/components/layout/Footer";
-import { useAuth } from "../../../core/providers/AuthContext";
-import { getCardsForUser } from "../../../core/services/firebaseUtils";
+import Header from "@/shared/components/layout/Header";
+import Footer from "@/shared/components/layout/Footer";
+import { useAuth } from "@/core/providers/AuthContext";
+import { getCardsForUser } from "@/core/services/firebaseUtils";
 import Confetti from "react-confetti";
 import { CardListRenderer } from "./CardListRenderer";
-import DynamicCardInputs from "../../../shared/components/ui/DynamicCardInputs";
+import DynamicCardInputs from "@/shared/components/ui/DynamicCardInputs";
 import {
   fetchBestCardQuestions,
   calculateBestCard,
   fetchMCC,
-} from "../../../core/services/api";
+} from "@/core/services/api";
 import _ from "lodash";
-import { useRegion } from "../../../core/providers/RegionContext";
+import { useRegion } from "@/core/providers/RegionContext";
 import { motion } from "framer-motion";
-import { getCurrencySymbol } from "../../../core/utils";
+import { getCurrencySymbol } from "@/core/utils";
 
 // Add analytics imports
 import {
@@ -54,7 +54,7 @@ import {
   useFormTracking,
   useAPITracking,
   useComponentAnalytics,
-} from "../../../core/hooks";
+} from "@/core/hooks";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },

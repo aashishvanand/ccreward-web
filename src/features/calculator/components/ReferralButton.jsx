@@ -1,6 +1,6 @@
 import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useRegion } from "../../../core/providers/RegionContext";
+import { useRegion } from "@/core/providers/RegionContext";
 
 // Use a prefix for the cache key to make it dynamic
 const CACHE_KEY_PREFIX = "referralData_";

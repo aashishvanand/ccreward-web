@@ -4,9 +4,9 @@ import { Flag, Search } from '@mui/icons-material';
 import MccSearch from './MccSearch';
 import MccResults from './MccResults';
 import ReportMccForm from './ReportMccForm';
-import Header from '../../../shared/components/layout/Header';
-import Footer from '../../../shared/components/layout/Footer';
-import { fetchMCC } from '../../../core/services/api';
+import Header from '@/shared/components/layout/Header';
+import Footer from '@/shared/components/layout/Footer';
+import { fetchMCC } from '@/core/services/api';
 
 const MccLookup = () => {
     const theme = useTheme();

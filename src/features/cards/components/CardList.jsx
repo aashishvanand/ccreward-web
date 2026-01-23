@@ -14,7 +14,7 @@ import {
 import { Delete as DeleteIcon } from "@mui/icons-material";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import useCardImagesData from "../../../core/hooks/useCardImagesData";
+import useCardImagesData from "@/core/hooks/useCardImagesData";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import CardDetailsModal from "./CardDetailsModal";

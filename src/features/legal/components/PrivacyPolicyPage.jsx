@@ -1,8 +1,8 @@
 // src/features/legal/components/PrivacyPolicyPage.js - Enhanced with Analytics
 import { useEffect } from "react";
 import { Box, Container, Typography } from "@mui/material";
-import Header from "../../../shared/components/layout/Header";
-import Footer from "../../../shared/components/layout/Footer";
+import Header from "@/shared/components/layout/Header";
+import Footer from "@/shared/components/layout/Footer";
 import { motion } from "framer-motion";
 
 // Add analytics imports
@@ -11,7 +11,7 @@ import {
   usePagePerformance,
   useEngagementTracking,
   useComponentAnalytics,
-} from "../../../core/hooks";
+} from "@/core/hooks";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },

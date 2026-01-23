@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Box, Container, Typography, Grid } from "@mui/material";
 import Counter from "./Counter";
-import { useRegion } from "../../../../core/providers/RegionContext";
+import { useRegion } from "@/../core/providers/RegionContext";
 
 const StatsSection = () => {
   const { region, isInitialized } = useRegion();
