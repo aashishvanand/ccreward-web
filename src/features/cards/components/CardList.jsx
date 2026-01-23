@@ -18,6 +18,7 @@ import useCardImagesData from "@/core/hooks/useCardImagesData";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import CardDetailsModal from "./CardDetailsModal";
+import TiltCard from "@/shared/components/ui/TiltCard";
 
 // Animation variants
 const listContainerVariants = {
@@ -47,15 +48,6 @@ const cardVariants = {
     scale: 0.9,
     opacity: 0,
     transition: { duration: 0.3 },
-  },
-  hover: {
-    y: -12,
-    boxShadow: "0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)",
-    transition: {
-      type: "spring",
-      stiffness: 400,
-      damping: 10,
-    },
   },
   tap: { scale: 0.98 },
 };
@@ -299,63 +291,36 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                           sx={{
                             position: "relative",
                             width: "100%",
-                            aspectRatio:
-                              card.orientation === "vertical"
-                                ? "0.63/1"
-                                : "1.59/1",
                             marginBottom: 0,
                           }}
                         >
-                          {card.image && (
-                            <motion.div
+                          {card.image ? (
+                             <motion.div
                               initial={{ opacity: 0 }}
                               animate={{
                                 opacity: 1,
                                 transition: { delay: 0.1 + index * 0.05 },
                               }}
                             >
-                              <Image
+                            <TiltCard 
                                 src={card.image}
                                 alt={`${card.bank} ${card.cardName}`}
-                                layout="fill"
-                                objectFit="contain"
-                                priority={index < 4} // Only prioritize first 4 images
-                              />
+                                orientation={card.orientation}
+                                width="100%"
+                            />
                             </motion.div>
+                          ) : (
+                                <Box sx={{ 
+                                    aspectRatio: card.orientation === "vertical" ? "0.63/1" : "1.59/1",
+                                    bgcolor: 'grey.200', 
+                                    borderRadius: 4, 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center' 
+                                }}>
+                                    <Typography variant="caption" color="text.secondary">No Image</Typography>
+                                </Box>
                           )}
-                          <motion.div
-                            variants={deleteButtonVariants}
-                            initial="hidden"
-                            whileHover="hover"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteCard(card.bank, card.cardName);
-                            }}
-                          >
-                            <Tooltip title="Remove Card">
-                                <IconButton
-                                  sx={{
-                                    position: "absolute",
-                                    top: 8,
-                                    right: 8,
-                                    bgcolor: "rgba(255, 255, 255, 0.9)",
-                                    color: "error.main",
-                                    boxShadow: 2,
-                                    "&:hover": {
-                                      bgcolor: "white",
-                                      color: "error.dark",
-                                      transform: "scale(1.1)",
-                                    },
-                                    transition: "all 0.2s",
-                                  }}
-                                  size="small"
-                                >
-                                  <DeleteIcon
-                                    sx={{ fontSize: "1.25rem" }}
-                                  />
-                                </IconButton>
-                            </Tooltip>
-                          </motion.div>
                         </Box>
                         <Box
                           sx={{

@@ -38,6 +38,7 @@ import {
 } from "@/core/services/api";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
+import PageHeader from "@/shared/components/layout/PageHeader";
 import { getCurrencySymbol } from "@/core/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -361,6 +362,8 @@ const TransferCalculator = () => {
           flexDirection: "column",
           minHeight: "100vh",
           bgcolor: "transparent",
+          position: "relative",
+          overflow: "hidden"
         }}
       >
         <Header />
@@ -384,17 +387,11 @@ const TransferCalculator = () => {
             sx={{ mt: 4, mb: 4, flexGrow: 1 }}
           >
           {/* --- MODIFICATION END --- */}
-          <Stack spacing={4}>
-            <Typography
-              variant="h4"
-              sx={{
-                fontWeight: "bold",
-                fontSize: { xs: "1.75rem", sm: "2.125rem" },
-                textAlign: { xs: "center", sm: "left" },
-              }}
-            >
-              Transfer Partner Calculator
-            </Typography>
+            <Stack spacing={4}>
+            <PageHeader
+                title="Transfer Partner Calculator"
+                subtitle="Calculate point transfers to airline and hotel partners."
+            />
 
             <Paper elevation={2} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2 }}>
               <Stack spacing={3}>

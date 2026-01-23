@@ -16,6 +16,7 @@ import {
 } from "@/core/services/firebaseUtils";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
+import PageHeader from "@/shared/components/layout/PageHeader";
 import CalculatorForm from "./CalculatorForm";
 import AddToMyCardsButton from "../../cards/components/AddToMyCardsButton";
 import ReportButtons from "@/shared/components/ui/ReportButtons";
@@ -295,6 +296,8 @@ function Calculator() {
           flexDirection: "column",
           minHeight: "100vh",
           bgcolor: "transparent",
+          position: "relative",
+          overflow: "hidden"
         }}
       >
         <Header />
@@ -312,16 +315,10 @@ function Calculator() {
           {showConfetti && <Confetti />}
 
           <Stack spacing={4}>
-            <Typography
-              variant="h4"
-              sx={{
-                fontWeight: "bold",
-                fontSize: { xs: "1.75rem", sm: "2.125rem" },
-                textAlign: { xs: "center", sm: "left" },
-              }}
-            >
-              Reward Calculator
-            </Typography>
+            <PageHeader
+                title="Reward Calculator"
+                subtitle="Calculate your credit card rewards for specific spends and MCC codes."
+            />
 
             <ErrorAlert message={error} onClose={() => setError(null)} />
 

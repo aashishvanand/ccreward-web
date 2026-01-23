@@ -6,6 +6,7 @@ import MccResults from './MccResults';
 import ReportMccForm from './ReportMccForm';
 import Header from '@/shared/components/layout/Header';
 import Footer from '@/shared/components/layout/Footer';
+import PageHeader from '@/shared/components/layout/PageHeader';
 import { fetchMCC } from '@/core/services/api';
 
 const MccLookup = () => {
@@ -51,41 +52,12 @@ const MccLookup = () => {
 
 
             <Container maxWidth="lg" sx={{ py: 6, position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                <Box sx={{ mb: 8, textAlign: 'center' }}>
-                    <Typography variant="h2" component="h1" gutterBottom fontWeight="800"
-                        sx={{ 
-                            background: theme.palette.mode === 'dark' 
-                                ? 'linear-gradient(45deg, #90caf9 30%, #ce93d8 90%)'
-                                : 'linear-gradient(45deg, #1976d2 30%, #9c27b0 90%)',
-                            backgroundClip: 'text',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            mb: 2,
-                            fontSize: { xs: '2.5rem', md: '3.5rem' }
-                        }}
-                    >
-                        MCC Lookup Tool
-                    </Typography>
-                    <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 650, mx: 'auto', mb: 5, lineHeight: 1.6, fontWeight: 400 }}>
-                        Search by merchant name to find category codes and industry details.
-                    </Typography>
-
-                    <Box sx={{ maxWidth: 700, mx: 'auto', position: 'relative' }}>
-                         {/* Search glow effect */}
-                        <Box sx={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            width: '90%',
-                            height: '80%',
-                            background: `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.2)})`,
-                            filter: 'blur(40px)',
-                            zIndex: -1,
-                        }} />
-                        <MccSearch onSearch={handleSearch} />
-                    </Box>
-                </Box>
+                <PageHeader 
+                    title="MCC Lookup Tool" 
+                    subtitle="Search by merchant name to find category codes and industry details."
+                >
+                    <MccSearch onSearch={handleSearch} />
+                </PageHeader>
 
                 <Box sx={{ flex: 1, mb: 6 }}>
                     <Fade in={true} timeout={800}>
