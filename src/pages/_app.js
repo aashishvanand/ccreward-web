@@ -8,6 +8,7 @@ import { ThemeRegistry } from '@/core/providers/ThemeRegistry';
 import { RegionProvider } from '@/core/providers/RegionContext';
 import { AuthProvider } from '@/core/providers/AuthContext';
 import { AnalyticsProvider } from '@/core/providers/AnalyticsProvider';
+import AmbientBackground from '@/shared/components/layout/AmbientBackground';
 
 function MyApp({ Component, pageProps }) {
     const router = useRouter();
@@ -106,6 +107,7 @@ function MyApp({ Component, pageProps }) {
     // FIXED: Wrap with providers for Pages Router
     return (
         <ThemeRegistry>
+            <AmbientBackground />
             <RegionProvider>
                 <AuthProvider>
                     <AnalyticsProvider>

@@ -360,7 +360,7 @@ const TransferCalculator = () => {
           display: "flex",
           flexDirection: "column",
           minHeight: "100vh",
-          bgcolor: "background.default",
+          bgcolor: "transparent",
         }}
       >
         <Header />

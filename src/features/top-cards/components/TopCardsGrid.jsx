@@ -9,6 +9,7 @@ import {
   Paper,
   Chip,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
 import {
   School as SchoolIcon,
   Theaters as TheatersIcon,
@@ -61,6 +62,7 @@ const TopCardsGrid = ({
 }) => {
   // Get the current region from the context
   const { region, isInitialized } = useRegion();
+  const router = useRouter();
   const [referralData, setReferralData] = useState({});
   const cols = isMobile ? 2 : isTablet ? 3 : 4;
 
@@ -242,20 +244,41 @@ const TopCardsGrid = ({
                     </Stack>
                     )}
 
-                    <Button
-                    variant="outlined"
-                    size="small"
-                    fullWidth
-                    sx={{
-                        mt: "auto",
-                        borderRadius: 1.5,
-                        textTransform: "none",
-                        fontSize: isMobile ? "0.8rem" : "0.875rem",
-                    }}
-                    onClick={() => handleCardClick(card.bank, card.cardName)}
-                    >
-                    Calculate Reward
-                    </Button>
+                    <Stack direction="row" spacing={1} sx={{ mt: "auto" }}>
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{
+                                borderRadius: 1.5,
+                                textTransform: "none",
+                                fontSize: isMobile ? "0.8rem" : "0.875rem",
+                            }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                const country = region ? region.toLowerCase() : 'in';
+                                // Encode for URL but keep it clean
+                                const safeBank = encodeURIComponent(card.bank.toLowerCase());
+                                const safeCard = encodeURIComponent(card.cardName.toLowerCase());
+                                router.push(`/${country}/bank/${safeBank}/${safeCard}`);
+                            }}
+                        >
+                            View
+                        </Button>
+                        <Button
+                            variant="contained"
+                            size="small"
+                            fullWidth
+                            sx={{
+                                borderRadius: 1.5,
+                                textTransform: "none",
+                                fontSize: isMobile ? "0.8rem" : "0.875rem",
+                            }}
+                            onClick={() => handleCardClick(card.bank, card.cardName)}
+                        >
+                            Calc
+                        </Button>
+                    </Stack>
                 </Box>
               </Paper>
             </motion.div>

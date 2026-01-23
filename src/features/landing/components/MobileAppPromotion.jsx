@@ -33,7 +33,7 @@ const MobileAppPromotion = ({ isAndroid }) => {
     <Box
       sx={{
         py: { xs: 3, sm: 4 },
-        bgcolor: "background.default",
+        bgcolor: "transparent",
         borderRadius: { xs: "16px 16px 0 0", sm: "24px 24px 0 0" },
         position: "relative",
         zIndex: 1,
