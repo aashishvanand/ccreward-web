@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Script from 'next/script';
 import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
-import { auth } from '@/../firebase';
+import { auth } from '@/firebase';
 import { useAuth } from '@/core/providers/AuthContext';
 import { useRegion } from '@/core/providers/RegionContext';
 
