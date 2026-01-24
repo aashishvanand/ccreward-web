@@ -30,6 +30,7 @@ export default async function robots() {
                 '/*.png',
                 '/*.ico',
                 '/site.webmanifest',
+                '/llms.txt',
             ],
             disallow: [
                 '/my-cards',
@@ -39,6 +40,9 @@ export default async function robots() {
                 '/mcc-lookup',
             ],
         },
-        sitemap: 'https://ccreward.app/sitemap.xml',
+        sitemap: [
+            'https://ccreward.app/sitemap.xml',
+            'https://ccreward.app/llms.txt',
+        ],
     };
 }

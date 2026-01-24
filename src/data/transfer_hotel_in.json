@@ -1,0 +1,153 @@
+{
+  "Accor": [
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "Kotak",
+      "currency": "Air Miles"
+    },
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    }
+  ],
+  "ShangriLa": [
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    }
+  ],
+  "Hilton": {
+    "bank": "AMEX",
+    "currency": "Membership Rewards"
+  },
+  "IHG": [
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    }
+  ],
+  "ITC": [
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "SBI",
+      "currency": [
+        "AURUM Reward Point",
+        "SBI Mile"
+      ]
+    }
+  ],
+  "Jumeirah": {
+    "bank": "SBI",
+    "currency": "SBI Mile"
+  },
+  "Marriott": [
+    {
+      "bank": "AMEX",
+      "currency": "Membership Rewards"
+    },
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "HDFC",
+      "currency": [
+        "HDFC Reward Point",
+        "Marriott Bonvoy"
+      ]
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "Kotak",
+      "currency": "Air Miles"
+    }
+  ],
+  "Orchid": {
+    "bank": "SBI",
+    "currency": "SBI Mile"
+  },
+  "Radisson": {
+    "bank": "SBI",
+    "currency": "SBI Mile"
+  },
+  "Taj": [
+    {
+      "bank": "HDFC",
+      "currency": "NeuCoin"
+    },
+    {
+      "bank": "SBI",
+      "currency": "NeuCoin"
+    }
+  ],
+  "Wyndham": [
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    }
+  ]
+}

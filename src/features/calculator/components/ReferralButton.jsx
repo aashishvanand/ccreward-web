@@ -79,7 +79,7 @@ const ReferralButton = ({
         );
         setReferralLink(cardReferral?.link || null);
       } catch (error) {
-        console.error(`Error fetching referral data for region ${region}:`, error);
+        console.error('Error fetching referral data for region:', region, error);
       } finally {
         setIsLoading(false);
       }

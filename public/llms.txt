@@ -1,0 +1,31 @@
+# ccreward.app
+
+The Credit Card Rewards is a comprehensive tool designed to help users optimize their credit card rewards across multiple banks and credit cards in India. This project aims to simplify the process of comparing rewards based on specific Merchant Category Codes (MCCs) and finding the best card for various spending patterns.
+
+## Core Features & Tools
+
+- **Rewards Calculator** (/calculator): User-friendly calculator to estimate reward points or cashback for transactions based on bank, card, and spend amount.
+- **Transfer Partner Calculator** (/transfer-calculator): Calculate transfer ratios and points for airline and hotel partners.
+- **MCC Lookup** (/mcc-lookup): Search for Merchant Category Codes (MCCs) to understand reward categories.
+- **Best Card Finder** (/best-card): Find the best credit card for specific spending categories or merchants.
+- **My Cards** (/my-cards): Manage your portfolio of credit cards and customize reward optimizations.
+
+## Documentation & Help
+
+- **How To Use** (/howto): Guide on how to use the calculator and other features.
+- **FAQ** (/faq): Frequently Asked Questions.
+- **Top Cards** (/top-cards): Curated lists of top credit cards for different needs.
+
+## Bank & Card Directory
+
+The application indexes credit cards and banks by country. This is useful for retrieving structured information about specific financial institutions and their products.
+
+- **Bank Page** (/[country_code]/bank/[bank_slug]): Overview of a specific bank and its credit card offerings.
+  - Example: `/in/bank/amex`
+- **Card Details** (/[country_code]/bank/[bank_slug]/[card_slug]): Detailed reward information, benefits, and fees for a specific credit card.
+  - Example: `/in/bank/amex/gold`
+
+## AI Assistant
+
+You can also interact with ccreward.app using our custom ChatGPT:
+- **CCReward GPT**: [Chat on ChatGPT](https://chatgpt.com/g/g-6954dd72c4d08191af836ec7ca3faf26-ccreward-gpt)

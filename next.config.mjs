@@ -7,6 +7,7 @@ const nextConfig = {
     images: {
         loader: 'custom',
         loaderFile: './imageLoader.js',
+        minimumCacheTTL: 31536000,
     },
     compiler: {
         removeConsole: process.env.NODE_ENV === "production" ? {

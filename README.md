@@ -2,11 +2,11 @@
 
 ## Overview
 
-The Credit Card Rewards is a comprehensive tool designed to help users optimize their credit card rewards across multiple banks and credit cards in India. This project aims to simplify the process of comparing rewards based on specific Merchant Category Codes (MCCs) and finding the best card for various spending patterns.
+The Credit Card Rewards is a comprehensive tool designed to help users optimize their credit card rewards across multiple banks and credit cards in India & Singapore. This project aims to simplify the process of comparing rewards based on specific Merchant Category Codes (MCCs) and finding the best card for various spending patterns.
 
 ## Features
 
-- Multi-bank support: Calculate rewards for cards from AMEX, Axis, AU, BOB, Canara, DBS, Federal, HDFC, HSBC, ICICI, IDFC First, IndusInd, Kotak, OneCard, RBL, SBI, SC, Yes.
+- Multi-bank support: Calculate rewards for cards from AMEX, AU, Axis, BOB, Canara, DBS, Equitas, Federal, HDFC, HSBC, ICICI, IDBI, IDFCFirst, IndusInd, Kotak, OneCard, PNB, RBL, SBI, SBM, SC, Union, YesBank in India and AMEX, BOC, CIMB, Citi, DBS, DCS, GXS, HSBC, Maybank, Maribank, OCBC, POSB, SC, TrustBank, UOB in Singapore
 - MCC-based calculations: Accurately calculate rewards based on specific Merchant Category Codes.
 - User-friendly interface: Easy-to-use calculator with intuitive design.
 - Dark mode support: Toggle between light and dark themes for comfortable viewing.
@@ -101,7 +101,7 @@ NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=xxx
 
 ## Contributing
 
-We welcome contributions to improve the Credit Card Rewards India Calculator! If you notice a missing bank or card, you can use the "Bank or Card Missing?" feature within the app to submit new information.
+We welcome contributions to improve the ccreward.app! If you notice a missing bank or card, you can use the "Bank or Card Missing?" feature within the app to submit new information.
 
 For more substantial contributions:
 

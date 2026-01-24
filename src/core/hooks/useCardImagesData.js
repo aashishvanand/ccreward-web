@@ -59,7 +59,7 @@ function useCardImagesData(initialData = null) {
                 }
 
             } catch (err) {
-                console.error(`Error loading card images for region ${region}:`, err);
+                console.error('Error loading card images for region:', region, err);
                 setError(err);
 
                 // Fallback to cached data if available, even if expired

@@ -7,7 +7,15 @@ import PerformanceWrapper from '@/shared/components/PerformanceWrapper';
 export async function getServerSideProps(context) {
   // Attempt to get country from headers (Cloudflare or Vercel or standard)
   const countryHeader = context.req.headers['cf-ipcountry'] || context.req.headers['x-vercel-ip-country'];
-  const region = countryHeader ? countryHeader.toLowerCase() : 'in';
+  let region = countryHeader ? countryHeader.toLowerCase() : 'in';
+
+  // Validate region to prevent SSRF - allow only supported regions
+  // Strict whitelist check
+  const allowedRegions = ['in', 'sg'];
+  if (!allowedRegions.includes(region)) {
+    region = 'in'; // Fallback to safe default
+  }
+
   const platforms = ["ios", "android", "web"];
   const guides = {};
 
