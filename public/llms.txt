@@ -1,4 +1,4 @@
-# Credit Card Rewards India Calculator (ccreward.app)
+# ccreward.app
 
 The Credit Card Rewards is a comprehensive tool designed to help users optimize their credit card rewards across multiple banks and credit cards in India. This project aims to simplify the process of comparing rewards based on specific Merchant Category Codes (MCCs) and finding the best card for various spending patterns.
 
