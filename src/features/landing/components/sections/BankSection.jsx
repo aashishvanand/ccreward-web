@@ -55,7 +55,7 @@ const BankSection = () => {
               }}
             >
               <Link 
-                href={`/${encodeURIComponent(region.toLowerCase())}/bank/${encodeURIComponent(bank.bank.toLowerCase())}`}
+                href={`/${(region === 'SG' ? 'sg' : 'in')}/bank/${encodeURIComponent(bank.bank.toLowerCase())}`}
                 style={{ textDecoration: 'none' }}
               >
                 <Card

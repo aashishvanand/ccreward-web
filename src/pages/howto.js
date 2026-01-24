@@ -9,9 +9,11 @@ export async function getServerSideProps(context) {
   const countryHeader = context.req.headers['cf-ipcountry'] || context.req.headers['x-vercel-ip-country'];
   let region = countryHeader ? countryHeader.toLowerCase() : 'in';
 
-  // Validate region to prevent SSRF - allow only 2 letter country codes
-  if (!/^[a-z]{2}$/.test(region)) {
-    region = 'in'; // Fallback to default if invalid
+  // Validate region to prevent SSRF - allow only supported regions
+  // Strict whitelist check
+  const allowedRegions = ['in', 'sg'];
+  if (!allowedRegions.includes(region)) {
+    region = 'in'; // Fallback to safe default
   }
 
   const platforms = ["ios", "android", "web"];
