@@ -55,7 +55,7 @@ const BankSection = () => {
               }}
             >
               <Link 
-                href={`/${region.toLowerCase()}/bank/${bank.bank.toLowerCase()}`}
+                href={`/${encodeURIComponent(region.toLowerCase())}/bank/${encodeURIComponent(bank.bank.toLowerCase())}`}
                 style={{ textDecoration: 'none' }}
               >
                 <Card

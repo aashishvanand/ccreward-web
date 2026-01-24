@@ -114,7 +114,7 @@ const StatsSection = () => {
         }));
         
       } catch (error) {
-        console.error(`Error fetching stats for ${region}:`, error);
+        console.error('Error fetching stats for:', region, error);
         
         // Fallback to reasonable defaults based on region
         const fallbackStats = {

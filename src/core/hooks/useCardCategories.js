@@ -69,7 +69,7 @@ function useCardCategories(initialData = null) {
 
             } catch (err) {
                 setError(err);
-                console.error(`Error fetching card categories for region ${region}:`, err);
+                console.error('Error fetching card categories for region:', region, err);
             } finally {
                 setIsLoading(false);
             }

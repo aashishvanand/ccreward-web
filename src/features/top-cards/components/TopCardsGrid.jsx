@@ -100,7 +100,7 @@ const TopCardsGrid = ({
           }));
         }
       } catch (error) {
-        console.error(`Error fetching referral data for region ${region}:`, error);
+        console.error('Error fetching referral data for region:', region, error);
         
         // Try to use cached data even if expired
         const cachedData = localStorage.getItem(cacheKey);
