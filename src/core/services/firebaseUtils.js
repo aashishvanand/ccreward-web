@@ -103,7 +103,7 @@ export const getCardsForUser = async (userId) => {
 
     // If document doesn't exist, this is a new user
     if (!userDoc.exists()) {
-      console.log("⚠️ User document doesn't exist, returning empty array");
+
       return []; // Return empty array for new users
     }
 

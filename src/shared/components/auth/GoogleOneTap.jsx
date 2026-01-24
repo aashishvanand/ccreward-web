@@ -38,11 +38,7 @@ const GoogleOneTap = () => {
       });
 
       window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed()) {
-          console.log('One Tap not displayed:', notification.getNotDisplayedReason());
-        } else if (notification.isSkippedMoment()) {
-          console.log('One Tap skipped:', notification.getSkippedReason());
-        }
+        // Notification handling
       });
     } catch (e) {
       console.error('One Tap initialization error', e);

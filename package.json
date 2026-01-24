@@ -15,7 +15,7 @@
   },
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build && npm run generate:sitemap",
     "build:worker": "opennextjs-cloudflare build",
     "preview": "npm run build:worker && wrangler dev",
     "deploy:dev": "npm run build:worker && wrangler deploy --env dev",
@@ -23,7 +23,8 @@
     "start": "next start",
     "postinstall": "npm install --include=optional sharp --legacy-peer-deps",
     "analyze": "cross-env ANALYZE=true npm run build",
-    "test:analytics": "node scripts/test-analytics.js"
+    "test:analytics": "node scripts/test-analytics.js",
+    "generate:sitemap": "node scripts/generate-sitemap.js"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",

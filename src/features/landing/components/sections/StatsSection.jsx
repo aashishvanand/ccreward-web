@@ -58,7 +58,7 @@ const StatsSection = () => {
             const cacheExpirationTime = 24 * 60 * 60 * 1000; // 24 hours
             
             if (cacheAge < cacheExpirationTime && cardsData && cardsData.issuers) {
-              console.log(`Using cached cards data for ${region}`);
+
               
               // Count total cards and banks from the cached data
               const issuers = Object.keys(cardsData.issuers);
@@ -81,7 +81,7 @@ const StatsSection = () => {
         
         // Fetch fresh cards data from the API
         const url = `https://files.ccreward.app/cards_${region.toLowerCase()}.json`;
-        console.log(`Fetching fresh cards data from: ${url}`);
+
         
         const response = await fetch(url);
         if (!response.ok) {
@@ -100,7 +100,7 @@ const StatsSection = () => {
           return total + (issuer.cards ? issuer.cards.length : 0);
         }, 0);
         
-        console.log(`Successfully fetched ${totalCards} cards and ${issuers.length} banks for ${region}`);
+
         
         setStats({
           cards: totalCards,
@@ -122,7 +122,7 @@ const StatsSection = () => {
           banks: region === 'SG' ? 13 : region === 'IN' ? 20 : 15,
         };
         
-        console.log(`Using fallback stats for ${region}:`, fallbackStats);
+
         setStats(fallbackStats);
       } finally {
         setIsLoading(false);
@@ -140,7 +140,7 @@ const StatsSection = () => {
       observerRef.current = new IntersectionObserver(
         (entries) => {
           if (entries[0].isIntersecting && !hasAnimated && !isLoading) {
-            console.log('Element came into view, triggering animation');
+
             setHasAnimated(true);
           }
         },

@@ -72,10 +72,58 @@ export async function getStaticProps({ params }) {
     };
 }
 
+// --- Step 4: Import SEO Component ---
+import SEOHead from '@/shared/components/seo/SEOHead';
+
 function CardRouteIN({ bankName, cardName, country }) {
+    const title = `${cardName} Review, Benefits & Rewards - ${new Date().getFullYear()} | ccreward`;
+    const description = `Maximize rewards with ${cardName} from ${bankName}. Calculate specific rewards, check lounge access, and find best usage strategies using ccreward.`;
+    const url = `https://ccreward.app/${country}/bank/${bankName.toLowerCase()}/${cardName.toLowerCase().replace(/ /g, '%20')}`;
+
+    // JSON-LD for Financial Product
+    // Note: Skipping complex fees/points data for now.
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "FinancialProduct",
+        "name": cardName,
+        "description": description,
+        "brand": {
+            "@type": "Brand",
+            "name": bankName
+        },
+        "url": url,
+        "category": "Credit Card",
+        "audience": {
+            "@type": "Audience",
+            "audienceType": "Credit Card Users in India"
+        }
+    };
+
+    const metadata = {
+        title,
+        description,
+        openGraph: {
+            title,
+            description,
+            url,
+            type: 'website',
+            // We could add image here if available in a map or fetched, but skipping dynamic image for now if not easily available synchronously
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title,
+            description
+        },
+        alternates: {
+            canonical: url
+        },
+        jsonLd
+    };
+
     return (
         <ThemeRegistry>
             <AuthProvider>
+                <SEOHead metadata={metadata} />
                 <CardPage bankName={bankName} cardName={cardName} country={country} />
             </AuthProvider>
         </ThemeRegistry>

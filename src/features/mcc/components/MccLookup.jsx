@@ -42,7 +42,7 @@ const MccLookup = () => {
 
     const handleReportSuccess = (message, severity) => {
         // You might want to show a snackbar here
-        console.log("Report submitted:", message);
+
     };
 
     return (

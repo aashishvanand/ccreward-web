@@ -869,7 +869,7 @@ const setupNetworkMonitoring = () => {
             }
         }
 
-        console.log('✅ Network monitoring setup complete');
+
         return true;
 
     } catch (error) {

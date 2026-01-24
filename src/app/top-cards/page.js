@@ -1,11 +1,26 @@
 import TopCardsPage from '../../features/top-cards/components/TopCardsPage';
-import { generateMetadata, pageMetadata } from '../../shared/components/seo';
+import { generateMetadata as generateMetadataHelper, pageMetadata } from '../../shared/components/seo';
 import PerformanceWrapper from '../../shared/components/PerformanceWrapper';
 
-export const metadata = generateMetadata({
-    ...pageMetadata.topCards,
-    path: '/top-cards'
-});
+export async function generateMetadata({ searchParams }) {
+    const { category, region = 'in' } = await searchParams;
+    const countryName = region.toLowerCase() === 'sg' ? 'Singapore' : 'India';
+
+    let title = `Top Credit Cards in ${countryName} - Compare Best Rewards Cards | ccreward`;
+    let description = `Discover and compare the best credit cards in ${countryName}. Find cards with the highest rewards, cashback, and benefits for your spending habits.`;
+
+    if (category) {
+        title = `Best Credit Cards for ${category} in ${countryName} - Top Picks ${new Date().getFullYear()} | ccreward`;
+        description = `Find the best credit cards for ${category} in ${countryName}. Compare top rated cards for ${category} spending and maximize your rewards.`;
+    }
+
+    return generateMetadataHelper({
+        ...pageMetadata.topCards,
+        title,
+        description,
+        path: '/top-cards'
+    });
+}
 
 async function getData(region = 'in') {
     const [categoriesRes, imagesRes] = await Promise.all([
