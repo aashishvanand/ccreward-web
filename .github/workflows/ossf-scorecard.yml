@@ -12,7 +12,7 @@ on:
   schedule:
     - cron: '30 1 * * 5'
   push:
-    branches: [ "main" ]
+    branches: [ "prod", "dev" ]
 
 # Declare default permissions as read only.
 permissions: read-all
@@ -38,11 +38,10 @@ jobs:
           persist-credentials: false
 
       - name: "Run analysis"
-        uses: ossf/scorecard-action@f49aabe0b5af0936a0987cfb85d86b75731b0186 # v2.4.1
+        uses: ossf/scorecard-action@4eaacf0543bb3f2c246792bd56e8cdeffafb205a # v2.4.3
         with:
           results_file: results.sarif
           results_format: sarif
-          # (Optional) "write" PAT token. Uncomment the `repo_token` line below if:
           # - you want to enable the Branch-Protection check on a *public* repository.
           # - you are installing Scorecards on a *private* repository.
           # To create the PAT, see https://github.com/ossf/scorecard-action#authentication-with-pat.
@@ -68,6 +67,6 @@ jobs:
 
       # Upload the results to GitHub's code scanning dashboard.
       - name: "Upload to code-scanning"
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@19b2f06db2b6f5108140aeb04014ef02b648f789 # v4
         with:
           sarif_file: results.sarif
