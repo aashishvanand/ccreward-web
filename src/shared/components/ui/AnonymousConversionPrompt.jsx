@@ -19,7 +19,7 @@ import {
   Google as GoogleIcon,
   CheckCircleOutline as CheckCircleOutlineIcon,
 } from "@mui/icons-material";
-import { useAuth } from "../../../core/providers/AuthContext";
+import { useAuth } from "@/core/providers/AuthContext";
 import {
   linkWithPopup,
   GoogleAuthProvider,

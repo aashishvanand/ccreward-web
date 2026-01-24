@@ -23,9 +23,9 @@ import {
 } from "@mui/material";
 import { Close as CloseIcon, AddCard as AddCardIcon } from "@mui/icons-material";
 import CardNetworkSelector from "./CardNetworkSelector";
-import { fetchBanks, fetchCards } from "../../../core/services/api";
+import { fetchBanks, fetchCards } from "@/core/services/api";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRegion } from "../../../core/providers/RegionContext";
+import { useRegion } from "@/core/providers/RegionContext";
 
 export default function AddCardDialog({ open, onClose, onAddCard }) {
   const theme = useTheme();

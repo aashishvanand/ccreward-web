@@ -4,6 +4,7 @@
 import { memo } from "react";
 import dynamic from 'next/dynamic';
 import { ThemeRegistry } from "../core/providers/ThemeRegistry";
+import AmbientBackground from "../shared/components/layout/AmbientBackground";
 import { RegionProvider } from "../core/providers/RegionContext";
 
 // Dynamic imports to prevent server-side execution of Firebase dependencies (protobufjs eval error)
@@ -31,6 +32,7 @@ const Providers = memo(({ children }) => {
 
   return (
     <ThemeRegistry>
+      <AmbientBackground />
       <RegionProvider>
         <AuthProvider>
           <AnalyticsProvider>

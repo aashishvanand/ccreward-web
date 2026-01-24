@@ -2,9 +2,9 @@
 import { useEffect, useState } from 'react';
 import Script from 'next/script';
 import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
-import { auth } from '../../../../firebase';
-import { useAuth } from '../../../core/providers/AuthContext';
-import { useRegion } from '../../../core/providers/RegionContext';
+import { auth } from '@/firebase';
+import { useAuth } from '@/core/providers/AuthContext';
+import { useRegion } from '@/core/providers/RegionContext';
 
 const GoogleOneTap = () => {
   const { user, loading } = useAuth();
@@ -38,11 +38,7 @@ const GoogleOneTap = () => {
       });
 
       window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed()) {
-          console.log('One Tap not displayed:', notification.getNotDisplayedReason());
-        } else if (notification.isSkippedMoment()) {
-          console.log('One Tap skipped:', notification.getSkippedReason());
-        }
+        // Notification handling
       });
     } catch (e) {
       console.error('One Tap initialization error', e);

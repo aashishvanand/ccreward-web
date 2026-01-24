@@ -1,5 +1,5 @@
 // src/core/services/analytics.js - Client-Side Only Firebase Analytics & Performance
-import { firebaseApp } from '../../../firebase';
+import { firebaseApp } from '@/firebase';
 
 let analytics = null;
 let firebasePerformance = null;
@@ -869,7 +869,7 @@ const setupNetworkMonitoring = () => {
             }
         }
 
-        console.log('✅ Network monitoring setup complete');
+
         return true;
 
     } catch (error) {

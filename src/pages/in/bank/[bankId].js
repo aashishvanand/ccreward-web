@@ -46,10 +46,55 @@ export async function getStaticProps({ params }) {
   };
 }
 
+// --- Step 4: Import SEO Component ---
+import SEOHead from '@/shared/components/seo/SEOHead';
+
 function BankRouteIN({ bank, cards }) {
+  const title = `${bank} Credit Cards - Best ${bank} Cards of ${new Date().getFullYear()} | ccreward`;
+  const description = `Compare and find the best ${bank} credit cards in India. Maximize your rewards with our ${bank} credit card calculator.`;
+  const url = `https://ccreward.app/in/bank/${bank.toLowerCase()}`;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": `${bank} Credit Cards`,
+    "description": description,
+    "url": url,
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": cards.map((card, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "url": `${url}/${card.toLowerCase()}`,
+        "name": `${bank} ${card}`
+      }))
+    }
+  };
+
+  const metadata = {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      type: 'website'
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description
+    },
+    alternates: {
+      canonical: url
+    },
+    jsonLd
+  };
+
   return (
     <ThemeRegistry>
       <AuthProvider>
+        <SEOHead metadata={metadata} />
         <BankPage bank={bank} cards={cards} />
       </AuthProvider>
     </ThemeRegistry>

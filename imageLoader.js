@@ -11,7 +11,12 @@ export default function smartLoader({ src, width, quality }) {
         return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality || 75}`;
     }
 
-    // Existing Cloudflare Images logic
+    // If src is already a full URL (e.g. from imagedelivery.net), use it directly
+    if (src.startsWith('http')) {
+        return src;
+    }
+
+    // Existing Cloudflare Images logic for IDs
     const params = [`width=${width}`];
     if (quality) {
         params.push(`quality=${quality}`);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, useTheme, Tooltip, Fade, Skeleton } from "@mui/material";
 import { motion } from "framer-motion";
-import { useRegion } from "../../../core/providers/RegionContext";
+import { useRegion } from "@/core/providers/RegionContext";
 import PropTypes from 'prop-types';
 
 const networkItemVariants = {

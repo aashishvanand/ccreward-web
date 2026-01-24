@@ -1,7 +1,7 @@
 'use client';
 import PropTypes from 'prop-types';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { auth, googleProvider, firebaseApp } from '../../../firebase';
+import { auth, googleProvider, firebaseApp } from '@/firebase';
 import { onAuthStateChanged, signInWithPopup, getIdToken, signOut, deleteUser } from 'firebase/auth';
 import { deleteUserData } from '../services/firebaseUtils';
 // import { getAnalytics, logEvent } from "firebase/analytics"; // Removed for dynamic import

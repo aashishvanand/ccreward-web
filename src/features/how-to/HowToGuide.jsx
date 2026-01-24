@@ -319,7 +319,7 @@ const HowToGuide = ({ initialGuidesData }) => {
           display: "flex",
           flexDirection: "column",
           minHeight: "100vh",
-          bgcolor: "background.default",
+          bgcolor: "transparent",
         }}
       >
         <Header />

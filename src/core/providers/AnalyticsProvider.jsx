@@ -4,7 +4,7 @@
 import { useRef, useEffect, useState } from "react";
 import Script from "next/script";
 // import { getAnalytics, isSupported } from "firebase/analytics"; // Removed dynamic import
-import { firebaseApp } from "../../../firebase";
+import { firebaseApp } from "@/firebase";
 import { initializeClarity } from "../services/clarity";
 import {
   initializeAnalytics,

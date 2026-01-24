@@ -12,8 +12,8 @@ import {
 } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import Image from "next/image";
-import useCardImagesData from "../../../../core/hooks/useCardImagesData";
-import { useRegion } from "../../../../core/providers/RegionContext";
+import useCardImagesData from "@/core/hooks/useCardImagesData";
+import { useRegion } from "@/core/providers/RegionContext";
 
 const TopSearchs = () => {
   // Get the current region from the context

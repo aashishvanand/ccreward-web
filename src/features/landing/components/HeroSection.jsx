@@ -27,7 +27,7 @@ const HeroSection = ({
   return (
     <Box
       sx={{
-        bgcolor: "background.default",
+        bgcolor: "transparent",
         background: theme => theme.palette.mode === 'light' 
           ? `radial-gradient(circle at 50% 0%, ${theme.palette.primary.light}15 0%, transparent 50%), ${theme.palette.background.default}`
           : `radial-gradient(circle at 50% 0%, ${theme.palette.primary.dark}20 0%, transparent 50%), ${theme.palette.background.default}`,

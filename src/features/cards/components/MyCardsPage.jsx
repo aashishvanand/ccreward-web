@@ -12,23 +12,24 @@ import {
   Button,
 } from "@mui/material";
 import { Add as AddIcon, CreditCard as CreditCardIcon } from "@mui/icons-material";
-import { useAuth } from "../../../core/providers/AuthContext";
+import { useAuth } from "@/core/providers/AuthContext";
 import {
   getCardsForUser,
   addCardForUser,
   deleteCardForUser,
   updateCardForUser,
-} from "../../../core/services/firebaseUtils";
-import { notifyCardUpdate } from "../../../core/utils/events";
-import Header from "../../../shared/components/layout/Header";
-import Footer from "../../../shared/components/layout/Footer";
+} from "@/core/services/firebaseUtils";
+import { notifyCardUpdate } from "@/core/utils/events";
+import Header from "@/shared/components/layout/Header";
+import Footer from "@/shared/components/layout/Footer";
+import PageHeader from "@/shared/components/layout/PageHeader";
 import CardList from "./CardList";
 import AddCardDialog from "./AddCardDialog";
 import { Share as ShareIcon } from "@mui/icons-material";
 import PortfolioShare from "./PortfolioShare";
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
 import ShareDialog from "./ShareDialog";
-import { useRegion } from "../../../core/providers/RegionContext";
+import { useRegion } from "@/core/providers/RegionContext";
 import { motion } from "framer-motion";
 import {
   useAnalytics,
@@ -36,7 +37,7 @@ import {
   useEngagementTracking,
   useJourneyTracking,
   useComponentAnalytics,
-} from "../../../core/hooks";
+} from "@/core/hooks";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -612,7 +613,7 @@ function MyCardsPage() {
       <title>My Cards Portfolio - CCReward</title>
       <meta name="description" content="Manage your credit card portfolio and track your benefits." />
       <Box
-        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", position: "relative", overflow: "hidden" }}
       >
         <Header />
         <Container
@@ -624,40 +625,10 @@ function MyCardsPage() {
           maxWidth="lg"
         >
           <Stack spacing={4}>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                mb: 4,
-              }}
-            >
-              <Typography
-                variant="h4"
-                component="h1"
-                sx={{
-                  fontSize: { xs: "1.75rem", sm: "2.125rem" },
-                  fontWeight: "bold",
-                }}
-              >
-                My Cards
-              </Typography>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleOpenAddDialog}
-                sx={{
-                  display: { xs: "none", md: "flex" },
-                  px: 3,
-                  py: 1,
-                  borderRadius: 2,
-                  background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.light} 90%)`,
-                  boxShadow: '0 3px 5px 2px rgba(33, 203, 243, .3)',
-                }}
-              >
-                Add New Card
-              </Button>
-            </Box>
+            <PageHeader 
+                title="My Cards" 
+                subtitle="Manage your credit card portfolio and track your benefits." 
+            />
             {renderContent()}
           </Stack>
         </Container>

@@ -16,11 +16,11 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import Header from "../../../shared/components/layout/Header";
-import Footer from "../../../shared/components/layout/Footer";
+import Header from "@/shared/components/layout/Header";
+import Footer from "@/shared/components/layout/Footer";
 import TopCardsGrid from "../../top-cards/components/TopCardsGrid";
-import { useAuth } from "../../../core/providers/AuthContext";
-import useCardImagesData from "../../../core/hooks/useCardImagesData";
+import { useAuth } from "@/core/providers/AuthContext";
+import useCardImagesData from "@/core/hooks/useCardImagesData";
 import { motion } from "framer-motion";
 
 // Add analytics imports
@@ -30,7 +30,7 @@ import {
   useEngagementTracking,
   useJourneyTracking,
   useComponentAnalytics,
-} from "../../../core/hooks";
+} from "@/core/hooks";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },

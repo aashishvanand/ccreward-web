@@ -9,7 +9,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Public as PublicIcon } from "@mui/icons-material";
-import { useRegion, REGIONS } from "../../../core/providers/RegionContext";
+import { useRegion, REGIONS } from "@/core/providers/RegionContext";
 
 const RegionSelector = () => {
   // ✅ USE CONTEXT ONLY - NO DIRECT LOCALSTORAGE ACCESS

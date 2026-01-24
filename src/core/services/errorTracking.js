@@ -10,12 +10,12 @@ let isInitialized = false;
 const initializeErrorTracking = () => {
     // Only run on client-side
     if (typeof window === 'undefined') {
-        console.log('🔧 Error tracking initialization skipped (server-side)');
+
         return false;
     }
 
     if (isInitialized) {
-        console.log('⚠️ Error tracking already initialized');
+
         return true;
     }
 
@@ -30,7 +30,7 @@ const initializeErrorTracking = () => {
         setupPerformanceErrorMonitoring();
 
         isInitialized = true;
-        console.log('✅ Client-side error tracking initialized');
+
 
         return true;
     } catch (error) {
@@ -408,7 +408,7 @@ const logBreadcrumb = (message, category = 'info', data = {}) => {
 
         // Development logging
         if (process.env.NODE_ENV === 'development') {
-            console.log(`🍞 [${category.toUpperCase()}] ${message}`, data);
+
         }
 
     } catch (error) {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material";
-import useCardImagesData from "../../../core/hooks/useCardImagesData";
+import useCardImagesData from "@/core/hooks/useCardImagesData";
 import { forwardRef, useImperativeHandle } from "react";
 
 const PortfolioShare = forwardRef(({ cards }, ref) => {

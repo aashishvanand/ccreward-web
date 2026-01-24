@@ -9,33 +9,34 @@ import {
   CircularProgress,
   Paper,
 } from "@mui/material";
-import { useAuth } from "../../../core/providers/AuthContext";
+import { useAuth } from "@/core/providers/AuthContext";
 import {
   getCardsForUser,
   addCardForUser,
-} from "../../../core/services/firebaseUtils";
-import Header from "../../../shared/components/layout/Header";
-import Footer from "../../../shared/components/layout/Footer";
+} from "@/core/services/firebaseUtils";
+import Header from "@/shared/components/layout/Header";
+import Footer from "@/shared/components/layout/Footer";
+import PageHeader from "@/shared/components/layout/PageHeader";
 import CalculatorForm from "./CalculatorForm";
 import AddToMyCardsButton from "../../cards/components/AddToMyCardsButton";
-import ReportButtons from "../../../shared/components/ui/ReportButtons";
+import ReportButtons from "@/shared/components/ui/ReportButtons";
 import MissingBankCardForm from "./ReportForms/MissingBankCardForm";
 import IncorrectRewardReportForm from "./ReportForms/IncorrectRewardReportForm";
-import { AnonymousConversionPrompt } from "../../../shared/components/ui/AnonymousConversionPrompt";
-import ErrorAlert from "../../../shared/components/ui/ErrorAlert";
-import { calculateRewards } from "../../../core/services/api";
-import { logCalculation } from "../../../core/services/analytics";
+import { AnonymousConversionPrompt } from "@/shared/components/ui/AnonymousConversionPrompt";
+import ErrorAlert from "@/shared/components/ui/ErrorAlert";
+import { calculateRewards } from "@/core/services/api";
+import { logCalculation } from "@/core/services/analytics";
 import { useCardSelection } from "./CalculatorHooks";
 import CalculationResults from "./CalculationResults";
 import Confetti from "react-confetti";
 import ReferralButton from "./ReferralButton";
-import { useRegion } from "../../../core/providers/RegionContext";
+import { useRegion } from "@/core/providers/RegionContext";
 import { motion } from "framer-motion";
 import {
   useAnalytics,
   usePagePerformance,
   useFormTracking,
-} from "../../../core/hooks";
+} from "@/core/hooks";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -294,7 +295,9 @@ function Calculator() {
           display: "flex",
           flexDirection: "column",
           minHeight: "100vh",
-          bgcolor: "background.default",
+          bgcolor: "transparent",
+          position: "relative",
+          overflow: "hidden"
         }}
       >
         <Header />
@@ -312,16 +315,10 @@ function Calculator() {
           {showConfetti && <Confetti />}
 
           <Stack spacing={4}>
-            <Typography
-              variant="h4"
-              sx={{
-                fontWeight: "bold",
-                fontSize: { xs: "1.75rem", sm: "2.125rem" },
-                textAlign: { xs: "center", sm: "left" },
-              }}
-            >
-              Reward Calculator
-            </Typography>
+            <PageHeader
+                title="Reward Calculator"
+                subtitle="Calculate your credit card rewards for specific spends and MCC codes."
+            />
 
             <ErrorAlert message={error} onClose={() => setError(null)} />
 

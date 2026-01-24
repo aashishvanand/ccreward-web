@@ -2,13 +2,13 @@
 // src/features/top-cards/components/TopCardsPage.jsx - Enhanced with Analytics
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "../../../core/providers/AuthContext";
-import Header from "../../../shared/components/layout/Header";
-import Footer from "../../../shared/components/layout/Footer";
-import useCardImagesData from "../../../core/hooks/useCardImagesData";
+import { useAuth } from "@/core/providers/AuthContext";
+import Header from "@/shared/components/layout/Header";
+import Footer from "@/shared/components/layout/Footer";
+import useCardImagesData from "@/core/hooks/useCardImagesData";
 import useCardCategories, {
   getCardsForCategory,
-} from "../../../core/hooks/useCardCategories";
+} from "@/core/hooks/useCardCategories";
 import TopCardsGrid from "./TopCardsGrid";
 import {
   Box,
@@ -26,7 +26,7 @@ import {
   useTheme,
   CircularProgress,
 } from "@mui/material";
-import { useRegion } from "../../../core/providers/RegionContext";
+import { useRegion } from "@/core/providers/RegionContext";
 import { motion } from "framer-motion";
 
 // Add analytics imports
@@ -35,7 +35,7 @@ import {
   usePagePerformance,
   useEngagementTracking,
   useComponentAnalytics,
-} from "../../../core/hooks";
+} from "@/core/hooks";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },

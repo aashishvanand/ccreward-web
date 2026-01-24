@@ -28,22 +28,23 @@ import {
   ExpandMore as ExpandMoreIcon,
   Clear as ClearIcon,
 } from "@mui/icons-material";
-import Header from "../../../shared/components/layout/Header";
-import Footer from "../../../shared/components/layout/Footer";
-import { useAuth } from "../../../core/providers/AuthContext";
-import { getCardsForUser } from "../../../core/services/firebaseUtils";
+import Header from "@/shared/components/layout/Header";
+import Footer from "@/shared/components/layout/Footer";
+import PageHeader from "@/shared/components/layout/PageHeader";
+import { useAuth } from "@/core/providers/AuthContext";
+import { getCardsForUser } from "@/core/services/firebaseUtils";
 import Confetti from "react-confetti";
 import { CardListRenderer } from "./CardListRenderer";
-import DynamicCardInputs from "../../../shared/components/ui/DynamicCardInputs";
+import DynamicCardInputs from "@/shared/components/ui/DynamicCardInputs";
 import {
   fetchBestCardQuestions,
   calculateBestCard,
   fetchMCC,
-} from "../../../core/services/api";
+} from "@/core/services/api";
 import _ from "lodash";
-import { useRegion } from "../../../core/providers/RegionContext";
+import { useRegion } from "@/core/providers/RegionContext";
 import { motion } from "framer-motion";
-import { getCurrencySymbol } from "../../../core/utils";
+import { getCurrencySymbol } from "@/core/utils";
 
 // Add analytics imports
 import {
@@ -54,7 +55,7 @@ import {
   useFormTracking,
   useAPITracking,
   useComponentAnalytics,
-} from "../../../core/hooks";
+} from "@/core/hooks";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -614,7 +615,7 @@ const BestCardCalculator = () => {
       exit="exit"
     >
       <Box
-        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", position: "relative", overflow: "hidden" }}
       >
         <Header />
         {loading ? (
@@ -639,17 +640,10 @@ const BestCardCalculator = () => {
             }}
           >
           {showConfetti && <Confetti />}
-          <Typography
-            variant="h4"
-            gutterBottom
-            sx={{
-              fontWeight: "bold",
-              fontSize: { xs: "1.75rem", sm: "2.125rem" },
-              mb: 4, 
-            }}
-          >
-            Best Card Calculator
-          </Typography>
+          <PageHeader 
+            title="Best Card Calculator" 
+            subtitle="Find the best card to use for your next purchase." 
+          />
 
           <Paper
             elevation={2}
@@ -766,34 +760,51 @@ const BestCardCalculator = () => {
                   <Typography>Advanced Mode</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  {cardQuestions.length === 0 ? (
-                    <Typography>No additional questions available.</Typography>
-                  ) : (
-                    Object.entries(
-                      _.groupBy(cardQuestions, (q) => `${q.bank}-${q.cardName}`)
-                    ).map(([cardKey, questions]) => (
-                      <Box key={cardKey} sx={{ mb: 4 }}>
-                        <Typography variant="h6" sx={{ mb: 2 }}>
-                          {cardKey.replace("-", " - ")}
-                        </Typography>
-                        <DynamicCardInputs
-                          cardConfig={questions}
-                          onChange={(inputKey, value) =>
-                            handleAdditionalInputChange(
-                              cardKey.replace("-", " - "),
-                              inputKey,
-                              value
-                            )
-                          }
-                          currentInputs={
-                            additionalInputs[cardKey.replace("-", " - ")] || {}
-                          }
-                          selectedMcc={selectedMcc}
-                        />
-                        <Divider sx={{ my: 2 }} />
-                      </Box>
-                    ))
-                  )}
+                  {(() => {
+                    const filteredQuestions = cardQuestions.filter((q) => {
+                      if (!q.applicableMCCs || q.applicableMCCs.length === 0) {
+                        return true;
+                      }
+                      return (
+                        selectedMcc && q.applicableMCCs.includes(selectedMcc.mcc)
+                      );
+                    });
+
+                    return filteredQuestions.length === 0 ? (
+                      <Typography>
+                        No additional questions available for the selected
+                        criteria.
+                      </Typography>
+                    ) : (
+                      Object.entries(
+                        _.groupBy(
+                          filteredQuestions,
+                          (q) => `${q.bank}-${q.cardName}`
+                        )
+                      ).map(([cardKey, questions]) => (
+                        <Box key={cardKey} sx={{ mb: 4 }}>
+                          <Typography variant="h6" sx={{ mb: 2 }}>
+                            {cardKey.replace("-", " - ")}
+                          </Typography>
+                          <DynamicCardInputs
+                            cardConfig={questions}
+                            onChange={(inputKey, value) =>
+                              handleAdditionalInputChange(
+                                cardKey.replace("-", " - "),
+                                inputKey,
+                                value
+                              )
+                            }
+                            currentInputs={
+                              additionalInputs[cardKey.replace("-", " - ")] || {}
+                            }
+                            selectedMcc={selectedMcc}
+                          />
+                          <Divider sx={{ my: 2 }} />
+                        </Box>
+                      ))
+                    );
+                  })()}
                 </AccordionDetails>
               </Accordion>
 

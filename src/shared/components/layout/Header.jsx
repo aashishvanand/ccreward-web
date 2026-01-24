@@ -35,12 +35,12 @@ import {
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { useAuth } from "../../../core/providers/AuthContext";
-import { useAppTheme } from "../../../core/providers/ThemeRegistry";
-import { useRegion } from "../../../core/providers/RegionContext";
-import { getCardsForUser } from "../../../core/services/firebaseUtils";
-import { onCardUpdate } from "../../../core/utils/events";
-import { detectDevice } from "../../../core/utils/deviceUtils";
+import { useAuth } from "@/core/providers/AuthContext";
+import { useAppTheme } from "@/core/providers/ThemeRegistry";
+import { useRegion } from "@/core/providers/RegionContext";
+import { getCardsForUser } from "@/core/services/firebaseUtils";
+import { onCardUpdate } from "@/core/utils/events";
+import { detectDevice } from "@/core/utils/deviceUtils";
 import RegionSelector from "./RegionSelector";
 
 // Icon mapping based on theme and region
