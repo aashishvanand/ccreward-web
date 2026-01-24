@@ -1,0 +1,493 @@
+{
+  "(AA) - AAdvantage": {
+    "bank": "SBI",
+    "currency": "SBI Mile"
+  },
+  "(AC) - Aeroplan": [
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "Kotak",
+      "currency": "Air Miles"
+    },
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    }
+  ],
+  "(AK) - AirAsia Rewards": [
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "SBI",
+      "currency": [
+        "AURUM Reward Point",
+        "SBI Mile"
+      ]
+    }
+  ],
+  "(SV) - Saudia Alfursan": {
+    "bank": "SBI",
+    "currency": "SBI Mile"
+  },
+  "(CX) - Asia Miles": [
+    {
+      "bank": "AMEX",
+      "currency": "Membership Rewards"
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "Kotak",
+      "currency": "Air Miles"
+    },
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    }
+  ],
+  "(6E) - BluChip": [
+    {
+      "bank": "IDFCFirst",
+      "currency": "BluChip"
+    },
+    {
+      "bank": "Kotak",
+      "currency": "BluChip"
+    }
+  ],
+  "(EY) - Etihad Guest": [
+    {
+      "bank": "AMEX",
+      "currency": "Membership Rewards"
+    },
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "Kotak",
+      "currency": "Air Miles"
+    },
+    {
+      "bank": "SBI",
+      "currency": [
+        "SBI Mile",
+        "Etihad Guest"
+      ]
+    }
+  ],
+  "(BA) - Executive Club": [
+    {
+      "bank": "AMEX",
+      "currency": "Membership Rewards"
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "IndusInd",
+      "currency": "Avios"
+    },
+    {
+      "bank": "Kotak",
+      "currency": "Air Miles"
+    },
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    }
+  ],
+  "(AY) - Finnair Plus": {
+    "bank": "HDFC",
+    "currency": "HDFC Reward Point"
+  },
+  "(AF) - Flying Blue": [
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "Kotak",
+      "currency": "Air Miles"
+    },
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    }
+  ],
+  "(VS) - Flying Club": {
+    "bank": "AMEX",
+    "currency": "Membership Rewards"
+  },
+  "(HU) - Fortune Wings Club": {
+    "bank": "HSBC",
+    "currency": "HSBC Reward Point"
+  },
+  "(BR) - Infinity MileageLands": {
+    "bank": "HSBC",
+    "currency": "HSBC Reward Point"
+  },
+  "(9W) - InterMiles": [
+    {
+      "bank": "HDFC",
+      "currency": "Diners Club Privilege"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "IndusInd",
+      "currency": "InterMiles"
+    },
+    {
+      "bank": "YesBank",
+      "currency": "Yes Reward Point"
+    }
+  ],
+  "(SQ) - KrisFlyer": [
+    {
+      "bank": "AMEX",
+      "currency": "Membership Rewards"
+    },
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "Federal",
+      "currency": "Federal Reward Point"
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "IndusInd",
+      "currency": "IndusInd Reward Point"
+    },
+    {
+      "bank": "SBI",
+      "currency": "KrisFlyer"
+    }
+  ],
+  "(AV) - LifeMiles": {
+    "bank": "HDFC",
+    "currency": "HDFC Reward Point"
+  },
+  "(VN) - Lotusmiles": [
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    }
+  ],
+  "(AI) - Maharaja Club": [
+    {
+      "bank": "AU",
+      "currency": "AU Reward Point"
+    },
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward",
+        "Maharaja Club"
+      ]
+    },
+    {
+      "bank": "Federal",
+      "currency": "Federal Reward Point"
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "ICICI",
+      "currency": "ICICI Reward Point"
+    },
+    {
+      "bank": "IDFCFirst",
+      "currency": "Maharaja Club"
+    },
+    {
+      "bank": "IndusInd",
+      "currency": [
+        "IndusInd Reward Point",
+        "Maharaja Club"
+      ]
+    },
+    {
+      "bank": "SBI",
+      "currency": [
+        "AURUM Reward Point",
+        "SBI Mile",
+        "Maharaja Club"
+      ]
+    },
+    {
+      "bank": "YesBank",
+      "currency": "Yes Reward Point"
+    }
+  ],
+  "(JL) - Mileage Bank": [
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    }
+  ],
+  "(UA) - MileagePlus": [
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "Kotak",
+      "currency": "Air Miles"
+    },
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    }
+  ],
+  "(LH) - Miles & More": {
+    "bank": "Axis",
+    "currency": [
+      "Edge Mile",
+      "Edge Reward"
+    ]
+  },
+  "(TK) - Miles & Smiles": [
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    }
+  ],
+  "(QR) - Privilege Club": [
+    {
+      "bank": "AMEX",
+      "currency": "Membership Rewards"
+    },
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "Federal",
+      "currency": "Federal Reward Point"
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "Kotak",
+      "currency": "Air Miles"
+    },
+    {
+      "bank": "IndusInd",
+      "currency": "Avios"
+    },
+    {
+      "bank": "SBI",
+      "currency": [
+        "AURUM Reward Point",
+        "SBI Mile"
+      ]
+    }
+  ],
+  "(QF) - Qantas Frequent Flyer": [
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    }
+  ],
+  "(TG) - Royal Orchid Plus": [
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    }
+  ],
+  "(ET) - ShebaMiles": [
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward"
+      ]
+    },
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    }
+  ],
+  "(EK) - Skywards": [
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    },
+    {
+      "bank": "ICICI",
+      "currency": "Skywards"
+    }
+  ],
+  "(SG) - SpiceClub": [
+    {
+      "bank": "Axis",
+      "currency": [
+        "Edge Mile",
+        "Edge Reward",
+        "SpiceClub"
+      ]
+    },
+    {
+      "bank": "HDFC",
+      "currency": "HDFC Reward Point"
+    },
+    {
+      "bank": "SBI",
+      "currency": "SBI Mile"
+    }
+  ]
+}

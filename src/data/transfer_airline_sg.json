@@ -1,0 +1,317 @@
+{
+  "(AC) - Aeroplan": {
+    "bank": "HSBC",
+    "currency": "HSBC Reward Point"
+  },
+  "(AK) - AirAsia Rewards": [
+    {
+      "bank": "DBS",
+      "currency": "DBS Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "Maybank",
+      "currency": "TREATS Point"
+    },
+    {
+      "bank": "UOB",
+      "currency": "UNI$"
+    }
+  ],
+  "(CX) - Asia Miles": [
+    {
+      "bank": "AMEX",
+      "currency": "Membership Rewards"
+    },
+    {
+      "bank": "Citi",
+      "currency": [
+        "ThankYou Point",
+        "Citi Miles"
+      ]
+    },
+    {
+      "bank": "DBS",
+      "currency": "DBS Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "Maybank",
+      "currency": "TREATS Point"
+    },
+    {
+      "bank": "OCBC",
+      "currency": [
+        "OCBC$",
+        "90°N",
+        "Voyage"
+      ]
+    },
+    {
+      "bank": "SC",
+      "currency": "360° Rewards Point"
+    },
+    {
+      "bank": "UOB",
+      "currency": "UNI$"
+    }
+  ],
+  "(MH) - Enrich": [
+    {
+      "bank": "AMEX",
+      "currency": "Membership Rewards"
+    },
+    {
+      "bank": "Citi",
+      "currency": [
+        "ThankYou Point",
+        "Citi Miles"
+      ]
+    },
+    {
+      "bank": "Maybank",
+      "currency": "TREATS Point"
+    }
+  ],
+  "(EY) - Etihad Guest": [
+    {
+      "bank": "Citi",
+      "currency": [
+        "ThankYou Point",
+        "Citi Miles"
+      ]
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "OCBC",
+      "currency": [
+        "OCBC$",
+        "90°N",
+        "Voyage"
+      ]
+    }
+  ],
+  "(BA) - Executive Club": [
+    {
+      "bank": "AMEX",
+      "currency": "Membership Rewards"
+    },
+    {
+      "bank": "Citi",
+      "currency": [
+        "ThankYou Point",
+        "Citi Miles"
+      ]
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "OCBC",
+      "currency": [
+        "OCBC$",
+        "90°N",
+        "Voyage"
+      ]
+    }
+  ],
+  "(AF) - Flying Blue": [
+    {
+      "bank": "Citi",
+      "currency": [
+        "ThankYou Point",
+        "Citi Miles"
+      ]
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "OCBC",
+      "currency": [
+        "OCBC$",
+        "90°N",
+        "Voyage"
+      ]
+    }
+  ],
+  "(HU) - Fortune Wings Club": {
+    "bank": "HSBC",
+    "currency": "HSBC Reward Point"
+  },
+  "(BR) - Infinity MileageLands": [
+    {
+      "bank": "AMEX",
+      "currency": "Membership Rewards"
+    },
+    {
+      "bank": "Citi",
+      "currency": [
+        "ThankYou Point",
+        "Citi Miles"
+      ]
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    }
+  ],
+  "(SQ) - KrisFlyer": [
+    {
+      "bank": "AMEX",
+      "currency": [
+        "Membership Rewards",
+        "KrisFlyer"
+      ]
+    },
+    {
+      "bank": "BOC",
+      "currency": "BOC Point"
+    },
+    {
+      "bank": "Citi",
+      "currency": [
+        "ThankYou Point",
+        "Citi Miles"
+      ]
+    },
+    {
+      "bank": "DBS",
+      "currency": [
+        "yuu Points",
+        "DBS Point"
+      ]
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "DCS",
+      "currency": [
+        "Club Rewards Point",
+        "Imperium Points"
+      ]
+    },
+    {
+      "bank": "Maybank",
+      "currency": "TREATS Point"
+    },
+    {
+      "bank": "OCBC",
+      "currency": [
+        "OCBC$",
+        "90°N",
+        "Voyage"
+      ]
+    },
+    {
+      "bank": "SC",
+      "currency": "360° Rewards Point"
+    },
+    {
+      "bank": "UOB",
+      "currency": [
+        "UNI$",
+        "KrisFlyer"
+      ]
+    }
+  ],
+  "(VN) - Lotusmiles": {
+    "bank": "HSBC",
+    "currency": "HSBC Reward Point"
+  },
+  "(JL) - Mileage Bank": {
+    "bank": "HSBC",
+    "currency": "HSBC Reward Point"
+  },
+  "(UA) - MileagePlus": [
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    },
+    {
+      "bank": "OCBC",
+      "currency": [
+        "OCBC$",
+        "90°N",
+        "Voyage"
+      ]
+    }
+  ],
+  "(TK) - Miles & Smiles": [
+    {
+      "bank": "Citi",
+      "currency": [
+        "ThankYou Point",
+        "Citi Miles"
+      ]
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    }
+  ],
+  "(QR) - Privilege Club": [
+    {
+      "bank": "Citi",
+      "currency": [
+        "ThankYou Point",
+        "Citi Miles"
+      ]
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    }
+  ],
+  "(QF) - Qantas Frequent Flyer": [
+    {
+      "bank": "AMEX",
+      "currency": "Membership Rewards"
+    },
+    {
+      "bank": "Citi",
+      "currency": [
+        "ThankYou Point",
+        "Citi Miles"
+      ]
+    },
+    {
+      "bank": "DBS",
+      "currency": "DBS Point"
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    }
+  ],
+  "(TG) - Royal Orchid Plus": [
+    {
+      "bank": "AMEX",
+      "currency": "Membership Rewards"
+    },
+    {
+      "bank": "Citi",
+      "currency": [
+        "ThankYou Point",
+        "Citi Miles"
+      ]
+    },
+    {
+      "bank": "HSBC",
+      "currency": "HSBC Reward Point"
+    }
+  ]
+}

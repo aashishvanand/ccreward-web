@@ -48,7 +48,7 @@ function generateSitemap() {
     const cardsIn = getCardsData('in');
     if (cardsIn && cardsIn.issuers) {
         Object.keys(cardsIn.issuers).forEach(bank => {
-            const bankLower = bank.toLowerCase();
+            const bankLower = encodeURIComponent(bank.toLowerCase());
             // Bank Page
             paths.push(`/in/bank/${bankLower}`);
 
@@ -56,7 +56,7 @@ function generateSitemap() {
             const cards = cardsIn.issuers[bank].cards;
             if (cards) {
                 cards.forEach(card => {
-                    const cardSlug = card.toLowerCase().replace(/ /g, '%20');
+                    const cardSlug = encodeURIComponent(card.toLowerCase());
                     paths.push(`/in/bank/${bankLower}/${cardSlug}`);
                 });
             }
@@ -68,12 +68,12 @@ function generateSitemap() {
     const cardsSg = getCardsData('sg');
     if (cardsSg && cardsSg.issuers) {
         Object.keys(cardsSg.issuers).forEach(bank => {
-            const bankLower = bank.toLowerCase();
+            const bankLower = encodeURIComponent(bank.toLowerCase());
             paths.push(`/sg/bank/${bankLower}`);
             const cards = cardsSg.issuers[bank].cards;
             if (cards) {
                 cards.forEach(card => {
-                    const cardSlug = card.toLowerCase().replace(/ /g, '%20'); // URL encoding spcaes
+                    const cardSlug = encodeURIComponent(card.toLowerCase()); // URL encoding spcaes
                     paths.push(`/sg/bank/${bankLower}/${cardSlug}`);
                 });
             }

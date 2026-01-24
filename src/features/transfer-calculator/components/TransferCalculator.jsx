@@ -47,6 +47,7 @@ import {
   useFormTracking,
   usePartnerLogos,
 } from "@/core/hooks";
+import TransferPartnerGrid from "./TransferPartnerGrid";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -553,6 +554,10 @@ const TransferCalculator = () => {
               </Box>
             )}
           </Stack>
+           {/* Add the TransferPartnerGrid here */}
+          <Box sx={{ mt: 8 }}>
+            <TransferPartnerGrid />
+          </Box>
           </Container>
         )}
 
