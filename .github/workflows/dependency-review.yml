@@ -1,0 +1,19 @@
+# Dependency Review Action
+#
+# This Action will scan your Pull Requests for vulnerable dependencies and fails if any vulnerabilities are found.
+# For more information, see: https://github.com/actions/dependency-review-action
+
+name: 'Dependency Review'
+on: [pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@v4
+      - name: 'Dependency Review'
+        uses: actions/dependency-review-action@v4
