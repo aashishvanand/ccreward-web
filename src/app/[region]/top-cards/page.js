@@ -3,7 +3,13 @@ import TopCardsPage from '@/features/top-cards/components/TopCardsPage';
 import { generateMetadata as generateMetadataHelper, pageMetadata } from '@/shared/components/seo';
 import PerformanceWrapper from '@/shared/components/PerformanceWrapper';
 
-export const revalidate = 86400; // Revalidate every 24 hours
+import categoriesIN from '@/data/cardCategories_in.json';
+import categoriesSG from '@/data/cardCategories_sg.json';
+
+const DATA = {
+    in: { categories: categoriesIN, images: [] },
+    sg: { categories: categoriesSG, images: [] }
+};
 
 export async function generateStaticParams() {
     return [
@@ -27,17 +33,9 @@ export async function generateMetadata({ params }) {
     });
 }
 
-async function getData(region = 'in') {
-    const [categoriesRes, imagesRes] = await Promise.all([
-        fetch(`https://files.ccreward.app/cardCategories_${region}.json`),
-        fetch(`https://files.ccreward.app/cardImages_${region}.json`)
-    ]);
-
-    // Handle errors / fallback
-    const categories = categoriesRes.ok ? await categoriesRes.json() : null;
-    const images = imagesRes.ok ? await imagesRes.json() : [];
-
-    return { categories, images };
+function getData(region = 'in') {
+    const key = region.toLowerCase() === 'sg' ? 'sg' : 'in';
+    return DATA[key] || DATA['in'];
 }
 
 export default async function TopCards({ params }) {
@@ -46,7 +44,7 @@ export default async function TopCards({ params }) {
     // Ensure accurate region passing
     const targetRegion = region || 'in';
 
-    const { categories, images } = await getData(targetRegion.toLowerCase());
+    const { categories, images } = getData(targetRegion.toLowerCase());
 
     return (
         <PerformanceWrapper name="top_cards_page">
