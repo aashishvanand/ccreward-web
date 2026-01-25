@@ -45,6 +45,10 @@ export default function MccLookupPage() {
                 <meta name="twitter:title" content={metadata.title} />
                 <meta name="twitter:description" content={metadata.description} />
             </Head>
+            <div style={{ display: 'none', visibility: 'hidden' }}>
+                <h1>MCC Lookup Tool</h1>
+                <p>Search by merchant name to find category codes and industry details.</p>
+            </div>
             <MccLookupWrapper />
         </>
     );

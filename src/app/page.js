@@ -1,33 +1,20 @@
-"use client";
-import { useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import Box from '@mui/material/Box';
-import { initializeAnalytics, setupNetworkMonitoring } from '../core/services/analytics';
-import PerformanceWrapper from '../shared/components/PerformanceWrapper';
+import HomeClientWrapper from './components/HomeClientWrapper';
 
-const LandingPage = dynamic(() => import('../features/landing/components/LandingPage'), { ssr: false });
+export const metadata = {
+  title: "Maximize Your Rewards with the Right Credit Card | ccreward",
+  description: "Compare cards, calculate rewards, and find the perfect credit card for your spending habits.",
+}
 
 function Home() {
-  // Add this useEffect for performance monitoring
-  useEffect(() => {
-    const initPerformanceMonitoring = async () => {
-      try {
-        await initializeAnalytics();
-        setupNetworkMonitoring();
-      } catch (error) {
-        console.error('Failed to initialize performance monitoring:', error);
-      }
-    };
-
-    initPerformanceMonitoring();
-  }, []);
-
   return (
-    <Box sx={{ minHeight: '100vh' }}>
-      <PerformanceWrapper name="landing_page">
-        <LandingPage />
-      </PerformanceWrapper>
-    </Box>
+    <div style={{ minHeight: '100vh' }}>
+      {/* Static Shell for SEO */}
+      <div style={{ display: 'none', visibility: 'hidden' }} aria-hidden="true">
+        <h1>Maximize Your Rewards with the Right Credit Card</h1>
+        <p>Compare cards, calculate rewards, and find the perfect credit card for your spending habits.</p>
+      </div>
+      <HomeClientWrapper />
+    </div>
   );
 }
 

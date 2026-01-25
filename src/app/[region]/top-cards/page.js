@@ -1,24 +1,29 @@
-import TopCardsPage from '../../features/top-cards/components/TopCardsPage';
-import { generateMetadata as generateMetadataHelper, pageMetadata } from '../../shared/components/seo';
-import PerformanceWrapper from '../../shared/components/PerformanceWrapper';
 
-export async function generateMetadata({ searchParams }) {
-    const { category, region = 'in' } = await searchParams;
+import TopCardsPage from '@/features/top-cards/components/TopCardsPage';
+import { generateMetadata as generateMetadataHelper, pageMetadata } from '@/shared/components/seo';
+import PerformanceWrapper from '@/shared/components/PerformanceWrapper';
+
+export const revalidate = 86400; // Revalidate every 24 hours
+
+export async function generateStaticParams() {
+    return [
+        { region: 'in' },
+        { region: 'sg' },
+    ];
+}
+
+export async function generateMetadata({ params }) {
+    const { region } = await params;
     const countryName = region.toLowerCase() === 'sg' ? 'Singapore' : 'India';
 
     let title = `Top Credit Cards in ${countryName} - Compare Best Rewards Cards | ccreward`;
     let description = `Discover and compare the best credit cards in ${countryName}. Find cards with the highest rewards, cashback, and benefits for your spending habits.`;
 
-    if (category) {
-        title = `Best Credit Cards for ${category} in ${countryName} - Top Picks ${new Date().getFullYear()} | ccreward`;
-        description = `Find the best credit cards for ${category} in ${countryName}. Compare top rated cards for ${category} spending and maximize your rewards.`;
-    }
-
     return generateMetadataHelper({
         ...pageMetadata.topCards,
         title,
         description,
-        path: '/top-cards'
+        path: `/${region}/top-cards`
     });
 }
 
@@ -35,11 +40,10 @@ async function getData(region = 'in') {
     return { categories, images };
 }
 
-export default async function TopCards({ searchParams }) {
-    const { region } = await searchParams; // searchParams is a promise in Next.js 15+ (and maybe 14+), better await it just in case or use it if it's object
-    // Next.js docs say searchParams is an object in pages, but good to check version. Package.json says "next": "^16.1.0". 
-    // In Next 15, params and searchParams are promises.
+export default async function TopCards({ params }) {
+    const { region } = await params;
 
+    // Ensure accurate region passing
     const targetRegion = region || 'in';
 
     const { categories, images } = await getData(targetRegion.toLowerCase());
