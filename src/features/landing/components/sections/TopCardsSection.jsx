@@ -49,7 +49,7 @@ const TopCardsSection = () => {
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
   );
-  const { regionName } = useRegion();
+  const { regionName, region } = useRegion();
 
   const handleNext = () => {
     setCurrentPage((prev) => (prev + 1) % totalPages);
@@ -113,7 +113,7 @@ const TopCardsSection = () => {
           <Button
             variant="contained"
             size="large"
-            onClick={() => router.push("/top-cards")}
+            onClick={() => router.push(`/${region.toLowerCase()}/top-cards`)}
             sx={{
               px: 4,
               py: 1.5,
@@ -199,7 +199,7 @@ const TopCardsSection = () => {
                         size="small"
                         onClick={() =>
                           router.push(
-                            `/top-cards?category=${encodeURIComponent(
+                            `/${region.toLowerCase()}/top-cards/${encodeURIComponent(
                               categoryName
                             )}`
                           )

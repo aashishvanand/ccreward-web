@@ -13,6 +13,10 @@ export default function BestCardPage() {
   return (
     <>
       <SEOHead metadata={metadata} />
+      <div style={{ display: 'none', visibility: 'hidden' }}>
+        <h1>Best Card Calculator</h1>
+        <p>Find the best card to use for your next purchase.</p>
+      </div>
       <BestCardCalculator />
     </>
   );

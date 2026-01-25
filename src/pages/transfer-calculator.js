@@ -16,6 +16,10 @@ export default function TransferCalculatorPage() {
     return (
         <PerformanceWrapper name="transfer_calculator_page">
             <SEOHead metadata={metadata} />
+            <div style={{ display: 'none', visibility: 'hidden' }}>
+                <h1>Transfer Partner Calculator</h1>
+                <p>Calculate point transfers to airline and hotel partners.</p>
+            </div>
             <TransferCalculatorWrapper />
         </PerformanceWrapper>
     );

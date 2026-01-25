@@ -14,6 +14,10 @@ export default function CalculatorPage() {
   return (
     <>
       <SEOHead metadata={metadata} />
+      <div style={{ display: 'none', visibility: 'hidden' }}>
+        <h1>Reward Calculator</h1>
+        <p>Calculate your credit card rewards for specific spends and MCC codes.</p>
+      </div>
       <CalculatorWrapper />
     </>
   );

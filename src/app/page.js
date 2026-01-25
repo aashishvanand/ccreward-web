@@ -1,34 +1,10 @@
-"use client";
-import { useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import Box from '@mui/material/Box';
-import { initializeAnalytics, setupNetworkMonitoring } from '../core/services/analytics';
-import PerformanceWrapper from '../shared/components/PerformanceWrapper';
+import HomeClient from './HomeClient';
 
-const LandingPage = dynamic(() => import('../features/landing/components/LandingPage'), { ssr: false });
+export const metadata = {
+  title: 'Credit Card Rewards Calculator - Maximize Your Benefits',
+  description: 'Compare, calculate, and choose the best credit card rewards with ccreward. Optimize your spending with our advanced calculator.',
+};
 
-function Home() {
-  // Add this useEffect for performance monitoring
-  useEffect(() => {
-    const initPerformanceMonitoring = async () => {
-      try {
-        await initializeAnalytics();
-        setupNetworkMonitoring();
-      } catch (error) {
-        console.error('Failed to initialize performance monitoring:', error);
-      }
-    };
-
-    initPerformanceMonitoring();
-  }, []);
-
-  return (
-    <Box sx={{ minHeight: '100vh' }}>
-      <PerformanceWrapper name="landing_page">
-        <LandingPage />
-      </PerformanceWrapper>
-    </Box>
-  );
+export default function Home() {
+  return <HomeClient />;
 }
-
-export default Home;

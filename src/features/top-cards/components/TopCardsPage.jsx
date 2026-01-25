@@ -75,12 +75,13 @@ const categories = [
   "Wallet Loading",
 ];
 
-const TopCardsPage = ({ initialCategories, initialCardImages }) => {
+const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = "" }) => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
   const { user, signInWithGoogle } = useAuth();
+  const { region: currentRegion } = useRegion(); // Get current region from context
 
   // Analytics hooks
   const { trackButtonClick, trackFeatureUsage, trackEvent, trackNavigation } =
@@ -89,7 +90,7 @@ const TopCardsPage = ({ initialCategories, initialCardImages }) => {
   const { trackCustomEngagement } = useEngagementTracking();
   const { trackComponentError } = useComponentAnalytics("TopCardsPage");
 
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState(initialCategory || "");
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [alert, setAlert] = useState({
@@ -112,85 +113,78 @@ const TopCardsPage = ({ initialCategories, initialCardImages }) => {
     trackFeatureUsage("top_cards_page_loaded", {
       user_authenticated: !!user,
       device_type: isMobile ? "mobile" : isTablet ? "tablet" : "desktop",
+      initial_category: initialCategory,
     });
 
     recordCustomMetric("page_load_time", performance.now());
-  }, [trackFeatureUsage, recordCustomMetric, user, isMobile, isTablet]);
+  }, [trackFeatureUsage, recordCustomMetric, user, isMobile, isTablet, initialCategory]);
 
   // Validate category helper function
   const isValidCategory = (cat) => categories.includes(cat);
 
-  // Handle URL category parameter with analytics
+  // Handle URL category parameter with analytics (Legacy support or direct query param usage)
   useEffect(() => {
-    const validateAndSetCategory = async () => {
-      setIsValidating(true);
-      try {
-        const categoryFromUrl = searchParams.get("category");
-        if (categoryFromUrl) {
-          const decodedCategory = decodeURIComponent(categoryFromUrl);
+    // Only check params if no initialCategory was provided (meaning we are on the index page)
+    // and we haven't selected a category yet.
+    if (!initialCategory && !category) {
+      const validateAndSetCategory = async () => {
+        setIsValidating(true);
+        try {
+          const categoryFromUrl = searchParams.get("category");
+          if (categoryFromUrl) {
+            const decodedCategory = decodeURIComponent(categoryFromUrl);
 
-          trackEvent("category_url_parameter_detected", {
-            category: decodedCategory,
-            is_valid: isValidCategory(decodedCategory),
+            trackEvent("category_url_parameter_detected", {
+              category: decodedCategory,
+              is_valid: isValidCategory(decodedCategory),
+            });
+
+            if (isValidCategory(decodedCategory)) {
+              setCategory(decodedCategory);
+
+              trackEvent("category_set_from_url", {
+                category: decodedCategory,
+              });
+            } else {
+              trackComponentError("invalid_category_in_url", {
+                invalid_category: decodedCategory,
+                valid_categories: categories,
+              });
+
+              setAlert({
+                open: true,
+                message: "Invalid category specified. Showing all categories.",
+                severity: "warning",
+              });
+              // Redirect to clean index if invalid
+              router.replace(`/${currentRegion}/top-cards`);
+            }
+          }
+        } catch (error) {
+          trackComponentError("category_validation_error", {
+            error_message: error.message,
           });
 
-          if (isValidCategory(decodedCategory)) {
-            setCategory(decodedCategory);
-
-            trackEvent("category_set_from_url", {
-              category: decodedCategory,
-            });
-          } else {
-            trackComponentError("invalid_category_in_url", {
-              invalid_category: decodedCategory,
-              valid_categories: categories,
-            });
-
-            setAlert({
-              open: true,
-              message: "Invalid category specified. Showing all categories.",
-              severity: "warning",
-            });
-            router.push("/top-cards", undefined, { shallow: true });
-          }
+          console.error("Error validating category:", error);
+          setAlert({
+            open: true,
+            message: "Error processing category. Please try again.",
+            severity: "error",
+          });
+        } finally {
+          setIsValidating(false);
         }
-      } catch (error) {
-        trackComponentError("category_validation_error", {
-          error_message: error.message,
-        });
+      };
 
-        console.error("Error validating category:", error);
-        setAlert({
-          open: true,
-          message: "Error processing category. Please try again.",
-          severity: "error",
-        });
-      } finally {
-        setIsValidating(false);
-      }
-    };
-
-    validateAndSetCategory();
-  }, [searchParams, router, trackEvent, trackComponentError]);
+      validateAndSetCategory();
+    }
+  }, [searchParams, router, trackEvent, trackComponentError, initialCategory, category, currentRegion]);
 
   // Update URL when category changes
-  useEffect(() => {
-    if (!isValidating) {
-      if (category) {
-        trackNavigation(
-          `/top-cards?category=${encodeURIComponent(category)}`,
-          "category_filter"
-        );
-        router.push(
-          `/top-cards?category=${encodeURIComponent(category)}`,
-          undefined,
-          { shallow: true }
-        );
-      } else {
-        router.push("/top-cards", undefined, { shallow: true });
-      }
-    }
-  }, [category, router, isValidating, trackNavigation]);
+  // We handle navigation in handleCategoryChange now to prevent cycle, 
+  // or checks if category matches current URL to avoid redundant pushes.
+  // BUT: if we want to change URL when `category` state changes (e.g. from UI), we do it here.
+  // However, explicit navigation is often cleaner. Let's do it in handleCategoryChange.
 
   const getCardsWithImages = (categoryName) => {
     if (!categoriesData) return [];
@@ -235,6 +229,12 @@ const TopCardsPage = ({ initialCategories, initialCardImages }) => {
           selection_method: "dropdown",
         });
       }
+
+      // Navigate to the new static route
+      const newPath = `/${currentRegion}/top-cards/${encodeURIComponent(newCategory)}`;
+      trackNavigation(newPath, "category_filter");
+      router.push(newPath);
+
     } else {
       trackComponentError("invalid_category_selected", {
         invalid_category: newCategory,
