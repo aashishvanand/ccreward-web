@@ -1,9 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const https = require('https');
+const axios = require('axios');
+const axiosRetry = require('axios-retry').default;
 
 // Load .env.local manually if not in CI/production
-const loadedEnv = {};
 if (!process.env.STATIC_DATA_API_KEY || !process.env.NEXT_PUBLIC_API_BASE_URL) {
     const envPath = path.join(__dirname, '../.env.local');
     if (fs.existsSync(envPath)) {
@@ -26,18 +26,12 @@ const DATA_DIR = path.join(__dirname, '../src/data');
 const API_KEY = process.env.STATIC_DATA_API_KEY;
 
 const FILES_TO_FETCH = [
-    'airline_logo.json',
     'banks_in.json',
     'banks_sg.json',
     'cardCategories_in.json',
     'cardCategories_sg.json',
-    'cardImages_in.json',
-    'cardImages_sg.json',
-    'cardNetworks_in.json',
-    'cardNetworks_sg.json',
     'cards_in.json',
     'cards_sg.json',
-    'hotel_logo.json',
     'referral_in.json',
     'referral_sg.json',
     'transfer_airline_in.json',
@@ -48,11 +42,6 @@ const FILES_TO_FETCH = [
 
 if (!API_KEY) {
     console.warn('⚠️ STATIC_DATA_API_KEY is not set. Skipping data fetch.');
-    // We exit with 0 so the build doesn't fail if the key is missing in dev environments,
-    // assuming local data might exist or be optional for dev.
-    // However, for production builds, this might need to fail. 
-    // Given the user request "pull these files during build", let's assume valid key is provided for prod.
-    // Ideally we should fail if CI=true or similar, but a warning is safer for now.
     process.exit(0);
 }
 
@@ -61,49 +50,59 @@ if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
-const downloadFile = (filename) => {
-    return new Promise((resolve, reject) => {
-        const url = `${API_BASE_URL}${filename}`;
-        const filePath = path.join(DATA_DIR, filename);
-        const file = fs.createWriteStream(filePath);
+// Configure axios with retry
+axiosRetry(axios, {
+    retries: 3,
+    retryDelay: (retryCount) => {
+        console.log(`⚠️ Rate limit hit. Retrying attempt ${retryCount}...`);
+        return retryCount * 2000; // Exponential backoff: 2s, 4s, 6s
+    },
+    retryCondition: (error) => {
+        return error.response?.status === 429 || error.response?.status >= 500;
+    }
+});
 
-        const options = {
-            headers: {
-                'x-api-key': API_KEY
-            }
-        };
+const downloadFile = async (filename) => {
+    const url = `${API_BASE_URL}${filename}`;
+    const filePath = path.join(DATA_DIR, filename);
 
-        https.get(url, options, (response) => {
-            if (response.statusCode !== 200) {
-                file.close();
-                fs.unlink(filePath, () => { }); // Delete empty file
-                reject(new Error(`Failed to fetch ${filename}: Status Code ${response.statusCode}`));
-                return;
-            }
+    try {
+        const response = await axios.get(url, {
+            headers: { 'x-api-key': API_KEY },
+            responseType: 'stream'
+        });
 
-            response.pipe(file);
+        const writer = fs.createWriteStream(filePath);
 
-            file.on('finish', () => {
-                file.close();
+        return new Promise((resolve, reject) => {
+            response.data.pipe(writer);
+            writer.on('finish', () => {
+                writer.close();
                 console.log(`✅ Fetched ${filename}`);
                 resolve();
             });
-
-            file.on('error', (err) => {
+            writer.on('error', (err) => {
+                writer.close();
                 fs.unlink(filePath, () => { });
                 reject(err);
             });
-        }).on('error', (err) => {
-            fs.unlink(filePath, () => { });
-            reject(err);
         });
-    });
+
+    } catch (error) {
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        throw new Error(`Failed to fetch ${filename}: ${error.message}`);
+    }
 };
 
 async function fetchAll() {
     console.log('🚀 Starting static data fetch...');
     try {
-        await Promise.all(FILES_TO_FETCH.map(file => downloadFile(file)));
+        // Still fetch sequentially to be nice, but rely on retry for rate limits
+        for (const file of FILES_TO_FETCH) {
+            await downloadFile(file);
+            // Small delay to be polite
+            await new Promise(r => setTimeout(r, 500));
+        }
         console.log('✨ All static data fetched successfully.');
     } catch (error) {
         console.error('❌ Error fetching static data:', error.message);
