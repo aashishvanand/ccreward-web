@@ -15,7 +15,8 @@
   },
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build && npm run generate:sitemap",
+    "fetch-data": "node scripts/fetch-static-data.js",
+    "build": "npm run fetch-data && next build && npm run generate:sitemap",
     "build:worker": "opennextjs-cloudflare build",
     "preview": "npm run build:worker && wrangler dev",
     "deploy:dev": "npm run build:worker && wrangler deploy --env dev",

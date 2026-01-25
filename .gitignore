@@ -42,3 +42,6 @@ missing_cards.json
 
 .open-next/
 .wrangler
+
+# static data (fetched at build time)
+/src/data/*.json

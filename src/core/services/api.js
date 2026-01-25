@@ -379,5 +379,52 @@ export const calculateTransferPartners = async (data) => {
     }
 };
 
+// Fetch Card Details
+export const fetchCardDetails = async (bank, card, country) => {
+    // Check if region is initialized
+    if (!isRegionInitialized()) {
+        console.warn('Cannot fetch card details: Region not initialized');
+        return null;
+    }
+
+    // Note: The country parameter is actually typically handled by the cache key
+    // or passed implicitly via the interceptor if not provided,
+    // but preserving the signature requested or implied by existing usage.
+    // However, existing usage had country passed in query. 
+    // The interceptor adds it if missing, but let's be explicit if passed.
+
+    // We'll use the country passed in args if available, or fall back to region.
+    const region = country || getCountryCode();
+    if (!region) return null;
+
+    const encodedCard = encodeURIComponent(card);
+    const cacheKey = `card_detail_${bank}_${encodedCard}_${region}`;
+
+    return fetchWithCache(cacheKey, async () => {
+        const response = await api.get(`/v3/card/detail?bank=${bank}&card=${encodedCard}&country=${region}`);
+        return response.data;
+    });
+};
+
+// Fetch Card Goals
+export const fetchCardGoals = async (bank, card, country) => {
+    // Check if region is initialized
+    if (!isRegionInitialized()) {
+        console.warn('Cannot fetch card goals: Region not initialized');
+        return null;
+    }
+
+    const region = country || getCountryCode();
+    if (!region) return null;
+
+    const encodedCard = encodeURIComponent(card);
+    const cacheKey = `card_goals_${bank}_${encodedCard}_${region}`;
+
+    return fetchWithCache(cacheKey, async () => {
+        const response = await api.get(`/v3/goals?bank=${bank}&card=${encodedCard}&country=${region}`);
+        return response.data;
+    });
+};
+
 // Export the API instance
 export { api };

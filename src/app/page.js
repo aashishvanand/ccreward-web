@@ -1,21 +1,10 @@
-import HomeClientWrapper from './components/HomeClientWrapper';
+import HomeClient from './HomeClient';
 
 export const metadata = {
-  title: "Maximize Your Rewards with the Right Credit Card | ccreward",
-  description: "Compare cards, calculate rewards, and find the perfect credit card for your spending habits.",
-}
+  title: 'Credit Card Rewards Calculator - Maximize Your Benefits',
+  description: 'Compare, calculate, and choose the best credit card rewards with ccreward. Optimize your spending with our advanced calculator.',
+};
 
-function Home() {
-  return (
-    <div style={{ minHeight: '100vh' }}>
-      {/* Static Shell for SEO */}
-      <div style={{ display: 'none', visibility: 'hidden' }} aria-hidden="true">
-        <h1>Maximize Your Rewards with the Right Credit Card</h1>
-        <p>Compare cards, calculate rewards, and find the perfect credit card for your spending habits.</p>
-      </div>
-      <HomeClientWrapper />
-    </div>
-  );
+export default function Home() {
+  return <HomeClient />;
 }
-
-export default Home;

@@ -49,6 +49,7 @@ import StarIcon from "@mui/icons-material/Star";
 
 import { useAuth } from "@/core/providers/AuthContext";
 import useCardImagesData from "@/core/hooks/useCardImagesData";
+import { fetchCardDetails, fetchCardGoals } from "@/core/services/api";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth, googleProvider } from "@/firebase";
 import TiltCard from "@/shared/components/ui/TiltCard";
@@ -524,47 +525,40 @@ const CardPage = ({ bankName, cardName, country }) => {
 
     const fetchData = async () => {
       try {
-        // Use the auth object from firebase to get the token directly
-        // The user object from context might be a plain object stripped of methods
-        const { auth: firebaseAuth } = await import('@/firebase');
-        const token = firebaseAuth.currentUser ? await firebaseAuth.currentUser.getIdToken() : null;
+        const detailsData = await fetchCardDetails(bankName, cardName, country);
 
-        if (!token) {
-          throw new Error("Unable to authenticate. Please try signing in again.");
+        if (!detailsData) {
+          // If null returned, it might be 404 or error. 
+          // fetchCardDetails returns null on error in some cases or throws. 
+          // Our implementation in api.js throws on 404/500 usually via handleApiError 
+          // but returns null if region not init.
+          // However, fetchWithCache might handle some errors.
+          // Let's assume if it returns data it's good.
+          // If api.js throws, it will go to catch.
+          // If it returns null/undefined without throwing (e.g. region not init), we might want to handle it.
+          // But here since we have a region (country is passed), it should work.
+           
+           // If we modify api.js to throw on 404, we catch it here.
+           // api.js uses handleApiError which throws.
         }
-
-        const headers = { Authorization: `Bearer ${token}` };
-        const encodedCard = encodeURIComponent(cardName);
-        const baseUrl = "https://devapi.ccreward.app/v3";
-
-        // Fetch Card Details
-        const detailsRes = await fetch(
-          `${baseUrl}/card/detail?bank=${bankName}&card=${encodedCard}&country=${country}`,
-          { headers }
-        );
-
-        if (detailsRes.status === 404) {
-          router.replace("/404");
-          return;
-        }
-
-        if (!detailsRes.ok) throw new Error("Failed to fetch card details");
-        const detailsData = await detailsRes.json();
+        
+        // fetchCardDetails returns the data directly.
         setData(detailsData);
 
         // Fetch Goals
-        const goalsRes = await fetch(
-          `${baseUrl}/goals?bank=${bankName}&card=${encodedCard}&country=${country}`,
-          { headers }
-        );
-
-        if (goalsRes.ok) {
-          const goalsData = await goalsRes.json();
-          setGoals(goalsData);
+        const goalsData = await fetchCardGoals(bankName, cardName, country);
+        if (goalsData) {
+           setGoals(goalsData);
         }
+
       } catch (err) {
         console.error(err);
-        setError(err.message);
+        // Check for 404 equivalent. api.js throws error with response.
+        if (err.response && err.response.status === 404) {
+             router.replace("/404");
+             return;
+        }
+        setError(err.message || "Failed to fetch card details");
       } finally {
         setLoading(false);
       }
