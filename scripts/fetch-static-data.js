@@ -32,8 +32,6 @@ const FILES_TO_FETCH = [
     'cardCategories_sg.json',
     'cards_in.json',
     'cards_sg.json',
-    'referral_in.json',
-    'referral_sg.json',
     'transfer_airline_in.json',
     'transfer_airline_sg.json',
     'transfer_hotel_in.json',
