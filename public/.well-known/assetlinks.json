@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.ccreward",
+      "sha256_cert_fingerprints": [
+        "6F:6D:6F:04:0B:2B:FD:65:CE:A8:A3:E7:BA:20:D2:FD:72:AE:22:DF:64:D5:77:DE:53:6B:2B:B8:2E:3A:F5:3D"
+      ]
+    }
+  }
+]
