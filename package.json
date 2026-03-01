@@ -30,15 +30,15 @@
   "dependencies": {
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@microsoft/clarity": "^1.0.2",
     "@mui/icons-material": "^7.3.8",
     "@mui/material": "^7.3.8",
     "@mui/material-nextjs": "^7.3.8",
-    "@opennextjs/cloudflare": "^1.16.5",
-    "axios": "^1.13.5",
+    "@opennextjs/cloudflare": "^1.17.1",
+    "axios": "^1.13.6",
     "axios-retry": "^4.5.0",
-    "firebase": "^12.9.0",
+    "firebase": "^12.10.0",
     "framer-motion": "^12.34.3",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.23",
@@ -55,11 +55,11 @@
     "@next/bundle-analyzer": "^16.1.6",
     "@types/react": "^19.2.14",
     "cross-env": "^10.1.0",
-    "eslint": "^9.39.3",
+    "eslint": "^10.0.2",
     "eslint-config-next": "^16.1.6",
     "jest": "^30.2.0",
     "typescript": "^5.9.3",
-    "wrangler": "^4.67.0"
+    "wrangler": "^4.69.0"
   },
   "resolutions": {
     "@emotion/react": "^11.14.0",
