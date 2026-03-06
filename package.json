@@ -15,8 +15,8 @@
   },
   "scripts": {
     "dev": "vinext dev",
-    "fetch-data": "node scripts/fetch-static-data.cjs",
-    "generate:sitemap": "node scripts/generate-sitemap.cjs",
+    "fetch-data": "node scripts/fetch-static-data.js",
+    "generate:sitemap": "node scripts/generate-sitemap.js",
     "prebuild:site": "npm run fetch-data && npm run generate:sitemap",
     "build": "npm run prebuild:site && vinext build",
     "start": "vinext start",
