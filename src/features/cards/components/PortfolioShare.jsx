@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material";
 import useCardImagesData from "@/core/hooks/useCardImagesData";
 import { forwardRef, useImperativeHandle } from "react";
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 const PortfolioShare = forwardRef(({ cards }, ref) => {
   const theme = useTheme();
@@ -16,7 +17,7 @@ const PortfolioShare = forwardRef(({ cards }, ref) => {
       img.crossOrigin = "anonymous";
       img.onload = () => resolve(img);
       img.onerror = reject;
-      img.src = `https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/${imageId}/public`;
+      img.src = buildCloudflareImageUrl(imageId, "public");
     });
   };
 
@@ -122,8 +123,8 @@ const PortfolioShare = forwardRef(({ cards }, ref) => {
       logo.crossOrigin = "anonymous";
       logo.src =
         theme.palette.mode === "dark"
-          ? "https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/f4bf16b1-527e-4d80-47b4-99989a1ded00/public"
-          : "https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/b6c3c6f1-a744-4e47-8c50-4c33c84c3900/public";
+          ? buildCloudflareImageUrl("f4bf16b1-527e-4d80-47b4-99989a1ded00", "public")
+          : buildCloudflareImageUrl("b6c3c6f1-a744-4e47-8c50-4c33c84c3900", "public");
       await new Promise((resolve) => {
         logo.onload = resolve;
       });
@@ -199,13 +200,15 @@ const PortfolioShare = forwardRef(({ cards }, ref) => {
       appStoreLogo.crossOrigin = "anonymous";
       appStoreLogo.src =
         theme.palette.mode === "dark"
-          ? "https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/d6909a96-9073-4189-84ea-54475d93ac00/public"
-          : "https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/60ca24d3-0052-4177-4da7-ce7fc0d24a00/public";
+          ? buildCloudflareImageUrl("d6909a96-9073-4189-84ea-54475d93ac00", "public")
+          : buildCloudflareImageUrl("60ca24d3-0052-4177-4da7-ce7fc0d24a00", "public");
 
       const googlePlayLogo = new Image();
       googlePlayLogo.crossOrigin = "anonymous";
-      googlePlayLogo.src =
-        "https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/9a793092-57c3-41e6-15d3-9801d75ae900/public";
+      googlePlayLogo.src = buildCloudflareImageUrl(
+        "9a793092-57c3-41e6-15d3-9801d75ae900",
+        "public"
+      );
 
       await new Promise((resolve) => {
         appStoreLogo.onload = resolve;

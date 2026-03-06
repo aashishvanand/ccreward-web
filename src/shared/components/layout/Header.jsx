@@ -41,6 +41,7 @@ import { useRegion } from "@/core/providers/RegionContext";
 import { getCardsForUser } from "@/core/services/firebaseUtils";
 import { onCardUpdate } from "@/core/utils/events";
 import { detectDevice } from "@/core/utils/deviceUtils";
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 import RegionSelector from "./RegionSelector";
 
 // Icon mapping based on theme and region
@@ -122,7 +123,7 @@ function Header({ hideNavigation = false }) {
 
   // Generate the icon URL
   const ccrewardIconUrl = useMemo(() => {
-    return `https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/${ccrewardIconId}/public`;
+    return buildCloudflareImageUrl(ccrewardIconId, "public");
   }, [ccrewardIconId]);
 
   useEffect(() => {

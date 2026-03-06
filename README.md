@@ -90,6 +90,9 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=xxx
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=xxx
 NEXT_PUBLIC_FIREBASE_APP_ID=xxx
 NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=xxx
+NEXT_PUBLIC_CLOUDFLARE_IMAGES_ACCOUNT_HASH=your_cloudflare_images_account_hash
+# Optional if you use a custom delivery domain instead of imagedelivery.net
+# NEXT_PUBLIC_CLOUDFLARE_IMAGES_DELIVERY_BASE_URL=https://imagedelivery.net/your_cloudflare_images_account_hash
 ```
 
 3. Save the `.env.local` file and ensure it's added to your `.gitignore`

@@ -19,6 +19,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import CardDetailsModal from "./CardDetailsModal";
 import TiltCard from "@/shared/components/ui/TiltCard";
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 // Animation variants
 const listContainerVariants = {
@@ -212,7 +213,10 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
           >
             <Box
               component="img"
-              src="https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/c68cca10-3860-4546-74e7-06ea7aa8e000/public"
+              src={buildCloudflareImageUrl(
+                "c68cca10-3860-4546-74e7-06ea7aa8e000",
+                "public"
+              )}
               alt="ccreward Logo"
               sx={{
                 mt: 4,

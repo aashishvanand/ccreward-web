@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Box } from "@mui/material";
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 const TiltCard = ({ 
   src, 
@@ -32,8 +33,7 @@ const TiltCard = ({
   const resolveSrc = (imageSrc) => {
       if (!imageSrc) return '';
       if (imageSrc.startsWith('http') || imageSrc.startsWith('/')) return imageSrc;
-      // Assume Cloudflare Image ID
-      return `https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/${imageSrc}/public`;
+      return buildCloudflareImageUrl(imageSrc, "public");
   };
 
   const finalSrc = resolveSrc(src);
