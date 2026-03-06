@@ -30,6 +30,7 @@ import {
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRegion } from "@/core/providers/RegionContext";
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 // Use a prefix for the cache key to make it dynamic
 const CACHE_KEY_PREFIX = "referralData_";
@@ -175,11 +176,12 @@ const TopCardsGrid = ({
                     aspectRatio: card.orientation === "vertical" ? "0.63/1" : "1.59/1",
                 }}>
                   <Image
-                    src={card.image}
+                    src={buildCloudflareImageUrl(card.image, "public")}
                     alt={`${card.bank} ${card.cardName}`}
                     layout="fill"
                     objectFit="contain"
                     loading="lazy"
+                    unoptimized
                   />
                 </Box>
 

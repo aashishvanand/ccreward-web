@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRegion } from "@/core/providers/RegionContext";
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 const BankSection = () => {
   const { region, regionName, isInitialized } = useRegion();
@@ -84,10 +85,11 @@ const BankSection = () => {
                     }}
                   >
                     <Image
-                      src={bank.id}
+                      src={buildCloudflareImageUrl(bank.id, "public")}
                       alt={`${bank.bank.toUpperCase()} logo`}
                       width={80}
                       height={80}
+                      unoptimized
                       style={{ objectFit: "contain" }}
                     />
                   </Box>

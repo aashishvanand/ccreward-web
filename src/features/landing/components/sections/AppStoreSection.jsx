@@ -1,5 +1,6 @@
 import { Box, Container, Typography } from "@mui/material";
 import Image from "next/image";
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 const AppStoreSection = ({ isMobile, theme }) => {
   return (
@@ -81,10 +82,11 @@ const AppStoreButton = ({ href, imageId, alt }) => (
     }}
   >
     <Image
-      src={imageId}
+      src={buildCloudflareImageUrl(imageId, "public")}
       alt={alt}
       width={200}
       height={60}
+      unoptimized
       style={{ objectFit: "contain" }}
     />
   </Box>

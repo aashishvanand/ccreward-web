@@ -32,6 +32,7 @@ import hotelSgData from "@/data/transfer_hotel_sg.json";
 import banksInData from "@/data/banks_in.json";
 import banksSgData from "@/data/banks_sg.json";
 import { styled } from "@mui/material/styles";
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 const StyledTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -211,10 +212,11 @@ const TransferPartnerGrid = () => {
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                         {bankInfo ? (
                              <Box sx={{ position: 'relative', width: 40, height: 40 }}>
-                                <Image 
-                                    src={bankInfo.id} 
+                                 <Image 
+                                    src={buildCloudflareImageUrl(bankInfo.id, "public")} 
                                     alt={bankName}
                                     fill
+                                    unoptimized
                                     style={{ objectFit: 'contain' }}
                                 />
                              </Box>
