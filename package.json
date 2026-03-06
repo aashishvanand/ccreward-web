@@ -71,8 +71,8 @@
     "react-dom": "19.1.0"
   },
   "engines": {
-    "node": ">=18.18.0",
-    "npm": ">=9.0.0"
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
   },
   "keywords": [
     "credit card reward calculator",
