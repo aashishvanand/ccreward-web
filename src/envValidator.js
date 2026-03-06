@@ -14,13 +14,12 @@ export const validateEnvVars = () => {
     if (missingVars.length > 0) {
         const errorMsg = `Missing required environment variables: ${missingVars.join(', ')}`;
         if (typeof window === 'undefined') {
-            // Server-side: throw error in development/build to fail fast
-            console.error(`[Security] ${errorMsg}`);
-            throw new Error(errorMsg);
+            console.warn(`[Config] ${errorMsg}`);
         } else {
-            // Client-side: log securely, and throw to prevent initialization with missing configs
-            console.error('[Security] Application configuration error. Missing critical variables.');
-            throw new Error('Application configuration error. Please contact support.');
+            console.warn('[Config] Missing Firebase/Google env vars. Auth features may be unavailable.');
         }
+        return false;
     }
+
+    return true;
 };

@@ -14,7 +14,9 @@ const firebaseConfig = {
     measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-validateEnvVars();
+if (typeof window !== 'undefined') {
+    validateEnvVars();
+}
 
 // Initialize Firebase
 let app;
