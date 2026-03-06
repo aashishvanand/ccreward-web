@@ -1,13 +1,10 @@
 {
     "name": "ccreward-web",
-    "main": "dist/worker/index.js",
+    "main": "./worker/index.ts",
     "compatibility_date": "2026-03-06",
     "compatibility_flags": [
         "nodejs_compat"
     ],
-    "images": {
-        "binding": "IMAGES"
-    },
     "observability": {
         "logs": {
             "enabled": true,
@@ -25,6 +22,9 @@
                     "custom_domain": true
                 }
             ],
+            "images": {
+                "binding": "IMAGES"
+            },
             "kv_namespaces": [
                 {
                     "binding": "NEXT_CACHE_WORKERS_KV",
@@ -50,6 +50,9 @@
                     "custom_domain": true
                 }
             ],
+            "images": {
+                "binding": "IMAGES"
+            },
             "kv_namespaces": [
                 {
                     "binding": "NEXT_CACHE_WORKERS_KV",

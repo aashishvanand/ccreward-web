@@ -50,6 +50,7 @@
     "sharp": "^0.34.5"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.26.1",
     "@next/bundle-analyzer": "^16.1.6",
     "@types/react": "^19.2.14",
     "@vitejs/plugin-rsc": "^0.5.21",
