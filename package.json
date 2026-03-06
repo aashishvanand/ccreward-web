@@ -14,18 +14,17 @@
     "url": "https://github.com/aashishvanand/ccreward-web/issues"
   },
   "scripts": {
-    "dev": "next dev --turbopack",
-    "fetch-data": "node scripts/fetch-static-data.js",
-    "build": "npm run fetch-data && next build && npm run generate:sitemap",
-    "build:worker": "opennextjs-cloudflare build",
-    "preview": "npm run build:worker && wrangler dev",
-    "deploy:dev": "npm run build:worker && wrangler deploy --env dev",
-    "deploy:prod": "npm run build:worker && wrangler deploy --env prod",
-    "start": "next start",
+    "dev": "vinext dev",
+    "fetch-data": "node scripts/fetch-static-data.cjs",
+    "build": "npm run fetch-data && vinext build && npm run generate:sitemap",
+    "preview": "vinext deploy --preview",
+    "deploy:dev": "vinext deploy --env dev",
+    "deploy:prod": "vinext deploy --env prod",
+    "start": "vinext start",
     "postinstall": "npm install --include=optional sharp --legacy-peer-deps",
     "analyze": "cross-env ANALYZE=true npm run build",
-    "test:analytics": "node scripts/test-analytics.js",
-    "generate:sitemap": "node scripts/generate-sitemap.js"
+    "test:analytics": "node scripts/test-analytics.cjs",
+    "generate:sitemap": "node scripts/generate-sitemap.cjs"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -35,7 +34,6 @@
     "@mui/icons-material": "^7.3.8",
     "@mui/material": "^7.3.8",
     "@mui/material-nextjs": "^7.3.8",
-    "@opennextjs/cloudflare": "^1.17.1",
     "axios": "^1.13.6",
     "axios-retry": "^4.5.0",
     "firebase": "^12.10.0",
@@ -54,11 +52,16 @@
   "devDependencies": {
     "@next/bundle-analyzer": "^16.1.6",
     "@types/react": "^19.2.14",
+    "@vitejs/plugin-rsc": "^0.5.21",
     "cross-env": "^10.1.0",
     "eslint": "^10.0.2",
     "eslint-config-next": "^16.1.6",
+    "glob": "^13.0.6",
     "jest": "^30.2.0",
+    "react-server-dom-webpack": "^19.2.4",
     "typescript": "^5.9.3",
+    "vinext": "^0.0.21",
+    "vite": "^7.3.1",
     "wrangler": "^4.69.0"
   },
   "resolutions": {
@@ -108,5 +111,6 @@
     "qs": "^6.14.2",
     "@smithy/config-resolver": "^4.4.0",
     "minimatch": "^10.2.1"
-  }
+  },
+  "type": "module"
 }

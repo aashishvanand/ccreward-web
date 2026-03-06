@@ -33,7 +33,6 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "open-next.config.ts",
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [

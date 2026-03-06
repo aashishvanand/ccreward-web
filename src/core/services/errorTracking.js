@@ -40,6 +40,47 @@ const initializeErrorTracking = () => {
 };
 
 /**
+ * Sanitize error payload to remove potential PII or sensitive data
+ */
+const sanitizeErrorInfo = (info) => {
+    if (!info) return info;
+
+    try {
+        const sanitized = {};
+        const sensitiveKeys = ['password', 'token', 'auth', 'secret', 'credential', 'credit_card', 'cvv', 'pin', 'email', 'phone'];
+
+        const sanitizeValue = (val, currentKey) => {
+            if (val === null || val === undefined) return val;
+
+            if (typeof currentKey === 'string') {
+                const lowerKey = currentKey.toLowerCase();
+                if (sensitiveKeys.some(sensitive => lowerKey.includes(sensitive))) {
+                    return '[REDACTED]';
+                }
+            }
+
+            if (typeof val === 'object' && !Array.isArray(val)) {
+                const newObj = {};
+                for (const k in val) {
+                    newObj[k] = sanitizeValue(val[k], k);
+                }
+                return newObj;
+            }
+
+            return val;
+        };
+
+        for (const key in info) {
+            sanitized[key] = sanitizeValue(info[key], key);
+        }
+
+        return sanitized;
+    } catch (e) {
+        return { message: 'Failed to sanitize error info' };
+    }
+};
+
+/**
  * Record a custom error
  * @param {string} errorName - Name/type of the error
  * @param {Object} errorInfo - Additional error information
@@ -49,9 +90,19 @@ const recordError = (errorName, errorInfo = {}, isFatal = false) => {
     if (typeof window === 'undefined') return;
 
     try {
+        const sanitizedInfo = sanitizeErrorInfo(errorInfo);
+
+        // Categorize security events
+        const isSecurityEvent = errorName.toLowerCase().includes('auth') ||
+            errorName.toLowerCase().includes('security') ||
+            errorName.toLowerCase().includes('validation');
+
+        let categoryType = isFatal ? 'fatal' : 'non_fatal';
+        if (isSecurityEvent) categoryType = 'security_event';
+
         const enhancedErrorInfo = {
             error_name: errorName,
-            error_type: isFatal ? 'fatal' : 'non_fatal',
+            error_type: categoryType,
             timestamp: new Date().toISOString(),
             session_id: getOrCreateSessionId(),
             page_url: window.location.href,
@@ -64,7 +115,7 @@ const recordError = (errorName, errorInfo = {}, isFatal = false) => {
             app_version: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
             environment: process.env.NODE_ENV || 'production',
             deployment_platform: 'cloudflare_pages',
-            ...errorInfo
+            ...sanitizedInfo
         };
 
         // Log to Firebase Analytics

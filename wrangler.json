@@ -1,14 +1,10 @@
 {
     "name": "ccreward-web",
-    "main": ".open-next/worker.js",
-    "compatibility_date": "2026-01-01",
+    "main": "dist/worker/index.js",
+    "compatibility_date": "2026-03-06",
     "compatibility_flags": [
         "nodejs_compat"
     ],
-    "assets": {
-        "directory": ".open-next/assets",
-        "binding": "ASSETS"
-    },
     "images": {
         "binding": "IMAGES"
     },
@@ -71,11 +67,5 @@
                 }
             ]
         }
-    },
-    "services": [
-        {
-            "binding": "WORKER_SELF_REFERENCE",
-            "service": "ccreward-web"
-        }
-    ]
+    }
 }

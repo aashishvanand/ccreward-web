@@ -1,8 +1,9 @@
 import { firebaseApp } from '@/firebase';
+import { recordError } from './errorTracking';
 
 const CACHE_KEY = 'userCardsCache';
 const CACHE_TIMESTAMP_KEY = 'userCardsCacheTimestamp';
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
 // Helper function to get cached data
 const getCachedData = (userId) => {
@@ -14,8 +15,13 @@ const getCachedData = (userId) => {
     const now = new Date().getTime();
     if (now - parseInt(cacheTimestamp) < CACHE_DURATION) {
       return JSON.parse(cachedData);
+    } else {
+      // Clean up stale cache
+      localStorage.removeItem(`${CACHE_KEY}_${userId}`);
+      localStorage.removeItem(`${CACHE_TIMESTAMP_KEY}_${userId}`);
     }
   }
+
   return null;
 };
 
@@ -24,6 +30,20 @@ const setCachedData = (userId, data) => {
   if (typeof window === 'undefined') return;
   localStorage.setItem(`${CACHE_KEY}_${userId}`, JSON.stringify(data));
   localStorage.setItem(`${CACHE_TIMESTAMP_KEY}_${userId}`, new Date().getTime().toString());
+};
+
+// Sanitization helpers
+const sanitizeString = (str, maxLength = 100) => {
+  if (str === null || str === undefined) return str;
+  if (typeof str === 'number') return str.toString();
+  if (typeof str !== 'string') return '';
+  return str.trim().substring(0, maxLength);
+};
+
+const sanitizeNumber = (num) => {
+  const parsed = Number(num);
+  if (isNaN(parsed)) return null;
+  return parsed;
 };
 
 // Helper to load firestore dynamically
@@ -52,18 +72,25 @@ export const addCardForUser = async (userId, cardData) => {
     // Get country from region context or local storage
     const country = localStorage.getItem('app-region')?.toLowerCase() || 'in';
 
-    // Create a new object with only essential and provided fields
+    // Create a new object with only essential and sanitized fields
+    const bankStr = sanitizeString(cardData.bank);
+    const cardNameStr = sanitizeString(cardData.cardName);
+
+    if (!bankStr || !cardNameStr) {
+      throw new Error("Invalid card data: missing required fields");
+    }
+
     const cardToAdd = {
-      bank: cardData.bank,
-      cardName: cardData.cardName,
-      country: country
+      bank: bankStr,
+      cardName: cardNameStr,
+      country: sanitizeString(country, 10)
     };
 
     // Conditionally add optional fields only if they exist
-    if (cardData.network) cardToAdd.network = cardData.network;
-    if (cardData.billingDate) cardToAdd.billingDate = cardData.billingDate;
-    if (cardData.limit) cardToAdd.limit = cardData.limit;
-    if (cardData.since) cardToAdd.since = cardData.since;
+    if (cardData.network) cardToAdd.network = sanitizeString(cardData.network, 50);
+    if (cardData.billingDate) cardToAdd.billingDate = sanitizeNumber(cardData.billingDate);
+    if (cardData.limit) cardToAdd.limit = sanitizeNumber(cardData.limit);
+    if (cardData.since) cardToAdd.since = sanitizeString(cardData.since, 20);
 
     // Add server timestamp
     cardToAdd.addedAt = serverTimestamp();
@@ -80,7 +107,7 @@ export const addCardForUser = async (userId, cardData) => {
     // Return the card key
     return cardKey;
   } catch (error) {
-    console.error("Error adding card:", error);
+    recordError('firebase_add_card_error', { error: error.message }, false);
     throw error;
   }
 };
@@ -103,7 +130,6 @@ export const getCardsForUser = async (userId) => {
 
     // If document doesn't exist, this is a new user
     if (!userDoc.exists()) {
-
       return []; // Return empty array for new users
     }
 
@@ -130,7 +156,7 @@ export const getCardsForUser = async (userId) => {
 
     return filteredCardList;
   } catch (error) {
-    console.error("❌ Error fetching cards:", error);
+    recordError('firebase_get_cards_error', { error: error.message }, false);
     // Return empty array on error
     return [];
   }
@@ -155,9 +181,18 @@ export const updateCardForUser = async (userId, cardData) => {
       ...cardDetails
     } = cardData;
 
+    // Sanitize card details
+    const sanitizedDetails = Object.keys(cardDetails).reduce((acc, key) => {
+      const val = cardDetails[key];
+      if (typeof val === 'string') acc[key] = sanitizeString(val, 200);
+      else if (typeof val === 'number') acc[key] = sanitizeNumber(val);
+      else if (typeof val === 'boolean') acc[key] = val;
+      return acc;
+    }, {});
+
     await updateDoc(userRef, {
       [`cards.${id}`]: {
-        ...cardDetails
+        ...sanitizedDetails
       }
     });
 
@@ -167,7 +202,7 @@ export const updateCardForUser = async (userId, cardData) => {
 
     return id;
   } catch (error) {
-    console.error("Error updating card:", error);
+    recordError('firebase_update_card_error', { error: error.message }, false);
     throw error;
   }
 };
@@ -188,7 +223,7 @@ export const deleteCardForUser = async (userId, cardKey) => {
     localStorage.removeItem(`${CACHE_KEY}_${userId}`);
     localStorage.removeItem(`${CACHE_TIMESTAMP_KEY}_${userId}`);
   } catch (error) {
-    console.error("Error deleting card:", error);
+    recordError('firebase_delete_card_error', { error: error.message }, false);
     throw error;
   }
 };
@@ -223,7 +258,7 @@ export const refreshCardCache = async (userId) => {
 
     return cardList;
   } catch (error) {
-    console.error("Error refreshing card cache:", error);
+    recordError('firebase_refresh_cache_error', { error: error.message }, false);
     throw error;
   }
 };
@@ -242,7 +277,7 @@ export const deleteUserData = async (userId) => {
     localStorage.removeItem(`${CACHE_KEY}_${userId}`);
     localStorage.removeItem(`${CACHE_TIMESTAMP_KEY}_${userId}`);
   } catch (error) {
-    console.error("Error deleting user data:", error);
+    recordError('firebase_delete_user_error', { error: error.message }, false);
     throw error;
   }
 };

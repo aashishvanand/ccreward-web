@@ -7,20 +7,23 @@ import { initializeAnalytics, setupNetworkMonitoring } from '../core/services/an
 import PerformanceWrapper from '../shared/components/PerformanceWrapper';
 import PropTypes from 'prop-types';
 
+// Dynamically import LandingPage to enable client-side rendering
 const LandingPage = dynamic(() => import('../features/landing/components/LandingPage'), { ssr: false });
 
 export default function HomeClient({ region }) {
-    // Add this useEffect for performance monitoring
+    // Initialize performance monitoring and analytics on component mount
     useEffect(() => {
         const initPerformanceMonitoring = async () => {
             try {
                 await initializeAnalytics();
 
                 // Setup network monitoring if functionality exists
+                // This helps in tracking network performance and errors
                 if (typeof setupNetworkMonitoring === 'function') {
                     setupNetworkMonitoring();
                 }
             } catch (error) {
+                // Log analytics initialization failures but don't break the app
                 console.warn('Analytics initialization failed:', error);
             }
         };

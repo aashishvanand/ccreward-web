@@ -1,4 +1,6 @@
 // src/features/landing/components/LandingPage.jsx - Enhanced with Analytics (FIXED)
+// This component manages the main landing page including all sections, 
+// analytics tracking, user authentication state, and responsive behavior
 import { useState, useEffect, useMemo } from "react";
 import { Box, Alert, Container, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
@@ -28,6 +30,11 @@ import GoogleOneTap from "@/shared/components/auth/GoogleOneTap";
 import { motion } from "framer-motion";
 
 // Add analytics imports - FIXED
+// These hooks provide various tracking capabilities:
+// - useAnalytics: Core event tracking functionality
+// - usePagePerformance: Performance metrics collection
+// - useEngagementTracking: User engagement measurements
+// - useJourneyTracking: User journey mapping and completion tracking
 import {
   useAnalytics,
   usePagePerformance,
@@ -55,6 +62,7 @@ const pageVariants = {
   },
 };
 
+// Main LandingPage component that orchestrates all sections and tracking
 const LandingPage = () => {
   const router = useRouter();
   const {
@@ -97,19 +105,22 @@ const LandingPage = () => {
     isTablet: false,
   });
 
+  // Fetch card images data for the application
   const { cardImagesData } = useCardImagesData();
 
   const [allTweets, setAllTweets] = useState([]);
   
-  // Randomize tweets on mount
+  // Shuffle tweets on initial load to provide varied testimonials
   useEffect(() => {
     setAllTweets([...tweets].sort(() => Math.random() - 0.5));
   }, []);
 
+  // Calculate number of tweets per page based on screen size
   const tweetsPerPage = isMobile ? 1 : isTablet ? 2 : 3;
   // Use allTweets for total pages calculation to avoid mismatch during initial render/shuffle
   const totalPages = Math.ceil((allTweets.length > 0 ? allTweets : tweets).length / tweetsPerPage);
 
+  // Memoize visible tweets to prevent unnecessary re-renders
   const visibleTweets = useMemo(
     () => {
       // Use shuffled tweets if available, otherwise fallback to default order
@@ -122,7 +133,7 @@ const LandingPage = () => {
     [currentPage, tweetsPerPage, allTweets]
   );
 
-  // Auto-scroll testimonials
+  // Auto-scroll testimonials every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentPage((prev) => (prev + 1) % totalPages);
@@ -131,7 +142,7 @@ const LandingPage = () => {
     return () => clearInterval(interval);
   }, [totalPages]);
 
-  // Track landing page visit
+  // Track landing page visit with analytics
   useEffect(() => {
     trackFeatureUsage("landing_page_visit", {
       region,
@@ -161,7 +172,7 @@ const LandingPage = () => {
     isAuthenticated,
   ]);
 
-  // Track device detection
+  // Track device detection and viewport changes for responsive design analytics
   useEffect(() => {
     const initialDeviceInfo = detectDevice();
     setDeviceInfo(initialDeviceInfo);
@@ -192,7 +203,7 @@ const LandingPage = () => {
     }
   }, [trackEvent]);
 
-  // Track region and card images loading
+  // Track region and card images loading for performance monitoring
   useEffect(() => {
     if (cardImagesData?.length > 0) {
       trackEvent("card_images_loaded", {
@@ -201,7 +212,7 @@ const LandingPage = () => {
         loading_time: performance.now(),
       });
 
-      // Filter cards based on region
+      // Filter cards based on region to show relevant ones
       const regionCards = cardImagesData.filter((card) => {
         if (region === "IN") {
           return [
@@ -246,6 +257,7 @@ const LandingPage = () => {
         (card) => card.orientation === "horizontal"
       );
 
+      // Shuffle the cards and take first 3 for display
       const shuffled = [...horizontalCards].sort(() => Math.random() - 0.5);
       setCardImages(shuffled.slice(0, 3));
 
@@ -315,7 +327,7 @@ const LandingPage = () => {
 
 
   
-  // Enhanced sign-in handler with analytics
+  // Enhanced sign-in handler with analytics tracking for user actions
   const handleSignIn = async (signInMethod) => {
     const signInMethodName = "google";
 
@@ -440,7 +452,7 @@ const LandingPage = () => {
     });
   };
 
-  // Track section visibility
+  // Track section visibility for user engagement analytics
   useEffect(() => {
     if (
       typeof window === "undefined" ||
@@ -470,7 +482,7 @@ const LandingPage = () => {
       { threshold: 0.5 }
     );
 
-    // Observe all sections
+    // Observe all sections for engagement tracking
     const sections = document.querySelectorAll("[data-section]");
     sections.forEach((section) => observer.observe(section));
 

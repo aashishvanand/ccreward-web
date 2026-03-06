@@ -26,6 +26,37 @@ export function AnalyticsProvider({ children }) {
   const router = useRouter();
   const currentPath = useRef("");
 
+  // Initialize gtag early for Firebase Analytics
+  useEffect(() => {
+    if (typeof window !== "undefined" && !window.gtagInitialized) {
+      window.gtagInitialized = true;
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function gtag() {
+        window.dataLayer.push(arguments);
+      };
+      window.gtag("js", new Date());
+
+      const measurementId = process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID;
+      if (measurementId) {
+        window.gtag("config", measurementId, {
+          page_path: window.location.pathname,
+          send_page_view: false, // We'll handle page views manually
+          custom_map: {
+            custom_error: "error_name",
+            custom_user_id: "user_id",
+            custom_session_id: "session_id",
+          },
+        });
+
+        // Enhanced error tracking
+        window.gtag("config", measurementId, {
+          transport_type: "beacon",
+          anonymize_ip: true,
+        });
+      }
+    }
+  }, []);
+
   // Initialize analytics services
   useEffect(() => {
     const initializeAllAnalytics = async () => {
@@ -208,42 +239,6 @@ export function AnalyticsProvider({ children }) {
           console.error("❌ Google Analytics script failed to load:", error);
         }}
       />
-
-      <Script id="firebase-analytics-init" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', '${process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID}', {
-            page_path: window.location.pathname,
-            send_page_view: false, // We'll handle page views manually
-            custom_map: {
-              'custom_error': 'error_name',
-              'custom_user_id': 'user_id',
-              'custom_session_id': 'session_id'
-            }
-          });
-          
-          // Enhanced error tracking
-          gtag('config', '${process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID}', {
-            transport_type: 'beacon',
-            anonymize_ip: true
-          });
-        `}
-      </Script>
-
-      {/* Load Microsoft Clarity script */}
-      <Script id="microsoft-clarity" strategy="afterInteractive">
-        {`
-          (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-          })(window, document, "clarity", "script", "ngsrwjccm4");
-        `}
-      </Script>
-
-
 
       {children}
     </>
