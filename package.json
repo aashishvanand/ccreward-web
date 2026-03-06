@@ -16,15 +16,17 @@
   "scripts": {
     "dev": "vinext dev",
     "fetch-data": "node scripts/fetch-static-data.cjs",
-    "build": "npm run fetch-data && vinext build && npm run generate:sitemap",
-    "preview": "vinext deploy --preview",
-    "deploy:dev": "vinext deploy --env dev",
-    "deploy:prod": "vinext deploy --env prod",
+    "generate:sitemap": "node scripts/generate-sitemap.cjs",
+    "prebuild:site": "npm run fetch-data && npm run generate:sitemap",
+    "build": "npm run prebuild:site && vinext build",
     "start": "vinext start",
+    "preview": "vinext deploy --preview",
+    "clean:wrangler-deploy": "rm -rf .wrangler/deploy",
+    "deploy:dev": "npm run clean:wrangler-deploy && npm run prebuild:site && vinext deploy --env dev",
+    "deploy:prod": "npm run clean:wrangler-deploy && npm run prebuild:site && vinext deploy --env prod",
     "postinstall": "npm install --include=optional sharp --legacy-peer-deps",
     "analyze": "cross-env ANALYZE=true npm run build",
-    "test:analytics": "node scripts/test-analytics.cjs",
-    "generate:sitemap": "node scripts/generate-sitemap.cjs"
+    "test:analytics": "node scripts/test-analytics.cjs"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",

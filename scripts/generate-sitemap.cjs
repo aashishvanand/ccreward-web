@@ -1,15 +1,11 @@
-const fs = require('fs');
-const path = require('path');
-const glob = require('glob'); // You might need to install 'glob' if not present, but usually 'fs' is enough if we know paths.
-// We'll use fs and standard loops to avoid external deps if possible, or assume simple structure.
-// Actually, I can require the JSON files directly as they are in src/data.
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const BASE_URL = 'https://ccreward.app';
 
-// Import data
-// Note: We need to handle ES modules vs CommonJS. The project seems to use "type": "module"? 
-// Let's check package.json. If it's a mix or Next.js handles it, scripts might need plain node.
-// Safer to read JSON files using fs to avoid module issues in a standalone script.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const DATA_DIR = path.join(__dirname, '../src/data');
 const SITEMAP_PATH = path.join(__dirname, '../public/sitemap.xml');

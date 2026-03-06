@@ -1,7 +1,11 @@
-const fs = require('fs');
-const path = require('path');
-const axios = require('axios');
-const axiosRetry = require('axios-retry').default;
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import axios from 'axios';
+import axiosRetry from 'axios-retry';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load .env.local manually if not in CI/production
 if (!process.env.STATIC_DATA_API_KEY || !process.env.NEXT_PUBLIC_API_BASE_URL) {

@@ -1,74 +1,83 @@
 {
-    "name": "ccreward-web",
-    "main": "./worker/index.ts",
-    "compatibility_date": "2026-03-06",
-    "compatibility_flags": [
-        "nodejs_compat"
-    ],
-    "observability": {
-        "logs": {
-            "enabled": true,
-            "head_sampling_rate": 1,
-            "invocation_logs": true,
-            "persist": true
-        }
-    },
-    "env": {
-        "dev": {
-            "name": "ccreward-web-dev",
-            "routes": [
-                {
-                    "pattern": "dev.ccreward.app",
-                    "custom_domain": true
-                }
-            ],
-            "images": {
-                "binding": "IMAGES"
-            },
-            "kv_namespaces": [
-                {
-                    "binding": "NEXT_CACHE_WORKERS_KV",
-                    "id": "fa2bcf379a1741f5bfb33323e8cdafad"
-                }
-            ],
-            "r2_buckets": [
-                {
-                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
-                    "bucket_name": "ccreward-next-cache-dev"
-                },
-                {
-                    "binding": "CCREWARD_BUCKET",
-                    "bucket_name": "ccreward"
-                }
-            ]
-        },
-        "prod": {
-            "name": "ccreward-web-prod",
-            "routes": [
-                {
-                    "pattern": "ccreward.app",
-                    "custom_domain": true
-                }
-            ],
-            "images": {
-                "binding": "IMAGES"
-            },
-            "kv_namespaces": [
-                {
-                    "binding": "NEXT_CACHE_WORKERS_KV",
-                    "id": "0507c6cedd314f108fbf29f84212f141"
-                }
-            ],
-            "r2_buckets": [
-                {
-                    "binding": "NEXT_INC_CACHE_R2_BUCKET",
-                    "bucket_name": "ccreward-next-cache-prod"
-                },
-                {
-                    "binding": "CCREWARD_BUCKET",
-                    "bucket_name": "ccreward"
-                }
-            ]
-        }
+  "name": "ccreward-web",
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2026-03-06",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "none"
+  },
+  "images": {
+    "binding": "IMAGES"
+  },
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+      "persist": true
     }
+  },
+  "env": {
+    "dev": {
+      "name": "ccreward-web-dev",
+      "images": {
+        "binding": "IMAGES"
+      },
+      "routes": [
+        {
+          "pattern": "dev.ccreward.app",
+          "custom_domain": true
+        }
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "NEXT_CACHE_WORKERS_KV",
+          "id": "fa2bcf379a1741f5bfb33323e8cdafad"
+        }
+      ],
+      "r2_buckets": [
+        {
+          "binding": "NEXT_INC_CACHE_R2_BUCKET",
+          "bucket_name": "ccreward-next-cache-dev"
+        },
+        {
+          "binding": "CCREWARD_BUCKET",
+          "bucket_name": "ccreward"
+        }
+      ]
+    },
+    "prod": {
+      "name": "ccreward-web-prod",
+      "images": {
+        "binding": "IMAGES"
+      },
+      "routes": [
+        {
+          "pattern": "ccreward.app",
+          "custom_domain": true
+        }
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "NEXT_CACHE_WORKERS_KV",
+          "id": "0507c6cedd314f108fbf29f84212f141"
+        }
+      ],
+      "r2_buckets": [
+        {
+          "binding": "NEXT_INC_CACHE_R2_BUCKET",
+          "bucket_name": "ccreward-next-cache-prod"
+        },
+        {
+          "binding": "CCREWARD_BUCKET",
+          "bucket_name": "ccreward"
+        }
+      ]
+    }
+  }
 }
