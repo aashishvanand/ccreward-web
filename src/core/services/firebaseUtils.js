@@ -40,6 +40,7 @@ const sanitizeString = (str, maxLength = 100) => {
   return str.trim().substring(0, maxLength);
 };
 
+
 const sanitizeNumber = (num) => {
   const parsed = Number(num);
   if (isNaN(parsed)) return null;
@@ -59,7 +60,7 @@ export const addCardForUser = async (userId, cardData) => {
   try {
     const { db, funcs } = await loadFirestore();
     if (!db || !funcs) throw new Error("Firestore not initialized");
-    const { doc, getDoc, setDoc, serverTimestamp, updateDoc } = funcs;
+    const { doc, getDoc, setDoc, serverTimestamp, updateDoc, FieldPath } = funcs;
 
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
@@ -95,9 +96,10 @@ export const addCardForUser = async (userId, cardData) => {
     // Add server timestamp
     cardToAdd.addedAt = serverTimestamp();
 
-    const cardKey = `${cardData.bank}_${cardData.cardName}`;
+    const cardKey = `${bankStr}_${cardNameStr}`;
+    // Use FieldPath to treat the key as a literal string, not a dot-separated path
     await updateDoc(userRef, {
-      [`cards.${cardKey}`]: cardToAdd
+      [new FieldPath('cards', cardKey)]: cardToAdd
     });
 
     // Clear cache to force a fresh fetch next time
@@ -167,7 +169,7 @@ export const updateCardForUser = async (userId, cardData) => {
   try {
     const { db, funcs } = await loadFirestore();
     if (!db || !funcs) throw new Error("Firestore not initialized");
-    const { doc, updateDoc } = funcs;
+    const { doc, updateDoc, FieldPath } = funcs;
 
     const userRef = doc(db, 'users', userId);
 
@@ -190,8 +192,9 @@ export const updateCardForUser = async (userId, cardData) => {
       return acc;
     }, {});
 
+    // Use FieldPath to treat dots in card key as literal characters, not nested paths
     await updateDoc(userRef, {
-      [`cards.${id}`]: {
+      [new FieldPath('cards', id)]: {
         ...sanitizedDetails
       }
     });
@@ -212,11 +215,12 @@ export const deleteCardForUser = async (userId, cardKey) => {
   try {
     const { db, funcs } = await loadFirestore();
     if (!db || !funcs) throw new Error("Firestore not initialized");
-    const { doc, updateDoc, deleteField } = funcs;
+    const { doc, updateDoc, deleteField, FieldPath } = funcs;
 
     const userRef = doc(db, 'users', userId);
+    // Use FieldPath to treat dots in card key as literal characters, not nested paths
     await updateDoc(userRef, {
-      [`cards.${cardKey}`]: deleteField()
+      [new FieldPath('cards', cardKey)]: deleteField()
     });
 
     // Clear cache to force a fresh fetch next time
