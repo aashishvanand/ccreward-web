@@ -1,6 +1,7 @@
 // src/pages/_app.js - FIXED: Add RegionProvider for Pages Router
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import '@/app/globals.css';
 import { initializeAnalytics, trackPageView } from '@/core/services/analytics';
 import { initializeErrorTracking } from '@/core/services/errorTracking';
 // ADD: Import providers for Pages Router

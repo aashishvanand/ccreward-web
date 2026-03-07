@@ -1,12 +1,8 @@
 import './globals.css'
-// import { Inter, Outfit } from "next/font/google";
 import Script from "next/script";
 import Providers from './providers'
 import { baseJsonLd } from '../shared/constants/jsonLd';
 import ErrorBoundary from '../shared/components/ErrorBoundary';
-
-const inter = { variable: 'font-inter' };
-const outfit = { variable: 'font-outfit' };
 
 function RootLayout({ children }) {
   return (
@@ -48,7 +44,7 @@ function RootLayout({ children }) {
           key="jsonld"
         />
       </head>
-      <body className={`${inter.variable} ${outfit.variable} `} suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <ErrorBoundary componentName="RootLayout">
           <Providers>
             {children}
