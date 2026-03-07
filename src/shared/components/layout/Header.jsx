@@ -33,7 +33,7 @@ import {
   Person as PersonIcon,
 } from "@mui/icons-material";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 import { useAuth } from "@/core/providers/AuthContext";
 import { useAppTheme } from "@/core/providers/ThemeRegistry";
@@ -103,7 +103,7 @@ function Header({ hideNavigation = false }) {
   const { region } = useRegion();
   const { user, logout, deleteAccount, isAuthenticated, signInWithGoogle } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = router.asPath?.split("?")[0] || "/";
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [deviceInfo, setDeviceInfo] = useState({

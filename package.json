@@ -72,8 +72,8 @@
   "resolutions": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
   },
   "engines": {
     "node": ">=22.0.0",

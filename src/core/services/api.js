@@ -1,7 +1,15 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
-import { getAuth, getIdToken } from "firebase/auth";
 import { jwtDecode } from "jwt-decode";
+
+// Firebase auth is dynamically imported to reduce initial bundle size
+let _authModule = null;
+const getAuthModule = async () => {
+    if (!_authModule) {
+        _authModule = await import("firebase/auth");
+    }
+    return _authModule;
+};
 
 // Define the base URL for API calls
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -28,6 +36,7 @@ let currentToken = null;
 let tokenRefreshPromise = null;
 
 const getToken = async () => {
+    const { getAuth, getIdToken } = await getAuthModule();
     const auth = getAuth();
     if (!auth.currentUser) {
         throw new Error('No user is currently signed in');
@@ -123,6 +132,7 @@ export const setAuthToken = (token) => {
 
 // Initialize authentication
 export const initializeAuth = async () => {
+    const { getAuth, getIdToken } = await getAuthModule();
     const auth = getAuth();
     if (auth.currentUser) {
         try {

@@ -1,15 +1,23 @@
 // src/core/services/performance.js - Enhanced Firebase Performance Monitoring
-import { getPerformance, trace, connectPerformanceEmulator } from 'firebase/performance';
-import { firebaseApp } from '@/firebase';
+// Firebase modules are dynamically imported to reduce initial bundle size
 
 let firebasePerformance = null;
 let isInitialized = false;
+let traceFn = null;
 
 // Initialize Firebase Performance Monitoring
 export const initializePerformanceMonitoring = async () => {
     if (typeof window === 'undefined') return false;
 
     try {
+        // Dynamically import Firebase modules
+        const [{ getPerformance, trace: traceImport, connectPerformanceEmulator }, { firebaseApp }] = await Promise.all([
+            import('firebase/performance'),
+            import('@/firebase')
+        ]);
+
+        traceFn = traceImport;
+
         // Initialize Performance Monitoring
         firebasePerformance = getPerformance(firebaseApp);
 
@@ -45,7 +53,7 @@ export const createTrace = (traceName) => {
     }
 
     try {
-        return trace(firebasePerformance, traceName);
+        return traceFn(firebasePerformance, traceName);
     } catch (error) {
         console.error('Error creating trace:', error);
         return null;

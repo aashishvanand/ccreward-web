@@ -24,6 +24,20 @@ export default defineConfig({
         if (warning.message.includes("dynamic import will not move module into another chunk")) return;
         warn(warning);
       },
+      output: {
+        manualChunks(id) {
+          // Split Firebase SDK into separate lazy-loaded chunks
+          if (id.includes("node_modules/firebase/")) {
+            if (id.includes("/auth")) return "firebase-auth";
+            if (id.includes("/analytics")) return "firebase-analytics";
+            if (id.includes("/performance")) return "firebase-performance";
+            if (id.includes("/firestore")) return "firebase-firestore";
+            if (id.includes("/app-check")) return "firebase-app-check";
+            if (id.includes("/app")) return "firebase-app";
+            return "firebase-common";
+          }
+        },
+      },
     },
   },
 });

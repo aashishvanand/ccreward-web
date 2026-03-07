@@ -22,9 +22,8 @@ import {
 } from "@/core/services/api";
 import _ from "lodash";
 import PropTypes from "prop-types";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";
 import { useRegion } from "@/core/providers/RegionContext";
-import { getCurrencySymbol } from "@/core/utils";
 
 const CalculatorForm = ({
   selectedBank,
@@ -54,7 +53,7 @@ const CalculatorForm = ({
   const [isLoadingBanks, setIsLoadingBanks] = useState(false);
   const [isLoadingCards, setIsLoadingCards] = useState(false);
   const [isLoadingMcc, setIsLoadingMcc] = useState(false);
-  const searchParams = useSearchParams();
+  const router = useRouter();
   const [isValidating, setIsValidating] = useState(false);
   const [regionError, setRegionError] = useState(false); // Add this state to track region initialization errors
 
@@ -116,9 +115,13 @@ const CalculatorForm = ({
 
   // URL parameter handling - now respects region initialization
   useEffect(() => {
+    if (!router.isReady) return;
+
     const validateAndSetBankCard = async () => {
-      const bank = searchParams.get("bank");
-      const card = searchParams.get("card");
+      const bankParam = router.query.bank;
+      const cardParam = router.query.card;
+      const bank = Array.isArray(bankParam) ? bankParam[0] : bankParam;
+      const card = Array.isArray(cardParam) ? cardParam[0] : cardParam;
 
       if (!bank || !card || !isInitialized) return;
       if (selectedBank && selectedCard) return; // Don't revalidate if already set
@@ -156,7 +159,7 @@ const CalculatorForm = ({
 
     validateAndSetBankCard();
   }, [
-    searchParams,
+    router,
     selectedBank,
     selectedCard,
     onBankChange,

@@ -13,7 +13,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import useCardCategories from "@/core/hooks/useCardCategories";
 import { useRegion } from "@/core/providers/RegionContext";
 

@@ -9,7 +9,7 @@ import {
   Paper,
   Chip,
 } from "@mui/material";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import {
   School as SchoolIcon,
   Theaters as TheatersIcon,

@@ -1,8 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Script from 'next/script';
-import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
-import { auth } from '@/firebase';
+import { getFirebaseAuth } from '@/firebase';
 import { useAuth } from '@/core/providers/AuthContext';
 import { useRegion } from '@/core/providers/RegionContext';
 import { recordError } from '@/core/services/errorTracking';
@@ -39,6 +38,8 @@ const GoogleOneTap = () => {
         callback: async (response) => {
           try {
             const { credential } = response;
+            const { GoogleAuthProvider, signInWithCredential } = await import('firebase/auth');
+            const { auth } = await getFirebaseAuth();
             const googleCredential = GoogleAuthProvider.credential(credential);
             await signInWithCredential(auth, googleCredential);
             sessionStorage.removeItem('onetap_failures'); // reset on success

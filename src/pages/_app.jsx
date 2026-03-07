@@ -22,7 +22,7 @@ function MyApp({ Component, pageProps }) {
 
         const initializeServices = async () => {
             try {
-                // Initializing services for Cloudflare Pages...
+                // Initializing services for Cloudflare Workers...
 
                 // Initialize error tracking first
                 const errorTrackingSuccess = initializeErrorTracking();
@@ -38,8 +38,8 @@ function MyApp({ Component, pageProps }) {
                     // Track initial page view
                     trackPageView(router.pathname, {
                         initial_load: true,
-                        deployment_platform: 'cloudflare_pages',
-                        build_type: 'static_export'
+                        deployment_platform: 'cloudflare_workers',
+                        build_type: 'ssr'
                     });
                 } else {
                     console.warn('⚠️ Analytics initialization failed');

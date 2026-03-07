@@ -1,7 +1,7 @@
-// firebase.js - Enhanced configuration with Crashlytics
+// firebase.js - Enhanced configuration with lazy-loaded auth and app-check
+// Only firebase/app is statically imported to minimize initial bundle size.
+// firebase/auth and firebase/app-check are loaded on first use.
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 import { validateEnvVars } from './envValidator';
 const firebaseConfig = {
@@ -18,31 +18,56 @@ if (typeof window !== 'undefined') {
     validateEnvVars();
 }
 
-// Initialize Firebase
+// Initialize Firebase App (lightweight - only firebase/app)
 let app;
 
 if (!getApps().length) {
     app = initializeApp(firebaseConfig);
-
-    // Initialize App Check for security (optional but recommended)
-    if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
-        try {
-            initializeAppCheck(app, {
-                provider: new ReCaptchaV3Provider(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY),
-                isTokenAutoRefreshEnabled: true
-            });
-        } catch (error) {
-            console.warn('App Check initialization failed:', error);
-        }
-    }
 } else {
     app = getApp();
 }
 
-export const auth = getAuth(app);
-// Firestore is now initialized where needed to avoid server-side evaluation errors
+// Lazy-loaded auth and provider instances (ESM live bindings)
+export let auth = null;
+export let googleProvider = null;
+let _authInitPromise = null;
+
+/**
+ * Get auth and googleProvider instances. Initializes firebase/auth and
+ * firebase/app-check on first call, then caches the result.
+ * @returns {Promise<{auth: import('firebase/auth').Auth, googleProvider: import('firebase/auth').GoogleAuthProvider}>}
+ */
+export const getFirebaseAuth = () => {
+    if (auth) return Promise.resolve({ auth, googleProvider });
+
+    if (!_authInitPromise) {
+        _authInitPromise = (async () => {
+            const { getAuth, GoogleAuthProvider } = await import('firebase/auth');
+            auth = getAuth(app);
+            googleProvider = new GoogleAuthProvider();
+
+            // Initialize App Check for security (optional)
+            if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
+                try {
+                    const { initializeAppCheck, ReCaptchaV3Provider } = await import('firebase/app-check');
+                    initializeAppCheck(app, {
+                        provider: new ReCaptchaV3Provider(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY),
+                        isTokenAutoRefreshEnabled: true
+                    });
+                } catch (error) {
+                    console.warn('App Check initialization failed:', error);
+                }
+            }
+
+            return { auth, googleProvider };
+        })();
+    }
+
+    return _authInitPromise;
+};
+
+// Firestore is initialized where needed to avoid server-side evaluation errors
 export const db = null;
-export const googleProvider = new GoogleAuthProvider();
 export const firebaseApp = app;
 
 // Initialize Analytics only on client side

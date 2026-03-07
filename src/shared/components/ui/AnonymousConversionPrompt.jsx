@@ -20,12 +20,7 @@ import {
   CheckCircleOutline as CheckCircleOutlineIcon,
 } from "@mui/icons-material";
 import { useAuth } from "@/core/providers/AuthContext";
-import {
-  linkWithPopup,
-  GoogleAuthProvider,
-  getAuth,
-  signInWithPopup,
-} from "firebase/auth";
+import { getFirebaseAuth } from "@/firebase";
 
 const CALCULATION_THRESHOLDS = [2, 4, 8, 16, 32, 64, 128];
 
@@ -66,7 +61,8 @@ const AnonymousConversionPrompt = forwardRef((props, ref) => {
 
   const handleConvertAccount = async () => {
     try {
-      const auth = getAuth();
+      const { linkWithPopup, GoogleAuthProvider } = await import('firebase/auth');
+      const { auth } = await getFirebaseAuth();
       const currentUser = auth.currentUser;
       if (!currentUser) {
         throw new Error("No user is currently signed in");
@@ -97,7 +93,8 @@ const AnonymousConversionPrompt = forwardRef((props, ref) => {
 
   const handleSignInExistingAccount = async () => {
     try {
-      const auth = getAuth();
+      const { GoogleAuthProvider, signInWithPopup } = await import('firebase/auth');
+      const { auth } = await getFirebaseAuth();
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
 
