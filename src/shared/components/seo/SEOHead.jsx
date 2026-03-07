@@ -47,7 +47,6 @@ export const SEOHead = ({ metadata }) => {
             {jsonLd && (
                 <script
                     type="application/ld+json"
-                    nonce="ccGeeks2026Secure"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
                 />
             )}

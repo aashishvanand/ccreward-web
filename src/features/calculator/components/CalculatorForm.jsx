@@ -320,8 +320,7 @@ const CalculatorForm = ({
       >
         <CircularProgress size={40} />
         <Typography variant="body1" sx={{ mt: 2 }}>
-          Initializing region settings...{" "}
-          {JSON.stringify({ region, isInitialized })}
+          Initializing region settings...
         </Typography>
       </Box>
     );

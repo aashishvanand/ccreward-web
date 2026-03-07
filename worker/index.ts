@@ -30,6 +30,19 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
+    // Lightweight geo-detection endpoint — returns the visitor's country
+    // code using Cloudflare's built-in cf.country (no third-party API call).
+    if (url.pathname === "/_geo") {
+      const country = (request as any).cf?.country || "US";
+      return new Response(JSON.stringify({ country }), {
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+          "Access-Control-Allow-Origin": url.origin,
+        },
+      });
+    }
+
     // Image optimization via Cloudflare Images binding.
     // The parseImageParams validation inside handleImageOptimization
     // normalizes backslashes and validates the origin hasn't changed.

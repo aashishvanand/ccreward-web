@@ -39,7 +39,6 @@ function RootLayout({ children }) {
 
         <script
           type="application/ld+json"
-          nonce="ccGeeks2026Secure"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(baseJsonLd) }}
           key="jsonld"
         />

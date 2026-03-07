@@ -50,17 +50,11 @@ const initializeAnalytics = async () => {
 
         isInitialized = true;
 
-        // Log initial app_open event with client-side performance data (with safety checks)
+        // Log initial app_open event (data-minimized — no user-agent or fingerprinting fields)
         try {
             logAnalyticsEvent('app_open', {
                 timestamp: new Date().toISOString(),
-                user_agent: navigator.userAgent,
-                screen_resolution: `${screen.width}x${screen.height}`,
-                viewport_size: `${window.innerWidth}x${window.innerHeight}`,
-                platform: navigator.platform,
-                language: navigator.language,
                 referrer: document.referrer || 'direct',
-                ...getClientPerformanceMetrics()
             });
         } catch (eventError) {
             console.warn('⚠️ Failed to log initial app_open event:', eventError);
@@ -101,33 +95,22 @@ const logAnalyticsEvent = (eventName, eventParams = {}) => {
     }
 
     try {
-        // Enrich all events with client-side context
+        // Data-minimized event enrichment.
+        // Removed: user_agent, screen dimensions, device_memory, connection_type,
+        // and memory metrics to reduce fingerprinting surface and privacy exposure.
         const enrichedParams = {
             ...eventParams,
             app_version: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
             timestamp: new Date().toISOString(),
             session_id: getOrCreateSessionId(),
-            page_url: window.location.href,
+            page_url: window.location.pathname, // path only, not full URL with query params
             page_title: document.title,
-            referrer: document.referrer || 'direct',
-            user_agent: navigator.userAgent,
-            viewport_width: window.innerWidth,
-            viewport_height: window.innerHeight,
-            screen_width: screen.width,
-            screen_height: screen.height,
-            connection_type: getConnectionType(),
-            device_memory: getDeviceMemory(),
-            // Add client-side performance context
-            ...getClientPerformanceMetrics()
         };
 
         // Log to Firebase Analytics
         if (logEventFn) {
             logEventFn(analytics, eventName, enrichedParams);
         }
-
-        // Development logging
-
 
     } catch (error) {
         console.error('❌ Error logging analytics event:', error);
@@ -351,15 +334,11 @@ const trackPageView = (path, additionalData = {}) => {
             page_title: document.title
         });
 
-        // Enhanced page view event
+        // Data-minimized page view event
         logAnalyticsEvent('page_view', {
             page_path: path,
             page_title: document.title,
-            page_location: window.location.href,
             page_referrer: document.referrer || 'direct',
-            scroll_percentage: getScrollPercentage(),
-            viewport_size: `${window.innerWidth}x${window.innerHeight}`,
-            ...getClientPerformanceMetrics(),
             ...additionalData
         });
 
@@ -387,6 +366,9 @@ const setUserAnalytics = (userId, userProperties = {}) => {
             setUserIdFn(analytics, userId);
         }
 
+        // Data-minimized user properties.
+        // Removed fingerprinting-prone fields: user_agent, screen_resolution,
+        // viewport_size, device_memory, connection_speed, timezone, browser, os.
         const enhancedProperties = {
             ...userProperties,
             first_visit: !getStorageItem('user_visited_before'),
@@ -396,14 +378,6 @@ const setUserAnalytics = (userId, userProperties = {}) => {
             last_login: new Date().toISOString(),
             platform: 'web',
             device_type: getDeviceType(),
-            browser: getBrowserInfo(),
-            os: getOSInfo(),
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            language: navigator.language,
-            screen_resolution: `${screen.width}x${screen.height}`,
-            viewport_size: `${window.innerWidth}x${window.innerHeight}`,
-            connection_speed: getConnectionType(),
-            device_memory: getDeviceMemory()
         };
 
         if (setUserPropertiesFn) {
@@ -416,8 +390,6 @@ const setUserAnalytics = (userId, userProperties = {}) => {
         // Log user identification event
         logAnalyticsEvent('user_identified', {
             user_id: userId,
-            identification_method: 'manual',
-            ...enhancedProperties
         });
 
     } catch (error) {
@@ -713,167 +685,47 @@ const logPageView = (path, additionalData = {}) => {
     trackPageView(path, additionalData);
 };
 
-// Setup network monitoring (client-side only)
+// Setup network monitoring using PerformanceObserver (client-side only).
+// This replaces the previous fetch/XHR monkey-patching approach which:
+//  1. Created a security surface (intercepted all network traffic)
+//  2. Was duplicated in performance.js (double-wrapping)
+//  3. Could mask real network errors if the wrapper threw
+// PerformanceObserver passively observes completed resource loads without
+// modifying any global prototypes.
 const setupNetworkMonitoring = () => {
-    // Only run on client-side
     if (typeof window === 'undefined') {
-
         return false;
     }
 
     try {
-        // Monitor fetch requests with safe timing
-        const originalFetch = window.fetch;
-        window.fetch = function (...args) {
-            // Use Date.now() instead of performance.now() for better compatibility
-            const startTime = Date.now();
-            const url = typeof args[0] === 'string' ? args[0] : args[0]?.url || 'unknown';
-            const method = args[1]?.method || 'GET';
-
-            return originalFetch.apply(this, args).then(response => {
-                const endTime = Date.now();
-                const duration = endTime - startTime;
-
-                // Only log if analytics is initialized
-                if (isInitialized) {
-                    try {
-                        // Log network performance
-                        logAnalyticsEvent('network_request', {
-                            url: url.substring(0, 100), // Limit URL length
-                            method,
-                            status_code: response.status,
-                            duration: Math.round(duration),
-                            success: response.ok,
-                            timestamp: new Date().toISOString()
-                        });
-
-                        // Log slow requests
-                        if (duration > 2000) {
-                            logAnalyticsEvent('slow_network_request', {
-                                url: url.substring(0, 100),
-                                method,
-                                duration: Math.round(duration),
-                                status_code: response.status
-                            });
-
-                            if (process.env.NODE_ENV === 'development') {
-                                console.warn(`🐌 Slow network request: ${url} took ${Math.round(duration)}ms`);
-                            }
-                        }
-                    } catch (analyticsError) {
-                        // Silently fail analytics logging to avoid breaking fetch
-                        if (process.env.NODE_ENV === 'development') {
-                            console.warn('Analytics logging failed for fetch:', analyticsError);
-                        }
-                    }
-                }
-
-                return response;
-            }).catch(error => {
-                const endTime = Date.now();
-                const duration = endTime - startTime;
-
-                // Only log if analytics is initialized
-                if (isInitialized) {
-                    try {
-                        // Log network errors
-                        logAnalyticsEvent('network_error', {
-                            url: url.substring(0, 100),
-                            method,
-                            duration: Math.round(duration),
-                            error_message: error.message,
-                            timestamp: new Date().toISOString()
-                        });
-                    } catch (analyticsError) {
-                        // Silently fail analytics logging
-                        if (process.env.NODE_ENV === 'development') {
-                            console.warn('Analytics logging failed for fetch error:', analyticsError);
-                        }
-                    }
-                }
-
-                if (process.env.NODE_ENV === 'development') {
-                    console.error(`🚨 Network error: ${url}`, error);
-                }
-
-                throw error;
-            });
-        };
-
-        // Monitor XMLHttpRequest (for compatibility) with safe timing
-        const originalXHROpen = XMLHttpRequest.prototype.open;
-        const originalXHRSend = XMLHttpRequest.prototype.send;
-
-        XMLHttpRequest.prototype.open = function (method, url, ...args) {
-            this._method = method;
-            this._url = url;
-            this._startTime = Date.now(); // Use Date.now() instead of performance.now()
-            return originalXHROpen.apply(this, [method, url, ...args]);
-        };
-
-        XMLHttpRequest.prototype.send = function (...args) {
-            const xhr = this;
-
-            xhr.addEventListener('loadend', function () {
-                if (isInitialized && xhr._startTime) {
-                    try {
-                        const duration = Date.now() - xhr._startTime;
-
-                        logAnalyticsEvent('xhr_request', {
-                            url: (xhr._url || '').substring(0, 100),
-                            method: xhr._method || 'GET',
-                            status_code: xhr.status,
-                            duration: Math.round(duration),
-                            success: xhr.status >= 200 && xhr.status < 300,
-                            timestamp: new Date().toISOString()
-                        });
-                    } catch (analyticsError) {
-                        // Silently fail analytics logging
-                        if (process.env.NODE_ENV === 'development') {
-                            console.warn('Analytics logging failed for XHR:', analyticsError);
-                        }
-                    }
-                }
-            });
-
-            return originalXHRSend.apply(this, args);
-        };
-
-        // Monitor resource loading performance (only if PerformanceObserver is available)
-        if ('PerformanceObserver' in window && window.performance && window.performance.getEntriesByType) {
-            try {
-                const resourceObserver = new PerformanceObserver((list) => {
-                    if (!isInitialized) return;
-
-                    for (const entry of list.getEntries()) {
-                        // Only log slow or failed resources
-                        if (entry.duration > 1000 || entry.transferSize === 0) {
-                            try {
-                                logAnalyticsEvent('resource_performance', {
-                                    resource_name: entry.name.substring(0, 100),
-                                    resource_type: entry.initiatorType,
-                                    duration: Math.round(entry.duration),
-                                    transfer_size: entry.transferSize || 0,
-                                    timestamp: new Date().toISOString()
-                                });
-                            } catch (analyticsError) {
-                                // Silently fail analytics logging
-                            }
-                        }
-                    }
-                });
-
-                resourceObserver.observe({ entryTypes: ['resource'] });
-            } catch (error) {
-                console.warn('⚠️ Resource performance monitoring not available:', error);
-            }
+        if (!('PerformanceObserver' in window)) {
+            return false;
         }
 
+        const resourceObserver = new PerformanceObserver((list) => {
+            if (!isInitialized) return;
 
+            for (const entry of list.getEntries()) {
+                // Only log slow resources (> 2s) to keep volume manageable
+                if (entry.duration > 2000) {
+                    try {
+                        logAnalyticsEvent('slow_network_request', {
+                            resource_name: entry.name.substring(0, 100),
+                            resource_type: entry.initiatorType,
+                            duration: Math.round(entry.duration),
+                        });
+                    } catch (_) {
+                        // Silently fail — analytics must never break the app
+                    }
+                }
+            }
+        });
+
+        resourceObserver.observe({ entryTypes: ['resource'] });
         return true;
 
     } catch (error) {
-        console.error('❌ Error setting up network monitoring:', error);
+        console.error('Error setting up network monitoring:', error);
         return false;
     }
 };

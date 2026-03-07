@@ -7,7 +7,26 @@ const nextConfig = {
                 headers: [
                     {
                         key: 'Content-Security-Policy',
-                        value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googletagmanager.com https://www.clarity.ms https://*.firebaseapp.com https://accounts.google.com https://apis.google.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://www.clarity.ms https://*.google-analytics.com https://*.analytics.google.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseinstallations.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://files.ccreward.app https://react-tweet.vercel.app; img-src 'self' data: https: https://firebasestorage.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com; font-src 'self' https://fonts.gstatic.com data:; frame-src 'self' https://www.youtube.com https://accounts.google.com https://*.firebaseapp.com; worker-src 'self' blob:;",
+                        value: [
+                            "default-src 'self'",
+                            // 'strict-dynamic' trusts scripts loaded by already-trusted scripts,
+                            // allowing bundled JS to dynamically load chunks without listing every CDN.
+                            // 'unsafe-inline' is intentionally kept ONLY as a fallback for older
+                            // browsers that don't support 'strict-dynamic' (they ignore it when
+                            // 'strict-dynamic' is present). Modern browsers will ignore 'unsafe-inline'
+                            // when 'strict-dynamic' is specified.
+                            "script-src 'self' 'strict-dynamic' 'unsafe-inline' https://www.googletagmanager.com https://*.googletagmanager.com https://www.clarity.ms https://*.firebaseapp.com https://accounts.google.com https://apis.google.com",
+                            "connect-src 'self' https://*.ccreward.app https://*.googleapis.com https://*.firebaseio.com https://www.clarity.ms https://*.google-analytics.com https://*.analytics.google.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseinstallations.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://files.ccreward.app https://react-tweet.vercel.app",
+                            "img-src 'self' data: https: https://firebasestorage.googleapis.com",
+                            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com",
+                            "font-src 'self' https://fonts.gstatic.com data:",
+                            "frame-src 'self' https://www.youtube.com https://accounts.google.com https://*.firebaseapp.com",
+                            "worker-src 'self' blob:",
+                        ].join("; "),
+                    },
+                    {
+                        key: 'X-XSS-Protection',
+                        value: '0',
                     },
                     {
                         key: 'Strict-Transport-Security',

@@ -138,7 +138,9 @@ export const initializeAuth = async () => {
         try {
             const token = await getIdToken(auth.currentUser, true);
             setAuthToken(token);
-            localStorage.setItem('authToken', token);
+            // Firebase Auth SDK manages token caching internally via IndexedDB.
+            // Do NOT store tokens in localStorage — they would be accessible to
+            // any JS on the page (XSS, third-party scripts).
         } catch (error) {
             console.error('Error initializing auth:', error);
         }
