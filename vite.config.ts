@@ -36,6 +36,18 @@ export default defineConfig({
             if (id.includes("/app")) return "firebase-app";
             return "firebase-common";
           }
+          // Split framer-motion into its own chunk (~60KB)
+          if (id.includes("node_modules/framer-motion")) {
+            return "framer-motion";
+          }
+          // Split MUI into a vendor chunk for better caching
+          if (id.includes("node_modules/@mui/")) {
+            return "mui-vendor";
+          }
+          // Split Emotion CSS-in-JS runtime
+          if (id.includes("node_modules/@emotion/")) {
+            return "emotion-vendor";
+          }
         },
       },
     },

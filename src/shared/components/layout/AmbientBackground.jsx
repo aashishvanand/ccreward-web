@@ -1,12 +1,20 @@
 "use client";
 
+import { memo } from 'react';
 import { Box, useTheme, alpha } from '@mui/material';
 
-const AmbientBackground = () => {
+const AmbientBackground = memo(() => {
     const theme = useTheme();
 
     return (
-        <Box sx={{ position: 'fixed', inset: 0, zIndex: -1, overflow: 'hidden', pointerEvents: 'none' }}>
+        <Box sx={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: -1,
+            overflow: 'hidden',
+            pointerEvents: 'none',
+            contain: 'strict',          // CSS containment - isolates layout/paint
+        }}>
              {/* Ambient Background Elements */}
             <Box sx={{
                 position: 'absolute',
@@ -17,11 +25,12 @@ const AmbientBackground = () => {
                 borderRadius: '50%',
                 background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, 0.15)} 0%, transparent 70%)`,
                 filter: 'blur(60px)',
-                zIndex: 0,
+                willChange: 'transform, opacity',  // Promote to GPU layer
+                transform: 'translateZ(0)',         // Force GPU compositing
                 animation: 'pulse 10s infinite alternate',
                 '@keyframes pulse': {
-                    '0%': { opacity: 0.5, transform: 'scale(1)' },
-                    '100%': { opacity: 1, transform: 'scale(1.2)' }
+                    '0%': { opacity: 0.5, transform: 'translateZ(0) scale(1)' },
+                    '100%': { opacity: 1, transform: 'translateZ(0) scale(1.2)' }
                 }
             }} />
              <Box sx={{
@@ -33,10 +42,12 @@ const AmbientBackground = () => {
                 borderRadius: '50%',
                 background: `radial-gradient(circle, ${alpha(theme.palette.secondary.main, 0.1)} 0%, transparent 70%)`,
                 filter: 'blur(50px)',
-                zIndex: 0
+                transform: 'translateZ(0)',         // Force GPU compositing
             }} />
         </Box>
     );
-};
+});
+
+AmbientBackground.displayName = 'AmbientBackground';
 
 export default AmbientBackground;

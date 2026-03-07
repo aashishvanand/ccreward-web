@@ -20,7 +20,7 @@ import {
   fetchMCC,
   fetchCardQuestions,
 } from "@/core/services/api";
-import _ from "lodash";
+import debounce from "lodash/debounce";
 import PropTypes from "prop-types";
 import { useRouter } from "next/router";
 import { useRegion } from "@/core/providers/RegionContext";
@@ -263,7 +263,7 @@ const CalculatorForm = ({
   };
 
   const debouncedFetchMCC = useCallback(
-    _.debounce(async (value) => {
+    debounce(async (value) => {
       if (!isInitialized) return; // Skip if region not initialized
 
       if (value && value.length >= 2) {

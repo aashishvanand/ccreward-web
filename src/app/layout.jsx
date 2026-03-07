@@ -8,6 +8,17 @@ function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Inline script to prevent theme FOUC - must run before first paint */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('app-theme');if(t==='dark'||((!t)&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark-mode')}}catch(e){}})()`,
+          }}
+        />
+        {/* Preconnect to critical external origins for faster resource loading */}
+        <link rel="preconnect" href="https://files.ccreward.app" />
+        <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://www.clarity.ms" />
         <meta property="og:title" content="Credit Card Rewards Calculator - Maximize Your Benefits" />
         <meta name="description" content="Compare, calculate, and choose the best credit card rewards with ccreward." />
         <meta property="og:description" content="Compare, calculate, and choose the best credit card rewards with ccreward." />
@@ -51,7 +62,7 @@ function RootLayout({ children }) {
         </ErrorBoundary>
 
         {/* Load analytics scripts without inline JS for CSP compliance */}
-        <Script src="/scripts/network-monitoring.js" strategy="beforeInteractive" />
+        <Script src="/scripts/network-monitoring.js" strategy="afterInteractive" />
         <Script src="/scripts/clarity.js" strategy="lazyOnload" />
       </body>
     </html>

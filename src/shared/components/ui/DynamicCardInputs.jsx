@@ -14,7 +14,7 @@ import {
   FormGroup,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
-import _ from "lodash";
+import isEqual from "lodash/isEqual";
 
 const DynamicCardInputs = ({
   cardConfig,
@@ -28,7 +28,7 @@ const DynamicCardInputs = ({
   const prevInputsRef = useRef(dynamicInputs);
 
   useEffect(() => {
-    if (!_.isEqual(dynamicInputs, prevInputsRef.current)) {
+    if (!isEqual(dynamicInputs, prevInputsRef.current)) {
       Object.keys(currentInputs).forEach((key) => {
         onChange(key, undefined);
       });
