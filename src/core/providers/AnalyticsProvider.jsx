@@ -126,8 +126,7 @@ export function AnalyticsProvider({ children }) {
       try {
         // Set user ID for analytics
         setUserAnalytics(user.uid, {
-          isAnonymous: user.isAnonymous,
-          signupMethod: user.isAnonymous ? "anonymous" : "google",
+          signupMethod: "google",
           emailVerified: user.emailVerified || false,
           creationTime: user.metadata?.creationTime,
           lastSignInTime: user.metadata?.lastSignInTime,
@@ -139,7 +138,6 @@ export function AnalyticsProvider({ children }) {
         // Log breadcrumb for user authentication
         logBreadcrumb("User authenticated", "user", {
           user_id: user.uid,
-          is_anonymous: user.isAnonymous,
           email_verified: user.emailVerified || false,
         });
       } catch (error) {

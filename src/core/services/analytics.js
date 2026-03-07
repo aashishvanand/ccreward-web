@@ -391,7 +391,7 @@ const setUserAnalytics = (userId, userProperties = {}) => {
             ...userProperties,
             first_visit: !getStorageItem('user_visited_before'),
             total_sessions: getTotalSessions(),
-            user_type: userProperties.isAnonymous ? 'anonymous' : 'authenticated',
+            user_type: 'authenticated',
             signup_date: userProperties.createdAt || new Date().toISOString(),
             last_login: new Date().toISOString(),
             platform: 'web',

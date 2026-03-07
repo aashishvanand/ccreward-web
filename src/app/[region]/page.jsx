@@ -1,5 +1,8 @@
 import HomeClient from '../HomeClient';
 
+// Only allow valid region values - reject everything else so Pages Router can handle those routes
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
     return [
         { region: 'in' },

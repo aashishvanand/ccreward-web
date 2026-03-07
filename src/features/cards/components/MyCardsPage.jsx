@@ -103,7 +103,7 @@ function MyCardsPage() {
     });
     trackJourneyStep("my_cards_accessed", {
       source: "direct_navigation",
-      user_type: user?.isAnonymous ? "anonymous" : "authenticated",
+      user_type: "authenticated",
     });
     recordCustomMetric("page_load_time", performance.now());
   }, []);

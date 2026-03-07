@@ -48,17 +48,14 @@ export function AuthProvider({ children }) {
       unsubscribe = onAuthStateChanged(auth, (user) => {
         if (user) {
           const isNew = user.metadata.creationTime === user.metadata.lastSignInTime;
-          setUser({
-            ...user,
-            isAnonymous: user.isAnonymous,
-          });
+          setUser(user);
           setIsNewUser(isNew);
-          // Log sign_in event if it's a new user
+          // Log sign_up event if it's a new user
           if (isNew && typeof window !== 'undefined') {
             import("firebase/analytics").then(({ getAnalytics, logEvent }) => {
               const analytics = getAnalytics(firebaseApp);
               logEvent(analytics, 'sign_up', {
-                method: user.isAnonymous ? 'anonymous' : 'google',
+                method: 'google',
               });
             }).catch(e => console.warn("Analytics error", e));
           }
