@@ -98,9 +98,7 @@ export const addCardForUser = async (userId, cardData) => {
 
     const cardKey = `${bankStr}_${cardNameStr}`;
     // Use FieldPath to treat the key as a literal string, not a dot-separated path
-    await updateDoc(userRef, {
-      [new FieldPath('cards', cardKey)]: cardToAdd
-    });
+    await updateDoc(userRef, new FieldPath('cards', cardKey), cardToAdd);
 
     // Clear cache to force a fresh fetch next time
     localStorage.removeItem(`${CACHE_KEY}_${userId}`);
@@ -193,11 +191,7 @@ export const updateCardForUser = async (userId, cardData) => {
     }, {});
 
     // Use FieldPath to treat dots in card key as literal characters, not nested paths
-    await updateDoc(userRef, {
-      [new FieldPath('cards', id)]: {
-        ...sanitizedDetails
-      }
-    });
+    await updateDoc(userRef, new FieldPath('cards', id), sanitizedDetails);
 
     // Clear cache to force a fresh fetch next time
     localStorage.removeItem(`${CACHE_KEY}_${userId}`);
@@ -219,9 +213,7 @@ export const deleteCardForUser = async (userId, cardKey) => {
 
     const userRef = doc(db, 'users', userId);
     // Use FieldPath to treat dots in card key as literal characters, not nested paths
-    await updateDoc(userRef, {
-      [new FieldPath('cards', cardKey)]: deleteField()
-    });
+    await updateDoc(userRef, new FieldPath('cards', cardKey), deleteField());
 
     // Clear cache to force a fresh fetch next time
     localStorage.removeItem(`${CACHE_KEY}_${userId}`);

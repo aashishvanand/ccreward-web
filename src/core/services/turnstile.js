@@ -10,15 +10,13 @@
  * Server-side verification:
  *   POST https://challenges.cloudflare.com/turnstile/v0/siteverify
  *   { secret: TURNSTILE_SECRET_KEY, response: token }
+ *
+ * Note: Turnstile tokens are single-use. Each server-side verification
+ * consumes the token, so a fresh token is required for every API call.
  */
 
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
-// Turnstile tokens are valid for 300s, refresh at 240s for safety margin
-const TOKEN_REFRESH_INTERVAL = 240 * 1000;
-
-let _currentToken = null;
-let _tokenTimestamp = 0;
 let _widgetId = null;
 let _scriptLoaded = false;
 let _scriptLoadPromise = null;
@@ -87,37 +85,27 @@ const renderWidget = () => {
     sitekey: SITE_KEY,
     size: 'invisible',
     callback: (token) => {
-      _currentToken = token;
-      _tokenTimestamp = Date.now();
-
       // Resolve any pending token requests
       const resolvers = _tokenResolvers;
       _tokenResolvers = [];
       resolvers.forEach((resolve) => resolve(token));
     },
     'error-callback': () => {
-      _currentToken = null;
       // Reject pending requests
       const resolvers = _tokenResolvers;
       _tokenResolvers = [];
       resolvers.forEach((resolve) => resolve(null));
     },
     'expired-callback': () => {
-      _currentToken = null;
+      // No-op: tokens are always freshly requested before each API call
     },
   });
 };
 
 /**
- * Check if the current token is still fresh.
- */
-const isTokenFresh = () => {
-  return _currentToken && (Date.now() - _tokenTimestamp) < TOKEN_REFRESH_INTERVAL;
-};
-
-/**
- * Get a valid Turnstile token. Returns the cached token if fresh,
- * otherwise triggers a new challenge and waits for the result.
+ * Get a fresh Turnstile token. Always resets the widget and requests
+ * a new token, since Turnstile tokens are single-use (consumed on
+ * server-side verification).
  *
  * @returns {Promise<string|null>} The Turnstile token, or null if unavailable
  */
@@ -128,12 +116,7 @@ export const getTurnstileToken = async () => {
     await loadScript();
     renderWidget();
 
-    // Return cached token if still fresh
-    if (isTokenFresh()) {
-      return _currentToken;
-    }
-
-    // Request a new token
+    // Always request a fresh token (tokens are single-use)
     return new Promise((resolve) => {
       _tokenResolvers.push(resolve);
 

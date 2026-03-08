@@ -169,14 +169,16 @@ api.interceptors.request.use(async (config) => {
         return Promise.reject(new Error('Region not initialized'));
     }
 
-    // Attach Turnstile token for bot protection (non-blocking)
-    try {
-        const turnstileToken = await getTurnstileToken();
-        if (turnstileToken) {
-            config.headers['X-Turnstile-Token'] = turnstileToken;
+    // Attach Turnstile token for bot protection on POST requests only (non-blocking)
+    if (config.method && config.method.toLowerCase() === 'post') {
+        try {
+            const turnstileToken = await getTurnstileToken();
+            if (turnstileToken) {
+                config.headers['X-Turnstile-Token'] = turnstileToken;
+            }
+        } catch {
+            // Non-critical — API should still work without Turnstile during rollout
         }
-    } catch {
-        // Non-critical — API should still work without Turnstile during rollout
     }
 
     // Ensure URL has versioning

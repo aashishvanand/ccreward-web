@@ -266,7 +266,7 @@ const TransferPartnerGrid = () => {
                   >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         {logoSrc ? (
-                            <Image src={logoSrc} alt={partner.name} width={24} height={24} style={{objectFit: 'contain'}} />
+                            <Image src={buildCloudflareImageUrl(logoSrc, "public")} alt={partner.name} width={24} height={24} unoptimized style={{objectFit: 'contain'}} />
                         ) : (
                              type === "airline" ? <FlightIcon fontSize="small" color="action"/> : <HotelIcon fontSize="small"  color="action"/>
                         )}
