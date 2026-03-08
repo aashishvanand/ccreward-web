@@ -28,9 +28,8 @@ import {
   AccountBalanceWallet as AccountBalanceWalletIcon,
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { useRegion } from "@/core/providers/RegionContext";
-import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
+import TiltCard from "@/shared/components/ui/TiltCard";
 
 // Use a prefix for the cache key to make it dynamic
 const CACHE_KEY_PREFIX = "referralData_";
@@ -170,20 +169,12 @@ const TopCardsGrid = ({
                   />
                 )}
 
-                <Box sx={{ 
-                    position: "relative",
-                    width: "100%",
-                    aspectRatio: card.orientation === "vertical" ? "0.63/1" : "1.59/1",
-                }}>
-                  <Image
-                    src={buildCloudflareImageUrl(card.image, "public")}
-                    alt={`${card.bank} ${card.cardName}`}
-                    layout="fill"
-                    objectFit="contain"
-                    loading="lazy"
-                    unoptimized
-                  />
-                </Box>
+                <TiltCard
+                  src={card.image}
+                  alt={`${card.bank} ${card.cardName}`}
+                  orientation={card.orientation}
+                  width="100%"
+                />
 
                 <Box sx={{ p: 2 }}>
                     <Typography

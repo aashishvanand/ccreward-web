@@ -79,15 +79,17 @@ const AppStoreButton = ({ href, imageId, alt }) => (
       },
       display: "flex",
       alignItems: "center",
+      justifyContent: "center",
+      height: 56,
     }}
   >
     <Image
       src={buildCloudflareImageUrl(imageId, "public")}
       alt={alt}
-      width={200}
-      height={60}
+      width={180}
+      height={56}
       unoptimized
-      style={{ objectFit: "contain" }}
+      style={{ objectFit: "contain", height: 56, width: "auto" }}
     />
   </Box>
 );
