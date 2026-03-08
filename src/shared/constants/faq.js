@@ -20,11 +20,6 @@ const faqs = [
       "Yes, ccreward is available on both Android and iOS platforms, as well as a web application.",
   },
   {
-    question: "What happens when I sign up using an anonymous account?",
-    answer:
-      "If you sign up anonymously, your account is automatically deleted after 30 days, irrespective of whether you’ve added cards or not. This ensures your privacy.",
-  },
-  {
     question: "Can ccreward track my reward points?",
     answer:
       "Not yet. At the moment, ccreward focuses on helping users find the best card for transactions and calculate rewards. Tracking accumulated reward points is a feature we may add in the future.",

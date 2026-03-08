@@ -3,6 +3,7 @@ import { Box, Typography, useTheme, Tooltip, Fade, Skeleton } from "@mui/materia
 import { motion } from "framer-motion";
 import { useRegion } from "@/core/providers/RegionContext";
 import PropTypes from 'prop-types';
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 const networkItemVariants = {
     hidden: { opacity: 0, scale: 0.8 },
@@ -134,7 +135,7 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
                                     >
                                         {item.id ? (
                                             <img
-                                                src={`https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/${item.id}/public`}
+                                                src={buildCloudflareImageUrl(item.id, "public")}
                                                 alt={item.network}
                                                 title={item.network}
                                                 style={{ maxWidth: '65%', maxHeight: '65%', objectFit: 'contain' }}

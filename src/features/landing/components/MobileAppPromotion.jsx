@@ -4,6 +4,7 @@ import {
   getAppStoreUrl,
   getPlayStoreUrl,
 } from "@/core/utils/deviceUtils";
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 const MobileAppPromotion = ({ isAndroid }) => {
   const theme = useTheme();
@@ -75,11 +76,12 @@ const MobileAppPromotion = ({ isAndroid }) => {
               }}
             >
               <Image
-                src={screenshot}
+                src={buildCloudflareImageUrl(screenshot, "public")}
                 alt={`App Screenshot ${index + 1}`}
                 layout="fill"
                 objectFit="cover"
                 priority={index === 0}
+                unoptimized
               />
             </Box>
           ))}

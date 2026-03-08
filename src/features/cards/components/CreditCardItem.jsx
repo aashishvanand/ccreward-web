@@ -9,6 +9,7 @@ import {
 import { Delete as DeleteIcon } from "@mui/icons-material";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 const bankColors = {
   HDFC: "#004C8F",
@@ -101,10 +102,11 @@ function CreditCardItem({ card, onDelete }) {
             }}
           >
             <Image
-              src={card.imageId}
+              src={buildCloudflareImageUrl(card.imageId, "public")}
               alt={`${card.bank} ${card.cardName}`}
               layout="fill"
               objectFit="contain"
+              unoptimized
               sizes={
                 isHorizontal
                   ? "(max-width: 600px) 50vw, (max-width: 960px) 33vw, 25vw"

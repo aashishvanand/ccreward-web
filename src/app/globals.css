@@ -1,10 +1,33 @@
-/* Add any global styles here */
+/* Inter: body text font - only latin subset needed for IN/SG audience */
+@import "@fontsource/inter/latin-400.css";
+@import "@fontsource/inter/latin-500.css";
+@import "@fontsource/inter/latin-600.css";
+@import "@fontsource/inter/latin-700.css";
+/* Outfit: heading font - only latin subset needed */
+@import "@fontsource/outfit/latin-400.css";
+@import "@fontsource/outfit/latin-500.css";
+@import "@fontsource/outfit/latin-600.css";
+@import "@fontsource/outfit/latin-700.css";
+
+:root {
+  --font-inter: "Inter";
+  --font-outfit: "Outfit";
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Prevent theme flash: set initial colors before MUI hydrates */
+  background-color: #F3F4F6;
+  color: #111827;
+}
+
+/* Dark mode initial colors - class set by inline script before paint */
+html.dark-mode body {
+  background-color: #0F172A;
+  color: #F9FAFB;
 }

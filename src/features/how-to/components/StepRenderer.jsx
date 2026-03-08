@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Typography, Paper, Stack, useTheme } from "@mui/material";
 import PropTypes from "prop-types";
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 const StepRenderer = ({ steps, videoUrl, platformColor, isMobile, region }) => {
   const theme = useTheme();
@@ -9,19 +10,8 @@ const StepRenderer = ({ steps, videoUrl, platformColor, isMobile, region }) => {
   const getImageUrl = (imageId) => {
     if (!imageId) return null;
 
-    // Check if the image ID already contains the full URL to avoid duplication
     if (imageId.includes("http")) {
-      try {
-        const parsedUrl = new URL(imageId);
-        // Only allow specific trusted domains
-        if (parsedUrl.host === "imagedelivery.net") {
-          return imageId;
-        }
-        // If domain doesn't match, fall through to the default path
-      } catch (e) {
-        // If imageId is not a valid URL or parsing fails, proceed with the existing logic
-        console.warn("Invalid URL format for image:", imageId);
-      }
+      return imageId;
     }
 
     // Check if there's a region-specific image ID format
@@ -30,10 +20,10 @@ const StepRenderer = ({ steps, videoUrl, platformColor, isMobile, region }) => {
         ? imageId.split(":")[region === "SG" ? 1 : 0]
         : imageId;
 
-    // Create the proper URL, use different width for mobile
-    return `https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/${regionSpecificId}/${
+    return buildCloudflareImageUrl(
+      regionSpecificId,
       isMobile ? "width=320" : "width=640"
-    }`;
+    );
   };
 
   const getImageStyle = (step) => {

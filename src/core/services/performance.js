@@ -1,15 +1,23 @@
 // src/core/services/performance.js - Enhanced Firebase Performance Monitoring
-import { getPerformance, trace, connectPerformanceEmulator } from 'firebase/performance';
-import { firebaseApp } from '@/firebase';
+// Firebase modules are dynamically imported to reduce initial bundle size
 
 let firebasePerformance = null;
 let isInitialized = false;
+let traceFn = null;
 
 // Initialize Firebase Performance Monitoring
 export const initializePerformanceMonitoring = async () => {
     if (typeof window === 'undefined') return false;
 
     try {
+        // Dynamically import Firebase modules
+        const [{ getPerformance, trace: traceImport, connectPerformanceEmulator }, { firebaseApp }] = await Promise.all([
+            import('firebase/performance'),
+            import('@/firebase')
+        ]);
+
+        traceFn = traceImport;
+
         // Initialize Performance Monitoring
         firebasePerformance = getPerformance(firebaseApp);
 
@@ -45,7 +53,7 @@ export const createTrace = (traceName) => {
     }
 
     try {
-        return trace(firebasePerformance, traceName);
+        return traceFn(firebasePerformance, traceName);
     } catch (error) {
         console.error('Error creating trace:', error);
         return null;
@@ -174,57 +182,35 @@ function setupPageLoadTracking() {
     observer.observe(document, { subtree: true, childList: true });
 }
 
-// Setup network request monitoring
+// Network request monitoring via PerformanceObserver.
+// Previously this monkey-patched window.fetch and XMLHttpRequest, which:
+//  - modified global prototypes (fragile, potential security surface)
+//  - was duplicated in analytics.js (double-wrapping)
+// Now we use the passive PerformanceObserver API instead.
 function setupNetworkMonitoring() {
-    // Monitor fetch requests
-    const originalFetch = window.fetch;
-    window.fetch = async (...args) => {
-        const url = args[0];
-        const options = args[1] || {};
-        const method = options.method || 'GET';
+    if (!('PerformanceObserver' in window)) return;
 
-        const apiTracker = trackApiCall(url, method);
-
-        try {
-            const response = await originalFetch(...args);
-
-            if (apiTracker) {
-                apiTracker.success(response.status);
+    try {
+        const resourceObserver = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+                // Only trace slow network requests (> 2s)
+                if (entry.duration > 2000) {
+                    const trace = createTrace(`slow_resource_${entry.initiatorType}`);
+                    if (trace) {
+                        trace.start();
+                        trace.putAttribute('resource_name', entry.name.substring(0, 100));
+                        trace.putAttribute('duration', Math.round(entry.duration).toString());
+                        trace.putAttribute('initiator_type', entry.initiatorType || 'unknown');
+                        trace.stop();
+                    }
+                }
             }
+        });
 
-            return response;
-        } catch (error) {
-            if (apiTracker) {
-                apiTracker.error(error);
-            }
-            throw error;
-        }
-    };
-
-    // Monitor XMLHttpRequest
-    const originalXHROpen = XMLHttpRequest.prototype.open;
-    const originalXHRSend = XMLHttpRequest.prototype.send;
-
-    XMLHttpRequest.prototype.open = function (method, url, ...args) {
-        this._performanceTracker = trackApiCall(url, method);
-        return originalXHROpen.call(this, method, url, ...args);
-    };
-
-    XMLHttpRequest.prototype.send = function (...args) {
-        const tracker = this._performanceTracker;
-
-        if (tracker) {
-            this.addEventListener('load', () => {
-                tracker.success(this.status);
-            });
-
-            this.addEventListener('error', () => {
-                tracker.error(new Error('XMLHttpRequest failed'), this.status);
-            });
-        }
-
-        return originalXHRSend.call(this, ...args);
-    };
+        resourceObserver.observe({ entryTypes: ['resource'] });
+    } catch (error) {
+        console.warn('Resource performance monitoring not available:', error);
+    }
 }
 
 // Setup performance observers for Web Vitals

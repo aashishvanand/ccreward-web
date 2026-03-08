@@ -1,7 +1,16 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
-import { getAuth, getIdToken } from "firebase/auth";
 import { jwtDecode } from "jwt-decode";
+import { getTurnstileToken } from './turnstile';
+
+// Firebase auth is dynamically imported to reduce initial bundle size
+let _authModule = null;
+const getAuthModule = async () => {
+    if (!_authModule) {
+        _authModule = await import("firebase/auth");
+    }
+    return _authModule;
+};
 
 // Define the base URL for API calls
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -28,6 +37,7 @@ let currentToken = null;
 let tokenRefreshPromise = null;
 
 const getToken = async () => {
+    const { getAuth, getIdToken } = await getAuthModule();
     const auth = getAuth();
     if (!auth.currentUser) {
         throw new Error('No user is currently signed in');
@@ -123,12 +133,15 @@ export const setAuthToken = (token) => {
 
 // Initialize authentication
 export const initializeAuth = async () => {
+    const { getAuth, getIdToken } = await getAuthModule();
     const auth = getAuth();
     if (auth.currentUser) {
         try {
             const token = await getIdToken(auth.currentUser, true);
             setAuthToken(token);
-            localStorage.setItem('authToken', token);
+            // Firebase Auth SDK manages token caching internally via IndexedDB.
+            // Do NOT store tokens in localStorage — they would be accessible to
+            // any JS on the page (XSS, third-party scripts).
         } catch (error) {
             console.error('Error initializing auth:', error);
         }
@@ -154,6 +167,16 @@ api.interceptors.request.use(async (config) => {
         console.warn('Skipping API request because region is not initialized:', config.url);
         // Cancel the request
         return Promise.reject(new Error('Region not initialized'));
+    }
+
+    // Attach Turnstile token for bot protection (non-blocking)
+    try {
+        const turnstileToken = await getTurnstileToken();
+        if (turnstileToken) {
+            config.headers['X-Turnstile-Token'] = turnstileToken;
+        }
+    } catch {
+        // Non-critical — API should still work without Turnstile during rollout
     }
 
     // Ensure URL has versioning

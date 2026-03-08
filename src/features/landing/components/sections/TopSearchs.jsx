@@ -14,6 +14,7 @@ import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import Image from "next/image";
 import useCardImagesData from "@/core/hooks/useCardImagesData";
 import { useRegion } from "@/core/providers/RegionContext";
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 const TopSearchs = () => {
   // Get the current region from the context
@@ -219,10 +220,11 @@ const TopSearchs = () => {
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   {cardImage ? (
                     <Image
-                      src={cardImage.id}
+                      src={buildCloudflareImageUrl(cardImage.id, "public")}
                       alt={`${card.bank} ${card.cardName}`}
                       width={cardImage.orientation === "horizontal" ? 80 : 50}
                       height={cardImage.orientation === "horizontal" ? 50 : 80}
+                      unoptimized
                       style={{ objectFit: "contain" }}
                     />
                   ) : (

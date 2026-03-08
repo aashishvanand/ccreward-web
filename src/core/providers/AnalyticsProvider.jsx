@@ -3,8 +3,8 @@
 
 import { useRef, useEffect, useState } from "react";
 import Script from "next/script";
-// import { getAnalytics, isSupported } from "firebase/analytics"; // Removed dynamic import
 import { firebaseApp } from "@/firebase";
+import { initTurnstile } from "../services/turnstile";
 import { initializeClarity } from "../services/clarity";
 import {
   initializeAnalytics,
@@ -17,7 +17,7 @@ import {
   logBreadcrumb,
 } from "../services/crashlytics";
 import { useAuth } from "./AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 
 export function AnalyticsProvider({ children }) {
   const initialized = useRef(false);
@@ -25,6 +25,37 @@ export function AnalyticsProvider({ children }) {
   const { user } = useAuth();
   const router = useRouter();
   const currentPath = useRef("");
+
+  // Initialize gtag early for Firebase Analytics
+  useEffect(() => {
+    if (typeof window !== "undefined" && !window.gtagInitialized) {
+      window.gtagInitialized = true;
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function gtag() {
+        window.dataLayer.push(arguments);
+      };
+      window.gtag("js", new Date());
+
+      const measurementId = process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID;
+      if (measurementId) {
+        window.gtag("config", measurementId, {
+          page_path: window.location.pathname,
+          send_page_view: false, // We'll handle page views manually
+          custom_map: {
+            custom_error: "error_name",
+            custom_user_id: "user_id",
+            custom_session_id: "session_id",
+          },
+        });
+
+        // Enhanced error tracking
+        window.gtag("config", measurementId, {
+          transport_type: "beacon",
+          anonymize_ip: true,
+        });
+      }
+    }
+  }, []);
 
   // Initialize analytics services
   useEffect(() => {
@@ -50,7 +81,7 @@ export function AnalyticsProvider({ children }) {
           // Initialize Crashlytics-like error reporting
           const crashlyticsReady = await initializeCrashlytics();
 
-          // Initialize Microsoft Clarity
+           // Initialize Microsoft Clarity
           try {
             initializeClarity();
           } catch (clarityError) {
@@ -59,6 +90,9 @@ export function AnalyticsProvider({ children }) {
               clarityError
             );
           }
+
+          // Pre-load Turnstile for bot protection (non-blocking)
+          initTurnstile();
 
           initialized.current = true;
           setAnalyticsReady(true);
@@ -96,8 +130,7 @@ export function AnalyticsProvider({ children }) {
       try {
         // Set user ID for analytics
         setUserAnalytics(user.uid, {
-          isAnonymous: user.isAnonymous,
-          signupMethod: user.isAnonymous ? "anonymous" : "google",
+          signupMethod: "google",
           emailVerified: user.emailVerified || false,
           creationTime: user.metadata?.creationTime,
           lastSignInTime: user.metadata?.lastSignInTime,
@@ -109,7 +142,6 @@ export function AnalyticsProvider({ children }) {
         // Log breadcrumb for user authentication
         logBreadcrumb("User authenticated", "user", {
           user_id: user.uid,
-          is_anonymous: user.isAnonymous,
           email_verified: user.emailVerified || false,
         });
       } catch (error) {
@@ -208,42 +240,6 @@ export function AnalyticsProvider({ children }) {
           console.error("❌ Google Analytics script failed to load:", error);
         }}
       />
-
-      <Script id="firebase-analytics-init" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', '${process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID}', {
-            page_path: window.location.pathname,
-            send_page_view: false, // We'll handle page views manually
-            custom_map: {
-              'custom_error': 'error_name',
-              'custom_user_id': 'user_id',
-              'custom_session_id': 'session_id'
-            }
-          });
-          
-          // Enhanced error tracking
-          gtag('config', '${process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID}', {
-            transport_type: 'beacon',
-            anonymize_ip: true
-          });
-        `}
-      </Script>
-
-      {/* Load Microsoft Clarity script */}
-      <Script id="microsoft-clarity" strategy="afterInteractive">
-        {`
-          (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-          })(window, document, "clarity", "script", "ngsrwjccm4");
-        `}
-      </Script>
-
-
 
       {children}
     </>

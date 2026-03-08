@@ -22,13 +22,13 @@ import AddToMyCardsButton from "../../cards/components/AddToMyCardsButton";
 import ReportButtons from "@/shared/components/ui/ReportButtons";
 import MissingBankCardForm from "./ReportForms/MissingBankCardForm";
 import IncorrectRewardReportForm from "./ReportForms/IncorrectRewardReportForm";
-import { AnonymousConversionPrompt } from "@/shared/components/ui/AnonymousConversionPrompt";
 import ErrorAlert from "@/shared/components/ui/ErrorAlert";
 import { calculateRewards } from "@/core/services/api";
 import { logCalculation } from "@/core/services/analytics";
 import { useCardSelection } from "./CalculatorHooks";
 import CalculationResults from "./CalculationResults";
-import Confetti from "react-confetti";
+import dynamic from "next/dynamic";
+const Confetti = dynamic(() => import("react-confetti"), { ssr: false });
 import ReferralButton from "./ReferralButton";
 import { useRegion } from "@/core/providers/RegionContext";
 import { motion } from "framer-motion";
@@ -387,8 +387,6 @@ function Calculator() {
             </Paper>
           </Stack>
         </Container>
-        <AnonymousConversionPrompt />
-
         <MissingBankCardForm
           open={missingFormOpen}
           onClose={() => setMissingFormOpen(false)}

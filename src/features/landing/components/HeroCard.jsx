@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { Card } from "@mui/material";
 import Image from "next/image";
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 const HeroCard = ({ card, index, isMobile, isTablet, isLargeScreen }) => {
   // Mobile configuration
@@ -50,9 +51,10 @@ const HeroCard = ({ card, index, isMobile, isTablet, isLargeScreen }) => {
       }}
     >
       <Image
-        src={card.id}
+        src={buildCloudflareImageUrl(card.id, "public")}
         alt={`${card.bank} ${card.cardName}`}
         fill
+        unoptimized
         style={{ objectFit: "contain" }}
         sizes="(max-width: 600px) 240px, (max-width: 960px) 280px, 320px"
         priority={index === 0}

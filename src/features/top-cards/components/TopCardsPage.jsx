@@ -1,7 +1,7 @@
 "use client";
 // src/features/top-cards/components/TopCardsPage.jsx - Enhanced with Analytics
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";
 import { useAuth } from "@/core/providers/AuthContext";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
@@ -106,7 +106,6 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
     error: categoriesError,
   } = useCardCategories(initialCategories);
   const [isValidating, setIsValidating] = useState(false);
-  const searchParams = useSearchParams();
 
   // Track page load
   useEffect(() => {
@@ -124,13 +123,19 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
 
   // Handle URL category parameter with analytics (Legacy support or direct query param usage)
   useEffect(() => {
+    if (!router.isReady) return;
+
     // Only check params if no initialCategory was provided (meaning we are on the index page)
     // and we haven't selected a category yet.
     if (!initialCategory && !category) {
       const validateAndSetCategory = async () => {
         setIsValidating(true);
         try {
-          const categoryFromUrl = searchParams.get("category");
+          const queryCategory = router.query.category;
+          const categoryFromUrl = Array.isArray(queryCategory)
+            ? queryCategory[0]
+            : queryCategory;
+
           if (categoryFromUrl) {
             const decodedCategory = decodeURIComponent(categoryFromUrl);
 
@@ -157,7 +162,7 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
                 severity: "warning",
               });
               // Redirect to clean index if invalid
-              router.replace(`/${currentRegion}/top-cards`);
+              router.replace(`/${currentRegion.toLowerCase()}/top-cards`);
             }
           }
         } catch (error) {
@@ -178,7 +183,7 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
 
       validateAndSetCategory();
     }
-  }, [searchParams, router, trackEvent, trackComponentError, initialCategory, category, currentRegion]);
+  }, [router, trackEvent, trackComponentError, initialCategory, category, currentRegion]);
 
   // Update URL when category changes
   // We handle navigation in handleCategoryChange now to prevent cycle, 

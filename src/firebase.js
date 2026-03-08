@@ -1,8 +1,9 @@
-// firebase.js - Enhanced configuration with Crashlytics
+// firebase.js - Enhanced configuration with lazy-loaded auth
+// Only firebase/app is statically imported to minimize initial bundle size.
+// firebase/auth is loaded on first use.
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
+import { validateEnvVars } from './envValidator';
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -13,31 +14,50 @@ const firebaseConfig = {
     measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
+if (typeof window !== 'undefined') {
+    validateEnvVars();
+}
+
+// Initialize Firebase App (lightweight - only firebase/app)
 let app;
 
 if (!getApps().length) {
     app = initializeApp(firebaseConfig);
-
-    // Initialize App Check for security (optional but recommended)
-    if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
-        try {
-            initializeAppCheck(app, {
-                provider: new ReCaptchaV3Provider(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY),
-                isTokenAutoRefreshEnabled: true
-            });
-        } catch (error) {
-            console.warn('App Check initialization failed:', error);
-        }
-    }
 } else {
     app = getApp();
 }
 
-export const auth = getAuth(app);
-// Firestore is now initialized where needed to avoid server-side evaluation errors
+// Lazy-loaded auth and provider instances (ESM live bindings)
+export let auth = null;
+export let googleProvider = null;
+let _authInitPromise = null;
+
+/**
+ * Get auth and googleProvider instances. Initializes firebase/auth on first
+ * call, then caches the result.
+ *
+ * Bot protection is handled by Cloudflare Turnstile (see core/services/turnstile.js)
+ * instead of Firebase App Check, since the API backend runs on Cloudflare Workers.
+ *
+ * @returns {Promise<{auth: import('firebase/auth').Auth, googleProvider: import('firebase/auth').GoogleAuthProvider}>}
+ */
+export const getFirebaseAuth = () => {
+    if (auth) return Promise.resolve({ auth, googleProvider });
+
+    if (!_authInitPromise) {
+        _authInitPromise = (async () => {
+            const { getAuth, GoogleAuthProvider } = await import('firebase/auth');
+            auth = getAuth(app);
+            googleProvider = new GoogleAuthProvider();
+            return { auth, googleProvider };
+        })();
+    }
+
+    return _authInitPromise;
+};
+
+// Firestore is initialized where needed to avoid server-side evaluation errors
 export const db = null;
-export const googleProvider = new GoogleAuthProvider();
 export const firebaseApp = app;
 
 // Initialize Analytics only on client side

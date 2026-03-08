@@ -33,7 +33,7 @@ import {
   Person as PersonIcon,
 } from "@mui/icons-material";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 import { useAuth } from "@/core/providers/AuthContext";
 import { useAppTheme } from "@/core/providers/ThemeRegistry";
@@ -41,6 +41,7 @@ import { useRegion } from "@/core/providers/RegionContext";
 import { getCardsForUser } from "@/core/services/firebaseUtils";
 import { onCardUpdate } from "@/core/utils/events";
 import { detectDevice } from "@/core/utils/deviceUtils";
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 import RegionSelector from "./RegionSelector";
 
 // Icon mapping based on theme and region
@@ -102,7 +103,7 @@ function Header({ hideNavigation = false }) {
   const { region } = useRegion();
   const { user, logout, deleteAccount, isAuthenticated, signInWithGoogle } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = router.asPath?.split("?")[0] || "/";
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [deviceInfo, setDeviceInfo] = useState({
@@ -122,7 +123,7 @@ function Header({ hideNavigation = false }) {
 
   // Generate the icon URL
   const ccrewardIconUrl = useMemo(() => {
-    return `https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/${ccrewardIconId}/public`;
+    return buildCloudflareImageUrl(ccrewardIconId, "public");
   }, [ccrewardIconId]);
 
   useEffect(() => {

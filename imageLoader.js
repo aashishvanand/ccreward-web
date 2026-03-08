@@ -2,25 +2,27 @@ const normalizeSrc = (src) => {
     return src.startsWith('/') ? src.slice(1) : src;
 };
 
+// Cloudflare Images account hash must come from env vars — no hardcoded fallback.
+// Set NEXT_PUBLIC_CLOUDFLARE_IMAGES_ACCOUNT_HASH in .env.local / CI secrets.
+const CLOUDFLARE_IMAGES_DELIVERY_BASE_URL =
+    process.env.NEXT_PUBLIC_CLOUDFLARE_IMAGES_DELIVERY_BASE_URL ||
+    `https://imagedelivery.net/${process.env.NEXT_PUBLIC_CLOUDFLARE_IMAGES_ACCOUNT_HASH || ''}`;
+
 export default function smartLoader({ src, width, quality }) {
     const isLocal = src.startsWith('/');
 
-    // If it's a local image (starts with /), let Next.js optimize it via the Binding
-    // We construct a standard Next.js image URL which OpenNext will intercept and handle using the IMAGES binding
     if (isLocal) {
-        return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality || 75}`;
+        return `/_vinext/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality || 75}`;
     }
 
-    // If src is already a full URL (e.g. from imagedelivery.net), use it directly
     if (src.startsWith('http')) {
         return src;
     }
 
-    // Existing Cloudflare Images logic for IDs
     const params = [`width=${width}`];
     if (quality) {
         params.push(`quality=${quality}`);
     }
     const paramsString = params.join(',');
-    return `https://imagedelivery.net/o7c7-WjKE1zaslpSuiAT5w/${normalizeSrc(src)}/${paramsString}`;
+    return `${CLOUDFLARE_IMAGES_DELIVERY_BASE_URL}/${normalizeSrc(src)}/${paramsString}`;
 }

@@ -40,8 +40,8 @@ next-env.d.ts
 error_log.json
 missing_cards.json
 
-.open-next/
 .wrangler
 
 # static data (fetched at build time)
 /src/data/*.json
+/dist/

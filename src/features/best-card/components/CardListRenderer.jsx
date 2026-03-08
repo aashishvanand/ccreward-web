@@ -11,6 +11,7 @@ import {
 import Image from "next/image";
 import { CreditCard as CreditCardIcon } from "@mui/icons-material";
 import useCardImagesData from "@/core/hooks/useCardImagesData";
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 const bankColors = {
   HDFC: "#004C8F",
@@ -68,12 +69,13 @@ const CardListRenderer = ({
 
     return (
       <Image
-        src={cardDetails.id}
+        src={buildCloudflareImageUrl(cardDetails.id, "public")}
         alt={`${card.bank} ${card.cardName}`}
         width={isHorizontal ? 60 : 40}
         height={isHorizontal ? 40 : 60}
         objectFit="contain"
         onError={() => handleImageError(card.id)}
+        unoptimized
       />
     );
   };

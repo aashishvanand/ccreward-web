@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import {
   Box,
   Container,
@@ -50,8 +50,7 @@ import StarIcon from "@mui/icons-material/Star";
 import { useAuth } from "@/core/providers/AuthContext";
 import useCardImagesData from "@/core/hooks/useCardImagesData";
 import { fetchCardDetails, fetchCardGoals } from "@/core/services/api";
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { auth, googleProvider } from "@/firebase";
+import { getFirebaseAuth } from "@/firebase";
 import TiltCard from "@/shared/components/ui/TiltCard";
 import Footer from "@/shared/components/layout/Footer";
 import Header from "@/shared/components/layout/Header";
@@ -569,6 +568,8 @@ const CardPage = ({ bankName, cardName, country }) => {
 
   const handleSignIn = async () => {
     try {
+      const { signInWithPopup } = await import('firebase/auth');
+      const { auth, googleProvider } = await getFirebaseAuth();
       await signInWithPopup(auth, googleProvider);
       setOpenDialog(false);
     } catch (error) {

@@ -123,7 +123,7 @@ Please describe what you were doing when this error occurred:
     const emailUrl = `mailto:support@ccreward.app?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
     
     if (typeof window !== 'undefined') {
-      window.open(emailUrl);
+      window.open(emailUrl, '_blank', 'noopener,noreferrer');
     }
   };
 

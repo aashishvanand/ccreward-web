@@ -48,6 +48,7 @@ import {
   usePartnerLogos,
 } from "@/core/hooks";
 import TransferPartnerGrid from "./TransferPartnerGrid";
+import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -276,10 +277,11 @@ const TransferCalculator = () => {
                     <CircularProgress size={24} />
                   ) : logoId ? (
                     <Image
-                      src={`${logoId}`}
+                      src={buildCloudflareImageUrl(logoId, "public")}
                       alt={`${partner.brand_name} logo`}
                       width={40}
                       height={40}
+                      unoptimized
                       style={{ objectFit: "contain" }}
                     />
                   ) : (

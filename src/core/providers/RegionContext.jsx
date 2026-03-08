@@ -134,7 +134,10 @@ export function RegionProvider({ children }) {
         }
 
         try {
-          const response = await fetch("https://ipinfo.io/json");
+          // Use our own Cloudflare Worker endpoint for geo-detection.
+          // This avoids leaking the user's IP to a third party (ipinfo.io)
+          // and uses Cloudflare's built-in cf.country which is free and fast.
+          const response = await fetch("/_geo");
           if (response.ok) {
             const data = await response.json();
             const countryCode = data.country?.toUpperCase();

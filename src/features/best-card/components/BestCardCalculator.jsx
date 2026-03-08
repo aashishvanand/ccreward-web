@@ -33,7 +33,8 @@ import Footer from "@/shared/components/layout/Footer";
 import PageHeader from "@/shared/components/layout/PageHeader";
 import { useAuth } from "@/core/providers/AuthContext";
 import { getCardsForUser } from "@/core/services/firebaseUtils";
-import Confetti from "react-confetti";
+import dynamic from "next/dynamic";
+const Confetti = dynamic(() => import("react-confetti"), { ssr: false });
 import { CardListRenderer } from "./CardListRenderer";
 import DynamicCardInputs from "@/shared/components/ui/DynamicCardInputs";
 import {
@@ -41,7 +42,8 @@ import {
   calculateBestCard,
   fetchMCC,
 } from "@/core/services/api";
-import _ from "lodash";
+import debounce from "lodash/debounce";
+import groupBy from "lodash/groupBy";
 import { useRegion } from "@/core/providers/RegionContext";
 import { motion } from "framer-motion";
 import { getCurrencySymbol } from "@/core/utils";
@@ -229,7 +231,7 @@ const BestCardCalculator = () => {
 
   // Enhanced MCC search with analytics
   const debouncedFetchMCC = useCallback(
-    _.debounce(async (value) => {
+    debounce(async (value) => {
       if (value && value.length >= 2) {
         setIsLoadingMcc(true);
         try {
@@ -777,7 +779,7 @@ const BestCardCalculator = () => {
                       </Typography>
                     ) : (
                       Object.entries(
-                        _.groupBy(
+                        groupBy(
                           filteredQuestions,
                           (q) => `${q.bank}-${q.cardName}`
                         )
