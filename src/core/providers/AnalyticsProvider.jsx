@@ -4,6 +4,7 @@
 import { useRef, useEffect, useState } from "react";
 import Script from "next/script";
 import { firebaseApp } from "@/firebase";
+import { initTurnstile } from "../services/turnstile";
 import { initializeClarity } from "../services/clarity";
 import {
   initializeAnalytics,
@@ -80,7 +81,7 @@ export function AnalyticsProvider({ children }) {
           // Initialize Crashlytics-like error reporting
           const crashlyticsReady = await initializeCrashlytics();
 
-          // Initialize Microsoft Clarity
+           // Initialize Microsoft Clarity
           try {
             initializeClarity();
           } catch (clarityError) {
@@ -89,6 +90,9 @@ export function AnalyticsProvider({ children }) {
               clarityError
             );
           }
+
+          // Pre-load Turnstile for bot protection (non-blocking)
+          initTurnstile();
 
           initialized.current = true;
           setAnalyticsReady(true);

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import { jwtDecode } from "jwt-decode";
+import { getTurnstileToken } from './turnstile';
 
 // Firebase auth is dynamically imported to reduce initial bundle size
 let _authModule = null;
@@ -166,6 +167,16 @@ api.interceptors.request.use(async (config) => {
         console.warn('Skipping API request because region is not initialized:', config.url);
         // Cancel the request
         return Promise.reject(new Error('Region not initialized'));
+    }
+
+    // Attach Turnstile token for bot protection (non-blocking)
+    try {
+        const turnstileToken = await getTurnstileToken();
+        if (turnstileToken) {
+            config.headers['X-Turnstile-Token'] = turnstileToken;
+        }
+    } catch {
+        // Non-critical — API should still work without Turnstile during rollout
     }
 
     // Ensure URL has versioning

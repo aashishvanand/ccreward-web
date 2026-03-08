@@ -1,6 +1,6 @@
-// firebase.js - Enhanced configuration with lazy-loaded auth and app-check
+// firebase.js - Enhanced configuration with lazy-loaded auth
 // Only firebase/app is statically imported to minimize initial bundle size.
-// firebase/auth and firebase/app-check are loaded on first use.
+// firebase/auth is loaded on first use.
 import { initializeApp, getApps, getApp } from 'firebase/app';
 
 import { validateEnvVars } from './envValidator';
@@ -33,8 +33,12 @@ export let googleProvider = null;
 let _authInitPromise = null;
 
 /**
- * Get auth and googleProvider instances. Initializes firebase/auth and
- * firebase/app-check on first call, then caches the result.
+ * Get auth and googleProvider instances. Initializes firebase/auth on first
+ * call, then caches the result.
+ *
+ * Bot protection is handled by Cloudflare Turnstile (see core/services/turnstile.js)
+ * instead of Firebase App Check, since the API backend runs on Cloudflare Workers.
+ *
  * @returns {Promise<{auth: import('firebase/auth').Auth, googleProvider: import('firebase/auth').GoogleAuthProvider}>}
  */
 export const getFirebaseAuth = () => {
@@ -45,20 +49,6 @@ export const getFirebaseAuth = () => {
             const { getAuth, GoogleAuthProvider } = await import('firebase/auth');
             auth = getAuth(app);
             googleProvider = new GoogleAuthProvider();
-
-            // Initialize App Check for security (optional)
-            if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY) {
-                try {
-                    const { initializeAppCheck, ReCaptchaV3Provider } = await import('firebase/app-check');
-                    initializeAppCheck(app, {
-                        provider: new ReCaptchaV3Provider(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY),
-                        isTokenAutoRefreshEnabled: true
-                    });
-                } catch (error) {
-                    console.warn('App Check initialization failed:', error);
-                }
-            }
-
             return { auth, googleProvider };
         })();
     }
