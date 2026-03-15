@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { getFirebaseAuth, firebaseApp } from '@/firebase';
 import { deleteUserData } from '../services/firebaseUtils';
+import { resetUsageState } from '../services/usageLimitService';
 import { useRouter } from "next/router";
 import { Box, CircularProgress, Typography, Paper, useTheme } from "@mui/material";
 import { motion } from "framer-motion";
@@ -126,6 +127,7 @@ export function AuthProvider({ children }) {
       setUser(null);
       setToken(null);
       setIsNewUser(false);
+      resetUsageState();
       if (typeof window !== 'undefined') {
         Object.keys(localStorage).forEach(key => {
           if (key.startsWith('userCardsCache_') ||
@@ -176,6 +178,7 @@ export function AuthProvider({ children }) {
       setUser(null);
       setToken(null);
       setIsNewUser(false);
+      resetUsageState();
 
       if (typeof window !== 'undefined') {
         Object.keys(localStorage).forEach(key => {

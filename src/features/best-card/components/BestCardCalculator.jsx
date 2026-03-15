@@ -42,6 +42,9 @@ import {
   calculateBestCard,
   fetchMCC,
 } from "@/core/services/api";
+import useUsageLimit from "@/core/hooks/useUsageLimit";
+import { RateLimitedFeature } from "@/core/services/usageLimitService";
+import UsageRemainingBadge from "@/shared/components/ui/UsageRemainingBadge";
 import debounce from "lodash/debounce";
 import groupBy from "lodash/groupBy";
 import { useRegion } from "@/core/providers/RegionContext";
@@ -103,6 +106,9 @@ const BestCardCalculator = () => {
   const { trackAPICall } = useAPITracking();
   const { trackComponentError, trackComponentInteraction } =
     useComponentAnalytics("BestCardCalculator");
+
+  const { remaining, limit, canUse, onSuccess: recordUsage, limitMessage } =
+    useUsageLimit(RateLimitedFeature.BEST_CARD);
 
   const [userCards, setUserCards] = useState([]);
   const [selectedMcc, setSelectedMcc] = useState(null);
@@ -350,6 +356,16 @@ const BestCardCalculator = () => {
       return;
     }
 
+    // Usage limit guard
+    if (!canUse) {
+      setAlert({
+        open: true,
+        message: limitMessage,
+        severity: "warning",
+      });
+      return;
+    }
+
     trackButtonClick("calculate_best_card", {
       cards_count: userCards.length,
       has_mcc: !!selectedMcc,
@@ -430,6 +446,9 @@ const BestCardCalculator = () => {
 
       const calculationDuration = performance.now() - startTime;
 
+      // Optimistic local decrement; backend is the source of truth
+      recordUsage();
+
       setPointsRanking(response.rankingByPoints);
       setRankingByValue(response.rankingByValue);
       setRankingByMiles(response.rankingByMiles);
@@ -507,6 +526,9 @@ const BestCardCalculator = () => {
     trackAPICall,
     recordCustomMetric,
     user,
+    canUse,
+    limitMessage,
+    recordUsage,
   ]);
 
   const handleCalculationError = (error) => {
@@ -646,6 +668,12 @@ const BestCardCalculator = () => {
             title="Best Card Calculator" 
             subtitle="Find the best card to use for your next purchase." 
           />
+
+          {user && (
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: -2 }}>
+              <UsageRemainingBadge remaining={remaining} limit={limit} />
+            </Box>
+          )}
 
           <Paper
             elevation={2}

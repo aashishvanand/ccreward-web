@@ -2,6 +2,7 @@ import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import { jwtDecode } from "jwt-decode";
 import { getTurnstileToken } from './turnstile';
+import { updateFromResponseHeaders } from './usageLimitService';
 
 // Firebase auth is dynamically imported to reduce initial bundle size
 let _authModule = null;
@@ -189,6 +190,21 @@ api.interceptors.request.use(async (config) => {
     return config;
 }, (error) => Promise.reject(error));
 
+// Response interceptor: extract usage limit headers from every response
+api.interceptors.response.use(
+  (response) => {
+    updateFromResponseHeaders(response.headers);
+    return response;
+  },
+  (error) => {
+    // Also read headers from error responses (e.g. 429)
+    if (error.response?.headers) {
+      updateFromResponseHeaders(error.response.headers);
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Handle API errors
 const handleApiError = (error) => {
     console.error("API Error:", error.response ? error.response.data : error.message);
@@ -198,6 +214,16 @@ const handleApiError = (error) => {
     }
 
     if (error.response && error.response.status === 429) {
+        const body = error.response.data;
+        const message = body?.message || body?.error || '';
+        if (typeof message === 'string' && message.toLowerCase().includes('daily limit')) {
+            throw new Error("Daily limit reached. Please use the CCReward app for more.");
+        }
+        const limit = body?.limit;
+        const period = body?.period;
+        if (limit && period) {
+            throw new Error(`Too many requests. Limited to ${limit} per ${period}.`);
+        }
         throw new Error("You've made too many requests. Please take a coffee break and try again later.");
     }
 
@@ -449,6 +475,82 @@ export const fetchCardGoals = async (bank, card, country) => {
         const response = await api.get(`/v3/goals?bank=${bank}&card=${encodedCard}&country=${region}`);
         return response.data;
     });
+};
+
+// ─── User Cards (v3) ────────────────────────────────────────────────
+// All /v3/user/cards endpoints require Firebase JWT (set by interceptor).
+// Only the authenticated user can access their own cards.
+
+/**
+ * Add a card to the user's portfolio.
+ * POST /v3/user/cards
+ */
+export const addUserCard = async (cardData) => {
+    try {
+        const response = await api.post('/v3/user/cards', cardData);
+        return response.data;
+    } catch (error) {
+        return handleApiError(error);
+    }
+};
+
+/**
+ * Update an existing card in the user's portfolio.
+ * Matches on (bank + cardName + country), updates the rest.
+ * PATCH /v3/user/cards
+ */
+export const updateUserCard = async (cardData) => {
+    try {
+        const response = await api.patch('/v3/user/cards', cardData);
+        return response.data;
+    } catch (error) {
+        return handleApiError(error);
+    }
+};
+
+/**
+ * Remove a card from the user's portfolio.
+ * DELETE /v3/user/cards
+ */
+export const deleteUserCard = async ({ bank, cardName, country }) => {
+    try {
+        const response = await api.delete('/v3/user/cards', {
+            data: { bank, cardName, country },
+        });
+        return response.data;
+    } catch (error) {
+        return handleApiError(error);
+    }
+};
+
+/**
+ * Get all cards for the authenticated user.
+ * GET /v3/user/cards?country=xx  (country is optional)
+ */
+export const getUserCards = async (country) => {
+    try {
+        const url = country
+            ? `/v3/user/cards?country=${encodeURIComponent(country)}`
+            : '/v3/user/cards';
+        const response = await api.get(url);
+        return response.data;
+    } catch (error) {
+        return handleApiError(error);
+    }
+};
+
+/**
+ * Bulk sync (full replace) cards for the authenticated user.
+ * Intended for Firestore-to-D1 migration, not day-to-day use.
+ * PUT /v3/user/cards
+ */
+export const bulkSyncUserCards = async ({ cards, country }) => {
+    try {
+        const response = await api.put('/v3/user/cards', { cards, country });
+        return response.data;
+    } catch (error) {
+        return handleApiError(error);
+    }
 };
 
 // Export the API instance

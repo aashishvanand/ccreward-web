@@ -14,6 +14,7 @@ import {
   getCardsForUser,
   addCardForUser,
 } from "@/core/services/firebaseUtils";
+import { addUserCard } from "@/core/services/api";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
 import PageHeader from "@/shared/components/layout/PageHeader";
@@ -27,6 +28,9 @@ import { calculateRewards } from "@/core/services/api";
 import { logCalculation } from "@/core/services/analytics";
 import { useCardSelection } from "./CalculatorHooks";
 import CalculationResults from "./CalculationResults";
+import useUsageLimit from "@/core/hooks/useUsageLimit";
+import { RateLimitedFeature } from "@/core/services/usageLimitService";
+import UsageRemainingBadge from "@/shared/components/ui/UsageRemainingBadge";
 import dynamic from "next/dynamic";
 const Confetti = dynamic(() => import("react-confetti"), { ssr: false });
 import ReferralButton from "./ReferralButton";
@@ -77,6 +81,9 @@ function Calculator() {
   const [incorrectRewardReportOpen, setIncorrectRewardReportOpen] =
     useState(false);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
+
+  const { remaining, limit, canUse, onSuccess: recordUsage, limitMessage } =
+    useUsageLimit(RateLimitedFeature.CALCULATOR);
 
   const {
     selectedBank,
@@ -141,7 +148,24 @@ function Calculator() {
           bank: selectedBank,
           cardName: selectedCard,
         };
-        const newCardId = await addCardForUser(user.uid, cardData);
+        const country = localStorage.getItem('app-region')?.toLowerCase() || 'in';
+        const apiPayload = {
+          bank: selectedBank,
+          cardName: selectedCard,
+          country,
+          addedAt: new Date().toISOString(),
+        };
+        // Write to Firestore and CF API in parallel; Firestore is source of truth
+        const [firestoreResult] = await Promise.allSettled([
+          addCardForUser(user.uid, cardData),
+          addUserCard(apiPayload).catch((err) => {
+            console.warn('CF API addUserCard failed (non-critical):', err);
+          }),
+        ]);
+        if (firestoreResult.status === 'rejected') {
+          throw firestoreResult.reason;
+        }
+        const newCardId = firestoreResult.value;
         setUserCards((prevCards) => [
           ...prevCards,
           { ...cardData, id: newCardId },
@@ -177,6 +201,16 @@ function Calculator() {
           ? "Please wait for questions to load before calculating."
           : "Please enter a valid spent amount",
         severity: "error",
+      });
+      return;
+    }
+
+    // Usage limit guard
+    if (!canUse) {
+      setAlert({
+        open: true,
+        message: limitMessage,
+        severity: "warning",
       });
       return;
     }
@@ -228,6 +262,9 @@ function Calculator() {
         country: region.toLowerCase(),
       });
 
+      // Optimistic local decrement; backend is the source of truth
+      recordUsage();
+
       setCalculationResult(result);
       setCalculationPerformed(true);
       setLastCalculationInputs(currentInputs);
@@ -255,6 +292,9 @@ function Calculator() {
     lastCalculationInputs,
     isLoadingQuestions,
     region,
+    canUse,
+    limitMessage,
+    recordUsage,
   ]);
 
   const handleCalculationError = (error) => {
@@ -319,6 +359,12 @@ function Calculator() {
                 title="Reward Calculator"
                 subtitle="Calculate your credit card rewards for specific spends and MCC codes."
             />
+
+            {user && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <UsageRemainingBadge remaining={remaining} limit={limit} />
+              </Box>
+            )}
 
             <ErrorAlert message={error} onClose={() => setError(null)} />
 

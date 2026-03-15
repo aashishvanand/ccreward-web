@@ -36,6 +36,9 @@ import {
   fetchCards,
   calculateTransferPartners,
 } from "@/core/services/api";
+import useUsageLimit from "@/core/hooks/useUsageLimit";
+import { RateLimitedFeature } from "@/core/services/usageLimitService";
+import UsageRemainingBadge from "@/shared/components/ui/UsageRemainingBadge";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
 import PageHeader from "@/shared/components/layout/PageHeader";
@@ -72,6 +75,9 @@ const TransferCalculator = () => {
   const theme = useTheme();
   const { region, isInitialized } = useRegion();
   const { user, isAuthenticated, loading } = useAuth();
+  const { remaining, limit, canUse, onSuccess: recordUsage, limitMessage } =
+    useUsageLimit(RateLimitedFeature.TRANSFERS);
+
   const [alert, setAlert] = useState({
     open: false,
     message: "",
@@ -181,6 +187,12 @@ const TransferCalculator = () => {
       return;
     }
 
+    // Usage limit guard
+    if (!canUse) {
+      showAlert(limitMessage, "warning");
+      return;
+    }
+
     setIsCalculating(true);
     setCalculationResult(null);
     trackButtonClick("calculate_transfers", {
@@ -196,6 +208,9 @@ const TransferCalculator = () => {
         card: selectedCard,
         points: Number(points),
       });
+      // Optimistic local decrement; backend is the source of truth
+      recordUsage();
+
       setCalculationResult(result);
       trackFormSubmission(true);
       trackConversion("transfer_calculation", Number(points));
@@ -395,6 +410,12 @@ const TransferCalculator = () => {
                 title="Transfer Partner Calculator"
                 subtitle="Calculate point transfers to airline and hotel partners."
             />
+
+            {user && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <UsageRemainingBadge remaining={remaining} limit={limit} />
+              </Box>
+            )}
 
             <Paper elevation={2} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2 }}>
               <Stack spacing={3}>
