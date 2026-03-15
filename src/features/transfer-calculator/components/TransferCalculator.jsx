@@ -411,13 +411,12 @@ const TransferCalculator = () => {
                 subtitle="Calculate point transfers to airline and hotel partners."
             />
 
-            {user && (
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <UsageRemainingBadge remaining={remaining} limit={limit} />
-              </Box>
-            )}
-
             <Paper elevation={2} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2 }}>
+              {user && (
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+                  <UsageRemainingBadge remaining={remaining} limit={limit} />
+                </Box>
+              )}
               <Stack spacing={3}>
                 <Autocomplete
                   fullWidth

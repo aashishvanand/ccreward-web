@@ -360,18 +360,17 @@ function Calculator() {
                 subtitle="Calculate your credit card rewards for specific spends and MCC codes."
             />
 
-            {user && (
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <UsageRemainingBadge remaining={remaining} limit={limit} />
-              </Box>
-            )}
-
             <ErrorAlert message={error} onClose={() => setError(null)} />
 
             <Paper
               elevation={2}
               sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2 }}
             >
+              {user && (
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+                  <UsageRemainingBadge remaining={remaining} limit={limit} />
+                </Box>
+              )}
 
               {loading || isFetchingUserData ? (
                 <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>

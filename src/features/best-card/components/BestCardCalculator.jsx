@@ -669,16 +669,15 @@ const BestCardCalculator = () => {
             subtitle="Find the best card to use for your next purchase." 
           />
 
-          {user && (
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: -2 }}>
-              <UsageRemainingBadge remaining={remaining} limit={limit} />
-            </Box>
-          )}
-
           <Paper
             elevation={2}
             sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2 }}
           >
+            {user && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+                <UsageRemainingBadge remaining={remaining} limit={limit} />
+              </Box>
+            )}
             <Stack spacing={3}>
               <Autocomplete
                 options={mccOptions}
