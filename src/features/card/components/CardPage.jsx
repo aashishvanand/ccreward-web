@@ -54,6 +54,7 @@ import { getFirebaseAuth } from "@/firebase";
 import TiltCard from "@/shared/components/ui/TiltCard";
 import Footer from "@/shared/components/layout/Footer";
 import Header from "@/shared/components/layout/Header";
+import SignInDialog from "@/shared/components/auth/SignInDialog";
 
 // ============================================================================
 // UTILITY FUNCTIONS
@@ -566,11 +567,22 @@ const CardPage = ({ bankName, cardName, country }) => {
     fetchData();
   }, [user, authLoading, bankName, cardName, country, router]);
 
-  const handleSignIn = async () => {
+  const handleGoogleSignIn = async () => {
     try {
       const { signInWithPopup } = await import('firebase/auth');
       const { auth, googleProvider } = await getFirebaseAuth();
       await signInWithPopup(auth, googleProvider);
+      setOpenDialog(false);
+    } catch (error) {
+      console.error("Sign in failed", error);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    try {
+      const { signInWithPopup } = await import('firebase/auth');
+      const { auth, appleProvider } = await getFirebaseAuth();
+      await signInWithPopup(auth, appleProvider);
       setOpenDialog(false);
     } catch (error) {
       console.error("Sign in failed", error);
@@ -1041,45 +1053,20 @@ const CardPage = ({ bankName, cardName, country }) => {
       </Container>
 
       {/* Sign In Dialog */}
-      <Dialog
+      <SignInDialog
         open={openDialog}
         onClose={() => {
           if (user) setOpenDialog(false);
         }}
-        PaperProps={{
-          sx: { borderRadius: 3, maxWidth: 400 },
-        }}
-      >
-        <DialogTitle sx={{ fontWeight: 700, textAlign: "center", pt: 4 }}>
-          Sign In Required
-        </DialogTitle>
-        <DialogContent sx={{ textAlign: "center", pb: 2 }}>
-          <CreditCardIcon
-            sx={{ fontSize: 64, color: "primary.main", mb: 2, opacity: 0.8 }}
-          />
-          <Typography color="text.secondary">
-            Sign in to view detailed card benefits, fees, and exclusive features.
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 1, flexDirection: "column", gap: 1 }}>
-          <Button
-            variant="contained"
-            fullWidth
-            size="large"
-            onClick={handleSignIn}
-            sx={{ borderRadius: 2 }}
-          >
-            Sign In with Google
-          </Button>
-          <Button
-            fullWidth
-            onClick={() => router.push("/")}
-            sx={{ color: "text.secondary" }}
-          >
-            Go Back Home
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onGoogleSignIn={handleGoogleSignIn}
+        onAppleSignIn={handleAppleSignIn}
+        title="Sign In Required"
+        message="Sign in to view detailed card benefits, fees, and exclusive features."
+        showIcon
+        showCancelButton
+        cancelLabel="Go Back Home"
+        onCancel={() => router.push("/")}
+      />
 
       <Footer />
     </Box>

@@ -20,6 +20,7 @@ import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
 import TopCardsGrid from "../../top-cards/components/TopCardsGrid";
 import { useAuth } from "@/core/providers/AuthContext";
+import SignInDialog from "@/shared/components/auth/SignInDialog";
 import useCardImagesData from "@/core/hooks/useCardImagesData";
 import { motion } from "framer-motion";
 
@@ -57,7 +58,7 @@ const BankPage = ({ bank, cards }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
-  const { user, signInWithGoogle } = useAuth();
+  const { user, signInWithGoogle, signInWithApple } = useAuth();
 
   // Analytics hooks
   const {
@@ -219,8 +220,9 @@ const BankPage = ({ bank, cards }) => {
     setSelectedCard(null);
   };
 
-  const handleSignIn = async () => {
+  const handleSignInWith = async (signInMethod, methodName) => {
     trackButtonClick("sign_in_from_bank_page", {
+      method: methodName,
       bank_name: bank,
       selected_card: selectedCard
         ? `${selectedCard.bank} ${selectedCard.cardName}`
@@ -231,18 +233,20 @@ const BankPage = ({ bank, cards }) => {
     const startTime = performance.now();
 
     try {
-      await signInWithGoogle();
+      await signInMethod();
 
       const signInDuration = performance.now() - startTime;
 
       trackConversion("bank_page_sign_in", 1);
       trackJourneyCompletion("sign_in_success_bank_page", {
+        method: methodName,
         bank_name: bank,
         selected_card: selectedCard?.cardName,
         sign_in_duration: Math.round(signInDuration),
       });
 
       trackEvent("sign_in_success_bank_page", {
+        method: methodName,
         bank_name: bank,
         selected_card: selectedCard
           ? `${selectedCard.bank} ${selectedCard.cardName}`
@@ -265,6 +269,7 @@ const BankPage = ({ bank, cards }) => {
       const signInDuration = performance.now() - startTime;
 
       trackComponentError("sign_in_failed_bank_page", {
+        method: methodName,
         bank_name: bank,
         selected_card: selectedCard
           ? `${selectedCard.bank} ${selectedCard.cardName}`
@@ -364,24 +369,15 @@ const BankPage = ({ bank, cards }) => {
           )}
         </Container>
 
-        <Dialog
+        <SignInDialog
           open={openDialog}
           onClose={handleCloseDialog}
-          slots={{
-            backdrop: "div",
-          }}
-        >
-          <DialogTitle>Sign In Required</DialogTitle>
-          <DialogContent>
-            <Typography>Please sign in to calculate your rewards.</Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>Cancel</Button>
-            <Button onClick={handleSignIn} variant="contained">
-              Sign In with Google
-            </Button>
-          </DialogActions>
-        </Dialog>
+          onGoogleSignIn={() => handleSignInWith(signInWithGoogle, 'google')}
+          onAppleSignIn={() => handleSignInWith(signInWithApple, 'apple')}
+          title="Sign In Required"
+          message="Please sign in to calculate your rewards."
+          onCancel={handleCloseDialog}
+        />
 
         {alert.open && (
           <Alert

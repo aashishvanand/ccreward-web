@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useAuth } from "@/core/providers/AuthContext";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
+import SignInDialog from "@/shared/components/auth/SignInDialog";
 import useCardImagesData from "@/core/hooks/useCardImagesData";
 import useCardCategories, {
   getCardsForCategory,
@@ -80,7 +81,7 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
-  const { user, signInWithGoogle } = useAuth();
+  const { user, signInWithGoogle, signInWithApple } = useAuth();
   const { region: currentRegion } = useRegion(); // Get current region from context
 
   // Analytics hooks
@@ -291,8 +292,9 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
     setSelectedCard(null);
   };
 
-  const handleSignIn = async () => {
+  const handleSignInWith = async (signInMethod, methodName) => {
     trackButtonClick("sign_in_from_top_cards", {
+      method: methodName,
       selected_card: selectedCard
         ? `${selectedCard.bank} ${selectedCard.cardName}`
         : "none",
@@ -300,7 +302,7 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
     });
 
     try {
-      await signInWithGoogle();
+      await signInMethod();
 
       if (selectedCard) {
         trackNavigation(
@@ -313,6 +315,7 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
       }
 
       trackEvent("sign_in_success_top_cards", {
+        method: methodName,
         selected_card: selectedCard
           ? `${selectedCard.bank} ${selectedCard.cardName}`
           : "none",
@@ -320,6 +323,7 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
     } catch (error) {
       trackComponentError("sign_in_failed_top_cards", {
         error_message: error.message,
+        method: methodName,
         selected_card: selectedCard
           ? `${selectedCard.bank} ${selectedCard.cardName}`
           : "none",
@@ -490,18 +494,15 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
           )}
         </Container>
 
-        <Dialog open={openDialog} onClose={handleCloseDialog}>
-          <DialogTitle>Sign In Required</DialogTitle>
-          <DialogContent>
-            <Typography>Please sign in to calculate your rewards.</Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>Cancel</Button>
-            <Button onClick={handleSignIn} variant="contained">
-              Sign In with Google
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <SignInDialog
+          open={openDialog}
+          onClose={handleCloseDialog}
+          onGoogleSignIn={() => handleSignInWith(signInWithGoogle, 'google')}
+          onAppleSignIn={() => handleSignInWith(signInWithApple, 'apple')}
+          title="Sign In Required"
+          message="Please sign in to calculate your rewards."
+          onCancel={handleCloseDialog}
+        />
 
         {alert.open && (
           <Alert

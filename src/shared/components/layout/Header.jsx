@@ -36,6 +36,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 import { useAuth } from "@/core/providers/AuthContext";
+import SignInButtons from "@/shared/components/auth/SignInButtons";
 import { useAppTheme } from "@/core/providers/ThemeRegistry";
 import { useRegion } from "@/core/providers/RegionContext";
 import { getCardsForUser } from "@/core/services/firebaseUtils";
@@ -101,7 +102,7 @@ const logoVariants = {
 function Header({ hideNavigation = false }) {
   const { mode, toggleTheme } = useAppTheme();
   const { region } = useRegion();
-  const { user, logout, deleteAccount, isAuthenticated, signInWithGoogle } = useAuth();
+  const { user, logout, deleteAccount, isAuthenticated, signInWithGoogle, signInWithApple } = useAuth();
   const router = useRouter();
   const pathname = router.asPath?.split("?")[0] || "/";
   const theme = useTheme();
@@ -113,6 +114,7 @@ function Header({ hideNavigation = false }) {
     isTablet: false,
   });
   const [anchorEl, setAnchorEl] = useState(null);
+  const [signInAnchorEl, setSignInAnchorEl] = useState(null);
   const [cardCount, setCardCount] = useState(0);
 
   // Get the appropriate CCReward icon based on theme and region
@@ -183,10 +185,29 @@ function Header({ hideNavigation = false }) {
     handleMenuClose();
   };
 
-  const handleLogin = async () => {
+  const handleSignInMenuOpen = (event) => {
+    setSignInAnchorEl(event.currentTarget);
+  };
+
+  const handleSignInMenuClose = () => {
+    setSignInAnchorEl(null);
+  };
+
+  const handleGoogleLogin = async () => {
     try {
-      await signInWithGoogle();
+      handleSignInMenuClose();
       handleMenuClose();
+      await signInWithGoogle();
+    } catch (error) {
+      console.error("Login error:", error);
+    }
+  };
+
+  const handleAppleLogin = async () => {
+    try {
+      handleSignInMenuClose();
+      handleMenuClose();
+      await signInWithApple();
     } catch (error) {
       console.error("Login error:", error);
     }
@@ -378,12 +399,14 @@ function Header({ hideNavigation = false }) {
           </MenuItem>
 
           {!isAuthenticated() && (
-            <MenuItem onClick={handleLogin} sx={{ py: 1.5, px: 2 }}>
-              <ListItemIcon>
-                <LoginIcon />
-              </ListItemIcon>
-              <ListItemText primary="Sign In" />
-            </MenuItem>
+            <Box sx={{ px: 2, py: 1 }}>
+              <SignInButtons
+                onGoogleSignIn={handleGoogleLogin}
+                onAppleSignIn={handleAppleLogin}
+                fullWidth
+                size="medium"
+              />
+            </Box>
           )}
         </Box>
       </Menu>
@@ -583,23 +606,49 @@ function Header({ hideNavigation = false }) {
 
               {/* Login Button for Desktop */}
               {!isAuthenticated() && (
-                <Button
-                  variant="outlined"
-                  color="inherit"
-                  startIcon={<LoginIcon />}
-                  onClick={handleLogin}
-                  sx={{
-                    ml: 1,
-                    borderColor: "rgba(255, 255, 255, 0.5)",
-                    color: "inherit",
-                    "&:hover": {
-                      borderColor: "white",
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    },
-                  }}
-                >
-                  Sign In
-                </Button>
+                <>
+                  <Button
+                    variant="outlined"
+                    color="inherit"
+                    startIcon={<LoginIcon />}
+                    onClick={handleSignInMenuOpen}
+                    sx={{
+                      ml: 1,
+                      borderColor: "rgba(255, 255, 255, 0.5)",
+                      color: "inherit",
+                      "&:hover": {
+                        borderColor: "white",
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      },
+                    }}
+                  >
+                    Sign In
+                  </Button>
+                  <Menu
+                    anchorEl={signInAnchorEl}
+                    open={Boolean(signInAnchorEl)}
+                    onClose={handleSignInMenuClose}
+                    PaperProps={{
+                      sx: {
+                        mt: 1.5,
+                        borderRadius: 2,
+                        minWidth: 260,
+                        p: 1.5,
+                        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+                        backdropFilter: "blur(10px)",
+                      },
+                    }}
+                    transformOrigin={{ horizontal: "right", vertical: "top" }}
+                    anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                  >
+                    <SignInButtons
+                      onGoogleSignIn={handleGoogleLogin}
+                      onAppleSignIn={handleAppleLogin}
+                      fullWidth
+                      size="medium"
+                    />
+                  </Menu>
+                </>
               )}
             </Box>
           )}
