@@ -8,20 +8,16 @@ import {
   CircularProgress,
   Stack,
   useTheme,
-  InputAdornment,
   Alert,
-  IconButton,
 } from "@mui/material";
-import { Clear } from "@mui/icons-material";
 import DynamicCardInputs from "@/shared/components/ui/DynamicCardInputs";
-import CurrencyPicker from "@/shared/components/ui/CurrencyPicker";
+import CurrencyAmountField from "@/shared/components/ui/CurrencyAmountField";
 import {
   fetchBanks,
   fetchCards,
   fetchMCC,
   fetchCardQuestions,
 } from "@/core/services/api";
-import { getCurrencySymbol } from "@/core/utils/currency";
 import debounce from "lodash/debounce";
 import PropTypes from "prop-types";
 import { useRouter } from "next/router";
@@ -441,47 +437,12 @@ const CalculatorForm = ({
             : "No options found"
         }
       />
-      <CurrencyPicker
-        value={selectedCurrency}
-        onChange={onCurrencyChange}
+      <CurrencyAmountField
+        currency={selectedCurrency}
+        onCurrencyChange={onCurrencyChange}
+        amount={spentAmount}
+        onAmountChange={onSpentAmountChange}
         disabled={isCalculating}
-      />
-      <TextField
-        fullWidth
-        label="Spent Amount"
-        type="number"
-        value={spentAmount}
-        onChange={(e) => {
-          // Prevent negative numbers and ensure minimum of 1
-          const value = Math.max(1, Number(e.target.value));
-          onSpentAmountChange(value.toString());
-        }}
-        required
-        slotProps={{
-          input: {
-            startAdornment: (
-              <InputAdornment position="start">
-                {getCurrencySymbol(selectedCurrency)}
-              </InputAdornment>
-            ),
-            endAdornment: spentAmount && (
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="clear spent amount"
-                  onClick={() => onSpentAmountChange("")}
-                  edge="end"
-                  size="small"
-                >
-                  <Clear />
-                </IconButton>
-              </InputAdornment>
-            ),
-            inputProps: {
-              min: 1,
-              step: 1,
-            },
-          },
-        }}
       />
       {isLoadingQuestions ? (
         <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>

@@ -3,11 +3,11 @@ import { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Typography,
-  TextField,
   Button,
   CircularProgress,
   Container,
   Autocomplete,
+  TextField,
   List,
   Alert,
   ToggleButton,
@@ -20,13 +20,11 @@ import {
   Divider,
   Stack,
   useTheme,
-  InputAdornment,
-  Paper, // Added Paper
+  Paper,
 } from "@mui/material";
 import {
   Info as InfoIcon,
   ExpandMore as ExpandMoreIcon,
-  Clear as ClearIcon,
 } from "@mui/icons-material";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
@@ -50,7 +48,7 @@ import groupBy from "lodash/groupBy";
 import { useRegion } from "@/core/providers/RegionContext";
 import { motion } from "framer-motion";
 import { getCurrencySymbol, getNativeCurrency } from "@/core/utils";
-import CurrencyPicker from "@/shared/components/ui/CurrencyPicker";
+import CurrencyAmountField from "@/shared/components/ui/CurrencyAmountField";
 import CurrencyConversionInfo from "@/shared/components/ui/CurrencyConversionInfo";
 
 // Add analytics imports
@@ -749,52 +747,18 @@ const BestCardCalculator = () => {
                 }
               />
 
-              <CurrencyPicker
-                value={selectedCurrency}
-                onChange={(val) => {
+              <CurrencyAmountField
+                currency={selectedCurrency}
+                onCurrencyChange={(val) => {
                   setSelectedCurrency(val);
                   trackFieldInteraction("currency", "select");
                 }}
+                amount={spentAmount}
+                onAmountChange={(val) => {
+                  setSpentAmount(val);
+                  if (val) trackFieldInteraction("spent_amount", "input");
+                }}
                 disabled={isLoading}
-              />
-
-              <TextField
-                fullWidth
-                label="Spent Amount"
-                type="number"
-                value={spentAmount}
-                onChange={(e) => {
-                  const value = Math.max(1, Number(e.target.value));
-                  setSpentAmount(value.toString());
-                  trackFieldInteraction("spent_amount", "input");
-                }}
-                required
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      {getCurrencySymbol(selectedCurrency)}
-                    </InputAdornment>
-                  ),
-                  endAdornment: spentAmount && (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="clear spent amount"
-                        onClick={() => {
-                          setSpentAmount("");
-                          trackFieldInteraction("spent_amount", "clear");
-                        }}
-                        edge="end"
-                        size="small"
-                      >
-                        <ClearIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                  inputProps: {
-                    min: 1,
-                    step: 1,
-                  },
-                }}
               />
 
               <Accordion
