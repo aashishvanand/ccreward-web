@@ -25,7 +25,7 @@ if (!process.env.STATIC_DATA_API_KEY || !process.env.NEXT_PUBLIC_API_BASE_URL) {
 }
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-const API_BASE_URL = `${BASE_URL}/v3/static/`;
+const API_BASE_URL = `${BASE_URL}/v4/static/`;
 const DATA_DIR = path.join(__dirname, '../src/data');
 const API_KEY = process.env.STATIC_DATA_API_KEY;
 

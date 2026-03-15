@@ -90,11 +90,13 @@ function Calculator() {
     selectedCard,
     selectedMcc,
     spentAmount,
+    selectedCurrency,
     additionalInputs,
     handleBankChange,
     handleCardChange,
     handleMccChange,
     handleSpentAmountChange,
+    handleCurrencyChange,
     handleAdditionalInputChange,
     resetAllFields,
   } = useCardSelection();
@@ -227,6 +229,7 @@ function Calculator() {
       card: selectedCard,
       mcc: selectedMcc ? selectedMcc.mcc : null,
       amount: parseFloat(spentAmount),
+      currency: selectedCurrency,
       additionalInputs,
       country: region.toLowerCase(),
     };
@@ -245,6 +248,7 @@ function Calculator() {
         card: selectedCard,
         mcc: selectedMcc ? selectedMcc.mcc : null,
         amount: parseFloat(spentAmount),
+        currency: selectedCurrency,
         answers: additionalInputs,
         country: region.toLowerCase(),
       });
@@ -287,6 +291,7 @@ function Calculator() {
     selectedBank,
     selectedCard,
     selectedMcc,
+    selectedCurrency,
     additionalInputs,
     hasCalculated,
     lastCalculationInputs,
@@ -383,11 +388,13 @@ function Calculator() {
                     selectedCard={selectedCard}
                     selectedMcc={selectedMcc}
                     spentAmount={spentAmount}
+                    selectedCurrency={selectedCurrency}
                     additionalInputs={additionalInputs}
                     onBankChange={handleBankChange}
                     onCardChange={handleCardChange}
                     onMccChange={handleMccChange}
                     onSpentAmountChange={handleSpentAmountChange}
+                    onCurrencyChange={handleCurrencyChange}
                     onAdditionalInputChange={handleAdditionalInputChange}
                     onCalculate={handleCalculate}
                     onClear={handleClearAll}

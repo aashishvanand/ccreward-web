@@ -1,10 +1,14 @@
 import { useState, useCallback } from "react";
+import { getNativeCurrency } from "@/core/utils/currency";
+import { useRegion } from "@/core/providers/RegionContext";
 
 export const useCardSelection = () => {
+  const { region } = useRegion();
   const [selectedBank, setSelectedBank] = useState("");
   const [selectedCard, setSelectedCard] = useState("");
   const [selectedMcc, setSelectedMcc] = useState(null);
   const [spentAmount, setSpentAmount] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState(getNativeCurrency(region));
   const [additionalInputs, setAdditionalInputs] = useState({});
 
   const handleBankChange = useCallback((newBank) => {
@@ -26,6 +30,10 @@ export const useCardSelection = () => {
     setSpentAmount(newAmount);
   }, []);
 
+  const handleCurrencyChange = useCallback((newCurrency) => {
+    setSelectedCurrency(newCurrency);
+  }, []);
+
   const handleAdditionalInputChange = useCallback((key, value) => {
     setAdditionalInputs((prev) => ({ ...prev, [key]: value }));
   }, []);
@@ -35,19 +43,22 @@ export const useCardSelection = () => {
     setSelectedCard("");
     setSelectedMcc(null);
     setSpentAmount("");
+    setSelectedCurrency(getNativeCurrency(region));
     setAdditionalInputs({});
-  }, []);
+  }, [region]);
 
   return {
     selectedBank,
     selectedCard,
     selectedMcc,
     spentAmount,
+    selectedCurrency,
     additionalInputs,
     handleBankChange,
     handleCardChange,
     handleMccChange,
     handleSpentAmountChange,
+    handleCurrencyChange,
     handleAdditionalInputChange,
     resetAllFields,
   };

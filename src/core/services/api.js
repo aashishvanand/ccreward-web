@@ -182,9 +182,9 @@ api.interceptors.request.use(async (config) => {
         }
     }
 
-    // Ensure URL has versioning
-    if (!config.url.startsWith('/v2/') && !config.url.startsWith('/v3/')) {
-        config.url = `/v2${config.url}`;
+    // Ensure URL has versioning — all endpoints now use v4
+    if (!config.url.startsWith('/v4/')) {
+        config.url = `/v4${config.url}`;
     }
 
     return config;
@@ -211,6 +211,23 @@ const handleApiError = (error) => {
 
     if (error.code === 'ECONNABORTED') {
         throw new Error("Request timed out. Please check your internet connection and try again.");
+    }
+
+    // Currency-specific errors from v4 API
+    if (error.response && error.response.status === 400) {
+        const body = error.response.data;
+        const code = body?.code || body?.error;
+        if (code === 'UNSUPPORTED_CURRENCY') {
+            throw new Error("Unsupported currency. Please select a valid currency and try again.");
+        }
+    }
+
+    if (error.response && error.response.status === 503) {
+        const body = error.response.data;
+        const code = body?.code || body?.error;
+        if (code === 'EXCHANGE_RATES_UNAVAILABLE') {
+            throw new Error("Exchange rates are temporarily unavailable. Please try again later or use your local currency.");
+        }
     }
 
     if (error.response && error.response.status === 429) {
@@ -418,8 +435,7 @@ export const calculateTransferPartners = async (data) => {
     }
 
     try {
-        // Use v3 endpoint as requested
-        const response = await authenticatedRequest('post', '/v3/transfer', data);
+        const response = await authenticatedRequest('post', '/v4/transfer', data);
         return response;
     } catch (error) {
         // If error is about region not being initialized, throw specific error
@@ -452,7 +468,7 @@ export const fetchCardDetails = async (bank, card, country) => {
     const cacheKey = `card_detail_${bank}_${encodedCard}_${region}`;
 
     return fetchWithCache(cacheKey, async () => {
-        const response = await api.get(`/v3/card/detail?bank=${bank}&card=${encodedCard}&country=${region}`);
+        const response = await api.get(`/v4/card/detail?bank=${bank}&card=${encodedCard}&country=${region}`);
         return response.data;
     });
 };
@@ -472,22 +488,22 @@ export const fetchCardGoals = async (bank, card, country) => {
     const cacheKey = `card_goals_${bank}_${encodedCard}_${region}`;
 
     return fetchWithCache(cacheKey, async () => {
-        const response = await api.get(`/v3/goals?bank=${bank}&card=${encodedCard}&country=${region}`);
+        const response = await api.get(`/v4/goals?bank=${bank}&card=${encodedCard}&country=${region}`);
         return response.data;
     });
 };
 
-// ─── User Cards (v3) ────────────────────────────────────────────────
-// All /v3/user/cards endpoints require Firebase JWT (set by interceptor).
+// ─── User Cards (v4) ────────────────────────────────────────────────
+// All /v4/user/cards endpoints require Firebase JWT (set by interceptor).
 // Only the authenticated user can access their own cards.
 
 /**
  * Add a card to the user's portfolio.
- * POST /v3/user/cards
+ * POST /v4/user/cards
  */
 export const addUserCard = async (cardData) => {
     try {
-        const response = await api.post('/v3/user/cards', cardData);
+        const response = await api.post('/v4/user/cards', cardData);
         return response.data;
     } catch (error) {
         return handleApiError(error);
@@ -497,11 +513,11 @@ export const addUserCard = async (cardData) => {
 /**
  * Update an existing card in the user's portfolio.
  * Matches on (bank + cardName + country), updates the rest.
- * PATCH /v3/user/cards
+ * PATCH /v4/user/cards
  */
 export const updateUserCard = async (cardData) => {
     try {
-        const response = await api.patch('/v3/user/cards', cardData);
+        const response = await api.patch('/v4/user/cards', cardData);
         return response.data;
     } catch (error) {
         return handleApiError(error);
@@ -510,11 +526,11 @@ export const updateUserCard = async (cardData) => {
 
 /**
  * Remove a card from the user's portfolio.
- * DELETE /v3/user/cards
+ * DELETE /v4/user/cards
  */
 export const deleteUserCard = async ({ bank, cardName, country }) => {
     try {
-        const response = await api.delete('/v3/user/cards', {
+        const response = await api.delete('/v4/user/cards', {
             data: { bank, cardName, country },
         });
         return response.data;
@@ -525,13 +541,13 @@ export const deleteUserCard = async ({ bank, cardName, country }) => {
 
 /**
  * Get all cards for the authenticated user.
- * GET /v3/user/cards?country=xx  (country is optional)
+ * GET /v4/user/cards?country=xx  (country is optional)
  */
 export const getUserCards = async (country) => {
     try {
         const url = country
-            ? `/v3/user/cards?country=${encodeURIComponent(country)}`
-            : '/v3/user/cards';
+            ? `/v4/user/cards?country=${encodeURIComponent(country)}`
+            : '/v4/user/cards';
         const response = await api.get(url);
         return response.data;
     } catch (error) {
@@ -542,11 +558,11 @@ export const getUserCards = async (country) => {
 /**
  * Bulk sync (full replace) cards for the authenticated user.
  * Intended for Firestore-to-D1 migration, not day-to-day use.
- * PUT /v3/user/cards
+ * PUT /v4/user/cards
  */
 export const bulkSyncUserCards = async ({ cards, country }) => {
     try {
-        const response = await api.put('/v3/user/cards', { cards, country });
+        const response = await api.put('/v4/user/cards', { cards, country });
         return response.data;
     } catch (error) {
         return handleApiError(error);

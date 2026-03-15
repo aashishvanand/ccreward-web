@@ -49,7 +49,9 @@ import debounce from "lodash/debounce";
 import groupBy from "lodash/groupBy";
 import { useRegion } from "@/core/providers/RegionContext";
 import { motion } from "framer-motion";
-import { getCurrencySymbol } from "@/core/utils";
+import { getCurrencySymbol, getNativeCurrency } from "@/core/utils";
+import CurrencyPicker from "@/shared/components/ui/CurrencyPicker";
+import CurrencyConversionInfo from "@/shared/components/ui/CurrencyConversionInfo";
 
 // Add analytics imports
 import {
@@ -113,6 +115,7 @@ const BestCardCalculator = () => {
   const [userCards, setUserCards] = useState([]);
   const [selectedMcc, setSelectedMcc] = useState(null);
   const [spentAmount, setSpentAmount] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState(getNativeCurrency(region));
   const [isLoading, setIsLoading] = useState(false);
   const [isCalculated, setIsCalculated] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -136,6 +139,7 @@ const BestCardCalculator = () => {
   const [rankingByValue, setRankingByValue] = useState([]);
   const [rankingByMiles, setRankingByMiles] = useState([]);
   const [isLoadingMcc, setIsLoadingMcc] = useState(false);
+  const [currencyConversion, setCurrencyConversion] = useState(null);
 
   const currentRanking =
     sortMethod === "points"
@@ -409,6 +413,7 @@ const BestCardCalculator = () => {
       cards,
       mcc: selectedMcc ? selectedMcc.mcc : null,
       amount: parseFloat(spentAmount),
+      currency: selectedCurrency,
       answers,
     };
 
@@ -452,6 +457,7 @@ const BestCardCalculator = () => {
       setPointsRanking(response.rankingByPoints);
       setRankingByValue(response.rankingByValue);
       setRankingByMiles(response.rankingByMiles);
+      setCurrencyConversion(response.currencyConversion || null);
       setIsCalculated(true);
       setLastCalculationParams(calculationParams);
 
@@ -512,6 +518,7 @@ const BestCardCalculator = () => {
     spentAmount,
     userCards,
     selectedMcc,
+    selectedCurrency,
     additionalInputs,
     lastCalculationParams,
     hasCalculated,
@@ -742,6 +749,15 @@ const BestCardCalculator = () => {
                 }
               />
 
+              <CurrencyPicker
+                value={selectedCurrency}
+                onChange={(val) => {
+                  setSelectedCurrency(val);
+                  trackFieldInteraction("currency", "select");
+                }}
+                disabled={isLoading}
+              />
+
               <TextField
                 fullWidth
                 label="Spent Amount"
@@ -756,7 +772,7 @@ const BestCardCalculator = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      {getCurrencySymbol()}
+                      {getCurrencySymbol(selectedCurrency)}
                     </InputAdornment>
                   ),
                   endAdornment: spentAmount && (
@@ -857,11 +873,13 @@ const BestCardCalculator = () => {
                     onClick={() => {
                       setSelectedMcc(null);
                       setSpentAmount("");
+                      setSelectedCurrency(getNativeCurrency(region));
                       setAdditionalInputs({});
                       setIsCalculated(false);
                       setPointsRanking([]);
                       setRankingByValue([]);
                       setRankingByMiles([]);
+                      setCurrencyConversion(null);
                       setLastCalculationParams(null);
                       setMccInputValue("");
                     }}
@@ -886,13 +904,19 @@ const BestCardCalculator = () => {
                       Ranking by Points/Cashback
                     </ToggleButton>
                     <ToggleButton value="value" aria-label="sort by value">
-                      Ranking by Value ({getCurrencySymbol()})
+                      Ranking by Value ({getCurrencySymbol(region)})
                     </ToggleButton>
                     <ToggleButton value="miles" aria-label="sort by miles">
                       Ranking by Miles
                     </ToggleButton>
                   </ToggleButtonGroup>
                 </Box>
+              )}
+
+              {isCalculated && currencyConversion && (
+                <CurrencyConversionInfo
+                  currencyConversion={currencyConversion}
+                />
               )}
 
               <List sx={{ width: "100%" }}>

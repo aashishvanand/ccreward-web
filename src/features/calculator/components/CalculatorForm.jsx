@@ -14,12 +14,14 @@ import {
 } from "@mui/material";
 import { Clear } from "@mui/icons-material";
 import DynamicCardInputs from "@/shared/components/ui/DynamicCardInputs";
+import CurrencyPicker from "@/shared/components/ui/CurrencyPicker";
 import {
   fetchBanks,
   fetchCards,
   fetchMCC,
   fetchCardQuestions,
 } from "@/core/services/api";
+import { getCurrencySymbol } from "@/core/utils/currency";
 import debounce from "lodash/debounce";
 import PropTypes from "prop-types";
 import { useRouter } from "next/router";
@@ -30,11 +32,13 @@ const CalculatorForm = ({
   selectedCard,
   selectedMcc,
   spentAmount,
+  selectedCurrency,
   additionalInputs,
   onBankChange,
   onCardChange,
   onMccChange,
   onSpentAmountChange,
+  onCurrencyChange,
   onAdditionalInputChange,
   onCalculate,
   onClear,
@@ -251,17 +255,6 @@ const CalculatorForm = ({
     }
   };
 
-  const getCurrencySymbol = () => {
-    switch (region) {
-      case "SG":
-        return "S$";
-      case "IN":
-        return "₹";
-      default:
-        return "$";
-    }
-  };
-
   const debouncedFetchMCC = useCallback(
     debounce(async (value) => {
       if (!isInitialized) return; // Skip if region not initialized
@@ -448,6 +441,11 @@ const CalculatorForm = ({
             : "No options found"
         }
       />
+      <CurrencyPicker
+        value={selectedCurrency}
+        onChange={onCurrencyChange}
+        disabled={isCalculating}
+      />
       <TextField
         fullWidth
         label="Spent Amount"
@@ -463,7 +461,7 @@ const CalculatorForm = ({
           input: {
             startAdornment: (
               <InputAdornment position="start">
-                {getCurrencySymbol(region)}
+                {getCurrencySymbol(selectedCurrency)}
               </InputAdornment>
             ),
             endAdornment: spentAmount && (
@@ -532,11 +530,13 @@ CalculatorForm.propTypes = {
     name: PropTypes.string,
   }),
   spentAmount: PropTypes.string,
+  selectedCurrency: PropTypes.string,
   additionalInputs: PropTypes.object,
   onBankChange: PropTypes.func.isRequired,
   onCardChange: PropTypes.func.isRequired,
   onMccChange: PropTypes.func.isRequired,
   onSpentAmountChange: PropTypes.func.isRequired,
+  onCurrencyChange: PropTypes.func.isRequired,
   onAdditionalInputChange: PropTypes.func.isRequired,
   onCalculate: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
