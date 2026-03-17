@@ -2,6 +2,7 @@ import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import { jwtDecode } from "jwt-decode";
 import { getTurnstileToken } from './turnstile';
+import { updateFromResponseHeaders } from './usageLimitService';
 
 // Firebase auth is dynamically imported to reduce initial bundle size
 let _authModule = null;
@@ -181,13 +182,28 @@ api.interceptors.request.use(async (config) => {
         }
     }
 
-    // Ensure URL has versioning
-    if (!config.url.startsWith('/v2/') && !config.url.startsWith('/v3/')) {
-        config.url = `/v2${config.url}`;
+    // Ensure URL has versioning — all endpoints now use v4
+    if (!config.url.startsWith('/v4/')) {
+        config.url = `/v4${config.url}`;
     }
 
     return config;
 }, (error) => Promise.reject(error));
+
+// Response interceptor: extract usage limit headers from every response
+api.interceptors.response.use(
+  (response) => {
+    updateFromResponseHeaders(response.headers);
+    return response;
+  },
+  (error) => {
+    // Also read headers from error responses (e.g. 429)
+    if (error.response?.headers) {
+      updateFromResponseHeaders(error.response.headers);
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Handle API errors
 const handleApiError = (error) => {
@@ -197,7 +213,34 @@ const handleApiError = (error) => {
         throw new Error("Request timed out. Please check your internet connection and try again.");
     }
 
+    // Currency-specific errors from v4 API
+    if (error.response && error.response.status === 400) {
+        const body = error.response.data;
+        const code = body?.code || body?.error;
+        if (code === 'UNSUPPORTED_CURRENCY') {
+            throw new Error("Unsupported currency. Please select a valid currency and try again.");
+        }
+    }
+
+    if (error.response && error.response.status === 503) {
+        const body = error.response.data;
+        const code = body?.code || body?.error;
+        if (code === 'EXCHANGE_RATES_UNAVAILABLE') {
+            throw new Error("Exchange rates are temporarily unavailable. Please try again later or use your local currency.");
+        }
+    }
+
     if (error.response && error.response.status === 429) {
+        const body = error.response.data;
+        const message = body?.message || body?.error || '';
+        if (typeof message === 'string' && message.toLowerCase().includes('daily limit')) {
+            throw new Error("Daily limit reached. Please use the CCReward app for more.");
+        }
+        const limit = body?.limit;
+        const period = body?.period;
+        if (limit && period) {
+            throw new Error(`Too many requests. Limited to ${limit} per ${period}.`);
+        }
         throw new Error("You've made too many requests. Please take a coffee break and try again later.");
     }
 
@@ -392,8 +435,7 @@ export const calculateTransferPartners = async (data) => {
     }
 
     try {
-        // Use v3 endpoint as requested
-        const response = await authenticatedRequest('post', '/v3/transfer', data);
+        const response = await authenticatedRequest('post', '/v4/transfer', data);
         return response;
     } catch (error) {
         // If error is about region not being initialized, throw specific error
@@ -426,7 +468,7 @@ export const fetchCardDetails = async (bank, card, country) => {
     const cacheKey = `card_detail_${bank}_${encodedCard}_${region}`;
 
     return fetchWithCache(cacheKey, async () => {
-        const response = await api.get(`/v3/card/detail?bank=${bank}&card=${encodedCard}&country=${region}`);
+        const response = await api.get(`/v4/card/detail?bank=${bank}&card=${encodedCard}&country=${region}`);
         return response.data;
     });
 };
@@ -446,9 +488,85 @@ export const fetchCardGoals = async (bank, card, country) => {
     const cacheKey = `card_goals_${bank}_${encodedCard}_${region}`;
 
     return fetchWithCache(cacheKey, async () => {
-        const response = await api.get(`/v3/goals?bank=${bank}&card=${encodedCard}&country=${region}`);
+        const response = await api.get(`/v4/goals?bank=${bank}&card=${encodedCard}&country=${region}`);
         return response.data;
     });
+};
+
+// ─── User Cards (v4) ────────────────────────────────────────────────
+// All /v4/user/cards endpoints require Firebase JWT (set by interceptor).
+// Only the authenticated user can access their own cards.
+
+/**
+ * Add a card to the user's portfolio.
+ * POST /v4/user/cards
+ */
+export const addUserCard = async (cardData) => {
+    try {
+        const response = await api.post('/v4/user/cards', cardData);
+        return response.data;
+    } catch (error) {
+        return handleApiError(error);
+    }
+};
+
+/**
+ * Update an existing card in the user's portfolio.
+ * Matches on (bank + cardName + country), updates the rest.
+ * PATCH /v4/user/cards
+ */
+export const updateUserCard = async (cardData) => {
+    try {
+        const response = await api.patch('/v4/user/cards', cardData);
+        return response.data;
+    } catch (error) {
+        return handleApiError(error);
+    }
+};
+
+/**
+ * Remove a card from the user's portfolio.
+ * DELETE /v4/user/cards
+ */
+export const deleteUserCard = async ({ bank, cardName, country }) => {
+    try {
+        const response = await api.delete('/v4/user/cards', {
+            data: { bank, cardName, country },
+        });
+        return response.data;
+    } catch (error) {
+        return handleApiError(error);
+    }
+};
+
+/**
+ * Get all cards for the authenticated user.
+ * GET /v4/user/cards?country=xx  (country is optional)
+ */
+export const getUserCards = async (country) => {
+    try {
+        const url = country
+            ? `/v4/user/cards?country=${encodeURIComponent(country)}`
+            : '/v4/user/cards';
+        const response = await api.get(url);
+        return response.data;
+    } catch (error) {
+        return handleApiError(error);
+    }
+};
+
+/**
+ * Bulk sync (full replace) cards for the authenticated user.
+ * Intended for Firestore-to-D1 migration, not day-to-day use.
+ * PUT /v4/user/cards
+ */
+export const bulkSyncUserCards = async ({ cards, country }) => {
+    try {
+        const response = await api.put('/v4/user/cards', { cards, country });
+        return response.data;
+    } catch (error) {
+        return handleApiError(error);
+    }
 };
 
 // Export the API instance

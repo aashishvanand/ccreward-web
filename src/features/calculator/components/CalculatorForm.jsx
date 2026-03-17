@@ -8,12 +8,10 @@ import {
   CircularProgress,
   Stack,
   useTheme,
-  InputAdornment,
   Alert,
-  IconButton,
 } from "@mui/material";
-import { Clear } from "@mui/icons-material";
 import DynamicCardInputs from "@/shared/components/ui/DynamicCardInputs";
+import CurrencyAmountField from "@/shared/components/ui/CurrencyAmountField";
 import {
   fetchBanks,
   fetchCards,
@@ -30,11 +28,13 @@ const CalculatorForm = ({
   selectedCard,
   selectedMcc,
   spentAmount,
+  selectedCurrency,
   additionalInputs,
   onBankChange,
   onCardChange,
   onMccChange,
   onSpentAmountChange,
+  onCurrencyChange,
   onAdditionalInputChange,
   onCalculate,
   onClear,
@@ -251,17 +251,6 @@ const CalculatorForm = ({
     }
   };
 
-  const getCurrencySymbol = () => {
-    switch (region) {
-      case "SG":
-        return "S$";
-      case "IN":
-        return "₹";
-      default:
-        return "$";
-    }
-  };
-
   const debouncedFetchMCC = useCallback(
     debounce(async (value) => {
       if (!isInitialized) return; // Skip if region not initialized
@@ -448,42 +437,12 @@ const CalculatorForm = ({
             : "No options found"
         }
       />
-      <TextField
-        fullWidth
-        label="Spent Amount"
-        type="number"
-        value={spentAmount}
-        onChange={(e) => {
-          // Prevent negative numbers and ensure minimum of 1
-          const value = Math.max(1, Number(e.target.value));
-          onSpentAmountChange(value.toString());
-        }}
-        required
-        slotProps={{
-          input: {
-            startAdornment: (
-              <InputAdornment position="start">
-                {getCurrencySymbol(region)}
-              </InputAdornment>
-            ),
-            endAdornment: spentAmount && (
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="clear spent amount"
-                  onClick={() => onSpentAmountChange("")}
-                  edge="end"
-                  size="small"
-                >
-                  <Clear />
-                </IconButton>
-              </InputAdornment>
-            ),
-            inputProps: {
-              min: 1,
-              step: 1,
-            },
-          },
-        }}
+      <CurrencyAmountField
+        currency={selectedCurrency}
+        onCurrencyChange={onCurrencyChange}
+        amount={spentAmount}
+        onAmountChange={onSpentAmountChange}
+        disabled={isCalculating}
       />
       {isLoadingQuestions ? (
         <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
@@ -532,11 +491,13 @@ CalculatorForm.propTypes = {
     name: PropTypes.string,
   }),
   spentAmount: PropTypes.string,
+  selectedCurrency: PropTypes.string,
   additionalInputs: PropTypes.object,
   onBankChange: PropTypes.func.isRequired,
   onCardChange: PropTypes.func.isRequired,
   onMccChange: PropTypes.func.isRequired,
   onSpentAmountChange: PropTypes.func.isRequired,
+  onCurrencyChange: PropTypes.func.isRequired,
   onAdditionalInputChange: PropTypes.func.isRequired,
   onCalculate: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,

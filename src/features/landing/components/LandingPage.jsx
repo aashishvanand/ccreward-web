@@ -67,6 +67,7 @@ const LandingPage = () => {
   const router = useRouter();
   const {
     signInWithGoogle,
+    signInWithApple,
     user,
     isAuthenticated,
     loading,
@@ -329,7 +330,7 @@ const LandingPage = () => {
   
   // Enhanced sign-in handler with analytics tracking for user actions
   const handleSignIn = async (signInMethod) => {
-    const signInMethodName = "google";
+    const signInMethodName = signInMethod === signInWithApple ? "apple" : "google";
 
     trackButtonClick("sign_in_attempt", {
       method: signInMethodName,
@@ -534,6 +535,7 @@ const LandingPage = () => {
             isAuthenticated={isAuthenticated()}
             loading={loading}
             signInWithGoogle={signInWithGoogle}
+            signInWithApple={signInWithApple}
           />
         )}
       </Box>
@@ -736,6 +738,7 @@ const DesktopView = ({
   isAuthenticated,
   loading,
   signInWithGoogle,
+  signInWithApple,
   visibleTweets,
   handlePrevPage,
   handleNextPage,
@@ -788,6 +791,7 @@ const DesktopView = ({
             isAuthenticated={isAuthenticated}
             loading={loading}
             signInWithGoogle={signInWithGoogle}
+            signInWithApple={signInWithApple}
           />
         </Box>
 

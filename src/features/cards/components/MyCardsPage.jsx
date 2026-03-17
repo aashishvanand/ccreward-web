@@ -19,6 +19,11 @@ import {
   deleteCardForUser,
   updateCardForUser,
 } from "@/core/services/firebaseUtils";
+import {
+  addUserCard,
+  updateUserCard,
+  deleteUserCard,
+} from "@/core/services/api";
 import { notifyCardUpdate } from "@/core/utils/events";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
@@ -271,7 +276,27 @@ function MyCardsPage() {
     update_type: "details",
   });
   try {
-    await updateCardForUser(user.uid, updatedCard);
+    // Write to Firestore and CF API in parallel; Firestore is source of truth
+    const country = updatedCard.country || localStorage.getItem('app-region')?.toLowerCase() || 'in';
+    const apiPayload = {
+      bank: updatedCard.bank,
+      cardName: updatedCard.cardName,
+      country,
+      ...(updatedCard.network !== undefined && { network: updatedCard.network }),
+      ...(updatedCard.lastFourDigits !== undefined && { lastFourDigits: updatedCard.lastFourDigits }),
+      ...(updatedCard.billingDate !== undefined && { billingDate: updatedCard.billingDate }),
+      ...(updatedCard.limit !== undefined && { limit: updatedCard.limit }),
+      ...(updatedCard.since !== undefined && { since: updatedCard.since }),
+    };
+    const [firestoreResult] = await Promise.allSettled([
+      updateCardForUser(user.uid, updatedCard),
+      updateUserCard(apiPayload).catch((err) => {
+        console.warn('CF API updateUserCard failed (non-critical):', err);
+      }),
+    ]);
+    if (firestoreResult.status === 'rejected') {
+      throw firestoreResult.reason;
+    }
     setCards((prevCards) =>
       prevCards.map((card) =>
         card.id === updatedCard.id ? updatedCard : card
@@ -331,7 +356,28 @@ function MyCardsPage() {
       showAlert("This card is already in your collection.", "info");
       return;
     }
-    await addCardForUser(user.uid, newCard);
+    // Write to Firestore and CF API in parallel; Firestore is source of truth
+    const country = localStorage.getItem('app-region')?.toLowerCase() || 'in';
+    const apiPayload = {
+      bank: newCard.bank,
+      cardName: newCard.cardName,
+      country,
+      ...(newCard.network && { network: newCard.network }),
+      ...(newCard.billingDate && { billingDate: newCard.billingDate }),
+      ...(newCard.limit && { limit: newCard.limit }),
+      ...(newCard.since && { since: newCard.since }),
+      addedAt: new Date().toISOString(),
+    };
+    const [firestoreResult] = await Promise.allSettled([
+      addCardForUser(user.uid, newCard),
+      addUserCard(apiPayload).catch((err) => {
+        console.warn('CF API addUserCard failed (non-critical):', err);
+      }),
+    ]);
+    // If Firestore write failed, surface the error
+    if (firestoreResult.status === 'rejected') {
+      throw firestoreResult.reason;
+    }
     await fetchUserCards();
     notifyCardUpdate();
     trackConversion("card_added", 1);
@@ -397,7 +443,17 @@ function MyCardsPage() {
     });
     try {
       const cardKey = `${bank}_${cardName}`;
-      await deleteCardForUser(user.uid, cardKey);
+      const country = localStorage.getItem('app-region')?.toLowerCase() || 'in';
+      // Write to Firestore and CF API in parallel; Firestore is source of truth
+      const [firestoreResult] = await Promise.allSettled([
+        deleteCardForUser(user.uid, cardKey),
+        deleteUserCard({ bank, cardName, country }).catch((err) => {
+          console.warn('CF API deleteUserCard failed (non-critical):', err);
+        }),
+      ]);
+      if (firestoreResult.status === 'rejected') {
+        throw firestoreResult.reason;
+      }
       setCards((prevCards) =>
         prevCards.filter(
           (card) => card.bank !== bank || card.cardName !== cardName

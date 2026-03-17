@@ -3,11 +3,11 @@ import { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Typography,
-  TextField,
   Button,
   CircularProgress,
   Container,
   Autocomplete,
+  TextField,
   List,
   Alert,
   ToggleButton,
@@ -20,13 +20,11 @@ import {
   Divider,
   Stack,
   useTheme,
-  InputAdornment,
-  Paper, // Added Paper
+  Paper,
 } from "@mui/material";
 import {
   Info as InfoIcon,
   ExpandMore as ExpandMoreIcon,
-  Clear as ClearIcon,
 } from "@mui/icons-material";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
@@ -42,11 +40,16 @@ import {
   calculateBestCard,
   fetchMCC,
 } from "@/core/services/api";
+import useUsageLimit from "@/core/hooks/useUsageLimit";
+import { RateLimitedFeature } from "@/core/services/usageLimitService";
+import UsageRemainingBadge from "@/shared/components/ui/UsageRemainingBadge";
 import debounce from "lodash/debounce";
 import groupBy from "lodash/groupBy";
 import { useRegion } from "@/core/providers/RegionContext";
 import { motion } from "framer-motion";
-import { getCurrencySymbol } from "@/core/utils";
+import { getCurrencySymbol, getNativeCurrency } from "@/core/utils";
+import CurrencyAmountField from "@/shared/components/ui/CurrencyAmountField";
+import CurrencyConversionInfo from "@/shared/components/ui/CurrencyConversionInfo";
 
 // Add analytics imports
 import {
@@ -104,9 +107,13 @@ const BestCardCalculator = () => {
   const { trackComponentError, trackComponentInteraction } =
     useComponentAnalytics("BestCardCalculator");
 
+  const { remaining, limit, canUse, onSuccess: recordUsage, limitMessage } =
+    useUsageLimit(RateLimitedFeature.BEST_CARD);
+
   const [userCards, setUserCards] = useState([]);
   const [selectedMcc, setSelectedMcc] = useState(null);
   const [spentAmount, setSpentAmount] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState(getNativeCurrency(region));
   const [isLoading, setIsLoading] = useState(false);
   const [isCalculated, setIsCalculated] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -130,6 +137,7 @@ const BestCardCalculator = () => {
   const [rankingByValue, setRankingByValue] = useState([]);
   const [rankingByMiles, setRankingByMiles] = useState([]);
   const [isLoadingMcc, setIsLoadingMcc] = useState(false);
+  const [currencyConversion, setCurrencyConversion] = useState(null);
 
   const currentRanking =
     sortMethod === "points"
@@ -350,6 +358,16 @@ const BestCardCalculator = () => {
       return;
     }
 
+    // Usage limit guard
+    if (!canUse) {
+      setAlert({
+        open: true,
+        message: limitMessage,
+        severity: "warning",
+      });
+      return;
+    }
+
     trackButtonClick("calculate_best_card", {
       cards_count: userCards.length,
       has_mcc: !!selectedMcc,
@@ -393,6 +411,7 @@ const BestCardCalculator = () => {
       cards,
       mcc: selectedMcc ? selectedMcc.mcc : null,
       amount: parseFloat(spentAmount),
+      currency: selectedCurrency,
       answers,
     };
 
@@ -430,9 +449,13 @@ const BestCardCalculator = () => {
 
       const calculationDuration = performance.now() - startTime;
 
+      // Optimistic local decrement; backend is the source of truth
+      recordUsage();
+
       setPointsRanking(response.rankingByPoints);
       setRankingByValue(response.rankingByValue);
       setRankingByMiles(response.rankingByMiles);
+      setCurrencyConversion(response.currencyConversion || null);
       setIsCalculated(true);
       setLastCalculationParams(calculationParams);
 
@@ -493,6 +516,7 @@ const BestCardCalculator = () => {
     spentAmount,
     userCards,
     selectedMcc,
+    selectedCurrency,
     additionalInputs,
     lastCalculationParams,
     hasCalculated,
@@ -507,6 +531,9 @@ const BestCardCalculator = () => {
     trackAPICall,
     recordCustomMetric,
     user,
+    canUse,
+    limitMessage,
+    recordUsage,
   ]);
 
   const handleCalculationError = (error) => {
@@ -651,6 +678,11 @@ const BestCardCalculator = () => {
             elevation={2}
             sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2 }}
           >
+            {user && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+                <UsageRemainingBadge remaining={remaining} limit={limit} />
+              </Box>
+            )}
             <Stack spacing={3}>
               <Autocomplete
                 options={mccOptions}
@@ -715,43 +747,18 @@ const BestCardCalculator = () => {
                 }
               />
 
-              <TextField
-                fullWidth
-                label="Spent Amount"
-                type="number"
-                value={spentAmount}
-                onChange={(e) => {
-                  const value = Math.max(1, Number(e.target.value));
-                  setSpentAmount(value.toString());
-                  trackFieldInteraction("spent_amount", "input");
+              <CurrencyAmountField
+                currency={selectedCurrency}
+                onCurrencyChange={(val) => {
+                  setSelectedCurrency(val);
+                  trackFieldInteraction("currency", "select");
                 }}
-                required
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      {getCurrencySymbol()}
-                    </InputAdornment>
-                  ),
-                  endAdornment: spentAmount && (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="clear spent amount"
-                        onClick={() => {
-                          setSpentAmount("");
-                          trackFieldInteraction("spent_amount", "clear");
-                        }}
-                        edge="end"
-                        size="small"
-                      >
-                        <ClearIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                  inputProps: {
-                    min: 1,
-                    step: 1,
-                  },
+                amount={spentAmount}
+                onAmountChange={(val) => {
+                  setSpentAmount(val);
+                  if (val) trackFieldInteraction("spent_amount", "input");
                 }}
+                disabled={isLoading}
               />
 
               <Accordion
@@ -830,11 +837,13 @@ const BestCardCalculator = () => {
                     onClick={() => {
                       setSelectedMcc(null);
                       setSpentAmount("");
+                      setSelectedCurrency(getNativeCurrency(region));
                       setAdditionalInputs({});
                       setIsCalculated(false);
                       setPointsRanking([]);
                       setRankingByValue([]);
                       setRankingByMiles([]);
+                      setCurrencyConversion(null);
                       setLastCalculationParams(null);
                       setMccInputValue("");
                     }}
@@ -859,13 +868,19 @@ const BestCardCalculator = () => {
                       Ranking by Points/Cashback
                     </ToggleButton>
                     <ToggleButton value="value" aria-label="sort by value">
-                      Ranking by Value ({getCurrencySymbol()})
+                      Ranking by Value ({getCurrencySymbol(region)})
                     </ToggleButton>
                     <ToggleButton value="miles" aria-label="sort by miles">
                       Ranking by Miles
                     </ToggleButton>
                   </ToggleButtonGroup>
                 </Box>
+              )}
+
+              {isCalculated && currencyConversion && (
+                <CurrencyConversionInfo
+                  currencyConversion={currencyConversion}
+                />
               )}
 
               <List sx={{ width: "100%" }}>

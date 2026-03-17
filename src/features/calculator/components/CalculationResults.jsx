@@ -12,6 +12,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { motion, AnimatePresence } from "framer-motion";
+import CurrencyConversionInfo from "@/shared/components/ui/CurrencyConversionInfo";
 
 const CalculationResults = ({ result, isLoading }) => {
   const [expanded, setExpanded] = useState(false);
@@ -245,6 +246,14 @@ const CalculationResults = ({ result, isLoading }) => {
                   </Tooltip>
                 )}
               </Box>
+
+              {result?.currencyConversion && (
+                <Box sx={{ mt: 1 }}>
+                  <CurrencyConversionInfo
+                    currencyConversion={result.currencyConversion}
+                  />
+                </Box>
+              )}
             </>
           )}
         </Paper>

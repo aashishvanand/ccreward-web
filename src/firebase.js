@@ -30,26 +30,30 @@ if (!getApps().length) {
 // Lazy-loaded auth and provider instances (ESM live bindings)
 export let auth = null;
 export let googleProvider = null;
+export let appleProvider = null;
 let _authInitPromise = null;
 
 /**
- * Get auth and googleProvider instances. Initializes firebase/auth on first
+ * Get auth and provider instances. Initializes firebase/auth on first
  * call, then caches the result.
  *
  * Bot protection is handled by Cloudflare Turnstile (see core/services/turnstile.js)
  * instead of Firebase App Check, since the API backend runs on Cloudflare Workers.
  *
- * @returns {Promise<{auth: import('firebase/auth').Auth, googleProvider: import('firebase/auth').GoogleAuthProvider}>}
+ * @returns {Promise<{auth: import('firebase/auth').Auth, googleProvider: import('firebase/auth').GoogleAuthProvider, appleProvider: import('firebase/auth').OAuthProvider}>}
  */
 export const getFirebaseAuth = () => {
-    if (auth) return Promise.resolve({ auth, googleProvider });
+    if (auth) return Promise.resolve({ auth, googleProvider, appleProvider });
 
     if (!_authInitPromise) {
         _authInitPromise = (async () => {
-            const { getAuth, GoogleAuthProvider } = await import('firebase/auth');
+            const { getAuth, GoogleAuthProvider, OAuthProvider } = await import('firebase/auth');
             auth = getAuth(app);
             googleProvider = new GoogleAuthProvider();
-            return { auth, googleProvider };
+            appleProvider = new OAuthProvider('apple.com');
+            appleProvider.addScope('email');
+            appleProvider.addScope('name');
+            return { auth, googleProvider, appleProvider };
         })();
     }
 

@@ -4,12 +4,10 @@ import {
   Container,
   Grid,
   Typography,
-  Button,
-  Stack,
-  CircularProgress,
   useTheme,
 } from "@mui/material";
 import HeroCard from "./HeroCard";
+import SignInButtons from "@/shared/components/auth/SignInButtons";
 
 const HeroSection = ({
   cardImages,
@@ -21,6 +19,7 @@ const HeroSection = ({
   isAuthenticated,
   loading,
   signInWithGoogle,
+  signInWithApple,
 }) => {
   const theme = useTheme();
 
@@ -83,27 +82,15 @@ const HeroSection = ({
               for your spending habits.
             </Typography>
             {!loading && !isAuthenticated && (
-              <Stack
-                direction={{ xs: "column", sm: "row" }}
-                spacing={2}
-                sx={{ mt: 4 }}
-              >
-                <Button
-                  variant="contained"
+              <Box sx={{ mt: 4, maxWidth: 320 }}>
+                <SignInButtons
+                  onGoogleSignIn={() => handleSignIn(signInWithGoogle)}
+                  onAppleSignIn={() => handleSignIn(signInWithApple)}
+                  isLoading={isLoading}
+                  fullWidth
                   size="large"
-                  onClick={() => handleSignIn(signInWithGoogle)}
-                  disabled={isLoading}
-                  startIcon={isLoading ? <CircularProgress size={20} /> : null}
-                  sx={{
-                    height: 48,
-                    px: 4,
-                    fontSize: "1.125rem",
-                  }}
-                >
-                  Sign in with Google
-                </Button>
-
-              </Stack>
+                />
+              </Box>
             )}
           </Grid>
           <Grid

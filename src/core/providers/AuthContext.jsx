@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { getFirebaseAuth, firebaseApp } from '@/firebase';
 import { deleteUserData } from '../services/firebaseUtils';
+import { resetUsageState } from '../services/usageLimitService';
 import { useRouter } from "next/router";
 import { Box, CircularProgress, Typography, Paper, useTheme } from "@mui/material";
 import { motion } from "framer-motion";
@@ -19,6 +20,7 @@ export function AuthProvider({ children }) {
   const [isNewUser, setIsNewUser] = useState(false);
   const authRef = useRef(null);
   const providerRef = useRef(null);
+  const appleProviderRef = useRef(null);
   const router = useRouter();
   const pathname = router.asPath?.split('?')[0] || '';
   const theme = useTheme ? useTheme() : { zIndex: { modal: 1300 } };
@@ -40,10 +42,11 @@ export function AuthProvider({ children }) {
 
     // Dynamically load firebase/auth, then set up the auth state listener
     (async () => {
-      const { auth, googleProvider } = await getFirebaseAuth();
+      const { auth, googleProvider, appleProvider } = await getFirebaseAuth();
       const { onAuthStateChanged } = await import('firebase/auth');
       authRef.current = auth;
       providerRef.current = googleProvider;
+      appleProviderRef.current = appleProvider;
 
       unsubscribe = onAuthStateChanged(auth, (user) => {
         if (user) {
@@ -52,10 +55,11 @@ export function AuthProvider({ children }) {
           setIsNewUser(isNew);
           // Log sign_up event if it's a new user
           if (isNew && typeof window !== 'undefined') {
+            const signInMethod = user.providerData?.[0]?.providerId === 'apple.com' ? 'apple' : 'google';
             import("firebase/analytics").then(({ getAnalytics, logEvent }) => {
               const analytics = getAnalytics(firebaseApp);
               logEvent(analytics, 'sign_up', {
-                method: 'google',
+                method: signInMethod,
               });
             }).catch(e => console.warn("Analytics error", e));
           }
@@ -112,7 +116,33 @@ export function AuthProvider({ children }) {
     }
   };
 
-
+  const signInWithApple = async () => {
+    try {
+      const { signInWithPopup } = await import('firebase/auth');
+      const result = await signInWithPopup(authRef.current, appleProviderRef.current);
+      if (typeof window !== 'undefined') {
+        const { getAnalytics, logEvent } = await import("firebase/analytics");
+        const analytics = getAnalytics(firebaseApp);
+        logEvent(analytics, 'login', {
+          method: 'apple',
+        });
+      }
+      return result.user;
+    } catch (error) {
+      console.error("Error signing in with Apple", error);
+      if (typeof window !== 'undefined') {
+        try {
+          const { getAnalytics, logEvent } = await import("firebase/analytics");
+          const analytics = getAnalytics(firebaseApp);
+          logEvent(analytics, 'error', {
+            error_code: error.code,
+            error_message: error.message,
+          });
+        } catch (e) { }
+      }
+      throw error;
+    }
+  };
 
   const logout = async () => {
     try {
@@ -126,6 +156,7 @@ export function AuthProvider({ children }) {
       setUser(null);
       setToken(null);
       setIsNewUser(false);
+      resetUsageState();
       if (typeof window !== 'undefined') {
         Object.keys(localStorage).forEach(key => {
           if (key.startsWith('userCardsCache_') ||
@@ -176,6 +207,7 @@ export function AuthProvider({ children }) {
       setUser(null);
       setToken(null);
       setIsNewUser(false);
+      resetUsageState();
 
       if (typeof window !== 'undefined') {
         Object.keys(localStorage).forEach(key => {
@@ -215,6 +247,7 @@ export function AuthProvider({ children }) {
   const value = {
     user,
     signInWithGoogle,
+    signInWithApple,
     logout,
     isAuthenticated,
     loading,
