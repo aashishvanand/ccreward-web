@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verification</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: transparent;
+      color: #333;
+    }
+    .container { text-align: center; padding: 16px; }
+    .spinner {
+      width: 24px; height: 24px;
+      margin: 0 auto 12px;
+      border: 3px solid #e0e0e0;
+      border-top-color: #1976d2;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .status { font-size: 14px; color: #666; }
+    .error { color: #d32f2f; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="spinner" class="spinner"></div>
+    <div id="status" class="status">Verifying...</div>
+    <div id="turnstile-widget"></div>
+  </div>
+
+  <script>
+    /**
+     * Turnstile bridge for mobile apps (iOS/Android).
+     *
+     * This page is loaded inside a WKWebView / WebView from the whitelisted
+     * domain (ccreward.app) so that Cloudflare Turnstile accepts the origin.
+     *
+     * Communication protocol (via postMessage / JS injection):
+     *
+     *   App -> WebView:  Call `requestToken()` to trigger a fresh challenge.
+     *   WebView -> App:  Posts messages via `window.webkit.messageHandlers.turnstile`
+     *                    (iOS) or `TurnstileInterface` (Android) with payloads:
+     *
+     *     { event: "ready" }                  — widget rendered, ready for challenges
+     *     { event: "token", token: "..." }    — challenge solved, token attached
+     *     { event: "error", code: "..." }     — challenge failed
+     *     { event: "expired" }                — token expired (request a new one)
+     *
+     * Query parameters:
+     *   ?sitekey=...   Override the default site key (optional)
+     *   ?theme=light|dark|auto   Widget theme (default: auto)
+     *   ?action=...    Optional Turnstile action tag
+     */
+
+    (function () {
+      'use strict';
+
+      var DEFAULT_SITE_KEY = '0x4AAAAAAAiHL1oxsRX9VAgH';
+      var params = new URLSearchParams(window.location.search);
+      var siteKey = params.get('sitekey') || DEFAULT_SITE_KEY;
+      var theme = params.get('theme') || 'auto';
+      var action = params.get('action') || undefined;
+
+      var widgetId = null;
+      var statusEl = document.getElementById('status');
+      var spinnerEl = document.getElementById('spinner');
+
+      /** Send a message to the native app layer. */
+      function postToApp(payload) {
+        var json = JSON.stringify(payload);
+
+        // iOS: WKWebView message handler
+        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.turnstile) {
+          window.webkit.messageHandlers.turnstile.postMessage(payload);
+        }
+
+        // Android: injected JS interface
+        if (window.TurnstileInterface && typeof window.TurnstileInterface.onMessage === 'function') {
+          window.TurnstileInterface.onMessage(json);
+        }
+
+        // Flutter: postMessage channel
+        if (window.FlutterTurnstile && typeof window.FlutterTurnstile.postMessage === 'function') {
+          window.FlutterTurnstile.postMessage(json);
+        }
+
+        // Generic fallback: dispatch a custom event (useful for debugging)
+        window.dispatchEvent(new CustomEvent('turnstile-message', { detail: payload }));
+      }
+
+      /** Called by the native app to request a fresh token. */
+      window.requestToken = function () {
+        if (widgetId !== null && window.turnstile) {
+          statusEl.textContent = 'Verifying...';
+          statusEl.className = 'status';
+          spinnerEl.className = 'spinner';
+          window.turnstile.reset(widgetId);
+        }
+      };
+
+      /** Turnstile explicit-render onload callback. */
+      window.onTurnstileLoad = function () {
+        var container = document.getElementById('turnstile-widget');
+
+        var opts = {
+          sitekey: siteKey,
+          size: 'invisible',
+          theme: theme,
+          callback: function (token) {
+            spinnerEl.className = 'hidden';
+            statusEl.textContent = 'Verified';
+            statusEl.className = 'status';
+            postToApp({ event: 'token', token: token });
+          },
+          'error-callback': function (code) {
+            spinnerEl.className = 'hidden';
+            statusEl.textContent = 'Verification failed';
+            statusEl.className = 'status error';
+            postToApp({ event: 'error', code: code || 'unknown' });
+          },
+          'expired-callback': function () {
+            postToApp({ event: 'expired' });
+          }
+        };
+
+        if (action) {
+          opts.action = action;
+        }
+
+        widgetId = window.turnstile.render(container, opts);
+        postToApp({ event: 'ready' });
+      };
+
+      // Load the Turnstile API script
+      var script = document.createElement('script');
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad';
+      script.async = true;
+      script.onerror = function () {
+        spinnerEl.className = 'hidden';
+        statusEl.textContent = 'Failed to load verification';
+        statusEl.className = 'status error';
+        postToApp({ event: 'error', code: 'script_load_failed' });
+      };
+      document.head.appendChild(script);
+    })();
+  </script>
+</body>
+</html>
