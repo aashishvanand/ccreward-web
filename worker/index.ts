@@ -57,6 +57,28 @@ export default {
       }, allowedWidths);
     }
 
+    // Turnstile bridge page for mobile apps — override CSP to allow
+    // the Cloudflare Turnstile script (challenges.cloudflare.com).
+    // Static assets are served by Workers Assets which doesn't process
+    // the _headers file, so we intercept and patch the response here.
+    if (url.pathname === "/turnstile.html") {
+      const res = await handler.fetch(request);
+      const patched = new Response(res.body, res);
+      patched.headers.set(
+        "Content-Security-Policy",
+        [
+          "default-src 'self'",
+          "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://static.cloudflareinsights.com",
+          "connect-src 'self' https://challenges.cloudflare.com",
+          "frame-src 'self' https://challenges.cloudflare.com",
+          "style-src 'self' 'unsafe-inline'",
+          "img-src 'self' data:",
+          "font-src 'self' data:",
+        ].join("; ")
+      );
+      return patched;
+    }
+
     // Delegate everything else to vinext
     return handler.fetch(request);
   },
