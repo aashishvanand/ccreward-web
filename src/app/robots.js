@@ -40,9 +40,6 @@ export default async function robots() {
                 '/mcc-lookup',
             ],
         },
-        sitemap: [
-            'https://ccreward.app/sitemap.xml',
-            'https://ccreward.app/llms.txt',
-        ],
+        sitemap: 'https://ccreward.app/sitemap.xml',
     };
 }

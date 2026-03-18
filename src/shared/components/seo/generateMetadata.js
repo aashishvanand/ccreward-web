@@ -6,8 +6,14 @@ export function generateMetadata({
     description = commonMetadata.defaultDescription,
     path = "",
     additionalJsonLd = null,
+    alternateLanguages = null,
 }) {
     const url = `${commonMetadata.baseUrl}${path}`;
+
+    const alternates = { canonical: url };
+    if (alternateLanguages) {
+        alternates.languages = alternateLanguages;
+    }
 
     const metadata = {
         title,
@@ -31,9 +37,7 @@ export function generateMetadata({
             description,
             images: [commonMetadata.defaultOgImage],
         },
-        alternates: {
-            canonical: url,
-        },
+        alternates,
         keywords: commonMetadata.keywords,
         applicationName: "ccreward",
         appleWebApp: {

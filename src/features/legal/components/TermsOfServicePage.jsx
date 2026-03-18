@@ -155,7 +155,7 @@ const TermsOfServicePage = () => {
             <div onFocus={() => handleSectionInteraction("service_description")}>
               <h2>2. Description of Service</h2>
               <p>
-                ccreward is a comprehensive credit card rewards calculator and
+                ccreward is a comprehensive credit card rewards comparison and
                 management tool for users in India and Singapore. The Service
                 allows users to:
               </p>

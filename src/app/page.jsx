@@ -1,8 +1,22 @@
 import HomeClient from './HomeClient';
 
 export const metadata = {
-  title: 'Credit Card Rewards Calculator - Maximize Your Benefits',
-  description: 'Compare, calculate, and choose the best credit card rewards with ccreward. Optimize your spending with our advanced calculator.',
+  title: {
+    absolute: 'ccreward - Maximize Your Credit Card Rewards',
+  },
+  description: 'ccreward helps you compare, calculate, and maximize your credit card rewards. Optimize spending across HDFC, ICICI, SBI, Axis, AMEX and more banks in India and Singapore.',
+  alternates: {
+    canonical: 'https://ccreward.app',
+  },
+  openGraph: {
+    title: 'ccreward - Maximize Your Credit Card Rewards',
+    description: 'ccreward helps you compare, calculate, and maximize your credit card rewards.',
+    url: 'https://ccreward.app',
+  },
+  twitter: {
+    title: 'ccreward - Maximize Your Credit Card Rewards',
+    description: 'ccreward helps you compare, calculate, and maximize your credit card rewards.',
+  },
 };
 
 export default function Home() {
