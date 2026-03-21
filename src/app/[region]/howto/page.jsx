@@ -12,10 +12,14 @@ export async function generateMetadata({ params }) {
   const countryName = region === 'sg' ? 'Singapore' : 'India';
 
   return {
-    title: `How To Guide - ccreward ${countryName}`,
-    description: `Comprehensive guides for using the ccreward app in ${countryName}`,
+    title: `How To Guide - ${countryName}`,
+    description: `Comprehensive guides for using the ccreward app in ${countryName}. Step-by-step tutorials for iOS, Android, and web.`,
     alternates: {
       canonical: `https://ccreward.app/${region}/howto`,
+      languages: {
+        'en-IN': 'https://ccreward.app/in/howto',
+        'en-SG': 'https://ccreward.app/sg/howto',
+      },
     },
   };
 }

@@ -14,14 +14,14 @@ export const baseJsonLd = {
         "@type": "WebSite",
         "url": "https://ccreward.app",
         "name": "ccreward",
-        "description": "A comprehensive credit card rewards calculator for finding the best credit cards and maximizing rewards in India."
+        "description": "ccreward helps you find the best credit cards and maximize rewards in India and Singapore."
       },
       {
         "@type": "SoftwareApplication",
         "name": "ccreward iOS",
         "operatingSystem": "iOS",
         "applicationCategory": "FinanceApplication",
-        "description": "Calculate and maximize your credit card rewards with our comprehensive calculator. Compare cards from major banks in India.",
+        "description": "ccreward helps you calculate and maximize your credit card rewards. Compare cards from major banks in India and Singapore.",
         "downloadUrl": "https://apps.apple.com/in/app/ccreward/id6736835206"
       },
       {
@@ -29,7 +29,7 @@ export const baseJsonLd = {
         "name": "ccreward Android",
         "operatingSystem": "Android",
         "applicationCategory": "FinanceApplication",
-        "description": "Calculate and maximize your credit card rewards with our comprehensive calculator. Compare cards from major banks in India.",
+        "description": "ccreward helps you calculate and maximize your credit card rewards. Compare cards from major banks in India and Singapore.",
         "downloadUrl": "https://play.google.com/store/apps/details?id=app.ccreward"
       },
       {

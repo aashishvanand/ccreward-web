@@ -1,6 +1,6 @@
 
 import TopCardsPage from '@/features/top-cards/components/TopCardsPage';
-import { generateMetadata as generateMetadataHelper, pageMetadata } from '@/shared/components/seo';
+import { generateMetadata as generateMetadataHelper, pageMetadata, commonMetadata } from '@/shared/components/seo';
 import PerformanceWrapper from '@/shared/components/PerformanceWrapper';
 
 import categoriesIN from '@/data/cardCategories_in.json';
@@ -22,14 +22,18 @@ export async function generateMetadata({ params }) {
     const { region } = await params;
     const countryName = region.toLowerCase() === 'sg' ? 'Singapore' : 'India';
 
-    let title = `Top Credit Cards in ${countryName} - Compare Best Rewards Cards | ccreward`;
+    let title = `Top Credit Cards in ${countryName} - Compare Best Rewards Cards`;
     let description = `Discover and compare the best credit cards in ${countryName}. Find cards with the highest rewards, cashback, and benefits for your spending habits.`;
 
     return generateMetadataHelper({
         ...pageMetadata.topCards,
         title,
         description,
-        path: `/${region}/top-cards`
+        path: `/${region}/top-cards`,
+        alternateLanguages: {
+            'en-IN': `${commonMetadata.baseUrl}/in/top-cards`,
+            'en-SG': `${commonMetadata.baseUrl}/sg/top-cards`,
+        },
     });
 }
 

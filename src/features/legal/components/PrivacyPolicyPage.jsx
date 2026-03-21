@@ -206,7 +206,7 @@ const PrivacyPolicyPage = () => {
               <ul>
                 <li>
                   <strong>Service Provision:</strong> To provide the core
-                  functionality of the credit card rewards calculator and card
+                  functionality of ccreward and its card
                   management tools.
                 </li>
                 <li>

@@ -1,6 +1,6 @@
 
 import TopCardsPage from '@/features/top-cards/components/TopCardsPage';
-import { generateMetadata as generateMetadataHelper, pageMetadata } from '@/shared/components/seo';
+import { generateMetadata as generateMetadataHelper, pageMetadata, commonMetadata } from '@/shared/components/seo';
 import PerformanceWrapper from '@/shared/components/PerformanceWrapper';
 
 import categoriesIN from '@/data/cardCategories_in.json';
@@ -48,14 +48,18 @@ export async function generateMetadata({ params }) {
     const countryName = region.toLowerCase() === 'sg' ? 'Singapore' : 'India';
     const decodedCategory = decodeURIComponent(category);
 
-    let title = `Best Credit Cards for ${decodedCategory} in ${countryName} - Top Picks ${new Date().getFullYear()} | ccreward`;
+    let title = `Best Credit Cards for ${decodedCategory} in ${countryName} - Top Picks ${new Date().getFullYear()}`;
     let description = `Find the best credit cards for ${decodedCategory} in ${countryName}. Compare top rated cards for ${decodedCategory} spending and maximize your rewards.`;
 
     return generateMetadataHelper({
         ...pageMetadata.topCards,
         title,
         description,
-        path: `/${region}/top-cards/${category}`
+        path: `/${region}/top-cards/${category}`,
+        alternateLanguages: {
+            'en-IN': `${commonMetadata.baseUrl}/in/top-cards/${category}`,
+            'en-SG': `${commonMetadata.baseUrl}/sg/top-cards/${category}`,
+        },
     });
 }
 

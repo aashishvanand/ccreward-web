@@ -66,6 +66,9 @@ const AppStoreSection = ({ isMobile, theme }) => {
   );
 };
 
+const BADGE_HEIGHT = 56;
+const BADGE_WIDTH = 190;
+
 const AppStoreButton = ({ href, imageId, alt }) => (
   <Box
     component="a"
@@ -80,16 +83,21 @@ const AppStoreButton = ({ href, imageId, alt }) => (
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      height: 56,
+      width: BADGE_WIDTH,
+      height: BADGE_HEIGHT,
     }}
   >
     <Image
       src={buildCloudflareImageUrl(imageId, "public")}
       alt={alt}
-      width={180}
-      height={56}
+      width={BADGE_WIDTH}
+      height={BADGE_HEIGHT}
       unoptimized
-      style={{ objectFit: "contain", height: 56, width: "auto" }}
+      style={{
+        objectFit: "contain",
+        width: BADGE_WIDTH,
+        height: BADGE_HEIGHT,
+      }}
     />
   </Box>
 );

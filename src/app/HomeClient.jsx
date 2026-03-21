@@ -13,6 +13,12 @@ const LandingPage = dynamic(() => import('../features/landing/components/Landing
 export default function HomeClient({ region }) {
     // Initialize performance monitoring and analytics on component mount
     useEffect(() => {
+        // Hide SSR content once client component mounts
+        const ssrContent = document.querySelector('[data-ssr-content="region"]');
+        if (ssrContent) {
+            ssrContent.style.display = 'none';
+        }
+
         const initPerformanceMonitoring = async () => {
             try {
                 await initializeAnalytics();

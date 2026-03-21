@@ -42,6 +42,13 @@ const FILES_TO_FETCH = [
     'transfer_hotel_sg.json'
 ];
 
+// Additional files fetched from files CDN (no API key needed).
+// These are optional — if Cloudflare blocks the request, the build continues without them.
+const CDN_FILES_TO_FETCH = [
+    { url: 'https://files.ccreward.app/cardImages_in.json', filename: 'cardImages_in.json' },
+    { url: 'https://files.ccreward.app/cardImages_sg.json', filename: 'cardImages_sg.json' },
+];
+
 if (!API_KEY) {
     console.warn('⚠️ STATIC_DATA_API_KEY is not set. Skipping data fetch.');
     process.exit(0);
@@ -96,6 +103,36 @@ const downloadFile = async (filename) => {
     }
 };
 
+const downloadCdnFile = async ({ url, filename }) => {
+    const filePath = path.join(DATA_DIR, filename);
+
+    try {
+        const response = await axios.get(url, {
+            responseType: 'stream'
+        });
+
+        const writer = fs.createWriteStream(filePath);
+
+        return new Promise((resolve, reject) => {
+            response.data.pipe(writer);
+            writer.on('finish', () => {
+                writer.close();
+                console.log(`✅ Fetched ${filename} (CDN)`);
+                resolve();
+            });
+            writer.on('error', (err) => {
+                writer.close();
+                fs.unlink(filePath, () => { });
+                reject(err);
+            });
+        });
+
+    } catch (error) {
+        // CDN files are optional - don't fail the build
+        console.warn(`⚠️ Could not fetch ${filename} from CDN: ${error.message}`);
+    }
+};
+
 async function fetchAll() {
     console.log('🚀 Starting static data fetch...');
     try {
@@ -105,6 +142,13 @@ async function fetchAll() {
             // Small delay to be polite
             await new Promise(r => setTimeout(r, 500));
         }
+
+        // Fetch card images data from CDN (for SSR)
+        for (const cdnFile of CDN_FILES_TO_FETCH) {
+            await downloadCdnFile(cdnFile);
+            await new Promise(r => setTimeout(r, 300));
+        }
+
         console.log('✨ All static data fetched successfully.');
     } catch (error) {
         console.error('❌ Error fetching static data:', error.message);
