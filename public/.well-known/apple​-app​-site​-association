@@ -1,0 +1,51 @@
+{
+    "applinks": {
+        "details": [
+            {
+                "appIDs": [
+                    "3MQ39BXGKV.app.ccreward"
+                ],
+                "components": [
+                    {
+                        "/": "/calculator",
+                        "?": {
+                            "bank": "?*"
+                        },
+                        "comment": "Calculator deep link"
+                    },
+                    {
+                        "/": "/calculator",
+                        "?": {
+                            "mcc": "?*"
+                        },
+                        "comment": "Calculator with MCC"
+                    },
+                    {
+                        "/": "/best-card",
+                        "comment": "Find best card"
+                    },
+                    {
+                        "/": "/mcc-lookup",
+                        "comment": "MCC lookup"
+                    },
+                    {
+                        "/": "/explore",
+                        "comment": "Explore banks/cards"
+                    },
+                    {
+                        "/": "/transfers",
+                        "comment": "Transfer partners"
+                    },
+                    {
+                        "/": "/import-sms",
+                        "comment": "SMS import"
+                    },
+                    {
+                        "/": "/lookup",
+                        "comment": "Merchant lookup"
+                    }
+                ]
+            }
+        ]
+    }
+}

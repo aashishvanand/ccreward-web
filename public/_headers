@@ -38,6 +38,9 @@ Cache-Control: no-cache
 Access-Control-Allow-Origin: *
 X-Robots-Tag: all
 
+# Apple App Site Association
+/.well-known/apple-app-site-association
+  Content-Type: application/json
 
 # CORS headers for API endpoint
 /bank
