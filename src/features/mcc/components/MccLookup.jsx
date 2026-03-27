@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Box, Container, Typography, Button, Paper, Fade, useTheme, alpha } from '@mui/material';
 import { Flag, Search } from '@mui/icons-material';
 import MccSearch from './MccSearch';
@@ -16,6 +16,12 @@ const MccLookup = () => {
     const [hasSearched, setHasSearched] = useState(false);
     const [isReportFormOpen, setIsReportFormOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+
+    // Read mcc URL parameter for deep linking
+    const initialMcc = useMemo(() => {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('mcc') || '';
+    }, []);
 
     const handleSearch = async (query) => {
         setSearchQuery(query);
@@ -56,7 +62,7 @@ const MccLookup = () => {
                     title="MCC Lookup Tool" 
                     subtitle="Search by merchant name to find category codes and industry details."
                 >
-                    <MccSearch onSearch={handleSearch} />
+                    <MccSearch onSearch={handleSearch} initialValue={initialMcc} />
                 </PageHeader>
 
                 <Box sx={{ flex: 1, mb: 6 }}>

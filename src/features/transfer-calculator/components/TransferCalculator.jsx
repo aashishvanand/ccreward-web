@@ -115,6 +115,45 @@ const TransferCalculator = () => {
     trackFormStart();
   }, [trackFeatureUsage, trackFormStart, region]);
 
+  // Handle URL parameters for deep linking
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const bankParam = params.get("bank");
+    const cardParam = params.get("card");
+    const pointsParam = params.get("points");
+
+    if (pointsParam && !points) {
+      const parsed = parseInt(pointsParam, 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        setPoints(parsed.toString());
+      }
+    }
+
+    if (bankParam && !selectedBank) {
+      const applyDeepLinkParams = async () => {
+        try {
+          const fetchedBanks = await fetchBanks();
+          if (fetchedBanks.includes(bankParam)) {
+            setSelectedBank(bankParam);
+
+            if (cardParam) {
+              const fetchedCards = await fetchCards(bankParam);
+              if (fetchedCards.includes(cardParam)) {
+                setCards(fetchedCards);
+                setSelectedCard(cardParam);
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error applying deep link params:", error);
+        }
+      };
+      applyDeepLinkParams();
+    }
+  }, [isInitialized]);
+
   // Load banks when region is initialized
   useEffect(() => {
     const loadBanks = async () => {
