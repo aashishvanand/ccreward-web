@@ -1,12 +1,20 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { TextField, InputAdornment, IconButton, useTheme, alpha } from '@mui/material';
 import { Search, Clear } from '@mui/icons-material';
 import debounce from 'lodash/debounce';
 
-const MccSearch = ({ onSearch, placeholder = "Search by merchant name (e.g., Netflix, Amazon)..." }) => {
+const MccSearch = ({ onSearch, initialValue = '', placeholder = "Search by merchant name (e.g., Netflix, Amazon)..." }) => {
     const theme = useTheme();
-    const [value, setValue] = useState('');
+    const [value, setValue] = useState(initialValue);
     const [isFocused, setIsFocused] = useState(false);
+
+    // Trigger search when initialValue is provided
+    useEffect(() => {
+        if (initialValue) {
+            setValue(initialValue);
+            onSearch(initialValue);
+        }
+    }, [initialValue]);
 
     // Debounce the search callback
     const debouncedSearch = useCallback(

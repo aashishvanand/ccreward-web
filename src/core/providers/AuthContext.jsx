@@ -1,7 +1,7 @@
 'use client';
 import PropTypes from 'prop-types';
 import { createContext, useContext, useEffect, useState, useRef } from 'react';
-import { getFirebaseAuth, firebaseApp } from '@/firebase';
+import { getFirebaseAuth, firebaseApp, initAppCheck } from '@/firebase';
 import { deleteUserData } from '../services/firebaseUtils';
 import { resetUsageState } from '../services/usageLimitService';
 import { useRouter } from "next/router";
@@ -42,6 +42,8 @@ export function AuthProvider({ children }) {
 
     // Dynamically load firebase/auth, then set up the auth state listener
     (async () => {
+      // Initialize App Check before any Firebase service call
+      await initAppCheck();
       const { auth, googleProvider, appleProvider } = await getFirebaseAuth();
       const { onAuthStateChanged } = await import('firebase/auth');
       authRef.current = auth;

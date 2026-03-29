@@ -168,6 +168,19 @@ const CalculatorForm = ({
     isInitialized,
   ]);
 
+  // Handle amount URL parameter
+  useEffect(() => {
+    if (!router.isReady) return;
+    const amountParam = router.query.amount;
+    const amount = Array.isArray(amountParam) ? amountParam[0] : amountParam;
+    if (amount && !spentAmount) {
+      const parsed = parseFloat(amount);
+      if (!isNaN(parsed) && parsed > 0) {
+        onSpentAmountChange(parsed.toString());
+      }
+    }
+  }, [router.isReady, router.query.amount, spentAmount, onSpentAmountChange]);
+
   // Event handler for region changes
   useEffect(() => {
     // Skip the first render to prevent unnecessary initial load

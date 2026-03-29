@@ -27,6 +27,57 @@ if (!getApps().length) {
     app = getApp();
 }
 
+// Initialize Firebase App Check with Cloudflare Turnstile (custom provider).
+// A Firebase Cloud Function verifies Turnstile tokens and mints App Check tokens.
+// API-level bot protection is separately handled by Cloudflare Turnstile.
+let _appCheckInitPromise = null;
+
+export const initAppCheck = () => {
+    if (typeof window === 'undefined') return Promise.resolve(null);
+    if (_appCheckInitPromise) return _appCheckInitPromise;
+
+    const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    if (!turnstileSiteKey || !apiBaseUrl) {
+        console.warn('[AppCheck] Missing NEXT_PUBLIC_TURNSTILE_SITE_KEY or NEXT_PUBLIC_API_BASE_URL — App Check disabled.');
+        return Promise.resolve(null);
+    }
+
+    _appCheckInitPromise = (async () => {
+        const { initializeAppCheck, CustomProvider } = await import('firebase/app-check');
+        const { getTurnstileToken } = await import('./core/services/turnstile');
+
+        const provider = new CustomProvider({
+            getToken: async () => {
+                const turnstileToken = await getTurnstileToken();
+                if (!turnstileToken) {
+                    throw new Error('Failed to obtain Turnstile token');
+                }
+
+                const response = await fetch(`${apiBaseUrl}/appCheckToken`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ turnstileToken, platform: 'web' }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`App Check token exchange failed: ${response.status}`);
+                }
+
+                const { token, expireTimeMillis } = await response.json();
+                return { token, expireTimeMillis };
+            },
+        });
+
+        return initializeAppCheck(app, {
+            provider,
+            isTokenAutoRefreshEnabled: true,
+        });
+    })();
+
+    return _appCheckInitPromise;
+};
+
 // Lazy-loaded auth and provider instances (ESM live bindings)
 export let auth = null;
 export let googleProvider = null;
@@ -37,8 +88,8 @@ let _authInitPromise = null;
  * Get auth and provider instances. Initializes firebase/auth on first
  * call, then caches the result.
  *
- * Bot protection is handled by Cloudflare Turnstile (see core/services/turnstile.js)
- * instead of Firebase App Check, since the API backend runs on Cloudflare Workers.
+ * Firebase App Check (Cloudflare Turnstile custom provider) protects Firebase services.
+ * Cloudflare Turnstile also protects the API backend (see core/services/turnstile.js).
  *
  * @returns {Promise<{auth: import('firebase/auth').Auth, googleProvider: import('firebase/auth').GoogleAuthProvider, appleProvider: import('firebase/auth').OAuthProvider}>}
  */

@@ -146,6 +146,41 @@ const BestCardCalculator = () => {
       ? rankingByMiles
       : rankingByValue;
 
+  // Handle URL parameters for deep linking
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const mccParam = params.get("mcc");
+    const amountParam = params.get("amount");
+    const currencyParam = params.get("currency");
+
+    if (amountParam && !spentAmount) {
+      const parsed = parseFloat(amountParam);
+      if (!isNaN(parsed) && parsed > 0) {
+        setSpentAmount(parsed.toString());
+      }
+    }
+
+    if (currencyParam && ["INR", "SGD", "USD", "EUR", "GBP"].includes(currencyParam.toUpperCase())) {
+      setSelectedCurrency(currencyParam.toUpperCase());
+    }
+
+    if (mccParam && !selectedMcc) {
+      const searchMcc = async () => {
+        try {
+          const mccData = await fetchMCC(mccParam);
+          if (mccData && mccData.length > 0) {
+            const exactMatch = mccData.find((m) => m.mcc === mccParam) || mccData[0];
+            setSelectedMcc(exactMatch);
+            setMccInputValue(`${exactMatch.mcc} - ${exactMatch.name}`);
+          }
+        } catch (error) {
+          console.error("Error fetching MCC from URL param:", error);
+        }
+      };
+      searchMcc();
+    }
+  }, []);
+
   // Track page load and initialization
   useEffect(() => {
     trackFeatureUsage("best_card_calculator_loaded", {
