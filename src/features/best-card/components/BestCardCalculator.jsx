@@ -50,6 +50,7 @@ import { motion } from "framer-motion";
 import { getCurrencySymbol, getNativeCurrency } from "@/core/utils";
 import CurrencyAmountField from "@/shared/components/ui/CurrencyAmountField";
 import CurrencyConversionInfo from "@/shared/components/ui/CurrencyConversionInfo";
+import FeedbackButtons from "@/shared/components/ui/FeedbackButtons";
 
 // Add analytics imports
 import {
@@ -138,6 +139,7 @@ const BestCardCalculator = () => {
   const [rankingByMiles, setRankingByMiles] = useState([]);
   const [isLoadingMcc, setIsLoadingMcc] = useState(false);
   const [currencyConversion, setCurrencyConversion] = useState(null);
+  const [calculationId, setCalculationId] = useState(null);
 
   const currentRanking =
     sortMethod === "points"
@@ -491,6 +493,7 @@ const BestCardCalculator = () => {
       setRankingByValue(response.rankingByValue);
       setRankingByMiles(response.rankingByMiles);
       setCurrencyConversion(response.currencyConversion || null);
+      setCalculationId(response.calculationId || null);
       setIsCalculated(true);
       setLastCalculationParams(calculationParams);
 
@@ -879,6 +882,7 @@ const BestCardCalculator = () => {
                       setRankingByValue([]);
                       setRankingByMiles([]);
                       setCurrencyConversion(null);
+                      setCalculationId(null);
                       setLastCalculationParams(null);
                       setMccInputValue("");
                     }}
@@ -928,6 +932,13 @@ const BestCardCalculator = () => {
                   handleImageError={handleImageError}
                 />
               </List>
+
+              {isCalculated && (
+                <FeedbackButtons
+                  key={calculationId}
+                  calculationId={calculationId}
+                />
+              )}
             </Stack>
           </Paper>
         </Container>

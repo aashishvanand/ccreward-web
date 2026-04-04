@@ -21,6 +21,7 @@ import PageHeader from "@/shared/components/layout/PageHeader";
 import CalculatorForm from "./CalculatorForm";
 import AddToMyCardsButton from "../../cards/components/AddToMyCardsButton";
 import ReportButtons from "@/shared/components/ui/ReportButtons";
+import FeedbackButtons from "@/shared/components/ui/FeedbackButtons";
 import MissingBankCardForm from "./ReportForms/MissingBankCardForm";
 import IncorrectRewardReportForm from "./ReportForms/IncorrectRewardReportForm";
 import ErrorAlert from "@/shared/components/ui/ErrorAlert";
@@ -102,6 +103,7 @@ function Calculator() {
   } = useCardSelection();
 
   const [calculationResult, setCalculationResult] = useState(null);
+  const [calculationId, setCalculationId] = useState(null);
   const [calculationPerformed, setCalculationPerformed] = useState(false);
   const [lastCalculationInputs, setLastCalculationInputs] = useState(null);
   const { trackButtonClick, trackFeatureUsage, trackConversion } =
@@ -191,6 +193,7 @@ function Calculator() {
   const handleClearAll = useCallback(() => {
     resetAllFields();
     setCalculationResult(null);
+    setCalculationId(null);
     setCalculationPerformed(false);
     setLastCalculationInputs(null);
   }, [resetAllFields]);
@@ -270,6 +273,7 @@ function Calculator() {
       recordUsage();
 
       setCalculationResult(result);
+      setCalculationId(result.calculationId || null);
       setCalculationPerformed(true);
       setLastCalculationInputs(currentInputs);
 
@@ -403,19 +407,32 @@ function Calculator() {
                     isCalculating={isCalculating}
                   />
 
-                  <ReportButtons
-                    calculationPerformed={calculationPerformed}
-                    onMissingFormOpen={() => setMissingFormOpen(true)}
-                    onIncorrectRewardOpen={() =>
-                      setIncorrectRewardReportOpen(true)
-                    }
-                  />
+                  {!calculationPerformed && (
+                    <ReportButtons
+                      calculationPerformed={false}
+                      onMissingFormOpen={() => setMissingFormOpen(true)}
+                      onIncorrectRewardOpen={() =>
+                        setIncorrectRewardReportOpen(true)
+                      }
+                    />
+                  )}
 
                   {calculationPerformed && calculationResult && (
                     <>
                       <CalculationResults
                         result={calculationResult}
                         isLoading={isCalculating}
+                      />
+                      <FeedbackButtons
+                        key={calculationId}
+                        calculationId={calculationId}
+                      />
+                      <ReportButtons
+                        calculationPerformed={true}
+                        onMissingFormOpen={() => setMissingFormOpen(true)}
+                        onIncorrectRewardOpen={() =>
+                          setIncorrectRewardReportOpen(true)
+                        }
                       />
                       <ReferralButton
                         bank={selectedBank}

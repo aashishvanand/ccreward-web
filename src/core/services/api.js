@@ -569,5 +569,21 @@ export const bulkSyncUserCards = async ({ cards, country }) => {
     }
 };
 
+// Submit feedback for a calculation
+export const submitFeedback = async ({ type = 'calculator_feedback', vote, userFeedback, calculationId, calculationPayload }) => {
+    const body = { type };
+    if (vote) body.vote = vote;
+    if (userFeedback) body.userFeedback = userFeedback;
+    if (calculationId) body.calculationId = calculationId;
+    if (calculationPayload) body.calculationPayload = calculationPayload;
+
+    try {
+        const response = await api.post('/v4/feedback', body);
+        return response.data;
+    } catch (error) {
+        return handleApiError(error);
+    }
+};
+
 // Export the API instance
 export { api };
