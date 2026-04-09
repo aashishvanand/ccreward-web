@@ -336,14 +336,16 @@ function Header({ hideNavigation = false }) {
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
-        PaperProps={{
-          sx: {
-            mt: 1,
-            borderRadius: 2,
-            minWidth: 200,
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
-            backdropFilter: "blur(10px)",
-          },
+        slotProps={{
+          paper: {
+            sx: {
+              mt: 1,
+              borderRadius: 2,
+              minWidth: 200,
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+              backdropFilter: "blur(10px)",
+            }
+          }
         }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
@@ -379,15 +381,16 @@ function Header({ hideNavigation = false }) {
                 </ListItemIcon>
                 <ListItemText
                   primary={item.label}
-                  primaryTypographyProps={{
-                    fontWeight: active ? 600 : 400,
-                    color: active ? "primary.main" : "text.primary",
+                  slotProps={{
+                    primary: {
+                      fontWeight: active ? 600 : 400,
+                      color: active ? "primary.main" : "text.primary",
+                    }
                   }}
                 />
               </MenuItem>
             );
           })}
-
         <Box sx={{ borderTop: 1, borderColor: "divider", mt: 1, pt: 1 }}>
           <MenuItem onClick={toggleTheme} sx={{ py: 1.5, px: 2 }}>
             <ListItemIcon>
@@ -419,14 +422,16 @@ function Header({ hideNavigation = false }) {
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
-        PaperProps={{
-          sx: {
-            mt: 1.5,
-            borderRadius: 2,
-            minWidth: 220,
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
-            backdropFilter: "blur(10px)",
-          },
+        slotProps={{
+          paper: {
+            sx: {
+              mt: 1.5,
+              borderRadius: 2,
+              minWidth: 220,
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+              backdropFilter: "blur(10px)",
+            }
+          }
         }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
@@ -445,25 +450,27 @@ function Header({ hideNavigation = false }) {
                  <Typography variant="subtitle2" noWrap sx={{ fontWeight: 600 }}>
                     {user?.displayName || "User"}
                 </Typography>
-                <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block' }}>
+                <Typography
+                  variant="caption"
+                  noWrap
+                  sx={{
+                    color: "text.secondary",
+                    display: 'block'
+                  }}>
                     {user?.email}
                 </Typography>
               </Box>
             </Box>
           </Box>
         )}
-        
         <Divider />
-
         <MenuItem onClick={handleLogout} sx={{ py: 1.5, px: 2 }}>
           <ListItemIcon>
             <LogoutIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText primary="Logout" />
         </MenuItem>
-
-         <Divider />
-         
+        <Divider />
         <Box sx={{ px: 2, py: 1 }}>
              <Typography variant="caption" color="error" sx={{ fontWeight: 600, display: 'block', mb: 0.5 }}>
                 DANGER ZONE
@@ -628,15 +635,17 @@ function Header({ hideNavigation = false }) {
                     anchorEl={signInAnchorEl}
                     open={Boolean(signInAnchorEl)}
                     onClose={handleSignInMenuClose}
-                    PaperProps={{
-                      sx: {
-                        mt: 1.5,
-                        borderRadius: 2,
-                        minWidth: 260,
-                        p: 1.5,
-                        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
-                        backdropFilter: "blur(10px)",
-                      },
+                    slotProps={{
+                      paper: {
+                        sx: {
+                          mt: 1.5,
+                          borderRadius: 2,
+                          minWidth: 260,
+                          p: 1.5,
+                          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12)",
+                          backdropFilter: "blur(10px)",
+                        }
+                      }
                     }}
                     transformOrigin={{ horizontal: "right", vertical: "top" }}
                     anchorOrigin={{ horizontal: "right", vertical: "bottom" }}

@@ -354,16 +354,42 @@ export const fetchMCC = async (search) => {
     }
 };
 
+// Cancel token for card questions requests
+let cardQuestionsCancelToken = null;
+
 // Fetch card questions for a specific bank and card
 export const fetchCardQuestions = async (bank, card) => {
     const encodedBank = encodeURIComponent(bank);
     const encodedCard = encodeURIComponent(card);
     const cacheKey = `questions_${bank}_${card}`;
 
-    return fetchWithCache(cacheKey, async () => {
-        const response = await api.get(`/cardQuestions?bank=${encodedBank}&card=${encodedCard}`);
+    // Check cache first before cancelling — a cache hit needs no network request
+    const cachedData = getFromCache(cacheKey);
+    if (cachedData) {
+        return cachedData;
+    }
+
+    // Cancel any in-flight card questions request
+    if (cardQuestionsCancelToken) {
+        cardQuestionsCancelToken.cancel('Operation canceled due to new request.');
+    }
+    cardQuestionsCancelToken = axios.CancelToken.source();
+
+    try {
+        const response = await api.get(`/cardQuestions?bank=${encodedBank}&card=${encodedCard}`, {
+            cancelToken: cardQuestionsCancelToken.token,
+        });
+        setToCache(cacheKey, response.data);
         return response.data;
-    });
+    } catch (error) {
+        if (axios.isCancel(error)) {
+            return null;
+        }
+        if (error.message === 'Region not initialized') {
+            return [];
+        }
+        return handleApiError(error);
+    }
 };
 
 // Calculate rewards based on provided data

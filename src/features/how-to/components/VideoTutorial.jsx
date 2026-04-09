@@ -100,22 +100,19 @@ const VideoTutorial = ({
       >
         {title || "Video Tutorial"}
       </Typography>
-
       {description && (
         <Typography
           variant="body2"
-          color="text.secondary"
           sx={{
+            color: "text.secondary",
             mb: 2,
             textAlign: "center",
             maxWidth: 600,
-            fontSize: "0.875rem",
-          }}
-        >
+            fontSize: "0.875rem"
+          }}>
           {description}
         </Typography>
       )}
-
       <Paper
         elevation={2}
         sx={{
@@ -190,21 +187,22 @@ const VideoTutorial = ({
           </IconButton>
         </Box>
       </Paper>
-
       <Dialog
         open={isOpen}
         onClose={handleCloseVideo}
         maxWidth="lg"
         fullWidth
         fullScreen={isFullscreen || isMobile}
-        PaperProps={{
-          sx: {
-            bgcolor: "black",
-            position: "relative",
-            overflow: "hidden",
-            borderRadius: isFullscreen || isMobile ? 0 : 2,
-            m: isMobile ? 0 : 2,
-          },
+        slotProps={{
+          paper: {
+            sx: {
+              bgcolor: "black",
+              position: "relative",
+              overflow: "hidden",
+              borderRadius: isFullscreen || isMobile ? 0 : 2,
+              m: isMobile ? 0 : 2,
+            },
+          }
         }}
       >
         <Box

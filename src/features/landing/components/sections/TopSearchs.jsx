@@ -111,7 +111,12 @@ const TopSearchs = () => {
         >
           Trending Credit Cards
         </Typography>
-        <Typography variant="h6" color="text.secondary" sx={{ mb: 3 }}>
+        <Typography
+          variant="h6"
+          sx={{
+            color: "text.secondary",
+            mb: 3
+          }}>
           Most searched cards this {timeframe.replace('ly', '')}
         </Typography>
 
@@ -128,7 +133,6 @@ const TopSearchs = () => {
           <Tab label="Monthly" value="monthly" />
         </Tabs>
       </Box>
-
       <Box sx={{ position: "relative" }}>
         {!isMobile && (
           <>
@@ -212,11 +216,12 @@ const TopSearchs = () => {
                   >
                     #{index + 1}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{
+                    color: "text.secondary"
+                  }}>
                     {card.searches} searches
                   </Typography>
                 </Box>
-
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   {cardImage ? (
                     <Image
@@ -239,7 +244,9 @@ const TopSearchs = () => {
                         justifyContent: "center",
                       }}
                     >
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" sx={{
+                        color: "text.secondary"
+                      }}>
                         {card.bank}
                       </Typography>
                     </Box>
@@ -254,9 +261,10 @@ const TopSearchs = () => {
                     </Typography>
                     <Typography
                       variant="body2"
-                      color="text.secondary"
-                      sx={{ lineHeight: 1.2 }}
-                    >
+                      sx={{
+                        color: "text.secondary",
+                        lineHeight: 1.2
+                      }}>
                       {card.cardName}
                     </Typography>
                   </Box>

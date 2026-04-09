@@ -7,26 +7,39 @@ const PageHeader = ({ title, subtitle, children }) => {
 
     return (
         <Box sx={{ mb: 8, textAlign: 'center' }}>
-            <Typography variant="h2" component="h1" gutterBottom fontWeight="800"
-                sx={{ 
+            <Typography
+                variant="h2"
+                component="h1"
+                gutterBottom
+                sx={{
+                    fontWeight: "800",
+
                     background: theme.palette.mode === 'dark' 
                         ? 'linear-gradient(45deg, #90caf9 30%, #ce93d8 90%)'
                         : 'linear-gradient(45deg, #1976d2 30%, #9c27b0 90%)',
+
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     mb: 2,
                     fontSize: { xs: '2.5rem', md: '3.5rem' }
-                }}
-            >
+                }}>
                 {title}
             </Typography>
             {subtitle && (
-                <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 650, mx: 'auto', mb: 5, lineHeight: 1.6, fontWeight: 400 }}>
+                <Typography
+                    variant="h6"
+                    sx={{
+                        color: "text.secondary",
+                        maxWidth: 650,
+                        mx: 'auto',
+                        mb: 5,
+                        lineHeight: 1.6,
+                        fontWeight: 400
+                    }}>
                     {subtitle}
                 </Typography>
             )}
-            
             <Box sx={{ maxWidth: 700, mx: 'auto', position: 'relative' }}>
                  {/* Glow effect */}
                 <Box sx={{

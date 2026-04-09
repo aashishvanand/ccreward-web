@@ -50,8 +50,10 @@ const IncorrectRewardReportForm = ({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: { width: "100%", maxWidth: 500, m: 2 },
+      slotProps={{
+        paper: {
+          sx: { width: "100%", maxWidth: 500, m: 2 },
+        }
       }}
     >
       <form onSubmit={handleSubmit}>

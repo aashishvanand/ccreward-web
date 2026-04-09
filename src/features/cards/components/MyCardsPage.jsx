@@ -600,10 +600,17 @@ function MyCardsPage() {
           >
             <CreditCardIcon sx={{ fontSize: 48, opacity: 1 }} />
           </Box>
-          <Typography variant="h5" fontWeight="bold" gutterBottom>
+          <Typography variant="h5" gutterBottom sx={{
+            fontWeight: "bold"
+          }}>
             No cards yet
           </Typography>
-          <Typography color="text.secondary" sx={{ maxWidth: 400, mb: 3 }}>
+          <Typography
+            sx={{
+              color: "text.secondary",
+              maxWidth: 400,
+              mb: 3
+            }}>
             Start building your portfolio by adding your first credit card. 
             We'll help you track rewards and benefits.
           </Typography>

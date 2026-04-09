@@ -358,17 +358,25 @@ const TransferCalculator = () => {
                 </ListItemIcon>
 
                 <Box sx={{ flex: "1 1 200px" }}>
-                  <Typography variant="body1" fontWeight="bold">
+                  <Typography variant="body1" sx={{
+                    fontWeight: "bold"
+                  }}>
                     {partner.brand_name} ({partner.partner_name})
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{
+                    color: "text.secondary"
+                  }}>
                     {partner.partner_points_received.toLocaleString()} points
                   </Typography>
                 </Box>
                 <Box sx={{ flex: "1 1 150px" }}>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{
+                    color: "text.secondary"
+                  }}>
                     Est. Value:{" "}
-                    <Typography component="span" fontWeight="bold">
+                    <Typography component="span" sx={{
+                      fontWeight: "bold"
+                    }}>
                       {getCurrencySymbol(currency)}
                       {partner.estimated_value.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
@@ -376,9 +384,13 @@ const TransferCalculator = () => {
                       })}
                     </Typography>
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{
+                    color: "text.secondary"
+                  }}>
                     Value/Point:{" "}
-                    <Typography component="span" fontWeight="bold">
+                    <Typography component="span" sx={{
+                      fontWeight: "bold"
+                    }}>
                       {getCurrencySymbol(currency)}
                       {partner.value_per_point.toFixed(2)}
                     </Typography>
@@ -393,7 +405,9 @@ const TransferCalculator = () => {
                   }}
                 >
                   <AccessTimeIcon fontSize="small" color="action" />
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{
+                    color: "text.secondary"
+                  }}>
                     {partner.transfer_time_display}
                   </Typography>
                 </Box>
@@ -469,14 +483,18 @@ const TransferCalculator = () => {
                       {...params}
                       label="Select a bank"
                       required
-                      InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <>
-                            {isLoadingBanks && <CircularProgress size={20} />}
-                            {params.InputProps.endAdornment}
-                          </>
-                        ),
+                      slotProps={{
+                        ...params.slotProps,
+
+                        input: {
+                          ...params.slotProps.input,
+                          endAdornment: (
+                            <>
+                              {isLoadingBanks && <CircularProgress size={20} />}
+                              {params.slotProps.input.endAdornment}
+                            </>
+                          ),
+                        }
                       }}
                     />
                   )}
@@ -494,14 +512,18 @@ const TransferCalculator = () => {
                       {...params}
                       label="Select a card"
                       required
-                      InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <>
-                            {isLoadingCards && <CircularProgress size={20} />}
-                            {params.InputProps.endAdornment}
-                          </>
-                        ),
+                      slotProps={{
+                        ...params.slotProps,
+
+                        input: {
+                          ...params.slotProps.input,
+                          endAdornment: (
+                            <>
+                              {isLoadingCards && <CircularProgress size={20} />}
+                              {params.slotProps.input.endAdornment}
+                            </>
+                          ),
+                        }
                       }}
                     />
                   )}
@@ -513,26 +535,28 @@ const TransferCalculator = () => {
                   value={points}
                   onChange={handlePointsChange}
                   required
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">Pts</InputAdornment>
-                    ),
-                    endAdornment: points && (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="clear points"
-                          onClick={() => setPoints("")}
-                          edge="end"
-                          size="small"
-                        >
-                          <ClearIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                    inputProps: {
-                      min: 1,
-                      step: 1,
-                    },
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start">Pts</InputAdornment>
+                      ),
+                      endAdornment: points && (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="clear points"
+                            onClick={() => setPoints("")}
+                            edge="end"
+                            size="small"
+                          >
+                            <ClearIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                      inputProps: {
+                        min: 1,
+                        step: 1,
+                      },
+                    }
                   }}
                 />
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>

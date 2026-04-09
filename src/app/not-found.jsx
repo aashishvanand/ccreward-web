@@ -10,7 +10,6 @@ export default function NotFound() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
       <Header />
-
       <Container component="main" sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', py: 8, textAlign: 'center' }}>
         <SentimentDissatisfiedIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
 
@@ -22,7 +21,13 @@ export default function NotFound() {
           Page Not Found
         </Typography>
 
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: '500px' }}>
+        <Typography
+          variant="body1"
+          sx={{
+            color: "text.secondary",
+            mb: 4,
+            maxWidth: '500px'
+          }}>
           Sorry, the page you are looking for does not exist. It might have been moved or deleted.
         </Typography>
 
@@ -32,7 +37,6 @@ export default function NotFound() {
           </Button>
         </Link>
       </Container>
-
       <Footer />
     </Box>
   );

@@ -43,9 +43,10 @@ const HeroSection = ({
         <Grid
           container
           spacing={{ xs: 4, md: 6, lg: 8 }}
-          alignItems="center"
-          sx={{ minHeight: { md: "60vh" } }} // Ensure grid takes full height
-        >
+          sx={{
+            alignItems: "center",
+            minHeight: { md: "60vh" }
+          }}>
           <Grid
             size={{
               xs: 12,

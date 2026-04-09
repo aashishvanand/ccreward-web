@@ -13,7 +13,7 @@ import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
 import ThumbDownOutlinedIcon from "@mui/icons-material/ThumbDownOutlined";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
 import { submitFeedback } from "@/core/services/api";
 
 const FeedbackButtons = ({ calculationId }) => {
@@ -78,10 +78,12 @@ const FeedbackButtons = ({ calculationId }) => {
           py: 1,
         }}
       >
-        <CheckCircleOutlineIcon
+        <CheckCircleOutlinedIcon
           sx={{ fontSize: 18, color: "text.secondary" }}
         />
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{
+          color: "text.secondary"
+        }}>
           Thanks for your feedback!
         </Typography>
       </Box>
@@ -90,9 +92,15 @@ const FeedbackButtons = ({ calculationId }) => {
 
   return (
     <Box sx={{ py: 1 }}>
-      <Stack alignItems="center" spacing={1}>
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <Typography variant="body2" color="text.secondary">
+      <Stack spacing={1} sx={{
+        alignItems: "center"
+      }}>
+        <Stack direction="row" spacing={1} sx={{
+          alignItems: "center"
+        }}>
+          <Typography variant="body2" sx={{
+            color: "text.secondary"
+          }}>
             Was this helpful?
           </Typography>
           <IconButton
@@ -137,10 +145,14 @@ const FeedbackButtons = ({ calculationId }) => {
               onChange={(e) => setFeedbackText(e.target.value.slice(0, 500))}
               fullWidth
               size="small"
-              inputProps={{ maxLength: 500 }}
               helperText={`${feedbackText.length}/500`}
+              slotProps={{
+                htmlInput: { maxLength: 500 }
+              }}
             />
-            <Stack direction="row" spacing={1} justifyContent="flex-end">
+            <Stack direction="row" spacing={1} sx={{
+              justifyContent: "flex-end"
+            }}>
               <Button
                 size="small"
                 variant="outlined"

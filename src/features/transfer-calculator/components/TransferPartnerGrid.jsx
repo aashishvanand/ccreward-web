@@ -160,9 +160,9 @@ const TransferPartnerGrid = () => {
 
   return (
     <Box sx={{ width: "100%", overflow: "hidden" }}>
-        <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 2 }}>
-            Transfer Partners Matrix
-        </Typography>
+      <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 2 }}>
+          Transfer Partners Matrix
+      </Typography>
       <Paper elevation={2} sx={{ borderRadius: 2, overflow: "hidden" }}>
         <Tabs
           value={tabValue}
@@ -250,52 +250,54 @@ const TransferPartnerGrid = () => {
                  }
                 
                 return (
-                <StyledTableRow key={partner.name}>
-                  <TableCell
-                    component="th"
-                    scope="row"
-                    sx={{
-                      position: "sticky",
-                      left: 0,
-                      background: "inherit",
-                      borderRight: "1px solid " + theme.palette.divider,
-                      zIndex: 1,
-                      fontWeight: 500,
-                      p: 2,
-                    }}
-                  >
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        {logoSrc ? (
-                            <Image src={buildCloudflareImageUrl(logoSrc, "public")} alt={partner.name} width={24} height={24} unoptimized style={{objectFit: 'contain'}} />
-                        ) : (
-                             type === "airline" ? <FlightIcon fontSize="small" color="action"/> : <HotelIcon fontSize="small"  color="action"/>
-                        )}
-                      <Typography variant="body2" noWrap title={partner.name}>
-                        {partner.name}
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                  {currentData.banks.map((bank) => {
-                    const details = partner.bankDetails[bank];
-                    return (
-                      <TableCell key={bank} align="center">
-                        {details ? (
-                          <StyledTooltip title={Array.isArray(details.currency) ? details.currency.join(", ") : details.currency} arrow>
-                             <CheckCircleIcon color="success" fontSize="small" sx={{ cursor: 'help' }} />
-                          </StyledTooltip>
-                        ) : (
-                          <Typography
-                            variant="caption"
-                            color="text.disabled"
-                          >
-                            -
-                          </Typography>
-                        )}
-                      </TableCell>
-                    );
-                  })}
+                  <StyledTableRow key={partner.name}>
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      sx={{
+                        position: "sticky",
+                        left: 0,
+                        background: "inherit",
+                        borderRight: "1px solid " + theme.palette.divider,
+                        zIndex: 1,
+                        fontWeight: 500,
+                        p: 2,
+                      }}
+                    >
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          {logoSrc ? (
+                              <Image src={buildCloudflareImageUrl(logoSrc, "public")} alt={partner.name} width={24} height={24} unoptimized style={{objectFit: 'contain'}} />
+                          ) : (
+                               type === "airline" ? <FlightIcon fontSize="small" color="action"/> : <HotelIcon fontSize="small"  color="action"/>
+                          )}
+                        <Typography variant="body2" noWrap title={partner.name}>
+                          {partner.name}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    {currentData.banks.map((bank) => {
+                      const details = partner.bankDetails[bank];
+                      return (
+                        <TableCell key={bank} align="center">
+                          {details ? (
+                            <StyledTooltip title={Array.isArray(details.currency) ? details.currency.join(", ") : details.currency} arrow>
+                               <CheckCircleIcon color="success" fontSize="small" sx={{ cursor: 'help' }} />
+                            </StyledTooltip>
+                          ) : (
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                color: "text.disabled"
+                              }}
+                            >
+                              -
+                            </Typography>
+                          )}
+                        </TableCell>
+                      );
+                    })}
                   </StyledTableRow>
-              )})}
+                );})}
             </TableBody>
           </Table>
         </TableContainer>

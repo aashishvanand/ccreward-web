@@ -270,17 +270,19 @@ const FAQPage = () => {
               placeholder="Search FAQs..."
               value={searchQuery}
               onChange={handleSearchChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
               sx={{
                 "& .MuiOutlinedInput-root": {
                   borderRadius: 2,
                 },
+              }}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }
               }}
             />
           </Box>
@@ -298,10 +300,11 @@ const FAQPage = () => {
               <Stack
                 direction="row"
                 spacing={1}
-                justifyContent="center"
-                flexWrap="wrap"
-                sx={{ gap: 1 }}
-              >
+                sx={{
+                  justifyContent: "center",
+                  flexWrap: "wrap",
+                  gap: 1
+                }}>
                 {popularQuestions.map((faq, index) => (
                   <Chip
                     key={index}
@@ -353,7 +356,9 @@ const FAQPage = () => {
           {/* Search Results Info */}
           {searchQuery.trim() !== "" && (
             <Box sx={{ mb: 3, textAlign: "center" }}>
-              <Typography variant="body1" color="text.secondary">
+              <Typography variant="body1" sx={{
+                color: "text.secondary"
+              }}>
                 {filteredFAQs.length === 0
                   ? `No results found for "${searchQuery}"`
                   : `Found ${filteredFAQs.length} result${
@@ -420,7 +425,12 @@ const FAQPage = () => {
               <Typography variant="h6" gutterBottom>
                 No FAQs match your search
               </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: "text.secondary",
+                  mb: 2
+                }}>
                 Try different keywords or browse all questions below
               </Typography>
               <Chip

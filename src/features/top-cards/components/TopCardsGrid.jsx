@@ -191,14 +191,13 @@ const TopCardsGrid = ({
                     </Typography>
 
                     <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{
+                      variant="body2"
+                      sx={{
+                        color: "text.secondary",
                         mb: 2,
                         fontSize: isMobile ? "0.8rem" : "0.875rem",
-                        lineHeight: 1.3,
-                    }}
-                    >
+                        lineHeight: 1.3
+                      }}>
                     {card.cardName}
                     </Typography>
 

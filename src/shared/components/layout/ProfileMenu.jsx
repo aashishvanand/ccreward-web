@@ -118,7 +118,6 @@ const ProfileMenu = ({ user, onLogout }) => {
           )}
         </IconButton>
       </motion.div>
-
       <Menu
         id="account-menu"
         anchorEl={anchorEl}
@@ -213,12 +212,11 @@ const ProfileMenu = ({ user, onLogout }) => {
                   >
                     <Typography
                       variant="body2"
-                      color="text.secondary"
                       sx={{
+                        color: "text.secondary",
                         wordBreak: "break-all",
-                        maxWidth: "100%",
-                      }}
-                    >
+                        maxWidth: "100%"
+                      }}>
                       {user?.email || ""}
                     </Typography>
                   </motion.div>

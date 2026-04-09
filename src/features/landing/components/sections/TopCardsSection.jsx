@@ -189,9 +189,10 @@ const TopCardsSection = () => {
                       </Typography>
                       <Typography
                         variant="body2"
-                        color="text.secondary"
-                        sx={{ mb: 2 }}
-                      >
+                        sx={{
+                          color: "text.secondary",
+                          mb: 2
+                        }}>
                         {category.cards.length} cards available
                       </Typography>
                       <Button

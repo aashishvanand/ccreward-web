@@ -239,6 +239,7 @@ const CalculatorForm = ({
     setIsLoadingQuestions(true);
     try {
       const questions = await fetchCardQuestions(selectedBank, selectedCard);
+      if (questions === null) return; // Request was cancelled by a newer one
       setCardQuestions(questions);
       setRegionError(false); // Clear any previous region errors
     } catch (error) {
@@ -364,15 +365,17 @@ const CalculatorForm = ({
             label="Select a bank"
             required
             slotProps={{
+              ...params.slotProps,
+
               input: {
-                ...params.InputProps,
+                ...params.slotProps.input,
                 endAdornment: (
                   <>
                     {isLoadingBanks && <CircularProgress size={20} />}
-                    {params.InputProps.endAdornment}
+                    {params.slotProps.input.endAdornment}
                   </>
                 ),
-              },
+              }
             }}
           />
         )}
@@ -390,15 +393,17 @@ const CalculatorForm = ({
             label="Select a card"
             required
             slotProps={{
+              ...params.slotProps,
+
               input: {
-                ...params.InputProps,
+                ...params.slotProps.input,
                 endAdornment: (
                   <>
                     {isLoadingCards && <CircularProgress size={20} />}
-                    {params.InputProps.endAdornment}
+                    {params.slotProps.input.endAdornment}
                   </>
                 ),
-              },
+              }
             }}
           />
         )}
@@ -431,15 +436,17 @@ const CalculatorForm = ({
             {...params}
             label="Search MCC, Merchant Category, or Known Merchants"
             slotProps={{
+              ...params.slotProps,
+
               input: {
-                ...params.InputProps,
+                ...params.slotProps.input,
                 endAdornment: (
                   <>
                     {isLoadingMcc && <CircularProgress size={20} />}
-                    {params.InputProps.endAdornment}
+                    {params.slotProps.input.endAdornment}
                   </>
                 ),
-              },
+              }
             }}
           />
         )}

@@ -2,7 +2,7 @@
 
 import { Box, Typography, Chip } from '@mui/material';
 import {
-  ErrorOutline as ErrorIcon,
+  ErrorOutlined as ErrorIcon,
   LocalFireDepartment as FlameIcon,
 } from '@mui/icons-material';
 
