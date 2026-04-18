@@ -20,6 +20,7 @@ import Footer from "@/shared/components/layout/Footer";
 import PageHeader from "@/shared/components/layout/PageHeader";
 import CalculatorForm from "./CalculatorForm";
 import AddToMyCardsButton from "../../cards/components/AddToMyCardsButton";
+import QuickCardSelector from "@/shared/components/ui/QuickCardSelector";
 import ReportButtons from "@/shared/components/ui/ReportButtons";
 import FeedbackButtons from "@/shared/components/ui/FeedbackButtons";
 import MissingBankCardForm from "./ReportForms/MissingBankCardForm";
@@ -189,6 +190,11 @@ function Calculator() {
       }
     }
   }, [user, selectedBank, selectedCard]);
+
+  const handleQuickCardSelect = useCallback((bank, cardName) => {
+    handleBankChange(bank);
+    handleCardChange(cardName);
+  }, [handleBankChange, handleCardChange]);
 
   const handleClearAll = useCallback(() => {
     resetAllFields();
@@ -402,6 +408,14 @@ function Calculator() {
                 </Box>
               ) : (
                 <Stack spacing={3}>
+                  {userCards.length > 0 && (
+                    <QuickCardSelector
+                      userCards={userCards}
+                      selectedBank={selectedBank}
+                      selectedCard={selectedCard}
+                      onSelectCard={handleQuickCardSelect}
+                    />
+                  )}
                   <CalculatorForm
                     selectedBank={selectedBank}
                     selectedCard={selectedCard}

@@ -31,11 +31,13 @@ import {
 } from "@mui/icons-material";
 import { useAuth } from "@/core/providers/AuthContext";
 import { useRegion } from "@/core/providers/RegionContext";
+import { getCardsForUser } from "@/core/services/firebaseUtils";
 import {
   fetchBanks,
   fetchCards,
   calculateTransferPartners,
 } from "@/core/services/api";
+import QuickCardSelector from "@/shared/components/ui/QuickCardSelector";
 import useUsageLimit from "@/core/hooks/useUsageLimit";
 import { RateLimitedFeature } from "@/core/services/usageLimitService";
 import UsageRemainingBadge from "@/shared/components/ui/UsageRemainingBadge";
@@ -92,6 +94,9 @@ const TransferCalculator = () => {
     "transfer-calculator"
   );
 
+  // My Cards State
+  const [userCards, setUserCards] = useState([]);
+
   // Form State
   const [selectedBank, setSelectedBank] = useState("");
   const [selectedCard, setSelectedCard] = useState("");
@@ -114,6 +119,19 @@ const TransferCalculator = () => {
     trackFeatureUsage("transfer_calculator_loaded", { region });
     trackFormStart();
   }, [trackFeatureUsage, trackFormStart, region]);
+
+  useEffect(() => {
+    if (!user || loading) return;
+    getCardsForUser(user.uid)
+      .then(setUserCards)
+      .catch(() => {});
+  }, [user, loading]);
+
+  const handleQuickCardSelect = useCallback((bank, cardName) => {
+    setSelectedBank(bank);
+    setSelectedCard(cardName);
+    setCalculationResult(null);
+  }, []);
 
   // Handle URL parameters for deep linking
   useEffect(() => {
@@ -471,6 +489,14 @@ const TransferCalculator = () => {
                 </Box>
               )}
               <Stack spacing={3}>
+                {userCards.length > 0 && (
+                  <QuickCardSelector
+                    userCards={userCards}
+                    selectedBank={selectedBank}
+                    selectedCard={selectedCard}
+                    onSelectCard={handleQuickCardSelect}
+                  />
+                )}
                 <Autocomplete
                   fullWidth
                   options={banks}
