@@ -5,14 +5,14 @@ import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
 } from "@mui/icons-material";
-import Image from "next/image";
 import useCardImagesData from "@/core/hooks/useCardImagesData";
 import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
-// Horizontal: 80×50  |  Vertical: 50×80
-const H = { w: 80, h: 50 };
-const V = { w: 50, h: 80 };
-const SCROLL_AMOUNT = 240;
+// Credit card aspect ratio: 85.6mm × 53.98mm ≈ 1.586 : 1
+const ASPECT_H = 1.586;   // horizontal
+const ASPECT_V = 1 / ASPECT_H; // vertical ≈ 0.630
+
+const SCROLL_AMOUNT = 300;
 
 const QuickCardSelector = ({ userCards = [], selectedBank, selectedCard, onSelectCard }) => {
   const { cardImagesData } = useCardImagesData();
@@ -33,7 +33,6 @@ const QuickCardSelector = ({ userCards = [], selectedBank, selectedCard, onSelec
         ...card,
         imageId: imageData?.id || null,
         isVertical,
-        dim: isVertical ? V : H,
       };
     });
   }, [userCards, cardImagesData]);
@@ -75,7 +74,7 @@ const QuickCardSelector = ({ userCards = [], selectedBank, selectedCard, onSelec
           <ChevronLeftIcon fontSize="small" />
         </IconButton>
 
-        {/* Scrollable row — alignItems center so tall vertical cards and short horizontal cards sit on the same baseline midpoint */}
+        {/* Scrollable row */}
         <Box
           ref={scrollRef}
           onScroll={updateScrollButtons}
@@ -94,7 +93,7 @@ const QuickCardSelector = ({ userCards = [], selectedBank, selectedCard, onSelec
         >
           {processedCards.map((card) => {
             const isSelected = selectedBank === card.bank && selectedCard === card.cardName;
-            const { w, h } = card.dim;
+            const aspect = card.isVertical ? ASPECT_V : ASPECT_H;
 
             return (
               <Tooltip
@@ -106,8 +105,9 @@ const QuickCardSelector = ({ userCards = [], selectedBank, selectedCard, onSelec
                   onClick={() => onSelectCard(card.bank, card.cardName)}
                   elevation={isSelected ? 4 : 1}
                   sx={{
+                    // clamp(min, fluid, max) — scales smoothly at every viewport width, no breakpoint steps
                     flexShrink: 0,
-                    width: w,
+                    width: card.isVertical ? "clamp(50px, 5vw, 80px)" : "clamp(80px, 8vw, 128px)",
                     cursor: "pointer",
                     borderRadius: 1.5,
                     overflow: "hidden",
@@ -121,26 +121,23 @@ const QuickCardSelector = ({ userCards = [], selectedBank, selectedCard, onSelec
                     },
                   }}
                 >
-                  {/* Image respects the card's natural ratio */}
+                  {/* Image container: width from parent, height derived via aspectRatio */}
                   <Box
                     sx={{
-                      width: w,
-                      height: h,
+                      width: "100%",
+                      aspectRatio: `${aspect}`,
+                      bgcolor: "background.default",
+                      overflow: "hidden",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      overflow: "hidden",
-                      bgcolor: "background.default",
                     }}
                   >
                     {card.imageId ? (
-                      <Image
+                      <img
                         src={buildCloudflareImageUrl(card.imageId, "public")}
                         alt={`${card.bank} ${card.cardName}`}
-                        width={w}
-                        height={h}
-                        unoptimized
-                        style={{ objectFit: "cover", width: "100%", height: "100%" }}
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
                       />
                     ) : (
                       <CreditCardIcon sx={{ color: "text.disabled", fontSize: 24 }} />
