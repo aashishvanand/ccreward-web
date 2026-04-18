@@ -120,11 +120,16 @@ export const getCardsForUser = async (userId) => {
     // Get current region/country directly from localStorage (don't use cached value)
     const selectedCountry = localStorage.getItem('app-region')?.toLowerCase() || 'in';
 
+    // Return cached card list if fresh — filter by country on the way out
+    const cachedList = getCachedData(userId);
+    if (cachedList) {
+      return cachedList.filter(card => !card.country || card.country.toLowerCase() === selectedCountry);
+    }
+
     const { db, funcs } = await loadFirestore();
     if (!db || !funcs) return [];
     const { doc, getDoc } = funcs;
 
-    // If not in cache, fetch from Firebase
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Box,
   Container,
@@ -239,7 +239,13 @@ function Calculator() {
 
     if (
       lastCalculationInputs &&
-      JSON.stringify(currentInputs) === JSON.stringify(lastCalculationInputs)
+      currentInputs.bank === lastCalculationInputs.bank &&
+      currentInputs.card === lastCalculationInputs.card &&
+      currentInputs.mcc === lastCalculationInputs.mcc &&
+      currentInputs.amount === lastCalculationInputs.amount &&
+      currentInputs.currency === lastCalculationInputs.currency &&
+      currentInputs.country === lastCalculationInputs.country &&
+      JSON.stringify(currentInputs.additionalInputs) === JSON.stringify(lastCalculationInputs.additionalInputs)
     ) {
       return;
     }
@@ -329,6 +335,15 @@ function Calculator() {
       severity,
     });
   };
+
+  const incorrectReportFormData = useMemo(() => ({
+    bank: selectedBank,
+    card: selectedCard,
+    mcc: selectedMcc ? `${selectedMcc.mcc} - ${selectedMcc.name}` : "Not selected",
+    spentAmount,
+    additionalInputs,
+    calculationResult,
+  }), [selectedBank, selectedCard, selectedMcc, spentAmount, additionalInputs, calculationResult]);
 
   return (
     <motion.div
@@ -470,16 +485,7 @@ function Calculator() {
           onSubmitSuccess={(message) =>
             setAlert({ open: true, message, severity: "success" })
           }
-          formData={{
-            bank: selectedBank,
-            card: selectedCard,
-            mcc: selectedMcc
-              ? `${selectedMcc.mcc} - ${selectedMcc.name}`
-              : "Not selected",
-            spentAmount,
-            additionalInputs,
-            calculationResult,
-          }}
+          formData={incorrectReportFormData}
         />
 
         {alert.open && (

@@ -9,6 +9,11 @@ import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } fr
 import type { ImageConfig } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
 
+// Local Env override for this worker — matches the vinext image-optimization
+// API shape. The global Env (from worker-configuration.d.ts) uses the stricter
+// ImagesBinding type from @cloudflare/workers-types which conflicts with the
+// string `format` that vinext's handleImageOptimization passes. Keep this until
+// vinext ships typed image helpers.
 interface Env {
   ASSETS: Fetcher;
   IMAGES: {
@@ -33,7 +38,7 @@ export default {
     // Lightweight geo-detection endpoint — returns the visitor's country
     // code using Cloudflare's built-in cf.country (no third-party API call).
     if (url.pathname === "/_geo") {
-      const country = (request as any).cf?.country || "US";
+      const country = (request as Request & { cf?: { country?: string } }).cf?.country || "US";
       return new Response(JSON.stringify({ country }), {
         headers: {
           "Content-Type": "application/json",

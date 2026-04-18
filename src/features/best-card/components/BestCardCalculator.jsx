@@ -670,7 +670,7 @@ const BestCardCalculator = () => {
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isCalculated, userCards.length, trackCustomEngagement]);
 

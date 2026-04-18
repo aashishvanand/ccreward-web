@@ -371,7 +371,7 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [category, categoryCards.length, trackCustomEngagement]);
 

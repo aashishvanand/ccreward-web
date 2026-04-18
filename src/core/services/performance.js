@@ -243,7 +243,7 @@ function setupPerformanceObservers() {
 
                 if (fidTrace) {
                     fidTrace.start();
-                    fidTrace.putAttribute('value', entries[0].processingStart - entries[0].startTime);
+                    fidTrace.putAttribute('value', (entries[0].processingStart - entries[0].startTime).toString());
                     fidTrace.putAttribute('name', entries[0].name);
                     fidTrace.stop();
                 }

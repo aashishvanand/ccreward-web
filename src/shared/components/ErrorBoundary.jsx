@@ -4,8 +4,6 @@ import React from 'react';
 import { Box, Typography, Button, Paper, Alert, Stack } from '@mui/material';
 import { Refresh as RefreshIcon, BugReport as BugReportIcon } from '@mui/icons-material';
 import { handleReactError, logBreadcrumb, recordFatalError } from '../../core/services/crashlytics';
-// FIXED: Use specific imports instead of export *
-import { motion } from 'framer-motion';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -25,7 +23,7 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     // Generate unique error ID
-    const errorId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const errorId = `error_${Date.now()}_${crypto.randomUUID().replace(/-/g, '').slice(0, 9)}`;
     
     // Log error details
     console.error('🚨 React Error Boundary caught an error:', error, errorInfo);
@@ -142,10 +140,14 @@ Please describe what you were doing when this error occurred:
             textAlign: 'center',
           }}
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
+          <Box
+            sx={{
+              animation: 'errorFadeIn 0.5s ease-out',
+              '@keyframes errorFadeIn': {
+                from: { opacity: 0, transform: 'scale(0.9)' },
+                to: { opacity: 1, transform: 'scale(1)' },
+              },
+            }}
           >
             <Paper
               elevation={3}
@@ -156,125 +158,89 @@ Please describe what you were doing when this error occurred:
                 borderRadius: 2,
               }}
             >
-              <motion.div
-                initial={{ y: -20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-              >
-                <BugReportIcon 
-                  sx={{ 
-                    fontSize: 64, 
-                    color: 'error.main', 
-                    mb: 2 
-                  }} 
-                />
-              </motion.div>
+              <BugReportIcon
+                sx={{
+                  fontSize: 64,
+                  color: 'error.main',
+                  mb: 2
+                }}
+              />
 
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
+              <Typography
+                variant="h4"
+                gutterBottom
+                sx={{ fontWeight: 'bold', color: 'error.main' }}
               >
-                <Typography 
-                  variant="h4" 
-                  gutterBottom 
-                  sx={{ fontWeight: 'bold', color: 'error.main' }}
-                >
-                  Oops! Something went wrong
-                </Typography>
-              </motion.div>
+                Oops! Something went wrong
+              </Typography>
 
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.5 }}
+              <Typography
+                variant="body1"
+                sx={{ mb: 3, color: 'text.secondary' }}
               >
-                <Typography 
-                  variant="body1" 
-                  sx={{ mb: 3, color: 'text.secondary' }}
-                >
-                  We've encountered an unexpected error. Our team has been notified and is working on a fix.
-                </Typography>
-              </motion.div>
+                We've encountered an unexpected error. Our team has been notified and is working on a fix.
+              </Typography>
 
               {process.env.NODE_ENV === 'development' && this.state.error && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                >
-                  <Alert severity="error" sx={{ mb: 3, textAlign: 'left' }}>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                      <strong>Error:</strong> {this.state.error.message}
+                <Alert severity="error" sx={{ mb: 3, textAlign: 'left' }}>
+                  <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                    <strong>Error:</strong> {this.state.error.message}
+                  </Typography>
+                  {this.state.errorId && (
+                    <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
+                      Error ID: {this.state.errorId}
                     </Typography>
-                    {this.state.errorId && (
-                      <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
-                        Error ID: {this.state.errorId}
-                      </Typography>
-                    )}
-                  </Alert>
-                </motion.div>
+                  )}
+                </Alert>
               )}
 
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.6, duration: 0.5 }}
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={2}
+                sx={{ mt: 3 }}
               >
-                <Stack 
-                  direction={{ xs: 'column', sm: 'row' }} 
-                  spacing={2} 
-                  sx={{ mt: 3 }}
+                <Button
+                  variant="contained"
+                  startIcon={<RefreshIcon />}
+                  onClick={this.handleRefresh}
+                  sx={{ flex: 1 }}
                 >
-                  <Button
-                    variant="contained"
-                    startIcon={<RefreshIcon />}
-                    onClick={this.handleRefresh}
-                    sx={{ flex: 1 }}
-                  >
-                    Try Again
-                  </Button>
-                  
-                  <Button
-                    variant="outlined"
-                    onClick={this.handleReload}
-                    sx={{ flex: 1 }}
-                  >
-                    Refresh Page
-                  </Button>
-                  
-                  <Button
-                    variant="outlined"
-                    startIcon={<BugReportIcon />}
-                    onClick={this.handleReportBug}
-                    sx={{ flex: 1 }}
-                  >
-                    Report Bug
-                  </Button>
-                </Stack>
-              </motion.div>
+                  Try Again
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  onClick={this.handleReload}
+                  sx={{ flex: 1 }}
+                >
+                  Refresh Page
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  startIcon={<BugReportIcon />}
+                  onClick={this.handleReportBug}
+                  sx={{ flex: 1 }}
+                >
+                  Report Bug
+                </Button>
+              </Stack>
 
               {this.state.errorId && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8, duration: 0.5 }}
+                <Typography
+                  variant="caption"
+                  sx={{
+                    mt: 2,
+                    display: 'block',
+                    color: 'text.disabled',
+                    fontFamily: 'monospace'
+                  }}
                 >
-                  <Typography 
-                    variant="caption" 
-                    sx={{ 
-                      mt: 2, 
-                      display: 'block',
-                      color: 'text.disabled',
-                      fontFamily: 'monospace'
-                    }}
-                  >
-                    Error ID: {this.state.errorId}
-                  </Typography>
-                </motion.div>
+                  Error ID: {this.state.errorId}
+                </Typography>
               )}
             </Paper>
-          </motion.div>
+          </Box>
         </Box>
       );
     }
