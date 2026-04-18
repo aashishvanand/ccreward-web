@@ -23,6 +23,9 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000;
 const api = axios.create({
     baseURL: API_BASE_URL,
     timeout: 10000, // 10 seconds timeout
+    headers: {
+        'Accept-Encoding': 'gzip, deflate, br',
+    },
 });
 
 // Configure retries
