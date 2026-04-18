@@ -482,6 +482,20 @@ const TransferCalculator = () => {
                 subtitle="Calculate point transfers to airline and hotel partners."
             />
 
+            {userCards.length > 0 && (
+              <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+                  My Cards
+                </Typography>
+                <QuickCardSelector
+                  userCards={userCards}
+                  selectedBank={selectedBank}
+                  selectedCard={selectedCard}
+                  onSelectCard={handleQuickCardSelect}
+                />
+              </Paper>
+            )}
+
             <Paper elevation={2} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2 }}>
               {user && (
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
@@ -489,14 +503,6 @@ const TransferCalculator = () => {
                 </Box>
               )}
               <Stack spacing={3}>
-                {userCards.length > 0 && (
-                  <QuickCardSelector
-                    userCards={userCards}
-                    selectedBank={selectedBank}
-                    selectedCard={selectedCard}
-                    onSelectCard={handleQuickCardSelect}
-                  />
-                )}
                 <Autocomplete
                   fullWidth
                   options={banks}
