@@ -53,9 +53,11 @@ function RootLayout({ children }) {
         {/* Inline script to prevent theme FOUC - must run before first paint */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('app-theme');if(t==='dark'||((!t)&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark-mode')}}catch(e){}})()`,
+            __html: `(function(){try{var t=localStorage.getItem('app-theme');var isDark=t==='dark'||((!t)&&window.matchMedia('(prefers-color-scheme:dark)').matches);if(isDark){document.documentElement.classList.add('dark-mode');document.documentElement.setAttribute('data-mui-color-scheme','dark')}var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=isDark?'#0F172A':'#ffffff'}catch(e){}})()`,
           }}
         />
+        <meta name="color-scheme" content="light dark" />
+        <meta name="theme-color" content="#ffffff" />
         {/* Preconnect to critical external origins for faster resource loading */}
         <link rel="preconnect" href="https://files.ccreward.app" />
         <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />

@@ -171,6 +171,7 @@ const VideoTutorial = ({
           }}
         >
           <IconButton
+            aria-label="Play video"
             sx={{
               color: "white",
               bgcolor: platformColor || "rgba(0,0,0,0.7)",
@@ -219,6 +220,7 @@ const VideoTutorial = ({
             <Tooltip title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
               <IconButton
                 onClick={toggleFullscreen}
+                aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
                 sx={{
                   bgcolor: "rgba(0,0,0,0.6)",
                   color: "white",
@@ -236,6 +238,7 @@ const VideoTutorial = ({
           <Tooltip title="Close">
             <IconButton
               onClick={handleCloseVideo}
+              aria-label="Close video"
               sx={{
                 bgcolor: "rgba(0,0,0,0.6)",
                 color: "white",

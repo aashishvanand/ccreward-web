@@ -138,6 +138,7 @@ const TopSearchs = () => {
           <>
             <IconButton
               onClick={() => scroll("left")}
+              aria-label="Scroll left"
               sx={{
                 position: "absolute",
                 left: -20,
@@ -153,6 +154,7 @@ const TopSearchs = () => {
             </IconButton>
             <IconButton
               onClick={() => scroll("right")}
+              aria-label="Scroll right"
               sx={{
                 position: "absolute",
                 right: -20,

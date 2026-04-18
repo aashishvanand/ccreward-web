@@ -59,7 +59,7 @@ const ResultCard = ({ item }) => {
             backdropFilter: 'blur(20px)',
             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
             boxShadow: `0 4px 20px ${alpha(theme.palette.common.black, 0.05)}`,
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             overflow: 'visible',
             position: 'relative',
             '&:hover': {
@@ -87,7 +87,7 @@ const ResultCard = ({ item }) => {
                             alignItems: 'center',
                             justifyContent: 'center',
                             mr: 2.5,
-                            transition: 'all 0.3s ease',
+                            transition: 'background-color 0.3s ease',
                             width: 56,
                             height: 56,
                             flexShrink: 0,
@@ -333,7 +333,7 @@ const MccResults = ({ results, isLoading, hasSearched }) => {
     }
 
     return (
-        <Grid container spacing={3}>
+        <Grid container spacing={3} aria-live="polite" aria-atomic="false">
             {results.map((item, index) => (
                 <Grid size={{ xs: 12, sm: 6, md: 4 }} key={item.mcc + index}>
                     <ResultCard item={item} />

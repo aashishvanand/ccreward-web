@@ -148,7 +148,7 @@ const RegionSelectionModal = ({ open, onRegionSelect, detectedCountry }) => {
                 border: 2,
                 borderColor: selectedRegion === region.code ? 'primary.main' : 'divider',
                 backgroundColor: selectedRegion === region.code ? 'primary.50' : 'background.paper',
-                transition: 'all 0.3s ease-in-out',
+                transition: 'transform 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out',
                 transform: selectedRegion === region.code ? 'scale(1.02)' : 'scale(1)',
                 boxShadow: selectedRegion === region.code ? 4 : 1,
                 '&:hover': {
@@ -251,7 +251,7 @@ const RegionSelectionModal = ({ open, onRegionSelect, detectedCountry }) => {
                 boxShadow: selectedRegion ? 6 : 1,
                 transform: selectedRegion ? 'translateY(-1px)' : 'none',
               },
-              transition: 'all 0.2s ease-in-out',
+              transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
             }}
           >
             {selectedRegion

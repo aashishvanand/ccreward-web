@@ -315,7 +315,7 @@ function Header({ hideNavigation = false }) {
                 ? "rgba(255, 255, 255, 0.1)"
                 : "transparent",
               color: active ? "inherit" : "rgba(255, 255, 255, 0.8)",
-              transition: "all 0.3s ease-in-out",
+              transition: "background-color 0.3s ease-in-out, color 0.3s ease-in-out, transform 0.3s ease-in-out",
               "&:hover": {
                 backgroundColor: "rgba(255, 255, 255, 0.1)",
                 color: "inherit",
@@ -575,7 +575,7 @@ function Header({ hideNavigation = false }) {
                       backgroundColor: "rgba(255, 255, 255, 0.2)",
                       transform: "rotate(180deg)",
                     },
-                    transition: "all 0.3s ease-in-out",
+                    transition: "background-color 0.3s ease-in-out, transform 0.3s ease-in-out",
                   }}
                 >
                   {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
@@ -592,7 +592,7 @@ function Header({ hideNavigation = false }) {
                       ml: 1,
                       p: 0,
                       border: '2px solid rgba(255, 255, 255, 0.2)',
-                      transition: 'all 0.2s',
+                      transition: 'border-color 0.2s',
                         '&:hover': {
                          border: '2px solid rgba(255, 255, 255, 0.5)',
                         }
@@ -678,7 +678,7 @@ function Header({ hideNavigation = false }) {
                     backgroundColor: "rgba(255, 255, 255, 0.2)",
                     transform: "rotate(180deg)",
                   },
-                  transition: "all 0.3s ease-in-out",
+                  transition: "background-color 0.3s ease-in-out, transform 0.3s ease-in-out",
                 }}
               >
                 {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}

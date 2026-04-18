@@ -366,7 +366,7 @@ const TransferCalculator = () => {
                   <Typography variant="body2" sx={{
                     color: "text.secondary"
                   }}>
-                    {partner.partner_points_received.toLocaleString()} points
+                    {new Intl.NumberFormat().format(partner.partner_points_received)} points
                   </Typography>
                 </Box>
                 <Box sx={{ flex: "1 1 150px" }}>
@@ -378,10 +378,10 @@ const TransferCalculator = () => {
                       fontWeight: "bold"
                     }}>
                       {getCurrencySymbol(currency)}
-                      {partner.estimated_value.toLocaleString(undefined, {
+                      {new Intl.NumberFormat(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
-                      })}
+                      }).format(partner.estimated_value)}
                     </Typography>
                   </Typography>
                   <Typography variant="body2" sx={{
@@ -606,7 +606,7 @@ const TransferCalculator = () => {
               <Box>
                 <Typography variant="h5" gutterBottom>
                   Transfer Partners for{" "}
-                  {calculationResult.points_available.toLocaleString()}{" "}
+                  {new Intl.NumberFormat().format(calculationResult.points_available)}{" "}
                   {calculationResult.card_currency}
                 </Typography>
 

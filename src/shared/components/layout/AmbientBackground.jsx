@@ -31,6 +31,9 @@ const AmbientBackground = memo(() => {
                 '@keyframes pulse': {
                     '0%': { opacity: 0.5, transform: 'translateZ(0) scale(1)' },
                     '100%': { opacity: 1, transform: 'translateZ(0) scale(1.2)' }
+                },
+                '@media (prefers-reduced-motion: reduce)': {
+                    animation: 'none',
                 }
             }} />
              <Box sx={{

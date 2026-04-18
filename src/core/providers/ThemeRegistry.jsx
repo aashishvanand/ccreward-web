@@ -192,7 +192,7 @@ export function ThemeRegistry({ children }) {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                 transform: 'translateY(-1px)',
               },
-              transition: 'all 0.2s ease-in-out',
+              transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
             },
             contained: {
               background: mode === 'light'
@@ -225,8 +225,9 @@ export function ThemeRegistry({ children }) {
 
   useEffect(() => {
     if (mounted && mode) {
-      // Set a proper data attribute for theme
       document.documentElement.setAttribute('data-mui-color-scheme', mode);
+      // Sync the dark-mode class used by globals.css for body background/color
+      document.documentElement.classList.toggle('dark-mode', mode === 'dark');
     }
   }, [mode, mounted]);
 

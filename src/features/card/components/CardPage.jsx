@@ -184,7 +184,7 @@ const StatCard = ({
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-        transition: "all 0.2s ease",
+        transition: "transform 0.2s ease, box-shadow 0.2s ease",
         "&:hover": {
           transform: "translateY(-2px)",
           boxShadow: `0 8px 24px ${alpha(theme.palette[color].main, 0.15)}`,
@@ -300,7 +300,7 @@ const PerkItem = ({ icon: Icon, label, access, color = "primary" }) => {
         display: "flex",
         alignItems: "center",
         gap: 2,
-        transition: "all 0.2s ease",
+        transition: "border-color 0.2s ease, background-color 0.2s ease",
         "&:hover": {
           borderColor: `${color}.main`,
           bgcolor: alpha(theme.palette[color].main, 0.02),
@@ -362,7 +362,7 @@ const MilestoneCard = ({ goal, index, country }) => {
         border: "1px solid",
         borderColor: "divider",
         bgcolor: "background.paper",
-        transition: "all 0.3s ease",
+        transition: "border-color 0.3s ease, box-shadow 0.3s ease",
         "&:hover": {
           borderColor: `${color}.main`,
           boxShadow: `0 4px 20px ${alpha(theme.palette[color].main, 0.12)}`,

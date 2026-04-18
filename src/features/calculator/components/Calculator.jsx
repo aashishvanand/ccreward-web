@@ -433,7 +433,7 @@ function Calculator() {
                   )}
 
                   {calculationPerformed && calculationResult && (
-                    <>
+                    <Box aria-live="polite" aria-atomic="true">
                       <CalculationResults
                         result={calculationResult}
                         isLoading={isCalculating}
@@ -464,7 +464,7 @@ function Calculator() {
                           onAddCard={handleAddCard}
                         />
                       )}
-                    </>
+                    </Box>
                   )}
                 </Stack>
               )}

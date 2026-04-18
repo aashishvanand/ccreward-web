@@ -161,7 +161,7 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
               fontWeight: "bold"
             }}>Add New Card</Typography>
           </Box>
-          <IconButton onClick={onClose} sx={{ color: "white", opacity: 0.8, '&:hover': { opacity: 1 } }}>
+          <IconButton onClick={onClose} aria-label="Close dialog" sx={{ color: "white", opacity: 0.8, '&:hover': { opacity: 1 } }}>
             <CloseIcon />
           </IconButton>
         </Box>

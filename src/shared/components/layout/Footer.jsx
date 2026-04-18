@@ -245,6 +245,7 @@ function Footer() {
                       display: "inline-block",
                       color: "error.main",
                       animation: "heartbeat 1.5s infinite",
+                      '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
                     }}
                   >
                     ❤️
@@ -259,21 +260,11 @@ function Footer() {
       {/* Add keyframes for heartbeat animation */}
       <style jsx global>{`
         @keyframes heartbeat {
-          0% {
-            transform: scale(1);
-          }
-          15% {
-            transform: scale(1.25);
-          }
-          30% {
-            transform: scale(1);
-          }
-          45% {
-            transform: scale(1.25);
-          }
-          60% {
-            transform: scale(1);
-          }
+          0% { transform: scale(1); }
+          15% { transform: scale(1.25); }
+          30% { transform: scale(1); }
+          45% { transform: scale(1.25); }
+          60% { transform: scale(1); }
         }
       `}</style>
     </motion.div>

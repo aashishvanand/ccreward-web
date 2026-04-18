@@ -52,7 +52,7 @@ const CurrencyConversionInfo = ({ currencyConversion }) => {
         }}
       >
         <Chip
-          label={`${inputSymbol}${inputAmount.toLocaleString()} ${inputCurrency}`}
+          label={`${inputSymbol}${new Intl.NumberFormat().format(inputAmount)} ${inputCurrency}`}
           variant="outlined"
           size="small"
         />
@@ -62,7 +62,7 @@ const CurrencyConversionInfo = ({ currencyConversion }) => {
           =
         </Typography>
         <Chip
-          label={`${nativeSymbol}${nativeAmount.toLocaleString()} ${nativeCurrency}`}
+          label={`${nativeSymbol}${new Intl.NumberFormat().format(nativeAmount)} ${nativeCurrency}`}
           color="primary"
           size="small"
         />

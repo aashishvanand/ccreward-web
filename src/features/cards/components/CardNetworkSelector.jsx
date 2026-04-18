@@ -123,7 +123,7 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
                                             cursor: "pointer",
                                             borderRadius: "50%",
                                             border: `3px solid ${isSelected ? theme.palette.primary.main : theme.palette.divider}`,
-                                            transition: "all 0.2s ease",
+                                            transition: "border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease",
                                             backgroundColor: isSelected 
                                                 ? `${theme.palette.primary.main}10` 
                                                 : theme.palette.background.paper,

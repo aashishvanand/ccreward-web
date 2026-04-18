@@ -143,7 +143,7 @@ const TopCardsGrid = ({
                 sx={{
                   borderRadius: 2,
                   cursor: "pointer",
-                  transition: "all 0.3s ease",
+                  transition: "box-shadow 0.3s ease, border-color 0.3s ease",
                   "&:hover": {
                     elevation: 8,
                     borderColor: "primary.main",

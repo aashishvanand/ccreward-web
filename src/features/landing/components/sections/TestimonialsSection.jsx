@@ -23,6 +23,7 @@ const TestimonialsSection = ({
         <Box sx={{ position: "relative", px: { xs: 4, sm: 6, md: 8 } }}>
           <IconButton
             onClick={handlePrevPage}
+            aria-label="Previous testimonials"
             sx={{
               position: "absolute",
               left: { xs: -8, sm: -16, md: -24 },
@@ -86,6 +87,7 @@ const TestimonialsSection = ({
 
           <IconButton
             onClick={handleNextPage}
+            aria-label="Next testimonials"
             sx={{
               position: "absolute",
               right: { xs: -8, sm: -16, md: -24 },

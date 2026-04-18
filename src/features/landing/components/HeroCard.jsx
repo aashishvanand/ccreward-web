@@ -38,7 +38,7 @@ const HeroCard = ({ card, index, isMobile, isTablet, isLargeScreen }) => {
       elevation={4}
       sx={{
         position: "absolute",
-        transition: "all 0.3s ease-in-out",
+        transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, top 0.3s ease-in-out, left 0.3s ease-in-out",
         top: getTopPosition(),
         left: getLeftPosition(),
         width,

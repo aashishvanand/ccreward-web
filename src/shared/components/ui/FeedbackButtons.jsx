@@ -109,6 +109,7 @@ const FeedbackButtons = ({ calculationId }) => {
             disabled={isSubmitting}
             color={vote === "up" ? "primary" : "default"}
             aria-label="Thumbs up"
+            sx={{ minWidth: 44, minHeight: 44 }}
           >
             {vote === "up" ? (
               <ThumbUpIcon fontSize="small" />
@@ -122,6 +123,7 @@ const FeedbackButtons = ({ calculationId }) => {
             disabled={isSubmitting}
             color={vote === "down" ? "error" : "default"}
             aria-label="Thumbs down"
+            sx={{ minWidth: 44, minHeight: 44 }}
           >
             {vote === "down" ? (
               <ThumbDownIcon fontSize="small" />

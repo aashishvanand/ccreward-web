@@ -59,7 +59,7 @@ const MccSearch = ({ onSearch, initialValue = '', placeholder = "Search by merch
                     ),
                     endAdornment: value && (
                         <InputAdornment position="end">
-                            <IconButton onClick={handleClear} edge="end" size="small">
+                            <IconButton onClick={handleClear} edge="end" size="small" aria-label="Clear search">
                                 <Clear />
                             </IconButton>
                         </InputAdornment>
@@ -74,7 +74,7 @@ const MccSearch = ({ onSearch, initialValue = '', placeholder = "Search by merch
                         border: `1px solid ${isFocused ? theme.palette.primary.main : alpha(theme.palette.divider, 0.1)}`,
                         padding: '12px 16px',
                         fontSize: '1.1rem',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transition: 'box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         '&:hover': {
                             backgroundColor: theme.palette.background.paper,
                             boxShadow: `0 8px 25px ${alpha(theme.palette.common.black, 0.1)}`,
