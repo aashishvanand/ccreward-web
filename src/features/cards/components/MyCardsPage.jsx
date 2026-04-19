@@ -673,8 +673,6 @@ function MyCardsPage() {
       animate="visible"
       exit="exit"
     >
-      <title>My Cards Portfolio - CCReward</title>
-      <meta name="description" content="Manage your credit card portfolio and track your benefits." />
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", position: "relative", overflow: "hidden" }}
       >

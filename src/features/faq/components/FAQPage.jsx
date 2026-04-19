@@ -8,11 +8,13 @@ import {
   AccordionDetails,
   TextField,
   InputAdornment,
+  IconButton,
   Chip,
   Stack,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
 import faqs from "@/shared/constants/faq";
@@ -107,6 +109,8 @@ const FAQPage = () => {
   }, [searchQuery, trackSearch, trackEvent, recordCustomMetric]);
 
   // Enhanced search input handler
+  const handleSearchClear = () => setSearchQuery("");
+
   const handleSearchChange = (event) => {
     const query = event.target.value;
     setSearchQuery(query);
@@ -280,6 +284,13 @@ const FAQPage = () => {
                   startAdornment: (
                     <InputAdornment position="start">
                       <SearchIcon />
+                    </InputAdornment>
+                  ),
+                  endAdornment: searchQuery && (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleSearchClear} edge="end" size="small" aria-label="Clear search">
+                        <ClearIcon />
+                      </IconButton>
                     </InputAdornment>
                   ),
                 }

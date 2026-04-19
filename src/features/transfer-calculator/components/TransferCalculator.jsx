@@ -444,7 +444,6 @@ const TransferCalculator = () => {
       animate="visible"
       exit="exit"
     >
-      <title>Points Transfer Calculator - CCReward</title>
       <Box
         sx={{
           display: "flex",

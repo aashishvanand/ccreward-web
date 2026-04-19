@@ -506,7 +506,6 @@ const LandingPage = () => {
       animate="visible"
       exit="exit"
     >
-      <title>Maximize Your Rewards with the Right Credit Card</title>
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >

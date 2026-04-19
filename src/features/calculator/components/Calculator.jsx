@@ -358,8 +358,6 @@ function Calculator() {
       animate="visible"
       exit="exit"
     >
-      <title>Reward Calculator - CCReward</title>
-      <meta name="description" content="Calculate your credit card rewards for specific spends and MCC codes." />
       <Box
         sx={{
           display: "flex",
