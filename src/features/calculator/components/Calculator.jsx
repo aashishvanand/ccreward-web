@@ -84,7 +84,7 @@ function Calculator() {
     useState(false);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
-  const { remaining, limit, canUse, onSuccess: recordUsage, limitMessage } =
+  const { remaining, limit, canUse, limitMessage } =
     useUsageLimit(RateLimitedFeature.CALCULATOR);
 
   const {
@@ -281,9 +281,6 @@ function Calculator() {
         country: region.toLowerCase(),
       });
 
-      // Optimistic local decrement; backend is the source of truth
-      recordUsage();
-
       setCalculationResult(result);
       setCalculationId(result.calculationId || null);
       setCalculationPerformed(true);
@@ -315,7 +312,6 @@ function Calculator() {
     region,
     canUse,
     limitMessage,
-    recordUsage,
   ]);
 
   const handleCalculationError = (error) => {

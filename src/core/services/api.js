@@ -2,7 +2,7 @@ import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import { jwtDecode } from "jwt-decode";
 import { getTurnstileToken } from './turnstile';
-import { updateFromResponseHeaders } from './usageLimitService';
+import { handleSuccessHeaders, handleLimitExceeded } from './usageLimitService';
 
 // Firebase auth is dynamically imported to reduce initial bundle size
 let _authModule = null;
@@ -193,16 +193,18 @@ api.interceptors.request.use(async (config) => {
     return config;
 }, (error) => Promise.reject(error));
 
-// Response interceptor: extract usage limit headers from every response
+// Response interceptor: track feature usage from response headers
 api.interceptors.response.use(
   (response) => {
-    updateFromResponseHeaders(response.headers);
+    handleSuccessHeaders(response.headers);
     return response;
   },
   (error) => {
-    // Also read headers from error responses (e.g. 429)
-    if (error.response?.headers) {
-      updateFromResponseHeaders(error.response.headers);
+    if (error.response?.status === 429) {
+      const code = error.response.data?.code || error.response.data?.error;
+      if (code === 'FEATURE_LIMIT_EXCEEDED') {
+        handleLimitExceeded(error.response.headers);
+      }
     }
     return Promise.reject(error);
   }

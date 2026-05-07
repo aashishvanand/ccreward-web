@@ -108,7 +108,7 @@ const BestCardCalculator = () => {
   const { trackComponentError, trackComponentInteraction } =
     useComponentAnalytics("BestCardCalculator");
 
-  const { remaining, limit, canUse, onSuccess: recordUsage, limitMessage } =
+  const { remaining, limit, canUse, limitMessage } =
     useUsageLimit(RateLimitedFeature.BEST_CARD);
 
   const [userCards, setUserCards] = useState([]);
@@ -486,9 +486,6 @@ const BestCardCalculator = () => {
 
       const calculationDuration = performance.now() - startTime;
 
-      // Optimistic local decrement; backend is the source of truth
-      recordUsage();
-
       setPointsRanking(response.rankingByPoints);
       setRankingByValue(response.rankingByValue);
       setRankingByMiles(response.rankingByMiles);
@@ -571,7 +568,6 @@ const BestCardCalculator = () => {
     user,
     canUse,
     limitMessage,
-    recordUsage,
   ]);
 
   const handleCalculationError = (error) => {

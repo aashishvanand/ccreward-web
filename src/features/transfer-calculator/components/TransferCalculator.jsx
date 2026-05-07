@@ -77,7 +77,7 @@ const TransferCalculator = () => {
   const theme = useTheme();
   const { region, isInitialized } = useRegion();
   const { user, isAuthenticated, loading } = useAuth();
-  const { remaining, limit, canUse, onSuccess: recordUsage, limitMessage } =
+  const { remaining, limit, canUse, limitMessage } =
     useUsageLimit(RateLimitedFeature.TRANSFERS);
 
   const [alert, setAlert] = useState({
@@ -265,9 +265,6 @@ const TransferCalculator = () => {
         card: selectedCard,
         points: Number(points),
       });
-      // Optimistic local decrement; backend is the source of truth
-      recordUsage();
-
       setCalculationResult(result);
       trackFormSubmission(true);
       trackConversion("transfer_calculation", Number(points));
