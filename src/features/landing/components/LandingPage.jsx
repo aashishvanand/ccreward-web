@@ -109,7 +109,7 @@ const LandingPage = () => {
   // Fetch card images data for the application
   const { cardImagesData } = useCardImagesData();
 
-  const [allTweets] = useState(() => [...tweets].sort(() => Math.random() - 0.5));
+  const [allTweets] = useState(() => [...(tweets || [])].sort(() => Math.random() - 0.5));
 
   // Calculate number of tweets per page based on screen size
   const tweetsPerPage = isMobile ? 1 : isTablet ? 2 : 3;
@@ -248,7 +248,7 @@ const LandingPage = () => {
       );
 
       // Shuffle the cards and take first 3 for display
-      const shuffled = [...horizontalCards].sort(() => Math.random() - 0.5);
+      const shuffled = [...(horizontalCards || [])].sort(() => Math.random() - 0.5);
       setCardImages(shuffled.slice(0, 3));
 
       recordCustomMetric("hero_cards_prepared", shuffled.length);

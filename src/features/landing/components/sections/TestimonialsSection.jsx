@@ -1,6 +1,7 @@
 import { Box, Container, Typography, Grid, IconButton } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import TweetContainer from "./TweetContainer";
+import ErrorBoundary from "@/shared/components/ErrorBoundary";
 // For motion components
 import { motion } from "framer-motion";
 
@@ -76,7 +77,9 @@ const TestimonialsSection = ({
                           duration: 0.3,
                         }}
                       >
-                        <TweetContainer tweetUrl={tweet.url} />
+                        <ErrorBoundary componentName="TweetContainer">
+                          <TweetContainer tweetUrl={tweet.url} />
+                        </ErrorBoundary>
                       </motion.div>
                     </Grid>
                   );
