@@ -127,6 +127,12 @@ Please describe what you were doing when this error occurred:
 
   render() {
     if (this.state.hasError) {
+      if (this.props.fallback) {
+        return typeof this.props.fallback === 'function' 
+          ? this.props.fallback(this.state.error, this.handleRefresh)
+          : this.props.fallback;
+      }
+      
       // Error UI with motion animations
       return (
         <Box

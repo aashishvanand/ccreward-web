@@ -77,7 +77,25 @@ const TestimonialsSection = ({
                           duration: 0.3,
                         }}
                       >
-                        <ErrorBoundary componentName="TweetContainer">
+                        <ErrorBoundary 
+                          componentName="TweetContainer"
+                          fallback={
+                            <Box sx={{ 
+                              p: 4, 
+                              minHeight: '200px', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center',
+                              bgcolor: 'background.paper',
+                              borderRadius: 2,
+                              border: '1px solid',
+                              borderColor: 'divider',
+                              color: 'text.secondary'
+                            }}>
+                              <Typography variant="body2">Tweet could not be loaded.</Typography>
+                            </Box>
+                          }
+                        >
                           <TweetContainer tweetUrl={tweet.url} />
                         </ErrorBoundary>
                       </motion.div>
