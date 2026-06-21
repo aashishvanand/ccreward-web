@@ -130,7 +130,7 @@ const ReferralButton = ({
           boxShadow: 6,
           transform: "translateY(-2px)",
         },
-        transition: "all 0.3s ease",
+        transition: "transform 0.3s ease, box-shadow 0.3s ease",
       }}
     >
       Get This Card

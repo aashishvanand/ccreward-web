@@ -26,8 +26,8 @@ import { detectDevice } from "@/core/utils/deviceUtils";
 import TopSearchs from "./sections/TopSearchs";
 import StatsSection from "./sections/StatsSection";
 import GoogleOneTap from "@/shared/components/auth/GoogleOneTap";
-// FIXED: Use specific imports instead of export *
 import { motion } from "framer-motion";
+import debounce from "lodash/debounce";
 
 // Add analytics imports - FIXED
 // These hooks provide various tracking capabilities:
@@ -109,28 +109,14 @@ const LandingPage = () => {
   // Fetch card images data for the application
   const { cardImagesData } = useCardImagesData();
 
-  const [allTweets, setAllTweets] = useState([]);
-  
-  // Shuffle tweets on initial load to provide varied testimonials
-  useEffect(() => {
-    setAllTweets([...tweets].sort(() => Math.random() - 0.5));
-  }, []);
+  const [allTweets] = useState(() => [...(tweets || [])].sort(() => Math.random() - 0.5));
 
   // Calculate number of tweets per page based on screen size
   const tweetsPerPage = isMobile ? 1 : isTablet ? 2 : 3;
-  // Use allTweets for total pages calculation to avoid mismatch during initial render/shuffle
-  const totalPages = Math.ceil((allTweets.length > 0 ? allTweets : tweets).length / tweetsPerPage);
+  const totalPages = Math.ceil(allTweets.length / tweetsPerPage);
 
-  // Memoize visible tweets to prevent unnecessary re-renders
   const visibleTweets = useMemo(
-    () => {
-      // Use shuffled tweets if available, otherwise fallback to default order
-      const sourceTweets = allTweets.length > 0 ? allTweets : tweets;
-      return sourceTweets.slice(
-        currentPage * tweetsPerPage,
-        (currentPage + 1) * tweetsPerPage
-      );
-    },
+    () => allTweets.slice(currentPage * tweetsPerPage, (currentPage + 1) * tweetsPerPage),
     [currentPage, tweetsPerPage, allTweets]
   );
 
@@ -187,7 +173,7 @@ const LandingPage = () => {
       screen_height: typeof window !== "undefined" ? window.innerHeight : 0,
     });
 
-    const handleResize = () => {
+    const handleResize = debounce(() => {
       const updatedDeviceInfo = detectDevice();
       setDeviceInfo(updatedDeviceInfo);
 
@@ -196,11 +182,14 @@ const LandingPage = () => {
         new_height: typeof window !== "undefined" ? window.innerHeight : 0,
         device_type: updatedDeviceInfo.isMobile ? "mobile" : "desktop",
       });
-    };
+    }, 150);
 
     if (typeof window !== "undefined") {
-      window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
+      window.addEventListener("resize", handleResize, { passive: true });
+      return () => {
+        handleResize.cancel();
+        window.removeEventListener("resize", handleResize);
+      };
     }
   }, [trackEvent]);
 
@@ -259,7 +248,7 @@ const LandingPage = () => {
       );
 
       // Shuffle the cards and take first 3 for display
-      const shuffled = [...horizontalCards].sort(() => Math.random() - 0.5);
+      const shuffled = [...(horizontalCards || [])].sort(() => Math.random() - 0.5);
       setCardImages(shuffled.slice(0, 3));
 
       recordCustomMetric("hero_cards_prepared", shuffled.length);
@@ -517,7 +506,6 @@ const LandingPage = () => {
       animate="visible"
       exit="exit"
     >
-      <title>Maximize Your Rewards with the Right Credit Card</title>
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >

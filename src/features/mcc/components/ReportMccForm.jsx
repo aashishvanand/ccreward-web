@@ -61,11 +61,13 @@ const ReportMccForm = ({ open, onClose, onSubmitSuccess }) => {
       onClose={onClose}
       maxWidth="sm"
       fullWidth
-      PaperProps={{
-        sx: {
-          borderRadius: 3,
-          overflow: "hidden",
-          backgroundImage: 'none',
+      slotProps={{
+        paper: {
+          sx: {
+            borderRadius: 3,
+            overflow: "hidden",
+            backgroundImage: 'none',
+          }
         }
       }}
     >
@@ -80,15 +82,22 @@ const ReportMccForm = ({ open, onClose, onSubmitSuccess }) => {
         }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <ReportIcon sx={{ fontSize: 32, opacity: 0.9 }} />
-            <Typography variant="h5" fontWeight="bold">Report MCC Issue</Typography>
+            <Typography variant="h5" sx={{
+              fontWeight: "bold"
+            }}>Report MCC Issue</Typography>
           </Box>
-          <IconButton onClick={onClose} sx={{ color: "white", opacity: 0.8, '&:hover': { opacity: 1 } }}>
+          <IconButton onClick={onClose} aria-label="Close dialog" sx={{ color: "white", opacity: 0.8, '&:hover': { opacity: 1 } }}>
             <CloseIcon />
           </IconButton>
         </Box>
 
         <DialogContent sx={{ p: 3, mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+                mb: 1
+              }}>
                 found a missing merchant or incorrect MCC? Help us improve the database by reporting it below.
             </Typography>
             <TextField

@@ -35,11 +35,12 @@ const CurrencyConversionInfo = ({ currencyConversion }) => {
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
         <CurrencyExchangeIcon fontSize="small" color="info" />
-        <Typography variant="subtitle2" color="info.main">
+        <Typography variant="subtitle2" sx={{
+          color: "info.main"
+        }}>
           Currency Conversion
         </Typography>
       </Box>
-
       <Box
         sx={{
           display: "flex",
@@ -51,31 +52,38 @@ const CurrencyConversionInfo = ({ currencyConversion }) => {
         }}
       >
         <Chip
-          label={`${inputSymbol}${inputAmount.toLocaleString()} ${inputCurrency}`}
+          label={`${inputSymbol}${new Intl.NumberFormat().format(inputAmount)} ${inputCurrency}`}
           variant="outlined"
           size="small"
         />
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{
+          color: "text.secondary"
+        }}>
           =
         </Typography>
         <Chip
-          label={`${nativeSymbol}${nativeAmount.toLocaleString()} ${nativeCurrency}`}
+          label={`${nativeSymbol}${new Intl.NumberFormat().format(nativeAmount)} ${nativeCurrency}`}
           color="primary"
           size="small"
         />
       </Box>
-
-      <Typography variant="caption" color="text.secondary" display="block">
+      <Typography
+        variant="caption"
+        sx={{
+          color: "text.secondary",
+          display: "block"
+        }}>
         Rate: 1 {inputCurrency} = {nativeSymbol}
         {exchangeRate} {nativeCurrency} (as of {rateDate})
       </Typography>
-
       {disclaimer && (
         <Box sx={{ display: "flex", alignItems: "flex-start", gap: 0.5, mt: 1 }}>
           <InfoIcon
             sx={{ fontSize: 14, mt: 0.3, color: "text.disabled" }}
           />
-          <Typography variant="caption" color="text.disabled">
+          <Typography variant="caption" sx={{
+            color: "text.disabled"
+          }}>
             {disclaimer}
           </Typography>
         </Box>

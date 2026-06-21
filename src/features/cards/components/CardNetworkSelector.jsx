@@ -98,7 +98,11 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
                     const isSelected = selectedNetwork === item.network;
 
                     return (
-                        <Tooltip key={item.network} title={item.network} placement="top" TransitionComponent={Fade} TransitionProps={{ timeout: 400 }} arrow>
+                        <Tooltip key={item.network} title={item.network} placement="top" arrow slots={{
+                            transition: Fade
+                        }} slotProps={{
+                            transition: { timeout: 400 }
+                        }}>
                             <Box sx={{ position: "relative", textAlign: "center" }}>
                                 <motion.div
                                     custom={index}
@@ -119,7 +123,7 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
                                             cursor: "pointer",
                                             borderRadius: "50%",
                                             border: `3px solid ${isSelected ? theme.palette.primary.main : theme.palette.divider}`,
-                                            transition: "all 0.2s ease",
+                                            transition: "border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease",
                                             backgroundColor: isSelected 
                                                 ? `${theme.palette.primary.main}10` 
                                                 : theme.palette.background.paper,
@@ -163,7 +167,12 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
                 })}
             </Box>
             <Box sx={{ mt: 2, borderTop: `1px solid ${theme.palette.divider}`, pt: 1, textAlign: 'center' }}>
-                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+                <Typography
+                    variant="caption"
+                    sx={{
+                        color: "text.secondary",
+                        fontSize: '0.75rem'
+                    }}>
                     {selectedNetwork ? `Selected: ${selectedNetwork}` : "Select a card network to continue"}
                 </Typography>
             </Box>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Box,
   Container,
@@ -20,7 +20,9 @@ import Footer from "@/shared/components/layout/Footer";
 import PageHeader from "@/shared/components/layout/PageHeader";
 import CalculatorForm from "./CalculatorForm";
 import AddToMyCardsButton from "../../cards/components/AddToMyCardsButton";
+import QuickCardSelector from "@/shared/components/ui/QuickCardSelector";
 import ReportButtons from "@/shared/components/ui/ReportButtons";
+import FeedbackButtons from "@/shared/components/ui/FeedbackButtons";
 import MissingBankCardForm from "./ReportForms/MissingBankCardForm";
 import IncorrectRewardReportForm from "./ReportForms/IncorrectRewardReportForm";
 import ErrorAlert from "@/shared/components/ui/ErrorAlert";
@@ -82,7 +84,7 @@ function Calculator() {
     useState(false);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
-  const { remaining, limit, canUse, onSuccess: recordUsage, limitMessage } =
+  const { remaining, limit, canUse, limitMessage } =
     useUsageLimit(RateLimitedFeature.CALCULATOR);
 
   const {
@@ -102,6 +104,7 @@ function Calculator() {
   } = useCardSelection();
 
   const [calculationResult, setCalculationResult] = useState(null);
+  const [calculationId, setCalculationId] = useState(null);
   const [calculationPerformed, setCalculationPerformed] = useState(false);
   const [lastCalculationInputs, setLastCalculationInputs] = useState(null);
   const { trackButtonClick, trackFeatureUsage, trackConversion } =
@@ -188,9 +191,15 @@ function Calculator() {
     }
   }, [user, selectedBank, selectedCard]);
 
+  const handleQuickCardSelect = useCallback((bank, cardName) => {
+    handleBankChange(bank);
+    handleCardChange(cardName);
+  }, [handleBankChange, handleCardChange]);
+
   const handleClearAll = useCallback(() => {
     resetAllFields();
     setCalculationResult(null);
+    setCalculationId(null);
     setCalculationPerformed(false);
     setLastCalculationInputs(null);
   }, [resetAllFields]);
@@ -236,7 +245,13 @@ function Calculator() {
 
     if (
       lastCalculationInputs &&
-      JSON.stringify(currentInputs) === JSON.stringify(lastCalculationInputs)
+      currentInputs.bank === lastCalculationInputs.bank &&
+      currentInputs.card === lastCalculationInputs.card &&
+      currentInputs.mcc === lastCalculationInputs.mcc &&
+      currentInputs.amount === lastCalculationInputs.amount &&
+      currentInputs.currency === lastCalculationInputs.currency &&
+      currentInputs.country === lastCalculationInputs.country &&
+      JSON.stringify(currentInputs.additionalInputs) === JSON.stringify(lastCalculationInputs.additionalInputs)
     ) {
       return;
     }
@@ -266,10 +281,8 @@ function Calculator() {
         country: region.toLowerCase(),
       });
 
-      // Optimistic local decrement; backend is the source of truth
-      recordUsage();
-
       setCalculationResult(result);
+      setCalculationId(result.calculationId || null);
       setCalculationPerformed(true);
       setLastCalculationInputs(currentInputs);
 
@@ -299,7 +312,6 @@ function Calculator() {
     region,
     canUse,
     limitMessage,
-    recordUsage,
   ]);
 
   const handleCalculationError = (error) => {
@@ -326,6 +338,15 @@ function Calculator() {
     });
   };
 
+  const incorrectReportFormData = useMemo(() => ({
+    bank: selectedBank,
+    card: selectedCard,
+    mcc: selectedMcc ? `${selectedMcc.mcc} - ${selectedMcc.name}` : "Not selected",
+    spentAmount,
+    additionalInputs,
+    calculationResult,
+  }), [selectedBank, selectedCard, selectedMcc, spentAmount, additionalInputs, calculationResult]);
+
   return (
     <motion.div
       variants={pageVariants}
@@ -333,8 +354,6 @@ function Calculator() {
       animate="visible"
       exit="exit"
     >
-      <title>Reward Calculator - CCReward</title>
-      <meta name="description" content="Calculate your credit card rewards for specific spends and MCC codes." />
       <Box
         sx={{
           display: "flex",
@@ -366,6 +385,20 @@ function Calculator() {
             />
 
             <ErrorAlert message={error} onClose={() => setError(null)} />
+
+            {!loading && !isFetchingUserData && userCards.length > 0 && (
+              <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+                  My Cards
+                </Typography>
+                <QuickCardSelector
+                  userCards={userCards}
+                  selectedBank={selectedBank}
+                  selectedCard={selectedCard}
+                  onSelectCard={handleQuickCardSelect}
+                />
+              </Paper>
+            )}
 
             <Paper
               elevation={2}
@@ -403,19 +436,32 @@ function Calculator() {
                     isCalculating={isCalculating}
                   />
 
-                  <ReportButtons
-                    calculationPerformed={calculationPerformed}
-                    onMissingFormOpen={() => setMissingFormOpen(true)}
-                    onIncorrectRewardOpen={() =>
-                      setIncorrectRewardReportOpen(true)
-                    }
-                  />
+                  {!calculationPerformed && (
+                    <ReportButtons
+                      calculationPerformed={false}
+                      onMissingFormOpen={() => setMissingFormOpen(true)}
+                      onIncorrectRewardOpen={() =>
+                        setIncorrectRewardReportOpen(true)
+                      }
+                    />
+                  )}
 
                   {calculationPerformed && calculationResult && (
-                    <>
+                    <Box aria-live="polite" aria-atomic="true">
                       <CalculationResults
                         result={calculationResult}
                         isLoading={isCalculating}
+                      />
+                      <FeedbackButtons
+                        key={calculationId}
+                        calculationId={calculationId}
+                      />
+                      <ReportButtons
+                        calculationPerformed={true}
+                        onMissingFormOpen={() => setMissingFormOpen(true)}
+                        onIncorrectRewardOpen={() =>
+                          setIncorrectRewardReportOpen(true)
+                        }
                       />
                       <ReferralButton
                         bank={selectedBank}
@@ -432,7 +478,7 @@ function Calculator() {
                           onAddCard={handleAddCard}
                         />
                       )}
-                    </>
+                    </Box>
                   )}
                 </Stack>
               )}
@@ -453,16 +499,7 @@ function Calculator() {
           onSubmitSuccess={(message) =>
             setAlert({ open: true, message, severity: "success" })
           }
-          formData={{
-            bank: selectedBank,
-            card: selectedCard,
-            mcc: selectedMcc
-              ? `${selectedMcc.mcc} - ${selectedMcc.name}`
-              : "Not selected",
-            spentAmount,
-            additionalInputs,
-            calculationResult,
-          }}
+          formData={incorrectReportFormData}
         />
 
         {alert.open && (

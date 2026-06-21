@@ -117,11 +117,10 @@ const MobileAppPromotion = ({ isAndroid }) => {
 
           <Typography
             variant="body2"
-            color="text.secondary"
             sx={{
-              fontSize: { xs: "0.875rem", sm: "1rem" },
-            }}
-          >
+              color: "text.secondary",
+              fontSize: { xs: "0.875rem", sm: "1rem" }
+            }}>
             Get the full experience with our app for{" "}
             {isAndroid ? "Android" : "iOS"}
           </Typography>

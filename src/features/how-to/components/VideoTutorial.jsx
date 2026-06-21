@@ -100,22 +100,19 @@ const VideoTutorial = ({
       >
         {title || "Video Tutorial"}
       </Typography>
-
       {description && (
         <Typography
           variant="body2"
-          color="text.secondary"
           sx={{
+            color: "text.secondary",
             mb: 2,
             textAlign: "center",
             maxWidth: 600,
-            fontSize: "0.875rem",
-          }}
-        >
+            fontSize: "0.875rem"
+          }}>
           {description}
         </Typography>
       )}
-
       <Paper
         elevation={2}
         sx={{
@@ -174,6 +171,7 @@ const VideoTutorial = ({
           }}
         >
           <IconButton
+            aria-label="Play video"
             sx={{
               color: "white",
               bgcolor: platformColor || "rgba(0,0,0,0.7)",
@@ -190,21 +188,22 @@ const VideoTutorial = ({
           </IconButton>
         </Box>
       </Paper>
-
       <Dialog
         open={isOpen}
         onClose={handleCloseVideo}
         maxWidth="lg"
         fullWidth
         fullScreen={isFullscreen || isMobile}
-        PaperProps={{
-          sx: {
-            bgcolor: "black",
-            position: "relative",
-            overflow: "hidden",
-            borderRadius: isFullscreen || isMobile ? 0 : 2,
-            m: isMobile ? 0 : 2,
-          },
+        slotProps={{
+          paper: {
+            sx: {
+              bgcolor: "black",
+              position: "relative",
+              overflow: "hidden",
+              borderRadius: isFullscreen || isMobile ? 0 : 2,
+              m: isMobile ? 0 : 2,
+            },
+          }
         }}
       >
         <Box
@@ -221,6 +220,7 @@ const VideoTutorial = ({
             <Tooltip title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}>
               <IconButton
                 onClick={toggleFullscreen}
+                aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
                 sx={{
                   bgcolor: "rgba(0,0,0,0.6)",
                   color: "white",
@@ -238,6 +238,7 @@ const VideoTutorial = ({
           <Tooltip title="Close">
             <IconButton
               onClick={handleCloseVideo}
+              aria-label="Close video"
               sx={{
                 bgcolor: "rgba(0,0,0,0.6)",
                 color: "white",

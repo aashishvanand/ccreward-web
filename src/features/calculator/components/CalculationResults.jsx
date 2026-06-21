@@ -203,7 +203,7 @@ const CalculationResults = ({ result, isLoading }) => {
                       fontSize: { xs: "1rem", sm: "1.25rem" },
                       cursor: "pointer",
                       maxWidth: "calc(100% - 40px)",
-                      transition: "all 0.3s ease",
+                      transition: "max-height 0.3s ease, opacity 0.3s ease",
                     },
                     expanded
                       ? {}

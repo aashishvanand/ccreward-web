@@ -209,7 +209,9 @@ const StatsSection = () => {
           {getRegionSpecificDescription()}
         </Typography>
 
-        <Grid container spacing={4} justifyContent="center">
+        <Grid container spacing={4} sx={{
+          justifyContent: "center"
+        }}>
           <Grid size={{ xs: 6, md: 4 }}>
             <Box sx={{ textAlign: "center" }}>
               <Typography
@@ -233,12 +235,11 @@ const StatsSection = () => {
               </Typography>
               <Typography
                 variant="h6"
-                color="text.secondary"
                 sx={{
+                  color: "text.secondary",
                   fontSize: { xs: "1rem", sm: "1.25rem" },
-                  fontWeight: "regular",
-                }}
-              >
+                  fontWeight: "regular"
+                }}>
                 Credit Cards
               </Typography>
             </Box>
@@ -267,12 +268,11 @@ const StatsSection = () => {
               </Typography>
               <Typography
                 variant="h6"
-                color="text.secondary"
                 sx={{
+                  color: "text.secondary",
                   fontSize: { xs: "1rem", sm: "1.25rem" },
-                  fontWeight: "regular",
-                }}
-              >
+                  fontWeight: "regular"
+                }}>
                 Banks
               </Typography>
             </Box>

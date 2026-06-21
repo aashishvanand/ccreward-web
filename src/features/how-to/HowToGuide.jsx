@@ -639,9 +639,10 @@ const HowToGuide = ({ initialGuidesData }) => {
 
                         <Typography
                           variant="body2"
-                          color="text.secondary"
-                          sx={{ mb: 3 }}
-                        >
+                          sx={{
+                            color: "text.secondary",
+                            mb: 3
+                          }}>
                           {currentGuide.description}
                         </Typography>
 
@@ -704,7 +705,9 @@ const HowToGuide = ({ initialGuidesData }) => {
                     </Fade>
                   ) : (
                     <Box sx={{ textAlign: "center", py: 4 }}>
-                      <Typography color="text.secondary">
+                      <Typography sx={{
+                        color: "text.secondary"
+                      }}>
                         {error || "Select a guide to view its content."}
                       </Typography>
                     </Box>

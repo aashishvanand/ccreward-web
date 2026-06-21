@@ -179,7 +179,9 @@ function Footer() {
               <Stack
                 direction={{ xs: "column", sm: "row" }}
                 spacing={{ xs: 1, sm: 3 }}
-                alignItems="center"
+                sx={{
+                  alignItems: "center"
+                }}
               >
                 {["terms", "privacy", "howto", "faq"].map((page, idx) => (
                   <motion.div
@@ -216,7 +218,12 @@ function Footer() {
 
           <motion.div variants={itemVariants}>
             <Box sx={{ textAlign: "center" }}>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                  mb: 1
+                }}>
                 © {new Date().getFullYear()} ccreward. All rights reserved.
               </Typography>
 
@@ -228,7 +235,9 @@ function Footer() {
                   transition: { duration: 0.3 },
                 }}
               >
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{
+                  color: "text.secondary"
+                }}>
                   Made with{" "}
                   <Box
                     component="span"
@@ -236,6 +245,7 @@ function Footer() {
                       display: "inline-block",
                       color: "error.main",
                       animation: "heartbeat 1.5s infinite",
+                      '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
                     }}
                   >
                     ❤️
@@ -247,25 +257,14 @@ function Footer() {
           </motion.div>
         </Container>
       </Box>
-
       {/* Add keyframes for heartbeat animation */}
       <style jsx global>{`
         @keyframes heartbeat {
-          0% {
-            transform: scale(1);
-          }
-          15% {
-            transform: scale(1.25);
-          }
-          30% {
-            transform: scale(1);
-          }
-          45% {
-            transform: scale(1.25);
-          }
-          60% {
-            transform: scale(1);
-          }
+          0% { transform: scale(1); }
+          15% { transform: scale(1.25); }
+          30% { transform: scale(1); }
+          45% { transform: scale(1.25); }
+          60% { transform: scale(1); }
         }
       `}</style>
     </motion.div>

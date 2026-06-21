@@ -31,11 +31,13 @@ import {
 } from "@mui/icons-material";
 import { useAuth } from "@/core/providers/AuthContext";
 import { useRegion } from "@/core/providers/RegionContext";
+import { getCardsForUser } from "@/core/services/firebaseUtils";
 import {
   fetchBanks,
   fetchCards,
   calculateTransferPartners,
 } from "@/core/services/api";
+import QuickCardSelector from "@/shared/components/ui/QuickCardSelector";
 import useUsageLimit from "@/core/hooks/useUsageLimit";
 import { RateLimitedFeature } from "@/core/services/usageLimitService";
 import UsageRemainingBadge from "@/shared/components/ui/UsageRemainingBadge";
@@ -75,7 +77,7 @@ const TransferCalculator = () => {
   const theme = useTheme();
   const { region, isInitialized } = useRegion();
   const { user, isAuthenticated, loading } = useAuth();
-  const { remaining, limit, canUse, onSuccess: recordUsage, limitMessage } =
+  const { remaining, limit, canUse, limitMessage } =
     useUsageLimit(RateLimitedFeature.TRANSFERS);
 
   const [alert, setAlert] = useState({
@@ -91,6 +93,9 @@ const TransferCalculator = () => {
   const { trackFormStart, trackFormSubmission } = useFormTracking(
     "transfer-calculator"
   );
+
+  // My Cards State
+  const [userCards, setUserCards] = useState([]);
 
   // Form State
   const [selectedBank, setSelectedBank] = useState("");
@@ -114,6 +119,19 @@ const TransferCalculator = () => {
     trackFeatureUsage("transfer_calculator_loaded", { region });
     trackFormStart();
   }, [trackFeatureUsage, trackFormStart, region]);
+
+  useEffect(() => {
+    if (!user || loading) return;
+    getCardsForUser(user.uid)
+      .then(setUserCards)
+      .catch(() => {});
+  }, [user, loading]);
+
+  const handleQuickCardSelect = useCallback((bank, cardName) => {
+    setSelectedBank(bank);
+    setSelectedCard(cardName);
+    setCalculationResult(null);
+  }, []);
 
   // Handle URL parameters for deep linking
   useEffect(() => {
@@ -247,9 +265,6 @@ const TransferCalculator = () => {
         card: selectedCard,
         points: Number(points),
       });
-      // Optimistic local decrement; backend is the source of truth
-      recordUsage();
-
       setCalculationResult(result);
       trackFormSubmission(true);
       trackConversion("transfer_calculation", Number(points));
@@ -358,27 +373,39 @@ const TransferCalculator = () => {
                 </ListItemIcon>
 
                 <Box sx={{ flex: "1 1 200px" }}>
-                  <Typography variant="body1" fontWeight="bold">
+                  <Typography variant="body1" sx={{
+                    fontWeight: "bold"
+                  }}>
                     {partner.brand_name} ({partner.partner_name})
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {partner.partner_points_received.toLocaleString()} points
+                  <Typography variant="body2" sx={{
+                    color: "text.secondary"
+                  }}>
+                    {new Intl.NumberFormat().format(partner.partner_points_received)} points
                   </Typography>
                 </Box>
                 <Box sx={{ flex: "1 1 150px" }}>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{
+                    color: "text.secondary"
+                  }}>
                     Est. Value:{" "}
-                    <Typography component="span" fontWeight="bold">
+                    <Typography component="span" sx={{
+                      fontWeight: "bold"
+                    }}>
                       {getCurrencySymbol(currency)}
-                      {partner.estimated_value.toLocaleString(undefined, {
+                      {new Intl.NumberFormat(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
-                      })}
+                      }).format(partner.estimated_value)}
                     </Typography>
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{
+                    color: "text.secondary"
+                  }}>
                     Value/Point:{" "}
-                    <Typography component="span" fontWeight="bold">
+                    <Typography component="span" sx={{
+                      fontWeight: "bold"
+                    }}>
                       {getCurrencySymbol(currency)}
                       {partner.value_per_point.toFixed(2)}
                     </Typography>
@@ -393,7 +420,9 @@ const TransferCalculator = () => {
                   }}
                 >
                   <AccessTimeIcon fontSize="small" color="action" />
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{
+                    color: "text.secondary"
+                  }}>
                     {partner.transfer_time_display}
                   </Typography>
                 </Box>
@@ -412,7 +441,6 @@ const TransferCalculator = () => {
       animate="visible"
       exit="exit"
     >
-      <title>Points Transfer Calculator - CCReward</title>
       <Box
         sx={{
           display: "flex",
@@ -450,6 +478,20 @@ const TransferCalculator = () => {
                 subtitle="Calculate point transfers to airline and hotel partners."
             />
 
+            {userCards.length > 0 && (
+              <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+                  My Cards
+                </Typography>
+                <QuickCardSelector
+                  userCards={userCards}
+                  selectedBank={selectedBank}
+                  selectedCard={selectedCard}
+                  onSelectCard={handleQuickCardSelect}
+                />
+              </Paper>
+            )}
+
             <Paper elevation={2} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 2 }}>
               {user && (
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
@@ -469,14 +511,18 @@ const TransferCalculator = () => {
                       {...params}
                       label="Select a bank"
                       required
-                      InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <>
-                            {isLoadingBanks && <CircularProgress size={20} />}
-                            {params.InputProps.endAdornment}
-                          </>
-                        ),
+                      slotProps={{
+                        ...params.slotProps,
+
+                        input: {
+                          ...params.slotProps.input,
+                          endAdornment: (
+                            <>
+                              {isLoadingBanks && <CircularProgress size={20} />}
+                              {params.slotProps.input.endAdornment}
+                            </>
+                          ),
+                        }
                       }}
                     />
                   )}
@@ -494,14 +540,18 @@ const TransferCalculator = () => {
                       {...params}
                       label="Select a card"
                       required
-                      InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <>
-                            {isLoadingCards && <CircularProgress size={20} />}
-                            {params.InputProps.endAdornment}
-                          </>
-                        ),
+                      slotProps={{
+                        ...params.slotProps,
+
+                        input: {
+                          ...params.slotProps.input,
+                          endAdornment: (
+                            <>
+                              {isLoadingCards && <CircularProgress size={20} />}
+                              {params.slotProps.input.endAdornment}
+                            </>
+                          ),
+                        }
                       }}
                     />
                   )}
@@ -513,26 +563,28 @@ const TransferCalculator = () => {
                   value={points}
                   onChange={handlePointsChange}
                   required
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">Pts</InputAdornment>
-                    ),
-                    endAdornment: points && (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="clear points"
-                          onClick={() => setPoints("")}
-                          edge="end"
-                          size="small"
-                        >
-                          <ClearIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                    inputProps: {
-                      min: 1,
-                      step: 1,
-                    },
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start">Pts</InputAdornment>
+                      ),
+                      endAdornment: points && (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="clear points"
+                            onClick={() => setPoints("")}
+                            edge="end"
+                            size="small"
+                          >
+                            <ClearIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                      inputProps: {
+                        min: 1,
+                        step: 1,
+                      },
+                    }
                   }}
                 />
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
@@ -582,7 +634,7 @@ const TransferCalculator = () => {
               <Box>
                 <Typography variant="h5" gutterBottom>
                   Transfer Partners for{" "}
-                  {calculationResult.points_available.toLocaleString()}{" "}
+                  {new Intl.NumberFormat().format(calculationResult.points_available)}{" "}
                   {calculationResult.card_currency}
                 </Typography>
 

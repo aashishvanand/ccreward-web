@@ -43,7 +43,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
+import WorkOutlinedIcon from "@mui/icons-material/WorkOutlined";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import StarIcon from "@mui/icons-material/Star";
 
@@ -146,7 +146,9 @@ const SectionHeader = ({ icon: Icon, title, subtitle, color = "primary" }) => {
           {title}
         </Typography>
         {subtitle && (
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{
+            color: "text.secondary"
+          }}>
             {subtitle}
           </Typography>
         )}
@@ -182,7 +184,7 @@ const StatCard = ({
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-        transition: "all 0.2s ease",
+        transition: "transform 0.2s ease, box-shadow 0.2s ease",
         "&:hover": {
           transform: "translateY(-2px)",
           boxShadow: `0 8px 24px ${alpha(theme.palette[color].main, 0.15)}`,
@@ -298,7 +300,7 @@ const PerkItem = ({ icon: Icon, label, access, color = "primary" }) => {
         display: "flex",
         alignItems: "center",
         gap: 2,
-        transition: "all 0.2s ease",
+        transition: "border-color 0.2s ease, background-color 0.2s ease",
         "&:hover": {
           borderColor: `${color}.main`,
           bgcolor: alpha(theme.palette[color].main, 0.02),
@@ -323,9 +325,10 @@ const PerkItem = ({ icon: Icon, label, access, color = "primary" }) => {
       <Box sx={{ flex: 1, minWidth: 0 }}>
         <Typography
           variant="body2"
-          color="text.secondary"
-          sx={{ fontWeight: 500 }}
-        >
+          sx={{
+            color: "text.secondary",
+            fontWeight: 500
+          }}>
           {label}
         </Typography>
         <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
@@ -359,7 +362,7 @@ const MilestoneCard = ({ goal, index, country }) => {
         border: "1px solid",
         borderColor: "divider",
         bgcolor: "background.paper",
-        transition: "all 0.3s ease",
+        transition: "border-color 0.3s ease, box-shadow 0.3s ease",
         "&:hover": {
           borderColor: `${color}.main`,
           boxShadow: `0 4px 20px ${alpha(theme.palette[color].main, 0.12)}`,
@@ -395,9 +398,10 @@ const MilestoneCard = ({ goal, index, country }) => {
           {goal.spendsNeeded && (
             <Typography
               variant="body2"
-              color="text.secondary"
-              sx={{ mt: 0.5 }}
-            >
+              sx={{
+                color: "text.secondary",
+                mt: 0.5
+              }}>
               Spend{" "}
               <Box component="span" sx={{ fontWeight: 600, color: `${color}.main` }}>
                 {formatCurrency(goal.spendsNeeded, country)}
@@ -407,7 +411,6 @@ const MilestoneCard = ({ goal, index, country }) => {
           )}
         </Box>
       </Box>
-
       {/* Reward Info */}
       {goal.reward && (
         <Box
@@ -437,7 +440,6 @@ const MilestoneCard = ({ goal, index, country }) => {
           </Typography>
         </Box>
       )}
-
       {/* Excluded Categories (if any) */}
       {goal.excludedCategories && goal.excludedCategories.length > 0 && (
         <>
@@ -629,7 +631,9 @@ const CardPage = ({ bankName, cardName, country }) => {
             }}
           >
             <CircularProgress size={48} thickness={4} />
-            <Typography color="text.secondary">
+            <Typography sx={{
+              color: "text.secondary"
+            }}>
               Loading card details...
             </Typography>
           </Box>
@@ -668,7 +672,13 @@ const CardPage = ({ bankName, cardName, country }) => {
             <Typography variant="h5" gutterBottom sx={{ fontWeight: 700 }}>
               Sign In Required
             </Typography>
-            <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 400, mx: "auto" }}>
+            <Typography
+              sx={{
+                color: "text.secondary",
+                mb: 3,
+                maxWidth: 400,
+                mx: "auto"
+              }}>
               Please sign in to view detailed card benefits and features.
             </Typography>
             <Button
@@ -716,7 +726,9 @@ const CardPage = ({ bankName, cardName, country }) => {
                   }}
                 />
 
-                <Grid container spacing={4} alignItems="center">
+                <Grid container spacing={4} sx={{
+                  alignItems: "center"
+                }}>
                   {/* Card Image */}
                   <Grid item xs={12} md={5}>
                     <Box
@@ -800,7 +812,7 @@ const CardPage = ({ bankName, cardName, country }) => {
                             <StatCard
                               label="Min. Income"
                               value={formatCurrency(data.incomeRequirement, country)}
-                              icon={WorkOutlineIcon}
+                              icon={WorkOutlinedIcon}
                               color="info"
                               variant="outlined"
                             />
@@ -1051,7 +1063,6 @@ const CardPage = ({ bankName, cardName, country }) => {
           </Fade>
         )}
       </Container>
-
       {/* Sign In Dialog */}
       <SignInDialog
         open={openDialog}
@@ -1067,7 +1078,6 @@ const CardPage = ({ bankName, cardName, country }) => {
         cancelLabel="Go Back Home"
         onCancel={() => router.push("/")}
       />
-
       <Footer />
     </Box>
   );

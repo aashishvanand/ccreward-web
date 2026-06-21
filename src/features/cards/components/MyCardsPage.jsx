@@ -543,7 +543,7 @@ function MyCardsPage() {
         });
       }
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [cards.length, trackCustomEngagement]);
 
@@ -600,10 +600,17 @@ function MyCardsPage() {
           >
             <CreditCardIcon sx={{ fontSize: 48, opacity: 1 }} />
           </Box>
-          <Typography variant="h5" fontWeight="bold" gutterBottom>
+          <Typography variant="h5" gutterBottom sx={{
+            fontWeight: "bold"
+          }}>
             No cards yet
           </Typography>
-          <Typography color="text.secondary" sx={{ maxWidth: 400, mb: 3 }}>
+          <Typography
+            sx={{
+              color: "text.secondary",
+              maxWidth: 400,
+              mb: 3
+            }}>
             Start building your portfolio by adding your first credit card. 
             We'll help you track rewards and benefits.
           </Typography>
@@ -666,8 +673,6 @@ function MyCardsPage() {
       animate="visible"
       exit="exit"
     >
-      <title>My Cards Portfolio - CCReward</title>
-      <meta name="description" content="Manage your credit card portfolio and track your benefits." />
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", position: "relative", overflow: "hidden" }}
       >

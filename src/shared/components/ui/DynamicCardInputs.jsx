@@ -91,7 +91,7 @@ const DynamicCardInputs = ({
               <FormLabel component="legend">{input.label}</FormLabel>
               {input.helperText && (
                 <Tooltip title={input.helperText}>
-                  <IconButton size="small">
+                  <IconButton size="small" aria-label={`Info: ${input.label}`} sx={{ minWidth: 44, minHeight: 44 }}>
                     <InfoIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
@@ -127,7 +127,7 @@ const DynamicCardInputs = ({
               <FormLabel component="legend">{input.label}</FormLabel>
               {input.helperText && (
                 <Tooltip title={input.helperText}>
-                  <IconButton size="small">
+                  <IconButton size="small" aria-label={`Info: ${input.label}`} sx={{ minWidth: 44, minHeight: 44 }}>
                     <InfoIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
@@ -166,7 +166,7 @@ const DynamicCardInputs = ({
               <FormLabel component="legend">{input.label}</FormLabel>
               {input.helperText && (
                 <Tooltip title={input.helperText}>
-                  <IconButton size="small">
+                  <IconButton size="small" aria-label={`Info: ${input.label}`} sx={{ minWidth: 44, minHeight: 44 }}>
                     <InfoIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>

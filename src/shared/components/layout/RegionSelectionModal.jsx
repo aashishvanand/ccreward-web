@@ -53,6 +53,12 @@ const RegionSelectionModal = ({ open, onRegionSelect, detectedCountry }) => {
     }
   };
 
+  const handleDialogClose = (_event, reason) => {
+    if (reason === "backdropClick" || reason === "escapeKeyDown") {
+      return;
+    }
+  };
+
   const getNoticeMessage = () => {
     if (detectedCountry) {
       return `We detected you're browsing from ${detectedCountry}. Since ccreward currently supports India and Singapore, please select the region most relevant to you.`;
@@ -63,24 +69,25 @@ const RegionSelectionModal = ({ open, onRegionSelect, detectedCountry }) => {
   return (
     <Dialog
       open={open}
+      onClose={handleDialogClose}
       maxWidth="sm"
       fullWidth
-      disableEscapeKeyDown
-      disableBackdropClick
-      PaperProps={{
-        sx: {
-          borderRadius: 3,
-          maxWidth: '500px',
-          m: 2,
+      slotProps={{
+        backdrop: {
+          sx: {
+            backdropFilter: 'blur(4px)',
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          }
+        },
+
+        paper: {
+          sx: {
+            borderRadius: 3,
+            maxWidth: '500px',
+            m: 2,
+          }
         }
-      }}
-      BackdropProps={{
-        sx: {
-          backdropFilter: 'blur(4px)',
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        }
-      }}
-    >
+      }}>
       <DialogContent sx={{ p: 4, pb: 2 }}>
         {/* Header */}
         <Box sx={{ textAlign: 'center', mb: 4 }}>
@@ -104,11 +111,12 @@ const RegionSelectionModal = ({ open, onRegionSelect, detectedCountry }) => {
           >
             Choose Your Region
           </Typography>
-          <Typography 
-            variant="body1" 
-            color="text.secondary"
-            sx={{ fontSize: '1rem' }}
-          >
+          <Typography
+            variant="body1"
+            sx={{
+              color: "text.secondary",
+              fontSize: '1rem'
+            }}>
             Select your region to access relevant credit card data
           </Typography>
         </Box>
@@ -140,7 +148,7 @@ const RegionSelectionModal = ({ open, onRegionSelect, detectedCountry }) => {
                 border: 2,
                 borderColor: selectedRegion === region.code ? 'primary.main' : 'divider',
                 backgroundColor: selectedRegion === region.code ? 'primary.50' : 'background.paper',
-                transition: 'all 0.3s ease-in-out',
+                transition: 'transform 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out',
                 transform: selectedRegion === region.code ? 'scale(1.02)' : 'scale(1)',
                 boxShadow: selectedRegion === region.code ? 4 : 1,
                 '&:hover': {
@@ -184,11 +192,12 @@ const RegionSelectionModal = ({ open, onRegionSelect, detectedCountry }) => {
                         />
                       )}
                     </Box>
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary"
-                      sx={{ fontSize: '0.9rem' }}
-                    >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "text.secondary",
+                        fontSize: '0.9rem'
+                      }}>
                       {region.description}
                     </Typography>
                   </Box>
@@ -223,7 +232,6 @@ const RegionSelectionModal = ({ open, onRegionSelect, detectedCountry }) => {
           ))}
         </Box>
       </DialogContent>
-
       <DialogActions sx={{ p: 4, pt: 0 }}>
         <Box sx={{ width: '100%' }}>
           <Button
@@ -243,7 +251,7 @@ const RegionSelectionModal = ({ open, onRegionSelect, detectedCountry }) => {
                 boxShadow: selectedRegion ? 6 : 1,
                 transform: selectedRegion ? 'translateY(-1px)' : 'none',
               },
-              transition: 'all 0.2s ease-in-out',
+              transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
             }}
           >
             {selectedRegion
@@ -251,17 +259,16 @@ const RegionSelectionModal = ({ open, onRegionSelect, detectedCountry }) => {
               : "Select a region to continue"}
           </Button>
           
-          <Typography 
-            variant="caption" 
-            color="text.secondary" 
-            sx={{ 
+          <Typography
+            variant="caption"
+            sx={{
+              color: "text.secondary",
               display: 'block',
               textAlign: 'center',
               mt: 2,
               fontSize: '0.8rem',
               lineHeight: 1.4
-            }}
-          >
+            }}>
             You can change your region later using the region selector in the header
           </Typography>
         </Box>

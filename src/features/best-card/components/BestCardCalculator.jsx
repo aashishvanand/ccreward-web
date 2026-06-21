@@ -50,6 +50,7 @@ import { motion } from "framer-motion";
 import { getCurrencySymbol, getNativeCurrency } from "@/core/utils";
 import CurrencyAmountField from "@/shared/components/ui/CurrencyAmountField";
 import CurrencyConversionInfo from "@/shared/components/ui/CurrencyConversionInfo";
+import FeedbackButtons from "@/shared/components/ui/FeedbackButtons";
 
 // Add analytics imports
 import {
@@ -107,7 +108,7 @@ const BestCardCalculator = () => {
   const { trackComponentError, trackComponentInteraction } =
     useComponentAnalytics("BestCardCalculator");
 
-  const { remaining, limit, canUse, onSuccess: recordUsage, limitMessage } =
+  const { remaining, limit, canUse, limitMessage } =
     useUsageLimit(RateLimitedFeature.BEST_CARD);
 
   const [userCards, setUserCards] = useState([]);
@@ -138,6 +139,7 @@ const BestCardCalculator = () => {
   const [rankingByMiles, setRankingByMiles] = useState([]);
   const [isLoadingMcc, setIsLoadingMcc] = useState(false);
   const [currencyConversion, setCurrencyConversion] = useState(null);
+  const [calculationId, setCalculationId] = useState(null);
 
   const currentRanking =
     sortMethod === "points"
@@ -484,13 +486,11 @@ const BestCardCalculator = () => {
 
       const calculationDuration = performance.now() - startTime;
 
-      // Optimistic local decrement; backend is the source of truth
-      recordUsage();
-
       setPointsRanking(response.rankingByPoints);
       setRankingByValue(response.rankingByValue);
       setRankingByMiles(response.rankingByMiles);
       setCurrencyConversion(response.currencyConversion || null);
+      setCalculationId(response.calculationId || null);
       setIsCalculated(true);
       setLastCalculationParams(calculationParams);
 
@@ -568,7 +568,6 @@ const BestCardCalculator = () => {
     user,
     canUse,
     limitMessage,
-    recordUsage,
   ]);
 
   const handleCalculationError = (error) => {
@@ -667,7 +666,7 @@ const BestCardCalculator = () => {
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isCalculated, userCards.length, trackCustomEngagement]);
 
@@ -742,16 +741,20 @@ const BestCardCalculator = () => {
                     {...params}
                     label="Search Merchant or MCC (Optional)"
                     fullWidth
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {isLoadingMcc ? (
-                            <CircularProgress size={20} />
-                          ) : null}
-                          {params.InputProps.endAdornment}
-                        </>
-                      ),
+                    slotProps={{
+                      ...params.slotProps,
+
+                      input: {
+                        ...params.slotProps.input,
+                        endAdornment: (
+                          <>
+                            {isLoadingMcc ? (
+                              <CircularProgress size={20} />
+                            ) : null}
+                            {params.slotProps.input.endAdornment}
+                          </>
+                        ),
+                      }
                     }}
                   />
                 )}
@@ -879,6 +882,7 @@ const BestCardCalculator = () => {
                       setRankingByValue([]);
                       setRankingByMiles([]);
                       setCurrencyConversion(null);
+                      setCalculationId(null);
                       setLastCalculationParams(null);
                       setMccInputValue("");
                     }}
@@ -928,6 +932,13 @@ const BestCardCalculator = () => {
                   handleImageError={handleImageError}
                 />
               </List>
+
+              {isCalculated && (
+                <FeedbackButtons
+                  key={calculationId}
+                  calculationId={calculationId}
+                />
+              )}
             </Stack>
           </Paper>
         </Container>

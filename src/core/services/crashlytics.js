@@ -1,4 +1,5 @@
 // src/core/services/crashlytics.js - Firebase Crashlytics Implementation
+import React from 'react';
 let crashlytics = null;
 let isInitialized = false;
 

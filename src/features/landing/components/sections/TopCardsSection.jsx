@@ -127,6 +127,7 @@ const TopCardsSection = () => {
         <Box sx={{ position: "relative", px: { xs: 4, sm: 6 } }}>
           <IconButton
             onClick={handlePrev}
+            aria-label="Previous cards"
             sx={{
               position: "absolute",
               left: { xs: -8, sm: -16 },
@@ -156,7 +157,7 @@ const TopCardsSection = () => {
                   key={categoryName}
                   sx={{
                     display: "flex",
-                    transition: "all 0.3s ease-in-out",
+                    transition: "opacity 0.3s ease-in-out",
                   }}
                   size={{
                     xs: 12,
@@ -169,7 +170,7 @@ const TopCardsSection = () => {
                       flex: 1,
                       display: "flex",
                       flexDirection: "column",
-                      transition: "all 0.3s ease-in-out",
+                      transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
                       "&:hover": {
                         transform: "translateY(-8px)",
                         "& .MuiButton-root": {
@@ -189,9 +190,10 @@ const TopCardsSection = () => {
                       </Typography>
                       <Typography
                         variant="body2"
-                        color="text.secondary"
-                        sx={{ mb: 2 }}
-                      >
+                        sx={{
+                          color: "text.secondary",
+                          mb: 2
+                        }}>
                         {category.cards.length} cards available
                       </Typography>
                       <Button
@@ -206,7 +208,7 @@ const TopCardsSection = () => {
                         }
                         className="MuiButton-root"
                         sx={{
-                          transition: "all 0.3s ease-in-out",
+                          transition: "background-color 0.3s ease-in-out, color 0.3s ease-in-out",
                         }}
                       >
                         View Cards
@@ -220,6 +222,7 @@ const TopCardsSection = () => {
 
           <IconButton
             onClick={handleNext}
+            aria-label="Next cards"
             sx={{
               position: "absolute",
               right: { xs: -8, sm: -16 },

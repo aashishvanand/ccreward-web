@@ -56,10 +56,12 @@ const CardDetailsModal = ({ open, onClose, card, onSave, onDelete }) => {
       onClose={onClose} 
       maxWidth="sm" 
       fullWidth
-      PaperProps={{
-        sx: {
-          borderRadius: 3,
-          overflow: "hidden"
+      slotProps={{
+        paper: {
+          sx: {
+            borderRadius: 3,
+            overflow: "hidden"
+          }
         }
       }}
     >
@@ -73,13 +75,14 @@ const CardDetailsModal = ({ open, onClose, card, onSave, onDelete }) => {
       }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <CreditCardIcon sx={{ fontSize: 32, opacity: 0.9 }} />
-          <Typography variant="h5" fontWeight="bold">Card Details</Typography>
+          <Typography variant="h5" sx={{
+            fontWeight: "bold"
+          }}>Card Details</Typography>
         </Box>
-        <IconButton onClick={onClose} sx={{ color: "white", opacity: 0.8, '&:hover': { opacity: 1 } }}>
+        <IconButton onClick={onClose} aria-label="Close dialog" sx={{ color: "white", opacity: 0.8, '&:hover': { opacity: 1 } }}>
           <CloseIcon />
         </IconButton>
       </Box>
-
       <DialogContent sx={{ p: 3, mt: 2 }}>
         <Stack spacing={3}>
           <TextField
@@ -88,8 +91,10 @@ const CardDetailsModal = ({ open, onClose, card, onSave, onDelete }) => {
             fullWidth
             disabled
             variant="outlined"
-            InputProps={{
-              readOnly: true,
+            slotProps={{
+              input: {
+                readOnly: true,
+              }
             }}
           />
           <TextField
@@ -98,8 +103,10 @@ const CardDetailsModal = ({ open, onClose, card, onSave, onDelete }) => {
             fullWidth
             disabled
             variant="outlined"
-            InputProps={{
-              readOnly: true,
+            slotProps={{
+              input: {
+                readOnly: true,
+              }
             }}
           />
           
@@ -116,7 +123,6 @@ const CardDetailsModal = ({ open, onClose, card, onSave, onDelete }) => {
           </Box>
         </Stack>
       </DialogContent>
-
       <DialogActions sx={{ p: 3, pt: 0, justifyContent: "space-between" }}>
         <Button 
           onClick={handleDelete} 

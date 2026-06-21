@@ -1,16 +1,13 @@
 /**
  * Usage Limit Service
  *
- * Client-side cache of per-feature daily usage, driven entirely by
- * backend response headers (X-Feature-Used / X-Feature-Remaining).
+ * Client-side tracking of per-feature daily usage.
+ * Storage: localStorage with date-keyed counters so a new day starts at 0 automatically.
+ * Limit: read from X-Feature-Limit response header — never hardcoded.
  *
- * The Cloudflare KV backend is the single source of truth.
- * This module simply caches the last-known values so the UI can
- * show badges and block requests locally without an extra API call.
- *
- * On fresh page load (no cached values), the client assumes full
- * quota — the backend 429 acts as the safety net until the first
- * successful response populates the cache.
+ * API interceptor calls:
+ *   handleSuccessHeaders(headers)  — on every 2xx response
+ *   handleLimitExceeded(headers)   — on 429 FEATURE_LIMIT_EXCEEDED
  */
 
 // ─── Feature definitions ───────────────────────────────────────────────────────
@@ -27,25 +24,55 @@ const FEATURE_META = {
   [RateLimitedFeature.TRANSFERS]: { displayName: 'Transfers', iconName: 'SwapHoriz' },
 };
 
-// ─── Default limits (must match backend) ───────────────────────────────────────
+const DEFAULT_LIMIT = 10;
 
-const FREE_LIMITS = {
-  [RateLimitedFeature.CALCULATOR]: 10,
-  [RateLimitedFeature.BEST_CARD]: 10,
-  [RateLimitedFeature.TRANSFERS]: 10,
+// ─── Storage helpers ───────────────────────────────────────────────────────────
+
+const todayStr = () => new Date().toISOString().slice(0, 10);
+
+const USED_KEY = (feature) => `feature_used_${feature}_${todayStr()}`;
+const LIMIT_KEY = (feature) => `feature_limit_${feature}`;
+
+const ls = {
+  get(key, fallback = null) {
+    if (typeof localStorage === 'undefined') return fallback;
+    try {
+      const v = localStorage.getItem(key);
+      return v !== null ? JSON.parse(v) : fallback;
+    } catch { return fallback; }
+  },
+  set(key, val) {
+    if (typeof localStorage === 'undefined') return;
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+  },
+  remove(key) {
+    if (typeof localStorage === 'undefined') return;
+    try { localStorage.removeItem(key); } catch {}
+  },
+  keys() {
+    if (typeof localStorage === 'undefined') return [];
+    try {
+      return Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i));
+    } catch { return []; }
+  },
 };
 
-// ─── In-memory cache ───────────────────────────────────────────────────────────
-// Keyed by feature name → { used, remaining }
-// null = not yet populated from a response header
-
-const _cache = {
-  [RateLimitedFeature.CALCULATOR]: null,
-  [RateLimitedFeature.BEST_CARD]: null,
-  [RateLimitedFeature.TRANSFERS]: null,
+// Remove stale feature_used_ keys from previous days
+const cleanupOldUsageKeys = () => {
+  const today = todayStr();
+  ls.keys().forEach((key) => {
+    if (key?.startsWith('feature_used_') && !key.endsWith(`_${today}`)) {
+      ls.remove(key);
+    }
+  });
 };
 
-// Simple event bus so React hooks can re-render when headers arrive
+if (typeof window !== 'undefined') {
+  cleanupOldUsageKeys();
+}
+
+// ─── Event bus ────────────────────────────────────────────────────────────────
+
 const _listeners = new Set();
 
 const notify = () => {
@@ -54,117 +81,87 @@ const notify = () => {
   });
 };
 
-// ─── Public API ────────────────────────────────────────────────────────────────
-
-/**
- * Subscribe to usage updates. Returns an unsubscribe function.
- * Used by the useUsageLimit hook.
- */
 export const subscribe = (listener) => {
   _listeners.add(listener);
   return () => _listeners.delete(listener);
 };
 
-/**
- * Called from the API response interceptor.
- * Reads X-Feature-Used and X-Feature-Remaining headers and updates cache.
- */
-export const updateFromResponseHeaders = (headers) => {
-  if (!headers) return;
+// ─── Core operations ──────────────────────────────────────────────────────────
 
-  const feature = headers['x-feature-name'] || headers['X-Feature-Name'];
-  const used = headers['x-feature-used'] || headers['X-Feature-Used'];
-  const remaining = headers['x-feature-remaining'] || headers['X-Feature-Remaining'];
-
-  if (!feature || used == null || remaining == null) return;
-
-  // Map backend feature names to our local keys
-  const featureKey = mapBackendFeature(feature);
-  if (!featureKey) return;
-
-  _cache[featureKey] = {
-    used: parseInt(used, 10),
-    remaining: parseInt(remaining, 10),
-  };
-
+export const increment = (feature) => {
+  const current = ls.get(USED_KEY(feature), 0);
+  ls.set(USED_KEY(feature), current + 1);
   notify();
 };
 
-/**
- * Returns the daily limit for a feature (free tier only on web).
- */
+export const setLimit = (feature, limit) => {
+  ls.set(LIMIT_KEY(feature), limit);
+  notify();
+};
+
+export const exhaust = (feature) => {
+  ls.set(USED_KEY(feature), dailyLimit(feature));
+  notify();
+};
+
+// ─── Read accessors ───────────────────────────────────────────────────────────
+
 export const dailyLimit = (feature) => {
-  return FREE_LIMITS[feature] || 10;
+  return ls.get(LIMIT_KEY(feature), DEFAULT_LIMIT);
 };
 
-/**
- * Returns the remaining usage count for a feature.
- * If we haven't received headers yet, assumes full quota.
- */
+const getUsed = (feature) => {
+  return ls.get(USED_KEY(feature), 0);
+};
+
 export const remainingUsage = (feature) => {
-  const cached = _cache[feature];
-  if (cached !== null) {
-    return Math.max(0, cached.remaining);
-  }
-  // No data yet — optimistic: assume full quota.
-  // Backend 429 is the safety net.
-  return dailyLimit(feature);
+  return Math.max(0, dailyLimit(feature) - getUsed(feature));
 };
 
-/**
- * Returns true if the user can still use the feature today.
- */
-export const canUseFeature = (feature) => {
-  return remainingUsage(feature) > 0;
-};
+export const canUseFeature = (feature) => remainingUsage(feature) > 0;
 
-/**
- * Optimistically decrement remaining after a successful API call,
- * before the next response headers arrive. Keeps the badge accurate
- * between requests.
- */
-export const decrementLocal = (feature) => {
-  const cached = _cache[feature];
-  if (cached !== null) {
-    cached.used += 1;
-    cached.remaining = Math.max(0, cached.remaining - 1);
-  } else {
-    // First usage before any headers — seed from defaults
-    _cache[feature] = {
-      used: 1,
-      remaining: dailyLimit(feature) - 1,
-    };
-  }
-  notify();
-};
-
-/**
- * Returns feature metadata (displayName, iconName).
- */
 export const getFeatureMeta = (feature) => {
   return FEATURE_META[feature] || { displayName: feature, iconName: 'Help' };
 };
 
-/**
- * Resets in-memory cache. Called on logout / account deletion.
- */
+// ─── API interceptor handlers ─────────────────────────────────────────────────
+
+export const handleSuccessHeaders = (headers) => {
+  if (!headers) return;
+  const featureName = headers['x-feature-name'];
+  const featureLimit = headers['x-feature-limit'];
+  if (!featureName) return;
+  const key = mapBackendFeature(featureName);
+  if (!key) return;
+  increment(key);
+  if (featureLimit != null) setLimit(key, +featureLimit);
+};
+
+export const handleLimitExceeded = (headers) => {
+  if (!headers) return;
+  const featureName = headers['x-feature-name'];
+  if (!featureName) return;
+  const key = mapBackendFeature(featureName);
+  if (!key) return;
+  exhaust(key);
+};
+
+// ─── Reset ────────────────────────────────────────────────────────────────────
+
 export const resetUsageState = () => {
-  Object.keys(_cache).forEach((key) => {
-    _cache[key] = null;
+  const today = todayStr();
+  Object.values(RateLimitedFeature).forEach((feature) => {
+    ls.remove(`feature_used_${feature}_${today}`);
+    ls.remove(LIMIT_KEY(feature));
   });
   notify();
 };
 
-// ─── Helpers ───────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-/**
- * Map backend feature header value to local RateLimitedFeature key.
- * The backend sends e.g. "calculateRewards", "calculateBestCard", "transfer".
- */
 const mapBackendFeature = (backendName) => {
   if (!backendName) return null;
   const lower = backendName.toLowerCase();
-
   if (lower.includes('reward') || lower.includes('calculator') || lower === 'calculaterewards') {
     return RateLimitedFeature.CALCULATOR;
   }
@@ -174,6 +171,5 @@ const mapBackendFeature = (backendName) => {
   if (lower.includes('transfer')) {
     return RateLimitedFeature.TRANSFERS;
   }
-
   return null;
 };

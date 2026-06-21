@@ -279,7 +279,9 @@ const HowToSelector = ({
                     >
                       <Typography variant="body2">{topic.title}</Typography>
                       {topic.difficulty && (
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="caption" sx={{
+                          color: "text.secondary"
+                        }}>
                           Difficulty: {topic.difficulty} • Est. Time:{" "}
                           {topic.estimatedTime}
                         </Typography>

@@ -2,7 +2,7 @@ import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import { jwtDecode } from "jwt-decode";
 import { getTurnstileToken } from './turnstile';
-import { updateFromResponseHeaders } from './usageLimitService';
+import { handleSuccessHeaders, handleLimitExceeded } from './usageLimitService';
 
 // Firebase auth is dynamically imported to reduce initial bundle size
 let _authModule = null;
@@ -23,6 +23,9 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000;
 const api = axios.create({
     baseURL: API_BASE_URL,
     timeout: 10000, // 10 seconds timeout
+    headers: {
+        'Accept-Encoding': 'gzip, deflate, br',
+    },
 });
 
 // Configure retries
@@ -190,16 +193,18 @@ api.interceptors.request.use(async (config) => {
     return config;
 }, (error) => Promise.reject(error));
 
-// Response interceptor: extract usage limit headers from every response
+// Response interceptor: track feature usage from response headers
 api.interceptors.response.use(
   (response) => {
-    updateFromResponseHeaders(response.headers);
+    handleSuccessHeaders(response.headers);
     return response;
   },
   (error) => {
-    // Also read headers from error responses (e.g. 429)
-    if (error.response?.headers) {
-      updateFromResponseHeaders(error.response.headers);
+    if (error.response?.status === 429) {
+      const code = error.response.data?.code || error.response.data?.error;
+      if (code === 'FEATURE_LIMIT_EXCEEDED') {
+        handleLimitExceeded(error.response.headers);
+      }
     }
     return Promise.reject(error);
   }
@@ -354,16 +359,42 @@ export const fetchMCC = async (search) => {
     }
 };
 
+// Cancel token for card questions requests
+let cardQuestionsCancelToken = null;
+
 // Fetch card questions for a specific bank and card
 export const fetchCardQuestions = async (bank, card) => {
     const encodedBank = encodeURIComponent(bank);
     const encodedCard = encodeURIComponent(card);
     const cacheKey = `questions_${bank}_${card}`;
 
-    return fetchWithCache(cacheKey, async () => {
-        const response = await api.get(`/cardQuestions?bank=${encodedBank}&card=${encodedCard}`);
+    // Check cache first before cancelling — a cache hit needs no network request
+    const cachedData = getFromCache(cacheKey);
+    if (cachedData) {
+        return cachedData;
+    }
+
+    // Cancel any in-flight card questions request
+    if (cardQuestionsCancelToken) {
+        cardQuestionsCancelToken.cancel('Operation canceled due to new request.');
+    }
+    cardQuestionsCancelToken = axios.CancelToken.source();
+
+    try {
+        const response = await api.get(`/cardQuestions?bank=${encodedBank}&card=${encodedCard}`, {
+            cancelToken: cardQuestionsCancelToken.token,
+        });
+        setToCache(cacheKey, response.data);
         return response.data;
-    });
+    } catch (error) {
+        if (axios.isCancel(error)) {
+            return null;
+        }
+        if (error.message === 'Region not initialized') {
+            return [];
+        }
+        return handleApiError(error);
+    }
 };
 
 // Calculate rewards based on provided data
@@ -563,6 +594,22 @@ export const getUserCards = async (country) => {
 export const bulkSyncUserCards = async ({ cards, country }) => {
     try {
         const response = await api.put('/v4/user/cards', { cards, country });
+        return response.data;
+    } catch (error) {
+        return handleApiError(error);
+    }
+};
+
+// Submit feedback for a calculation
+export const submitFeedback = async ({ type = 'calculator_feedback', vote, userFeedback, calculationId, calculationPayload }) => {
+    const body = { type };
+    if (vote) body.vote = vote;
+    if (userFeedback) body.userFeedback = userFeedback;
+    if (calculationId) body.calculationId = calculationId;
+    if (calculationPayload) body.calculationPayload = calculationPayload;
+
+    try {
+        const response = await api.post('/v4/feedback', body);
         return response.data;
     } catch (error) {
         return handleApiError(error);

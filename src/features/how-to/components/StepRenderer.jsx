@@ -201,13 +201,12 @@ const StepRenderer = ({ steps, videoUrl, platformColor, isMobile, region }) => {
                 >
                   <Typography
                     variant="body2"
-                    color="text.secondary"
                     sx={{
+                      color: "text.secondary",
                       display: "flex",
                       alignItems: "center",
-                      fontSize: "0.875rem",
-                    }}
-                  >
+                      fontSize: "0.875rem"
+                    }}>
                     <Box
                       component="span"
                       sx={{
@@ -254,9 +253,11 @@ const StepRenderer = ({ steps, videoUrl, platformColor, isMobile, region }) => {
                 {step.caption && (
                   <Typography
                     variant="caption"
-                    color="text.secondary"
-                    sx={{ display: "block", textAlign: "center" }}
-                  >
+                    sx={{
+                      color: "text.secondary",
+                      display: "block",
+                      textAlign: "center"
+                    }}>
                     {step.caption}
                   </Typography>
                 )}
@@ -265,7 +266,6 @@ const StepRenderer = ({ steps, videoUrl, platformColor, isMobile, region }) => {
           </Box>
         </Paper>
       ))}
-
       {videoUrl && (
         <Box
           sx={{

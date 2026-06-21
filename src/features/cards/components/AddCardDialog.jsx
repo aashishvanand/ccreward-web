@@ -138,10 +138,12 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
         onClose={onClose} 
         maxWidth="sm" 
         fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: 3,
-            overflow: "hidden"
+        slotProps={{
+          paper: {
+            sx: {
+              borderRadius: 3,
+              overflow: "hidden"
+            }
           }
         }}
       >
@@ -155,9 +157,11 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
         }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <AddCardIcon sx={{ fontSize: 32, opacity: 0.9 }} />
-            <Typography variant="h5" fontWeight="bold">Add New Card</Typography>
+            <Typography variant="h5" sx={{
+              fontWeight: "bold"
+            }}>Add New Card</Typography>
           </Box>
-          <IconButton onClick={onClose} sx={{ color: "white", opacity: 0.8, '&:hover': { opacity: 1 } }}>
+          <IconButton onClick={onClose} aria-label="Close dialog" sx={{ color: "white", opacity: 0.8, '&:hover': { opacity: 1 } }}>
             <CloseIcon />
           </IconButton>
         </Box>
@@ -242,7 +246,6 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
           </Button>
         </DialogActions>
       </Dialog>
-
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}

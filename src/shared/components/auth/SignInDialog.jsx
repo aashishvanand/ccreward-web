@@ -33,7 +33,9 @@ const SignInDialog = ({
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={PaperProps || { sx: { borderRadius: 3, maxWidth: 400 } }}
+      slotProps={{
+        paper: PaperProps || { sx: { borderRadius: 3, maxWidth: 400 } }
+      }}
     >
       <DialogTitle sx={{ fontWeight: 700, textAlign: 'center', pt: showIcon ? 4 : 3 }}>
         {title}
@@ -44,7 +46,9 @@ const SignInDialog = ({
             sx={{ fontSize: 64, color: 'primary.main', mb: 2, opacity: 0.8 }}
           />
         )}
-        <Typography color="text.secondary">
+        <Typography sx={{
+          color: "text.secondary"
+        }}>
           {message}
         </Typography>
       </DialogContent>

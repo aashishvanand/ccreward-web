@@ -5,8 +5,6 @@ import { getFirebaseAuth, firebaseApp, initAppCheck } from '@/firebase';
 import { deleteUserData } from '../services/firebaseUtils';
 import { resetUsageState } from '../services/usageLimitService';
 import { useRouter } from "next/router";
-import { Box, CircularProgress, Typography, Paper, useTheme } from "@mui/material";
-import { motion } from "framer-motion";
 
 const AuthContext = createContext();
 
@@ -23,19 +21,6 @@ export function AuthProvider({ children }) {
   const appleProviderRef = useRef(null);
   const router = useRouter();
   const pathname = router.asPath?.split('?')[0] || '';
-  const theme = useTheme ? useTheme() : { zIndex: { modal: 1300 } };
-  const [loadingDuration, setLoadingDuration] = useState(0);
-
-  // Track loading duration
-  useEffect(() => {
-    let interval;
-    if (loading) {
-      interval = setInterval(() => {
-        setLoadingDuration(prev => prev + 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [loading]);
 
   useEffect(() => {
     let unsubscribe;

@@ -322,7 +322,9 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                                     alignItems: 'center', 
                                     justifyContent: 'center' 
                                 }}>
-                                    <Typography variant="caption" color="text.secondary">No Image</Typography>
+                                    <Typography variant="caption" sx={{
+                                      color: "text.secondary"
+                                    }}>No Image</Typography>
                                 </Box>
                           )}
                         </Box>
@@ -373,17 +375,18 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                             >
                               <Typography
                                 variant="caption"
-                                color="text.secondary"
+                                noWrap
                                 sx={{
+                                  color: "text.secondary",
+
                                   fontSize:
                                     card.orientation === "vertical"
                                       ? "0.7rem"
                                       : "0.75rem",
+
                                   lineHeight: 1.2,
-                                  display: "block",
-                                }}
-                                noWrap
-                              >
+                                  display: "block"
+                                }}>
                                 {card.bank}
                               </Typography>
                             </motion.div>
@@ -398,7 +401,6 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
           </AnimatePresence>
         </ImageList>
       </motion.div>
-
       <CardDetailsModal
         open={detailsModalOpen}
         onClose={() => setDetailsModalOpen(false)}

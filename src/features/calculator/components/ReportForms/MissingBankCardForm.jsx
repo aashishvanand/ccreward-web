@@ -197,10 +197,12 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
       onClose={onClose}
       maxWidth="sm"
       fullWidth
-      PaperProps={{
-        sx: {
-          borderRadius: 3,
-          overflow: "hidden"
+      slotProps={{
+        paper: {
+          sx: {
+            borderRadius: 3,
+            overflow: "hidden"
+          }
         }
       }}
     >
@@ -215,9 +217,11 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
         }}>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <ReportIcon sx={{ fontSize: 32, opacity: 0.9 }} />
-            <Typography variant="h5" fontWeight="bold">Report Missing Info</Typography>
+            <Typography variant="h5" sx={{
+              fontWeight: "bold"
+            }}>Report Missing Info</Typography>
           </Box>
-          <IconButton onClick={onClose} sx={{ color: "white", opacity: 0.8, '&:hover': { opacity: 1 } }}>
+          <IconButton onClick={onClose} aria-label="Close dialog" sx={{ color: "white", opacity: 0.8, '&:hover': { opacity: 1 } }}>
             <CloseIcon />
           </IconButton>
         </Box>

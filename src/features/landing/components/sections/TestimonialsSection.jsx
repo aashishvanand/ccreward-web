@@ -1,6 +1,7 @@
 import { Box, Container, Typography, Grid, IconButton } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import TweetContainer from "./TweetContainer";
+import ErrorBoundary from "@/shared/components/ErrorBoundary";
 // For motion components
 import { motion } from "framer-motion";
 
@@ -23,6 +24,7 @@ const TestimonialsSection = ({
         <Box sx={{ position: "relative", px: { xs: 4, sm: 6, md: 8 } }}>
           <IconButton
             onClick={handlePrevPage}
+            aria-label="Previous testimonials"
             sx={{
               position: "absolute",
               left: { xs: -8, sm: -16, md: -24 },
@@ -75,7 +77,9 @@ const TestimonialsSection = ({
                           duration: 0.3,
                         }}
                       >
-                        <TweetContainer tweetUrl={tweet.url} />
+                        <ErrorBoundary componentName="TweetContainer">
+                          <TweetContainer tweetUrl={tweet.url} />
+                        </ErrorBoundary>
                       </motion.div>
                     </Grid>
                   );
@@ -86,6 +90,7 @@ const TestimonialsSection = ({
 
           <IconButton
             onClick={handleNextPage}
+            aria-label="Next testimonials"
             sx={{
               position: "absolute",
               right: { xs: -8, sm: -16, md: -24 },

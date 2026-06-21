@@ -55,8 +55,6 @@ const MccLookup = () => {
         <Box sx={{ position: 'relative', overflow: 'hidden', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             <Header />
             {/* Ambient Background Elements */}
-
-
             <Container maxWidth="lg" sx={{ py: 6, position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                 <PageHeader 
                     title="MCC Lookup Tool" 
@@ -91,10 +89,24 @@ const MccLookup = () => {
                             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`
                         }}
                     >
-                        <Typography variant="subtitle1" fontWeight="700" gutterBottom sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                        <Typography
+                            variant="subtitle1"
+                            gutterBottom
+                            sx={{
+                                fontWeight: "700",
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 1
+                            }}>
                             <Search fontSize="small" color="primary" /> Missing Data?
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                color: "text.secondary",
+                                mb: 3
+                            }}>
                             Can't find a merchant or spotted incorrect information? Help improve the database for everyone.
                         </Typography>
                         <Button 

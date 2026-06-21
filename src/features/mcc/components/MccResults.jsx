@@ -59,7 +59,7 @@ const ResultCard = ({ item }) => {
             backdropFilter: 'blur(20px)',
             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
             boxShadow: `0 4px 20px ${alpha(theme.palette.common.black, 0.05)}`,
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             overflow: 'visible',
             position: 'relative',
             '&:hover': {
@@ -87,7 +87,7 @@ const ResultCard = ({ item }) => {
                             alignItems: 'center',
                             justifyContent: 'center',
                             mr: 2.5,
-                            transition: 'all 0.3s ease',
+                            transition: 'background-color 0.3s ease',
                             width: 56,
                             height: 56,
                             flexShrink: 0,
@@ -96,15 +96,21 @@ const ResultCard = ({ item }) => {
                         {IndustryIcon}
                     </Box>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography variant="h6" fontWeight="800" lineHeight={1.3} sx={{ 
-                            mb: 0.5,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            minHeight: '2.6em', // Fixed height for 2 lines
-                        }}>
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                fontWeight: "800",
+                                lineHeight: 1.3,
+                                mb: 0.5,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+
+                                // Fixed height for 2 lines
+                                minHeight: '2.6em'
+                            }}>
                             {item.name || item.merchantName || item.merchant || "Unknown Merchant"}
                         </Typography>
                         {item.mcc && (
@@ -133,10 +139,21 @@ const ResultCard = ({ item }) => {
                                 <BusinessOutlined fontSize="small" />
                             </Box>
                             <Box>
-                                <Typography variant="caption" color="text.secondary" fontWeight="600" display="block" sx={{ letterSpacing: 0.5, textTransform: 'uppercase', fontSize: '0.7rem' }}>
+                                <Typography
+                                    variant="caption"
+                                    sx={{
+                                        color: "text.secondary",
+                                        fontWeight: "600",
+                                        display: "block",
+                                        letterSpacing: 0.5,
+                                        textTransform: 'uppercase',
+                                        fontSize: '0.7rem'
+                                    }}>
                                     Industry
                                 </Typography>
-                                <Typography variant="body2" fontWeight="500">
+                                <Typography variant="body2" sx={{
+                                    fontWeight: "500"
+                                }}>
                                     {item.industryname || item.industry}
                                 </Typography>
                             </Box>
@@ -150,10 +167,21 @@ const ResultCard = ({ item }) => {
                                 <CategoryOutlined fontSize="small" />
                             </Box>
                             <Box>
-                                <Typography variant="caption" color="text.secondary" fontWeight="600" display="block" sx={{ letterSpacing: 0.5, textTransform: 'uppercase', fontSize: '0.7rem' }}>
+                                <Typography
+                                    variant="caption"
+                                    sx={{
+                                        color: "text.secondary",
+                                        fontWeight: "600",
+                                        display: "block",
+                                        letterSpacing: 0.5,
+                                        textTransform: 'uppercase',
+                                        fontSize: '0.7rem'
+                                    }}>
                                     Category
                                 </Typography>
-                                <Typography variant="body2" fontWeight="500">
+                                <Typography variant="body2" sx={{
+                                    fontWeight: "500"
+                                }}>
                                     {category}
                                 </Typography>
                             </Box>
@@ -169,7 +197,16 @@ const ResultCard = ({ item }) => {
                             borderRadius: 3,
                             border: `1px solid ${alpha(theme.palette.divider, 0.05)}`
                         }}>
-                            <Typography variant="caption" color="text.secondary" fontWeight="600" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1.5 }}>
+                            <Typography
+                                variant="caption"
+                                sx={{
+                                    color: "text.secondary",
+                                    fontWeight: "600",
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 0.5,
+                                    mb: 1.5
+                                }}>
                                 <VerifiedOutlined fontSize="inherit" color="action" /> SIMILAR MERCHANTS
                             </Typography>
                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8 }}>
@@ -259,10 +296,18 @@ const MccResults = ({ results, isLoading, hasSearched }) => {
                 }}>
                     <CategoryOutlined sx={{ fontSize: 64, color: 'text.secondary' }} />
                 </Box>
-                <Typography variant="h5" color="text.primary" fontWeight="600" gutterBottom>
+                <Typography
+                    variant="h5"
+                    gutterBottom
+                    sx={{
+                        color: "text.primary",
+                        fontWeight: "600"
+                    }}>
                     No merchants found
                 </Typography>
-                <Typography variant="body1" color="text.secondary">
+                <Typography variant="body1" sx={{
+                    color: "text.secondary"
+                }}>
                     Try searching for a different merchant name or keyword
                 </Typography>
             </Box>
@@ -272,10 +317,15 @@ const MccResults = ({ results, isLoading, hasSearched }) => {
     if (!hasSearched && (!results || results.length === 0)) {
         return (
             <Box sx={{ textAlign: 'center', py: 12, opacity: 0.6 }}>
-                 <Box sx={{ mb: 3 }}>
-                    <StorefrontOutlined sx={{ fontSize: 80, color: 'action.disabled' }} />
-                </Box>
-                <Typography variant="h6" color="text.secondary" fontWeight="500">
+                <Box sx={{ mb: 3 }}>
+                   <StorefrontOutlined sx={{ fontSize: 80, color: 'action.disabled' }} />
+               </Box>
+                <Typography
+                    variant="h6"
+                    sx={{
+                        color: "text.secondary",
+                        fontWeight: "500"
+                    }}>
                     Start typing to search for Merchant Category Codes
                 </Typography>
             </Box>
@@ -283,7 +333,7 @@ const MccResults = ({ results, isLoading, hasSearched }) => {
     }
 
     return (
-        <Grid container spacing={3}>
+        <Grid container spacing={3} aria-live="polite" aria-atomic="false">
             {results.map((item, index) => (
                 <Grid size={{ xs: 12, sm: 6, md: 4 }} key={item.mcc + index}>
                     <ResultCard item={item} />

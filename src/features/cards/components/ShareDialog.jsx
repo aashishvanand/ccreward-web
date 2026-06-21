@@ -146,7 +146,9 @@ const ShareDialog = ({ open, onClose, onShare, isGenerating }) => {
               Step 2: Choose where to share
             </Typography>
             {!imageDownloaded && (
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{
+                color: "text.secondary"
+              }}>
                 (Download image first)
               </Typography>
             )}
@@ -187,13 +189,12 @@ const ShareDialog = ({ open, onClose, onShare, isGenerating }) => {
 
           <Typography
             variant="body2"
-            color="text.secondary"
             align="center"
             sx={{
+              color: "text.secondary",
               opacity: imageDownloaded ? 1 : 0.7,
-              fontStyle: "italic",
-            }}
-          >
+              fontStyle: "italic"
+            }}>
             {imageDownloaded
               ? "Upload the downloaded collection when sharing!"
               : "Complete Step 1 to enable sharing options"}
