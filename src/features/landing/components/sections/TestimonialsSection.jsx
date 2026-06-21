@@ -14,6 +14,9 @@ const TestimonialsSection = ({
   handleNextPage,
   isMobile,
 }) => {
+  // Temporary: completely hide the tweet section to bypass react-tweet crashing errors
+  return null;
+
   return (
     <Box sx={{ py: 8 }}>
       <Container maxWidth="lg">
