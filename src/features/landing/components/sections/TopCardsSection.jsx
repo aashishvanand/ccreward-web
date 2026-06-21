@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import {
   Box,
@@ -13,7 +15,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import useCardCategories from "@/core/hooks/useCardCategories";
 import { useRegion } from "@/core/providers/RegionContext";
 

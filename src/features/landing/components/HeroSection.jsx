@@ -1,3 +1,5 @@
+"use client";
+
 // src/features/landing/components/HeroSection.jsx
 import {
   Box,

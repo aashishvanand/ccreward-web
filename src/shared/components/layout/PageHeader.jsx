@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { Box, Typography, useTheme, alpha } from '@mui/material';
 import PropTypes from 'prop-types';

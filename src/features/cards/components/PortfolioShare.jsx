@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material";
 import useCardImagesData from "@/core/hooks/useCardImagesData";

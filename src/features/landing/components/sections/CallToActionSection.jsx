@@ -1,3 +1,5 @@
+"use client";
+
 import { Box, Container, Typography, Button, Stack } from "@mui/material";
 
 const CallToActionSection = ({

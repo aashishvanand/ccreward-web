@@ -18,7 +18,7 @@ export const metadata = {
   },
 };
 
-const MccLookup = dynamic(() => import('@/features/mcc/components/MccLookup'), { ssr: false });
+const MccLookup = dynamic(() => import('@/features/mcc/components/MccLookup'));
 
 export default function MccLookupPage() {
   return (

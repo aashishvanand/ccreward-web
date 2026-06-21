@@ -1,3 +1,5 @@
+"use client";
+
 // src/features/best-card/components/BestCardCalculator.jsx - Enhanced with Analytics
 import { useState, useEffect, useCallback } from "react";
 import {

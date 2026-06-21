@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Autocomplete,
@@ -20,7 +22,7 @@ import {
 } from "@/core/services/api";
 import debounce from "lodash/debounce";
 import PropTypes from "prop-types";
-import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
 import { useRegion } from "@/core/providers/RegionContext";
 
 const CalculatorForm = ({
@@ -53,7 +55,7 @@ const CalculatorForm = ({
   const [isLoadingBanks, setIsLoadingBanks] = useState(false);
   const [isLoadingCards, setIsLoadingCards] = useState(false);
   const [isLoadingMcc, setIsLoadingMcc] = useState(false);
-  const router = useRouter();
+  const searchParams = useSearchParams();
   const [isValidating, setIsValidating] = useState(false);
   const [regionError, setRegionError] = useState(false); // Add this state to track region initialization errors
 
@@ -115,13 +117,10 @@ const CalculatorForm = ({
 
   // URL parameter handling - now respects region initialization
   useEffect(() => {
-    if (!router.isReady) return;
 
     const validateAndSetBankCard = async () => {
-      const bankParam = router.query.bank;
-      const cardParam = router.query.card;
-      const bank = Array.isArray(bankParam) ? bankParam[0] : bankParam;
-      const card = Array.isArray(cardParam) ? cardParam[0] : cardParam;
+      const bank = searchParams.get('bank');
+      const card = searchParams.get('card');
 
       if (!bank || !card || !isInitialized) return;
       if (selectedBank && selectedCard) return; // Don't revalidate if already set
@@ -159,7 +158,7 @@ const CalculatorForm = ({
 
     validateAndSetBankCard();
   }, [
-    router,
+    searchParams,
     selectedBank,
     selectedCard,
     onBankChange,
@@ -170,16 +169,14 @@ const CalculatorForm = ({
 
   // Handle amount URL parameter
   useEffect(() => {
-    if (!router.isReady) return;
-    const amountParam = router.query.amount;
-    const amount = Array.isArray(amountParam) ? amountParam[0] : amountParam;
+    const amount = searchParams.get('amount');
     if (amount && !spentAmount) {
       const parsed = parseFloat(amount);
       if (!isNaN(parsed) && parsed > 0) {
         onSpentAmountChange(parsed.toString());
       }
     }
-  }, [router.isReady, router.query.amount, spentAmount, onSpentAmountChange]);
+  }, [searchParams, spentAmount, onSpentAmountChange]);
 
   // Event handler for region changes
   useEffect(() => {

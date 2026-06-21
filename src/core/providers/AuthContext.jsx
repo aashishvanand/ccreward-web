@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { getFirebaseAuth, firebaseApp, initAppCheck } from '@/firebase';
 import { deleteUserData } from '../services/firebaseUtils';
 import { resetUsageState } from '../services/usageLimitService';
-import { useRouter } from "next/router";
+import { useRouter, usePathname } from "next/navigation";
 
 const AuthContext = createContext();
 
@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
   const providerRef = useRef(null);
   const appleProviderRef = useRef(null);
   const router = useRouter();
-  const pathname = router.asPath?.split('?')[0] || '';
+  const pathname = usePathname() || '';
 
   useEffect(() => {
     let unsubscribe;

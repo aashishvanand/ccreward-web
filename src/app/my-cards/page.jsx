@@ -18,7 +18,7 @@ export const metadata = {
   },
 };
 
-const MyCardsList = dynamic(() => import('@/features/cards/components/MyCardsPage'), { ssr: false });
+const MyCardsList = dynamic(() => import('@/features/cards/components/MyCardsPage'));
 
 export default function MyCardsPage() {
   return (

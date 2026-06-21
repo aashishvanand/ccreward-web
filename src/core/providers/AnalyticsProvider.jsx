@@ -17,13 +17,13 @@ import {
   logBreadcrumb,
 } from "../services/crashlytics";
 import { useAuth } from "./AuthContext";
-import { useRouter } from "next/router";
+import { usePathname } from "next/navigation";
 
 export function AnalyticsProvider({ children }) {
   const initialized = useRef(false);
   const [analyticsReady, setAnalyticsReady] = useState(false);
   const { user } = useAuth();
-  const router = useRouter();
+  const pathname = usePathname();
   const currentPath = useRef("");
 
   // Initialize gtag early for Firebase Analytics
@@ -183,19 +183,11 @@ export function AnalyticsProvider({ children }) {
       // Listen for route changes (for client-side navigation)
       window.addEventListener("popstate", handleRouteChange);
 
-      // For Next.js router events
-      if (router?.events) {
-        router.events.on("routeChangeComplete", handleRouteChange);
-      }
-
       return () => {
         window.removeEventListener("popstate", handleRouteChange);
-        if (router?.events) {
-          router.events.off("routeChangeComplete", handleRouteChange);
-        }
       };
     }
-  }, [analyticsReady, router]);
+  }, [analyticsReady, pathname]);
 
   // Track visibility changes for engagement
   useEffect(() => {

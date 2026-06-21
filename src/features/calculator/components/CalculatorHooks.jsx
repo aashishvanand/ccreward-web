@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useCallback } from "react";
 import { getNativeCurrency } from "@/core/utils/currency";
 import { useRegion } from "@/core/providers/RegionContext";

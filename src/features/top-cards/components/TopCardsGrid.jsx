@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import {
   ImageList,
@@ -9,7 +11,7 @@ import {
   Paper,
   Chip,
 } from "@mui/material";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import {
   School as SchoolIcon,
   Theaters as TheatersIcon,

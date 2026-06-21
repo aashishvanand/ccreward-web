@@ -1,3 +1,5 @@
+"use client";
+
 import { Box, Container, Typography, Button } from "@mui/material";
 import SmartToyIcon from "@mui/icons-material/SmartToy"; // Robot icon for GPT
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";

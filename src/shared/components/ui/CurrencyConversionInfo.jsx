@@ -1,3 +1,5 @@
+"use client";
+
 import { Paper, Typography, Box, Chip } from "@mui/material";
 import {
   CurrencyExchange as CurrencyExchangeIcon,

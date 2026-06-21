@@ -1,3 +1,5 @@
+"use client";
+
 import { Tweet } from "react-tweet";
 import { Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";

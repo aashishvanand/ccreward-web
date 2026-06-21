@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useRegion } from "@/core/providers/RegionContext";

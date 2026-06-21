@@ -1,3 +1,5 @@
+"use client";
+
 import { useMemo, useRef, useState, useCallback } from "react";
 import { Box, Typography, Paper, Tooltip, IconButton } from "@mui/material";
 import {

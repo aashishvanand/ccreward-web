@@ -1,3 +1,5 @@
+"use client";
+
 // src/core/hooks/usePerformance.js - Client-Side Performance Hook
 import { useEffect, useRef, useCallback } from 'react';
 import { 

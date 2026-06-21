@@ -1,9 +1,11 @@
+"use client";
+
 // src/features/landing/components/LandingPage.jsx - Enhanced with Analytics (FIXED)
 // This component manages the main landing page including all sections, 
 // analytics tracking, user authentication state, and responsive behavior
 import { useState, useEffect, useMemo } from "react";
 import { Box, Alert, Container, Typography } from "@mui/material";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/core/providers/AuthContext";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";

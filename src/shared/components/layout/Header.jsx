@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useMemo } from "react";
 import {
   AppBar,
@@ -33,7 +35,7 @@ import {
   Person as PersonIcon,
 } from "@mui/icons-material";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { useAuth } from "@/core/providers/AuthContext";
 import SignInButtons from "@/shared/components/auth/SignInButtons";
@@ -104,7 +106,7 @@ function Header({ hideNavigation = false }) {
   const { region } = useRegion();
   const { user, logout, deleteAccount, isAuthenticated, signInWithGoogle, signInWithApple } = useAuth();
   const router = useRouter();
-  const pathname = router.asPath?.split("?")[0] || "/";
+  const pathname = usePathname() || "/";
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [deviceInfo, setDeviceInfo] = useState({
