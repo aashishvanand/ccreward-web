@@ -3,6 +3,7 @@
 
 import { memo } from "react";
 import dynamic from 'next/dynamic';
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ThemeRegistry } from "../core/providers/ThemeRegistry";
 import AmbientBackground from "../shared/components/layout/AmbientBackground";
 import { RegionProvider } from "../core/providers/RegionContext";
@@ -18,19 +19,9 @@ const AnalyticsProvider = dynamic(
   { ssr: false }
 );
 
-// Add a provider tracking mechanism
-let providerMounted = false;
-
 const Providers = memo(({ children }) => {
-  // Prevent multiple provider instances in development hot reload
-  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-    if (providerMounted) {
-      console.warn('⚠️ Multiple provider instances detected - this may cause duplicate modals');
-    }
-    providerMounted = true;
-  }
-
   return (
+    <AppRouterCacheProvider>
     <ThemeRegistry>
       <AmbientBackground />
       <RegionProvider>
@@ -41,6 +32,7 @@ const Providers = memo(({ children }) => {
         </AuthProvider>
       </RegionProvider>
     </ThemeRegistry>
+    </AppRouterCacheProvider>
   );
 });
 

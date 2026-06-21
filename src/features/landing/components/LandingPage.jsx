@@ -12,7 +12,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { getCardsForUser } from "@/core/services/firebaseUtils";
 import useCardImagesData from "@/core/hooks/useCardImagesData";
 import { useRegion } from "@/core/providers/RegionContext";
-import Header from "@/shared/components/layout/Header";
+import Header, { MinimalHeader } from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
 import HeroSection from "./HeroSection";
 import FeaturesSection from "./sections/FeaturesSection";
@@ -42,7 +42,7 @@ import {
   usePagePerformance,
   useEngagementTracking,
   useJourneyTracking,
-} from "@/core/hooks";
+} from "@/core/hooks/useAnalytics";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -511,7 +511,7 @@ const LandingPage = () => {
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
-        {!isMobileDevice && <GoogleOneTap />}
+        {!isMobileDevice ? <GoogleOneTap /> : null}
         {isMobileDevice ? (
           <MobileView {...commonProps} />
         ) : (
@@ -523,9 +523,7 @@ const LandingPage = () => {
             handleSignIn={handleSignIn}
             isLoading={isLoading}
             isAuthenticated={isAuthenticated()}
-            loading={loading}
             signInWithGoogle={signInWithGoogle}
-            signInWithApple={signInWithApple}
           />
         )}
       </Box>
@@ -580,7 +578,7 @@ const MobileView = ({
       }}
     >
       <Box sx={{ position: "relative", zIndex: 10 }}>
-        <Header hideNavigation={true} />
+        <MinimalHeader />
         <Box
           component="main"
           sx={{
@@ -726,9 +724,7 @@ const DesktopView = ({
   handleSignIn,
   isLoading,
   isAuthenticated,
-  loading,
   signInWithGoogle,
-  signInWithApple,
   visibleTweets,
   handlePrevPage,
   handleNextPage,
@@ -776,12 +772,9 @@ const DesktopView = ({
             isMobile={isMobile}
             isTablet={isTablet}
             isLargeScreen={isLargeScreen}
-            handleSignIn={handleSignIn}
+            onGoogleSignIn={() => handleSignIn(signInWithGoogle)}
+            onAppleSignIn={() => handleSignIn(signInWithApple)}
             isLoading={isLoading}
-            isAuthenticated={isAuthenticated}
-            loading={loading}
-            signInWithGoogle={signInWithGoogle}
-            signInWithApple={signInWithApple}
           />
         </Box>
 

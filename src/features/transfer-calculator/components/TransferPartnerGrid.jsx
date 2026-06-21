@@ -24,7 +24,7 @@ import {
 } from "@mui/icons-material";
 import Image from "next/image";
 import { useRegion } from "@/core/providers/RegionContext";
-import { usePartnerLogos } from "@/core/hooks";
+import usePartnerLogos from "@/core/hooks/usePartnerLogos";
 import airlineInData from "@/data/transfer_airline_in.json";
 import airlineSgData from "@/data/transfer_airline_sg.json";
 import hotelInData from "@/data/transfer_hotel_in.json";

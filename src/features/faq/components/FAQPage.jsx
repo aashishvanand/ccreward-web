@@ -27,7 +27,7 @@ import {
   useEngagementTracking,
   useJourneyTracking,
   useComponentAnalytics,
-} from "@/core/hooks";
+} from "@/core/hooks/useAnalytics";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },

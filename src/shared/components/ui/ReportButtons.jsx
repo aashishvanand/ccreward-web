@@ -2,36 +2,30 @@
 
 import { Button } from "@mui/material";
 
-const ReportButtons = ({
-  calculationPerformed,
-  onMissingFormOpen,
-  onIncorrectRewardOpen,
-}) => {
+export function ReportMissingButton({ onOpen }) {
   return (
-    <>
-      {calculationPerformed ? (
-        <Button
-          variant="text"
-          color="primary"
-          onClick={onIncorrectRewardOpen}
-          sx={{ mt: 2 }}
-          slots={{ root: "button" }}
-        >
-          Report Incorrect Reward
-        </Button>
-      ) : (
-        <Button
-          variant="text"
-          color="primary"
-          onClick={onMissingFormOpen}
-          sx={{ mt: 2 }}
-          slots={{ root: "button" }}
-        >
-          Bank or Card / MCC Missing?
-        </Button>
-      )}
-    </>
+    <Button
+      variant="text"
+      color="primary"
+      onClick={onOpen}
+      sx={{ mt: 2 }}
+      slots={{ root: "button" }}
+    >
+      Bank or Card / MCC Missing?
+    </Button>
   );
-};
+}
 
-export default ReportButtons;
+export function ReportIncorrectButton({ onOpen }) {
+  return (
+    <Button
+      variant="text"
+      color="primary"
+      onClick={onOpen}
+      sx={{ mt: 2 }}
+      slots={{ root: "button" }}
+    >
+      Report Incorrect Reward
+    </Button>
+  );
+}

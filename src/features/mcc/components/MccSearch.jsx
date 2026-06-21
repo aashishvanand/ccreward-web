@@ -5,7 +5,7 @@ import { TextField, InputAdornment, IconButton, useTheme, alpha } from '@mui/mat
 import { Search, Clear } from '@mui/icons-material';
 import debounce from 'lodash/debounce';
 
-const MccSearch = ({ onSearch, initialValue = '', placeholder = "Search by merchant name (e.g., Netflix, Amazon)..." }) => {
+const MccSearch = ({ onSearch, initialValue = '', placeholder = "Search by merchant name (e.g., Netflix, Amazon)…" }) => {
     const theme = useTheme();
     const [value, setValue] = useState(initialValue);
     const [isFocused, setIsFocused] = useState(false);

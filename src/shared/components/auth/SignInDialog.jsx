@@ -11,7 +11,11 @@ import CreditCardIcon from '@mui/icons-material/CreditCard';
 import SignInButtons from './SignInButtons';
 
 /**
- * Reusable sign-in dialog used across CardPage, TopCardsPage, and BankPage.
+ * Reusable sign-in dialog.
+ *
+ * Composition rules:
+ * - Pass `icon` to show a decorative icon above the message (e.g. <CreditCardIcon />)
+ * - Pass `onCancel` + `cancelLabel` to show a cancel button — omit both to hide it
  */
 const SignInDialog = ({
   open,
@@ -20,8 +24,7 @@ const SignInDialog = ({
   onAppleSignIn,
   title = 'Sign In Required',
   message = 'Please sign in to continue.',
-  showIcon = false,
-  showCancelButton = true,
+  icon = null,
   cancelLabel = 'Cancel',
   onCancel,
   isLoading = false,
@@ -37,18 +40,14 @@ const SignInDialog = ({
         paper: PaperProps || { sx: { borderRadius: 3, maxWidth: 400 } }
       }}
     >
-      <DialogTitle sx={{ fontWeight: 700, textAlign: 'center', pt: showIcon ? 4 : 3 }}>
+      <DialogTitle sx={{ fontWeight: 700, textAlign: 'center', pt: icon ? 4 : 3 }}>
         {title}
       </DialogTitle>
       <DialogContent sx={{ textAlign: 'center', pb: 2 }}>
-        {showIcon && (
-          <CreditCardIcon
-            sx={{ fontSize: 64, color: 'primary.main', mb: 2, opacity: 0.8 }}
-          />
+        {icon && (
+          <div style={{ marginBottom: 16 }}>{icon}</div>
         )}
-        <Typography sx={{
-          color: "text.secondary"
-        }}>
+        <Typography sx={{ color: "text.secondary" }}>
           {message}
         </Typography>
       </DialogContent>
@@ -60,7 +59,7 @@ const SignInDialog = ({
           fullWidth
           size="large"
         />
-        {showCancelButton && (
+        {onCancel ? (
           <Button
             fullWidth
             onClick={handleCancel}
@@ -68,7 +67,7 @@ const SignInDialog = ({
           >
             {cancelLabel}
           </Button>
-        )}
+        ) : null}
       </DialogActions>
     </Dialog>
   );

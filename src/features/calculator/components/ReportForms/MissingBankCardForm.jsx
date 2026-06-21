@@ -144,6 +144,7 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
                 onChange={(e) => setBankName(e.target.value)}
                 required
                 variant="outlined"
+                autoComplete="off"
               />
               <TextField
                 fullWidth
@@ -153,6 +154,7 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
                 onChange={(e) => setCardName(e.target.value)}
                 required
                 variant="outlined"
+                autoComplete="off"
               />
             </Box>
           );
@@ -167,10 +169,12 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
                 onChange={(e) => setMcc(e.target.value)}
                 required
                 type="number"
+                autoComplete="off"
                 slotProps={{
                   htmlInput: {
                     min: "0700",
                     max: "9999",
+                    inputMode: "numeric",
                   },
                 }}
                 variant="outlined"
@@ -183,6 +187,7 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
                 onChange={(e) => setMerchantName(e.target.value)}
                 required
                 variant="outlined"
+                autoComplete="off"
               />
             </Box>
           );
@@ -267,9 +272,9 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
               Next
             </Button>
           ) : (
-            <Button 
-              type="submit" 
-              variant="contained" 
+            <Button
+              type="submit"
+              variant="contained"
               disabled={isSubmitting}
               sx={{
                 px: 4,
@@ -279,7 +284,12 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
                 boxShadow: '0 3px 5px 2px rgba(156, 39, 176, .3)',
               }}
             >
-              {isSubmitting ? <CircularProgress size={24} color="inherit" /> : "Submit"}
+              {isSubmitting ? (
+                <>
+                  <CircularProgress size={16} color="inherit" sx={{ mr: 1 }} aria-hidden="true" />
+                  Submitting…
+                </>
+              ) : "Submit"}
             </Button>
           )}
         </DialogActions>

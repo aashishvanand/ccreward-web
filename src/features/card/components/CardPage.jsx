@@ -1073,8 +1073,7 @@ const CardPage = ({ bankName, cardName, country }) => {
         onAppleSignIn={handleAppleSignIn}
         title="Sign In Required"
         message="Sign in to view detailed card benefits, fees, and exclusive features."
-        showIcon
-        showCancelButton
+        icon={<CreditCardIcon sx={{ fontSize: 64, color: 'primary.main', opacity: 0.8 }} />}
         cancelLabel="Go Back Home"
         onCancel={() => router.push("/")}
       />

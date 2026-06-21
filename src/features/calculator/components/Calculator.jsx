@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   Box,
   Container,
@@ -23,7 +23,7 @@ import PageHeader from "@/shared/components/layout/PageHeader";
 import CalculatorForm from "./CalculatorForm";
 import AddToMyCardsButton from "../../cards/components/AddToMyCardsButton";
 import QuickCardSelector from "@/shared/components/ui/QuickCardSelector";
-import ReportButtons from "@/shared/components/ui/ReportButtons";
+import { ReportMissingButton, ReportIncorrectButton } from "@/shared/components/ui/ReportButtons";
 import FeedbackButtons from "@/shared/components/ui/FeedbackButtons";
 import MissingBankCardForm from "./ReportForms/MissingBankCardForm";
 import IncorrectRewardReportForm from "./ReportForms/IncorrectRewardReportForm";
@@ -44,7 +44,7 @@ import {
   useAnalytics,
   usePagePerformance,
   useFormTracking,
-} from "@/core/hooks";
+} from "@/core/hooks/useAnalytics";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -108,7 +108,7 @@ function Calculator() {
   const [calculationResult, setCalculationResult] = useState(null);
   const [calculationId, setCalculationId] = useState(null);
   const [calculationPerformed, setCalculationPerformed] = useState(false);
-  const [lastCalculationInputs, setLastCalculationInputs] = useState(null);
+  const lastCalculationInputs = useRef(null);
   const { trackButtonClick, trackFeatureUsage, trackConversion } =
     useAnalytics();
   const { recordCustomMetric } = usePagePerformance("calculator");
@@ -140,13 +140,13 @@ function Calculator() {
     };
 
     if (!loading) {
-      if (isAuthenticated()) {
+      if (!!user) {
         fetchUserCards();
       } else {
         setIsFetchingUserData(false);
       }
     }
-  }, [user, isAuthenticated, loading]);
+  }, [user, loading]);
 
   const handleAddCard = useCallback(async () => {
     if (user) {
@@ -203,7 +203,7 @@ function Calculator() {
     setCalculationResult(null);
     setCalculationId(null);
     setCalculationPerformed(false);
-    setLastCalculationInputs(null);
+    lastCalculationInputs.current = null;
   }, [resetAllFields]);
 
   const handleCalculate = useCallback(async () => {
@@ -246,14 +246,14 @@ function Calculator() {
     };
 
     if (
-      lastCalculationInputs &&
-      currentInputs.bank === lastCalculationInputs.bank &&
-      currentInputs.card === lastCalculationInputs.card &&
-      currentInputs.mcc === lastCalculationInputs.mcc &&
-      currentInputs.amount === lastCalculationInputs.amount &&
-      currentInputs.currency === lastCalculationInputs.currency &&
-      currentInputs.country === lastCalculationInputs.country &&
-      JSON.stringify(currentInputs.additionalInputs) === JSON.stringify(lastCalculationInputs.additionalInputs)
+      lastCalculationInputs.current &&
+      currentInputs.bank === lastCalculationInputs.current.bank &&
+      currentInputs.card === lastCalculationInputs.current.card &&
+      currentInputs.mcc === lastCalculationInputs.current.mcc &&
+      currentInputs.amount === lastCalculationInputs.current.amount &&
+      currentInputs.currency === lastCalculationInputs.current.currency &&
+      currentInputs.country === lastCalculationInputs.current.country &&
+      JSON.stringify(currentInputs.additionalInputs) === JSON.stringify(lastCalculationInputs.current.additionalInputs)
     ) {
       return;
     }
@@ -286,7 +286,7 @@ function Calculator() {
       setCalculationResult(result);
       setCalculationId(result.calculationId || null);
       setCalculationPerformed(true);
-      setLastCalculationInputs(currentInputs);
+      lastCalculationInputs.current = currentInputs;
 
       if (!hasCalculated) {
         setShowConfetti(true);
@@ -309,7 +309,6 @@ function Calculator() {
     selectedCurrency,
     additionalInputs,
     hasCalculated,
-    lastCalculationInputs,
     isLoadingQuestions,
     region,
     canUse,
@@ -388,7 +387,7 @@ function Calculator() {
 
             <ErrorAlert message={error} onClose={() => setError(null)} />
 
-            {!loading && !isFetchingUserData && userCards.length > 0 && (
+            {!loading && !isFetchingUserData && userCards.length > 0 ? (
               <Paper elevation={2} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 2 }}>
                 <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
                   My Cards
@@ -400,7 +399,7 @@ function Calculator() {
                   onSelectCard={handleQuickCardSelect}
                 />
               </Paper>
-            )}
+            ) : null}
 
             <Paper
               elevation={2}
@@ -438,17 +437,11 @@ function Calculator() {
                     isCalculating={isCalculating}
                   />
 
-                  {!calculationPerformed && (
-                    <ReportButtons
-                      calculationPerformed={false}
-                      onMissingFormOpen={() => setMissingFormOpen(true)}
-                      onIncorrectRewardOpen={() =>
-                        setIncorrectRewardReportOpen(true)
-                      }
-                    />
-                  )}
+                  {!calculationPerformed ? (
+                    <ReportMissingButton onOpen={() => setMissingFormOpen(true)} />
+                  ) : null}
 
-                  {calculationPerformed && calculationResult && (
+                  {calculationPerformed && calculationResult ? (
                     <Box aria-live="polite" aria-atomic="true">
                       <CalculationResults
                         result={calculationResult}
@@ -458,20 +451,14 @@ function Calculator() {
                         key={calculationId}
                         calculationId={calculationId}
                       />
-                      <ReportButtons
-                        calculationPerformed={true}
-                        onMissingFormOpen={() => setMissingFormOpen(true)}
-                        onIncorrectRewardOpen={() =>
-                          setIncorrectRewardReportOpen(true)
-                        }
-                      />
+                      <ReportIncorrectButton onOpen={() => setIncorrectRewardReportOpen(true)} />
                       <ReferralButton
                         bank={selectedBank}
                         cardName={selectedCard}
                         userCards={userCards}
                         calculationPerformed={calculationPerformed}
                       />
-                      {user && (
+                      {user ? (
                         <AddToMyCardsButton
                           user={user}
                           selectedBank={selectedBank}
@@ -479,9 +466,9 @@ function Calculator() {
                           userCards={userCards}
                           onAddCard={handleAddCard}
                         />
-                      )}
+                      ) : null}
                     </Box>
-                  )}
+                  ) : null}
                 </Stack>
               )}
             </Paper>
