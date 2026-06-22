@@ -1,3 +1,5 @@
+"use client";
+
 // src/features/best-card/components/BestCardCalculator.jsx - Enhanced with Analytics
 import { useState, useEffect, useCallback } from "react";
 import {
@@ -61,7 +63,7 @@ import {
   useFormTracking,
   useAPITracking,
   useComponentAnalytics,
-} from "@/core/hooks";
+} from "@/core/hooks/useAnalytics";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },

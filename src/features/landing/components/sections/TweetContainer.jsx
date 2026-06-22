@@ -1,6 +1,73 @@
-import { Tweet } from "react-tweet";
-import { Box } from "@mui/material";
+"use client";
+
+import { Suspense } from "react";
+import { EmbeddedTweet, TweetNotFound, TweetSkeleton, useTweet } from "react-tweet";
+import { Box, Typography, Skeleton } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+
+/**
+ * Loading placeholder that mimics a tweet card shape.
+ */
+const TweetLoading = () => (
+  <Box
+    sx={{
+      minHeight: "200px",
+      p: 2,
+      display: "flex",
+      flexDirection: "column",
+      gap: 1.5,
+      bgcolor: "background.paper",
+      borderRadius: 2,
+      border: "1px solid",
+      borderColor: "divider",
+    }}
+  >
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+      <Skeleton variant="circular" width={48} height={48} />
+      <Box sx={{ flex: 1 }}>
+        <Skeleton width="60%" height={20} />
+        <Skeleton width="40%" height={16} />
+      </Box>
+    </Box>
+    <Skeleton width="100%" height={16} />
+    <Skeleton width="90%" height={16} />
+    <Skeleton width="70%" height={16} />
+  </Box>
+);
+
+/**
+ * Fallback when a tweet cannot be loaded.
+ */
+const TweetError = () => (
+  <Box
+    sx={{
+      p: 4,
+      minHeight: "200px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      bgcolor: "background.paper",
+      borderRadius: 2,
+      border: "1px solid",
+      borderColor: "divider",
+      color: "text.secondary",
+    }}
+  >
+    <Typography variant="body2">Tweet could not be loaded.</Typography>
+  </Box>
+);
+
+/**
+ * Inner component that uses the useTweet SWR hook for client-side fetching.
+ */
+const TweetContent = ({ tweetId }) => {
+  const { data, error, isLoading } = useTweet(tweetId);
+
+  if (isLoading) return <TweetLoading />;
+  if (error || !data) return <TweetError />;
+
+  return <EmbeddedTweet tweet={data} />;
+};
 
 const TweetContainer = ({ tweetUrl }) => {
   const theme = useTheme();
@@ -23,7 +90,7 @@ const TweetContainer = ({ tweetUrl }) => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "400px",
+        minHeight: "200px",
         p: 2,
         "& .react-tweet-theme": {
           "--tweet-container-margin": "0",
@@ -33,39 +100,15 @@ const TweetContainer = ({ tweetUrl }) => {
           "--tweet-text-color": theme.palette.text.primary,
           "--tweet-link-color": theme.palette.primary.main,
         },
-        // Add styles for static images
         "& img": {
           maxWidth: "100%",
           height: "auto",
         },
       }}
     >
-      <Tweet
-        id={tweetId}
-        components={{
-          AvatarImg: (props) => (
-            <img
-              {...props}
-              loading="lazy"
-              style={{
-                width: "48px",
-                height: "48px",
-                borderRadius: "24px",
-              }}
-            />
-          ),
-          MediaImg: (props) => (
-            <img
-              {...props}
-              loading="lazy"
-              style={{
-                maxWidth: "100%",
-                height: "auto",
-              }}
-            />
-          ),
-        }}
-      />
+      <Suspense fallback={<TweetLoading />}>
+        <TweetContent tweetId={tweetId} />
+      </Suspense>
     </Box>
   );
 };

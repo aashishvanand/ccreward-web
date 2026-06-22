@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import {
   Dialog,
@@ -39,11 +41,12 @@ const CardDetailsModal = ({ open, onClose, card, onSave, onDelete }) => {
     onClose(); 
   };
   
-  const handleDelete = () => { 
-    if (onDelete && card) { 
-      onDelete(card.bank, card.cardName); 
-      onClose(); 
-    } 
+  const handleDelete = () => {
+    if (onDelete && card) {
+      if (!window.confirm(`Remove ${card.cardName} from your cards? This cannot be undone.`)) return;
+      onDelete(card.bank, card.cardName);
+      onClose();
+    }
   };
   
   const handleNetworkChange = (network) => { 

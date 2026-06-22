@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useMemo } from 'react';
 import { Box, Container, Typography, Button, Paper, Fade, useTheme, alpha } from '@mui/material';
 import { Flag, Search } from '@mui/icons-material';

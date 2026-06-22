@@ -18,18 +18,7 @@ const AnalyticsProvider = dynamic(
   { ssr: false }
 );
 
-// Add a provider tracking mechanism
-let providerMounted = false;
-
 const Providers = memo(({ children }) => {
-  // Prevent multiple provider instances in development hot reload
-  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-    if (providerMounted) {
-      console.warn('⚠️ Multiple provider instances detected - this may cause duplicate modals');
-    }
-    providerMounted = true;
-  }
-
   return (
     <ThemeRegistry>
       <AmbientBackground />

@@ -2,7 +2,7 @@
 // src/core/providers/RegionContext.jsx - FIXED: Single Modal Instance
 import {
   createContext,
-  useContext,
+  use,
   useState,
   useEffect,
   useCallback,
@@ -234,7 +234,7 @@ export function RegionProvider({ children }) {
 }
 
 export function useRegion() {
-  const context = useContext(RegionContext);
+  const context = use(RegionContext);
   if (!context) {
     throw new Error("useRegion must be used within a RegionProvider");
   }

@@ -1,16 +1,18 @@
+"use client";
+
 // src/features/landing/components/LandingPage.jsx - Enhanced with Analytics (FIXED)
 // This component manages the main landing page including all sections, 
 // analytics tracking, user authentication state, and responsive behavior
 import { useState, useEffect, useMemo } from "react";
 import { Box, Alert, Container, Typography } from "@mui/material";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/core/providers/AuthContext";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { getCardsForUser } from "@/core/services/firebaseUtils";
 import useCardImagesData from "@/core/hooks/useCardImagesData";
 import { useRegion } from "@/core/providers/RegionContext";
-import Header from "@/shared/components/layout/Header";
+import Header, { MinimalHeader } from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
 import HeroSection from "./HeroSection";
 import FeaturesSection from "./sections/FeaturesSection";
@@ -40,7 +42,7 @@ import {
   usePagePerformance,
   useEngagementTracking,
   useJourneyTracking,
-} from "@/core/hooks";
+} from "@/core/hooks/useAnalytics";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -509,7 +511,7 @@ const LandingPage = () => {
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
-        {!isMobileDevice && <GoogleOneTap />}
+        {!isMobileDevice ? <GoogleOneTap /> : null}
         {isMobileDevice ? (
           <MobileView {...commonProps} />
         ) : (
@@ -521,7 +523,6 @@ const LandingPage = () => {
             handleSignIn={handleSignIn}
             isLoading={isLoading}
             isAuthenticated={isAuthenticated()}
-            loading={loading}
             signInWithGoogle={signInWithGoogle}
             signInWithApple={signInWithApple}
           />
@@ -578,7 +579,7 @@ const MobileView = ({
       }}
     >
       <Box sx={{ position: "relative", zIndex: 10 }}>
-        <Header hideNavigation={true} />
+        <MinimalHeader />
         <Box
           component="main"
           sx={{
@@ -724,7 +725,6 @@ const DesktopView = ({
   handleSignIn,
   isLoading,
   isAuthenticated,
-  loading,
   signInWithGoogle,
   signInWithApple,
   visibleTweets,
@@ -774,12 +774,9 @@ const DesktopView = ({
             isMobile={isMobile}
             isTablet={isTablet}
             isLargeScreen={isLargeScreen}
-            handleSignIn={handleSignIn}
+            onGoogleSignIn={() => handleSignIn(signInWithGoogle)}
+            onAppleSignIn={() => handleSignIn(signInWithApple)}
             isLoading={isLoading}
-            isAuthenticated={isAuthenticated}
-            loading={loading}
-            signInWithGoogle={signInWithGoogle}
-            signInWithApple={signInWithApple}
           />
         </Box>
 

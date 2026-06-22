@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useMemo } from "react";
 import {
   AppBar,
@@ -32,8 +34,8 @@ import {
   Delete as DeleteIcon,
   Person as PersonIcon,
 } from "@mui/icons-material";
-import Link from "next/link";
-import { useRouter } from "next/router";
+import Link from "@/shared/components/NextLink";
+import { useRouter, usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { useAuth } from "@/core/providers/AuthContext";
 import SignInButtons from "@/shared/components/auth/SignInButtons";
@@ -99,12 +101,13 @@ const logoVariants = {
   tap: { scale: 0.95 },
 };
 
-function Header({ hideNavigation = false }) {
+function Header() {
+  const hideNavigation = false;
   const { mode, toggleTheme } = useAppTheme();
   const { region } = useRegion();
   const { user, logout, deleteAccount, isAuthenticated, signInWithGoogle, signInWithApple } = useAuth();
   const router = useRouter();
-  const pathname = router.asPath?.split("?")[0] || "/";
+  const pathname = usePathname() || "/";
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [deviceInfo, setDeviceInfo] = useState({
@@ -350,15 +353,16 @@ function Header({ hideNavigation = false }) {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        {!hideNavigation &&
-          navItems.map((item) => {
+        {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
 
             return (
               <MenuItem
                 key={item.path}
-                onClick={() => handleNavigation(item.path)}
+                component={Link}
+                href={item.path}
+                onClick={isMobile ? handleMenuClose : undefined}
                 sx={{
                   py: 1.5,
                   px: 2,
@@ -373,10 +377,10 @@ function Header({ hideNavigation = false }) {
                 <ListItemIcon>
                   {item.badge ? (
                     <Badge badgeContent={item.badge} color="secondary" max={99}>
-                      <Icon color={active ? "primary" : "inherit"} />
+                      <Icon color={active ? "primary" : "inherit"} aria-hidden="true" />
                     </Badge>
                   ) : (
-                    <Icon color={active ? "primary" : "inherit"} />
+                    <Icon color={active ? "primary" : "inherit"} aria-hidden="true" />
                   )}
                 </ListItemIcon>
                 <ListItemText
@@ -524,6 +528,8 @@ function Header({ hideNavigation = false }) {
                 component="img"
                 src={ccrewardIconUrl}
                 alt="ccreward"
+                width={36}
+                height={36}
                 sx={{
                   height: { xs: 32, sm: 36 },
                   width: "auto",
@@ -568,6 +574,7 @@ function Header({ hideNavigation = false }) {
                 <IconButton
                   onClick={toggleTheme}
                   color="inherit"
+                  aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
                   sx={{
                     ml: 1,
                     backgroundColor: "rgba(255, 255, 255, 0.1)",
@@ -576,9 +583,12 @@ function Header({ hideNavigation = false }) {
                       transform: "rotate(180deg)",
                     },
                     transition: "background-color 0.3s ease-in-out, transform 0.3s ease-in-out",
+                    "@media (prefers-reduced-motion: reduce)": {
+                      transition: "background-color 0.3s ease-in-out",
+                    },
                   }}
                 >
-                  {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
+                  {mode === "dark" ? <LightModeIcon aria-hidden="true" /> : <DarkModeIcon aria-hidden="true" />}
                 </IconButton>
               </Tooltip>
 
@@ -588,6 +598,7 @@ function Header({ hideNavigation = false }) {
                 <Tooltip title="Account settings">
                   <IconButton
                     onClick={handleMenuOpen}
+                    aria-label="Account settings"
                     sx={{
                       ml: 1,
                       p: 0,
@@ -662,32 +673,8 @@ function Header({ hideNavigation = false }) {
             </Box>
           )}
 
-          {/* Mobile Minimal Header (Theme Toggle only) */}
-          {isMobile && hideNavigation && (
-            <Tooltip
-              title={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
-              arrow
-            >
-              <IconButton
-                onClick={toggleTheme}
-                color="inherit"
-                sx={{
-                  ml: 1,
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                  "&:hover": {
-                    backgroundColor: "rgba(255, 255, 255, 0.2)",
-                    transform: "rotate(180deg)",
-                  },
-                  transition: "background-color 0.3s ease-in-out, transform 0.3s ease-in-out",
-                }}
-              >
-                {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
-              </IconButton>
-            </Tooltip>
-          )}
-
           {/* Mobile Menu Button */}
-          {isMobile && !hideNavigation && (
+          {isMobile && (
             <IconButton
               color="inherit"
               aria-label="menu"
@@ -704,7 +691,84 @@ function Header({ hideNavigation = false }) {
           )}
 
           {/* Mobile Menu */}
-          {isMobile && !hideNavigation && renderMobileMenu()}
+          {isMobile && renderMobileMenu()}
+        </Toolbar>
+      </AppBar>
+    </motion.div>
+  );
+}
+
+/**
+ * Minimal header variant — logo + theme toggle only, no navigation.
+ * Use on pages that direct mobile users to the app (e.g. mobile landing).
+ */
+export function MinimalHeader() {
+  const { mode, toggleTheme } = useAppTheme();
+  const { region } = useRegion();
+  const ccrewardIconId = useMemo(() => {
+    const currency = REGION_CURRENCY_MAP[region] || "dollar";
+    return CCREWARD_ICONS[mode]?.[currency] || CCREWARD_ICONS.light.dollar;
+  }, [mode, region]);
+  const ccrewardIconUrl = useMemo(() => buildCloudflareImageUrl(ccrewardIconId, "public"), [ccrewardIconId]);
+
+  return (
+    <motion.div variants={headerVariants} initial="hidden" animate="visible">
+      <AppBar
+        position="sticky"
+        elevation={0}
+        sx={{
+          backdropFilter: "blur(20px)",
+          backgroundColor: "rgba(25, 118, 210, 0.9)",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+        }}
+      >
+        <Toolbar sx={{ px: { xs: 2, sm: 3 } }}>
+          <motion.div variants={logoVariants} whileHover="hover" whileTap="tap">
+            <Box
+              component={Link}
+              href="/"
+              sx={{ display: "flex", alignItems: "center", textDecoration: "none", color: "inherit", mr: 3 }}
+            >
+              <Box
+                component="img"
+                src={ccrewardIconUrl}
+                alt="ccreward"
+                width={36}
+                height={36}
+                sx={{ height: { xs: 32, sm: 36 }, width: "auto", mr: 1.5, filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))" }}
+              />
+              <Typography
+                variant="h6"
+                component="span"
+                sx={{
+                  fontWeight: 700,
+                  fontSize: { xs: "1.1rem", sm: "1.25rem" },
+                  background: "linear-gradient(45deg, #ffffff 30%, #e3f2fd 90%)",
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                ccreward
+              </Typography>
+            </Box>
+          </motion.div>
+          <Box sx={{ flexGrow: 1 }} />
+          <Tooltip title={`Switch to ${mode === "dark" ? "light" : "dark"} mode`} arrow>
+            <IconButton
+              onClick={toggleTheme}
+              color="inherit"
+              aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
+              sx={{
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.2)", transform: "rotate(180deg)" },
+                transition: "background-color 0.3s ease-in-out, transform 0.3s ease-in-out",
+                "@media (prefers-reduced-motion: reduce)": { transition: "background-color 0.3s ease-in-out" },
+              }}
+            >
+              {mode === "dark" ? <LightModeIcon aria-hidden="true" /> : <DarkModeIcon aria-hidden="true" />}
+            </IconButton>
+          </Tooltip>
         </Toolbar>
       </AppBar>
     </motion.div>

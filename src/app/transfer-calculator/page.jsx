@@ -18,7 +18,7 @@ export const metadata = {
   },
 };
 
-const TransferCalculator = dynamic(() => import('@/features/transfer-calculator/components/TransferCalculator'), { ssr: false });
+const TransferCalculator = dynamic(() => import('@/features/transfer-calculator/components/TransferCalculator'));
 
 export default function TransferCalculatorPage() {
   return (

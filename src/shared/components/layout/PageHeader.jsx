@@ -1,10 +1,10 @@
+"use client";
+
 import React from 'react';
-import { Box, Typography, useTheme, alpha } from '@mui/material';
+import { Box, Typography, alpha } from '@mui/material';
 import PropTypes from 'prop-types';
 
 const PageHeader = ({ title, subtitle, children }) => {
-    const theme = useTheme();
-
     return (
         <Box sx={{ mb: 8, textAlign: 'center' }}>
             <Typography
@@ -13,11 +13,9 @@ const PageHeader = ({ title, subtitle, children }) => {
                 gutterBottom
                 sx={{
                     fontWeight: "800",
-
-                    background: theme.palette.mode === 'dark' 
+                    background: (theme) => theme.palette.mode === 'dark'
                         ? 'linear-gradient(45deg, #90caf9 30%, #ce93d8 90%)'
                         : 'linear-gradient(45deg, #1976d2 30%, #9c27b0 90%)',
-
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
@@ -41,7 +39,7 @@ const PageHeader = ({ title, subtitle, children }) => {
                 </Typography>
             )}
             <Box sx={{ maxWidth: 700, mx: 'auto', position: 'relative' }}>
-                 {/* Glow effect */}
+                {/* Glow effect */}
                 <Box sx={{
                     position: 'absolute',
                     top: '50%',
@@ -49,7 +47,7 @@ const PageHeader = ({ title, subtitle, children }) => {
                     transform: 'translate(-50%, -50%)',
                     width: '90%',
                     height: '80%',
-                    background: `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.2)})`,
+                    background: (theme) => `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.2)})`,
                     filter: 'blur(40px)',
                     zIndex: -1,
                 }} />

@@ -18,7 +18,7 @@ export const metadata = {
   },
 };
 
-const BestCardCalculator = dynamic(() => import('@/features/best-card/components/BestCardCalculator'), { ssr: false });
+const BestCardCalculator = dynamic(() => import('@/features/best-card/components/BestCardCalculator'));
 
 export default function BestCardPage() {
   return (

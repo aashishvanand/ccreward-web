@@ -27,7 +27,7 @@ import {
   useEngagementTracking,
   useJourneyTracking,
   useComponentAnalytics,
-} from "@/core/hooks";
+} from "@/core/hooks/useAnalytics";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -274,11 +274,6 @@ const FAQPage = () => {
               placeholder="Search FAQs..."
               value={searchQuery}
               onChange={handleSearchChange}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                },
-              }}
               slotProps={{
                 input: {
                   startAdornment: (

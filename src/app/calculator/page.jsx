@@ -18,7 +18,7 @@ export const metadata = {
   },
 };
 
-const Calculator = dynamic(() => import('@/features/calculator/components/Calculator'), { ssr: false });
+const Calculator = dynamic(() => import('@/features/calculator/components/Calculator'));
 
 export default function CalculatorPage() {
   return (

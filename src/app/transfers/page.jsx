@@ -1,15 +1,9 @@
-"use client";
+import { redirect } from 'next/navigation';
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+export const metadata = { robots: 'noindex' };
 
-export default function TransfersRedirectPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    const params = window.location.search;
-    router.replace(`/transfer-calculator${params}`);
-  }, [router]);
-
-  return null;
+export default async function TransfersRedirectPage({ searchParams }) {
+  const params = await searchParams;
+  const query = new URLSearchParams(params).toString();
+  redirect(`/transfer-calculator${query ? `?${query}` : ''}`);
 }

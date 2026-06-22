@@ -1,3 +1,5 @@
+"use client";
+
 import { useMemo, useRef, useState, useCallback } from "react";
 import { Box, Typography, Paper, Tooltip, IconButton } from "@mui/material";
 import {
@@ -64,6 +66,7 @@ const QuickCardSelector = ({ userCards = [], selectedBank, selectedCard, onSelec
           size="small"
           onClick={() => scroll(-1)}
           disabled={!canScrollLeft}
+          aria-label="Scroll cards left"
           sx={{
             flexShrink: 0,
             mr: 0.5,
@@ -71,7 +74,7 @@ const QuickCardSelector = ({ userCards = [], selectedBank, selectedCard, onSelec
             transition: "opacity 0.2s",
           }}
         >
-          <ChevronLeftIcon fontSize="small" />
+          <ChevronLeftIcon fontSize="small" aria-hidden="true" />
         </IconButton>
 
         {/* Scrollable row */}
@@ -102,9 +105,21 @@ const QuickCardSelector = ({ userCards = [], selectedBank, selectedCard, onSelec
                 placement="top"
               >
                 <Paper
+                  component="button"
                   onClick={() => onSelectCard(card.bank, card.cardName)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onSelectCard(card.bank, card.cardName);
+                    }
+                  }}
+                  aria-label={`Select ${card.cardName} by ${card.bank}`}
+                  aria-pressed={isSelected}
                   elevation={isSelected ? 4 : 1}
                   sx={{
+                    background: "none",
+                    padding: 0,
+                    textAlign: "left",
                     // clamp(min, fluid, max) — scales smoothly at every viewport width, no breakpoint steps
                     flexShrink: 0,
                     width: card.isVertical ? "clamp(50px, 5vw, 80px)" : "clamp(80px, 8vw, 128px)",
@@ -170,6 +185,7 @@ const QuickCardSelector = ({ userCards = [], selectedBank, selectedCard, onSelec
           size="small"
           onClick={() => scroll(1)}
           disabled={!canScrollRight}
+          aria-label="Scroll cards right"
           sx={{
             flexShrink: 0,
             ml: 0.5,
@@ -177,7 +193,7 @@ const QuickCardSelector = ({ userCards = [], selectedBank, selectedCard, onSelec
             transition: "opacity 0.2s",
           }}
         >
-          <ChevronRightIcon fontSize="small" />
+          <ChevronRightIcon fontSize="small" aria-hidden="true" />
         </IconButton>
       </Box>
     </Box>

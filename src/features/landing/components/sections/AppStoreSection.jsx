@@ -1,3 +1,5 @@
+"use client";
+
 import { Box, Container, Typography } from "@mui/material";
 import Image from "next/image";
 import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";

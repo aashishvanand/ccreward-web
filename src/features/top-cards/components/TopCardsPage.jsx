@@ -1,7 +1,7 @@
 "use client";
 // src/features/top-cards/components/TopCardsPage.jsx - Enhanced with Analytics
 import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/core/providers/AuthContext";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
@@ -36,7 +36,7 @@ import {
   usePagePerformance,
   useEngagementTracking,
   useComponentAnalytics,
-} from "@/core/hooks";
+} from "@/core/hooks/useAnalytics";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -78,6 +78,7 @@ const categories = [
 
 const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = "" }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
@@ -124,21 +125,16 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
 
   // Handle URL category parameter with analytics (Legacy support or direct query param usage)
   useEffect(() => {
-    if (!router.isReady) return;
-
     // Only check params if no initialCategory was provided (meaning we are on the index page)
     // and we haven't selected a category yet.
     if (!initialCategory && !category) {
       const validateAndSetCategory = async () => {
         setIsValidating(true);
         try {
-          const queryCategory = router.query.category;
-          const categoryFromUrl = Array.isArray(queryCategory)
-            ? queryCategory[0]
-            : queryCategory;
+          const queryCategory = searchParams.get('category');
 
-          if (categoryFromUrl) {
-            const decodedCategory = decodeURIComponent(categoryFromUrl);
+          if (queryCategory) {
+            const decodedCategory = decodeURIComponent(queryCategory);
 
             trackEvent("category_url_parameter_detected", {
               category: decodedCategory,
@@ -184,7 +180,7 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
 
       validateAndSetCategory();
     }
-  }, [router, trackEvent, trackComponentError, initialCategory, category, currentRegion]);
+  }, [searchParams, trackEvent, trackComponentError, initialCategory, category, currentRegion]);
 
   // Update URL when category changes
   // We handle navigation in handleCategoryChange now to prevent cycle, 

@@ -1,3 +1,5 @@
+"use client";
+
 import { useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Box, useMediaQuery } from "@mui/material";

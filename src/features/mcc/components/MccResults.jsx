@@ -1,3 +1,5 @@
+"use client";
+
 import { Grid, Card, CardContent, Typography, Chip, Box, Skeleton, Divider, Tooltip, useTheme, alpha } from '@mui/material';
 import { 
     CategoryOutlined, 

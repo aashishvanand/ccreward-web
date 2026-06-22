@@ -50,8 +50,8 @@ import {
   useAnalytics,
   usePagePerformance,
   useFormTracking,
-  usePartnerLogos,
-} from "@/core/hooks";
+} from "@/core/hooks/useAnalytics";
+import usePartnerLogos from "@/core/hooks/usePartnerLogos";
 import TransferPartnerGrid from "./TransferPartnerGrid";
 import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 

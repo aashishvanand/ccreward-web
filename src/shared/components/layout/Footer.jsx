@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Box,
   Container,
@@ -120,8 +122,9 @@ function Footer() {
                     rel="noopener noreferrer"
                     size="small"
                     color="inherit"
+                    aria-label="Follow ccreward on X (Twitter)"
                   >
-                    <Twitter />
+                    <Twitter aria-hidden="true" />
                   </IconButton>
                 </motion.div>
 
@@ -136,8 +139,9 @@ function Footer() {
                     rel="noopener noreferrer"
                     size="small"
                     color="inherit"
+                    aria-label="Follow ccreward on Instagram"
                   >
-                    <Instagram />
+                    <Instagram aria-hidden="true" />
                   </IconButton>
                 </motion.div>
 
@@ -152,8 +156,9 @@ function Footer() {
                     rel="noopener noreferrer"
                     size="small"
                     color="inherit"
+                    aria-label="Join ccreward on Reddit"
                   >
-                    <Reddit />
+                    <Reddit aria-hidden="true" />
                   </IconButton>
                 </motion.div>
 
@@ -168,8 +173,9 @@ function Footer() {
                     rel="noopener noreferrer"
                     size="small"
                     color="inherit"
+                    aria-label="Join ccreward on Telegram"
                   >
-                    <Telegram />
+                    <Telegram aria-hidden="true" />
                   </IconButton>
                 </motion.div>
               </Stack>

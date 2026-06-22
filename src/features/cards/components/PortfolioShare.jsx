@@ -1,10 +1,12 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { useTheme } from "@mui/material";
 import useCardImagesData from "@/core/hooks/useCardImagesData";
-import { forwardRef, useImperativeHandle } from "react";
+import { useImperativeHandle } from "react";
 import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
-const PortfolioShare = forwardRef(({ cards }, ref) => {
+function PortfolioShare({ cards, ref }) {
   const theme = useTheme();
   const [shareUrl, setShareUrl] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -300,8 +302,6 @@ const PortfolioShare = forwardRef(({ cards }, ref) => {
   }, [cards, cardImagesData]);
 
   return null;
-});
-
-PortfolioShare.displayName = "PortfolioShare";
+}
 
 export default PortfolioShare;

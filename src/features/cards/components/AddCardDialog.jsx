@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import {
   Dialog,
@@ -180,7 +182,7 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
                   {...params} 
                   label="Select Bank" 
                   required
-                  placeholder="Search for your bank..."
+                  placeholder="Search for your bank…"
                   helperText="Start typing to search"
                 />
               )}
@@ -199,7 +201,7 @@ export default function AddCardDialog({ open, onClose, onAddCard }) {
                   {...params} 
                   label="Select Card" 
                   required
-                  placeholder={newCard.bank ? "Search for your card..." : "Select a bank first"}
+                  placeholder={newCard.bank ? "Search for your card…" : "Select a bank first"}
                 />
               )}
               noOptionsText={newCard.bank ? "No cards found for this bank" : "Select a bank first"}

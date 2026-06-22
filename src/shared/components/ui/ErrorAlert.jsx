@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect } from "react";
 import { Alert, Collapse, IconButton, Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";

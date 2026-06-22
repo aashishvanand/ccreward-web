@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Box,
@@ -42,7 +44,7 @@ import {
   useEngagementTracking,
   useJourneyTracking,
   useComponentAnalytics,
-} from "@/core/hooks";
+} from "@/core/hooks/useAnalytics";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 20 },

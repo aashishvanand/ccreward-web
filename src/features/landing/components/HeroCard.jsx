@@ -1,3 +1,5 @@
+"use client";
+
 import PropTypes from "prop-types";
 import { Card } from "@mui/material";
 import Image from "next/image";

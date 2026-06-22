@@ -1,6 +1,6 @@
 // src/core/providers/ThemeRegistry.js
 'use client';
-import { useState, useMemo, createContext, useContext, useEffect, useCallback } from 'react';
+import { useState, useMemo, createContext, use, useEffect, useCallback } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -100,6 +100,9 @@ const colorPalette = {
   },
 };
 
+// Hoisted: avoids recreating a default theme object on every pre-mount render.
+const DEFAULT_THEME = createTheme();
+
 function getInitialMode() {
   // Only return a default mode during server-side rendering to avoid hydration mismatch
   if (typeof window === 'undefined') {
@@ -141,7 +144,7 @@ export function ThemeRegistry({ children }) {
   }, [mode]);
 
   const theme = useMemo(() => {
-    if (!mode) return createTheme({ palette: { mode: 'light' } });
+    if (!mode) return DEFAULT_THEME;
 
     return createTheme({
       palette: {
@@ -164,22 +167,24 @@ export function ThemeRegistry({ children }) {
       components: {
         MuiCssBaseline: {
           styleOverrides: {
-            body: {
-              scrollbarColor: mode === 'dark' ? '#6b6b6b #2b2b2b' : '#959595 #f1f1f1',
+            // Use ({ theme }) callback so mode-specific values are evaluated lazily
+            // against the live theme, not captured in a stale closure.
+            body: ({ theme }) => ({
+              scrollbarColor: theme.palette.mode === 'dark' ? '#6b6b6b #2b2b2b' : '#959595 #f1f1f1',
               '&::-webkit-scrollbar': {
                 width: '8px',
               },
               '&::-webkit-scrollbar-thumb': {
                 borderRadius: '8px',
-                backgroundColor: mode === 'dark' ? '#6b6b6b' : '#959595',
+                backgroundColor: theme.palette.mode === 'dark' ? '#6b6b6b' : '#959595',
                 '&:hover': {
-                  backgroundColor: mode === 'dark' ? '#959595' : '#6b6b6b',
+                  backgroundColor: theme.palette.mode === 'dark' ? '#959595' : '#6b6b6b',
                 },
               },
               '&::-webkit-scrollbar-track': {
-                backgroundColor: mode === 'dark' ? '#2b2b2b' : '#f1f1f1',
+                backgroundColor: theme.palette.mode === 'dark' ? '#2b2b2b' : '#f1f1f1',
               },
-            },
+            }),
           },
         },
         MuiButton: {
@@ -194,22 +199,29 @@ export function ThemeRegistry({ children }) {
               },
               transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
             },
-            contained: {
-              background: mode === 'light'
+            contained: ({ theme }) => ({
+              background: theme.palette.mode === 'light'
                 ? `linear-gradient(135deg, ${colorPalette.light.primary.main} 0%, ${colorPalette.light.primary.dark} 100%)`
                 : `linear-gradient(135deg, ${colorPalette.dark.primary.main} 0%, ${colorPalette.dark.primary.dark} 100%)`,
-            },
+            }),
           },
         },
         MuiCard: {
           styleOverrides: {
-            root: {
+            root: ({ theme }) => ({
               borderRadius: 16,
-              boxShadow: mode === 'light'
+              boxShadow: theme.palette.mode === 'light'
                 ? '0 4px 20px rgba(0,0,0,0.05)'
                 : '0 4px 20px rgba(0,0,0,0.2)',
-              border: `1px solid ${mode === 'light' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
-            },
+              border: `1px solid ${theme.palette.mode === 'light' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
+            }),
+          },
+        },
+        MuiOutlinedInput: {
+          styleOverrides: {
+            root: ({ theme }) => ({
+              borderRadius: theme.spacing(2),
+            }),
           },
         },
         MuiPaper: {
@@ -235,7 +247,7 @@ export function ThemeRegistry({ children }) {
   if (!mounted) {
     return (
       <ThemeContext.Provider value={{ mode: 'light', toggleTheme, setMode }}>
-        <ThemeProvider theme={createTheme()}>
+        <ThemeProvider theme={DEFAULT_THEME}>
           {children}
         </ThemeProvider>
       </ThemeContext.Provider>
@@ -253,7 +265,7 @@ export function ThemeRegistry({ children }) {
 }
 
 export function useAppTheme() {
-  const context = useContext(ThemeContext);
+  const context = use(ThemeContext);
   if (!context) {
     throw new Error('useAppTheme must be used within ThemeRegistry');
   }

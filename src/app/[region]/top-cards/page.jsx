@@ -1,4 +1,4 @@
-
+import { Suspense } from 'react';
 import TopCardsPage from '@/features/top-cards/components/TopCardsPage';
 import { generateMetadata as generateMetadataHelper, pageMetadata, commonMetadata } from '@/shared/components/seo';
 import PerformanceWrapper from '@/shared/components/PerformanceWrapper';
@@ -51,8 +51,10 @@ export default async function TopCards({ params }) {
     const { categories, images } = getData(targetRegion.toLowerCase());
 
     return (
-        <PerformanceWrapper name="top_cards_page">
-            <TopCardsPage initialCategories={categories} initialCardImages={images} />
-        </PerformanceWrapper>
+        <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
+            <PerformanceWrapper name="top_cards_page">
+                <TopCardsPage initialCategories={categories} initialCardImages={images} />
+            </PerformanceWrapper>
+        </Suspense>
     );
 }

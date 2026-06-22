@@ -1,10 +1,10 @@
 'use client';
 import PropTypes from 'prop-types';
-import { createContext, useContext, useEffect, useState, useRef } from 'react';
+import { createContext, use, useEffect, useState, useRef } from 'react';
 import { getFirebaseAuth, firebaseApp, initAppCheck } from '@/firebase';
 import { deleteUserData } from '../services/firebaseUtils';
 import { resetUsageState } from '../services/usageLimitService';
-import { useRouter } from "next/router";
+import { useRouter, usePathname } from "next/navigation";
 
 const AuthContext = createContext();
 
@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
   const providerRef = useRef(null);
   const appleProviderRef = useRef(null);
   const router = useRouter();
-  const pathname = router.asPath?.split('?')[0] || '';
+  const pathname = usePathname() || '';
 
   useEffect(() => {
     let unsubscribe;
@@ -145,12 +145,10 @@ export function AuthProvider({ children }) {
       setIsNewUser(false);
       resetUsageState();
       if (typeof window !== 'undefined') {
-        Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('userCardsCache_') ||
-            key.startsWith('userCardsCacheTimestamp_')) {
-            localStorage.removeItem(key);
-          }
-        });
+        const keysToRemove = Object.keys(localStorage).filter(key =>
+          key.startsWith('userCardsCache_') || key.startsWith('userCardsCacheTimestamp_')
+        );
+        keysToRemove.forEach(key => localStorage.removeItem(key));
         localStorage.removeItem('calculationCount');
       }
 
@@ -197,12 +195,10 @@ export function AuthProvider({ children }) {
       resetUsageState();
 
       if (typeof window !== 'undefined') {
-        Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('userCardsCache_') ||
-            key.startsWith('userCardsCacheTimestamp_')) {
-            localStorage.removeItem(key);
-          }
-        });
+        const keysToRemove = Object.keys(localStorage).filter(key =>
+          key.startsWith('userCardsCache_') || key.startsWith('userCardsCacheTimestamp_')
+        );
+        keysToRemove.forEach(key => localStorage.removeItem(key));
         localStorage.removeItem('calculationCount');
       }
 
@@ -258,7 +254,7 @@ AuthProvider.propTypes = {
 
 
 export function useAuth() {
-  const context = useContext(AuthContext);
+  const context = use(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }

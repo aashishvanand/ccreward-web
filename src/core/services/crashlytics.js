@@ -1,5 +1,4 @@
 // src/core/services/crashlytics.js - Firebase Crashlytics Implementation
-import React from 'react';
 let crashlytics = null;
 let isInitialized = false;
 
@@ -277,7 +276,7 @@ export const handleReactError = (error, errorInfo) => {
         component_stack: errorInfo.componentStack,
         error_boundary: true,
         fatal: true,
-        react_version: React?.version || 'unknown'
+        react_version: typeof React !== 'undefined' ? React.version : 'unknown'
     };
 
     recordFatalError('react_error_boundary', reactErrorInfo);

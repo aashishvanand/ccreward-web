@@ -1,3 +1,5 @@
+"use client";
+
 // src/features/landing/components/sections/FeaturesSection.jsx
 import React from "react";
 import {
