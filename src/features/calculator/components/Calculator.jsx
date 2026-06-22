@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from "react";
 import {
   Box,
   Container,
@@ -417,25 +417,27 @@ function Calculator() {
                 </Box>
               ) : (
                 <Stack spacing={3}>
-                  <CalculatorForm
-                    selectedBank={selectedBank}
-                    selectedCard={selectedCard}
-                    selectedMcc={selectedMcc}
-                    spentAmount={spentAmount}
-                    selectedCurrency={selectedCurrency}
-                    additionalInputs={additionalInputs}
-                    onBankChange={handleBankChange}
-                    onCardChange={handleCardChange}
-                    onMccChange={handleMccChange}
-                    onSpentAmountChange={handleSpentAmountChange}
-                    onCurrencyChange={handleCurrencyChange}
-                    onAdditionalInputChange={handleAdditionalInputChange}
-                    onCalculate={handleCalculate}
-                    onClear={handleClearAll}
-                    isLoadingQuestions={isLoadingQuestions}
-                    setIsLoadingQuestions={setIsLoadingQuestions}
-                    isCalculating={isCalculating}
-                  />
+                  <Suspense fallback={<Box sx={{ display: "flex", justifyContent: "center", py: 4 }}><CircularProgress /></Box>}>
+                    <CalculatorForm
+                      selectedBank={selectedBank}
+                      selectedCard={selectedCard}
+                      selectedMcc={selectedMcc}
+                      spentAmount={spentAmount}
+                      selectedCurrency={selectedCurrency}
+                      additionalInputs={additionalInputs}
+                      onBankChange={handleBankChange}
+                      onCardChange={handleCardChange}
+                      onMccChange={handleMccChange}
+                      onSpentAmountChange={handleSpentAmountChange}
+                      onCurrencyChange={handleCurrencyChange}
+                      onAdditionalInputChange={handleAdditionalInputChange}
+                      onCalculate={handleCalculate}
+                      onClear={handleClearAll}
+                      isLoadingQuestions={isLoadingQuestions}
+                      setIsLoadingQuestions={setIsLoadingQuestions}
+                      isCalculating={isCalculating}
+                    />
+                  </Suspense>
 
                   {!calculationPerformed ? (
                     <ReportMissingButton onOpen={() => setMissingFormOpen(true)} />

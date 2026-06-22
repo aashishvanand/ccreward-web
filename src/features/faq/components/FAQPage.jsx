@@ -274,11 +274,6 @@ const FAQPage = () => {
               placeholder="Search FAQs..."
               value={searchQuery}
               onChange={handleSearchChange}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: 2,
-                },
-              }}
               slotProps={{
                 input: {
                   startAdornment: (

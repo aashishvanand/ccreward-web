@@ -1,5 +1,3 @@
-"use client";
-
 import { Box, Container, Typography, Button } from '@mui/material';
 import Link from 'next/link';
 import Header from '@/shared/components/layout/Header';

@@ -32,6 +32,12 @@
       "skillPath": "skills/material-ui-nextjs/SKILL.md",
       "computedHash": "63fc0cc8bf0be6693fdf9563e0d277afaba64988462bd481ed0a4cb02343d7d9"
     },
+    "material-ui-styling": {
+      "source": "mui/material-ui",
+      "sourceType": "github",
+      "skillPath": "skills/material-ui-styling/SKILL.md",
+      "computedHash": "286bc50b4244062e6eda02fad2d8b3765a8d0a74a1cd6821f7348384d10ba610"
+    },
     "material-ui-theming": {
       "source": "mui/material-ui",
       "sourceType": "github",

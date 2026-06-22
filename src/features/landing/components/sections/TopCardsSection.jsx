@@ -208,7 +208,6 @@ const TopCardsSection = () => {
                             )}`
                           )
                         }
-                        className="MuiButton-root"
                         sx={{
                           transition: "background-color 0.3s ease-in-out, color 0.3s ease-in-out",
                         }}

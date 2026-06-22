@@ -55,12 +55,7 @@ const HowToSelector = ({
 
         <FormControl
           size="small"
-          sx={{
-            minWidth: { xs: "100%", sm: 120 },
-            "& .MuiOutlinedInput-root": {
-              borderRadius: 2,
-            },
-          }}
+          sx={{ minWidth: { xs: "100%", sm: 120 } }}
         >
           <Select
             value={selectedPlatform}
@@ -116,12 +111,7 @@ const HowToSelector = ({
 
         <FormControl
           size="small"
-          sx={{
-            minWidth: { xs: "100%", sm: 180 },
-            "& .MuiOutlinedInput-root": {
-              borderRadius: 2,
-            },
-          }}
+          sx={{ minWidth: { xs: "100%", sm: 180 } }}
           disabled={!selectedPlatform || isLoading}
         >
           <Select

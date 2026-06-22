@@ -217,6 +217,13 @@ export function ThemeRegistry({ children }) {
             }),
           },
         },
+        MuiOutlinedInput: {
+          styleOverrides: {
+            root: ({ theme }) => ({
+              borderRadius: theme.spacing(2),
+            }),
+          },
+        },
         MuiPaper: {
           styleOverrides: {
             root: {
