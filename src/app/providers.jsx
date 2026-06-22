@@ -3,7 +3,6 @@
 
 import { memo } from "react";
 import dynamic from 'next/dynamic';
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ThemeRegistry } from "../core/providers/ThemeRegistry";
 import AmbientBackground from "../shared/components/layout/AmbientBackground";
 import { RegionProvider } from "../core/providers/RegionContext";
@@ -21,7 +20,6 @@ const AnalyticsProvider = dynamic(
 
 const Providers = memo(({ children }) => {
   return (
-    <AppRouterCacheProvider>
     <ThemeRegistry>
       <AmbientBackground />
       <RegionProvider>
@@ -32,7 +30,6 @@ const Providers = memo(({ children }) => {
         </AuthProvider>
       </RegionProvider>
     </ThemeRegistry>
-    </AppRouterCacheProvider>
   );
 });
 
