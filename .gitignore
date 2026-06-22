@@ -13,6 +13,9 @@
 /.next/
 /out/
 
+# vinext build cache (contains absolute local paths, never commit)
+/.vinext/
+
 # production
 /build
 /out
