@@ -524,6 +524,7 @@ const LandingPage = () => {
             isLoading={isLoading}
             isAuthenticated={isAuthenticated()}
             signInWithGoogle={signInWithGoogle}
+            signInWithApple={signInWithApple}
           />
         )}
       </Box>
@@ -725,6 +726,7 @@ const DesktopView = ({
   isLoading,
   isAuthenticated,
   signInWithGoogle,
+  signInWithApple,
   visibleTweets,
   handlePrevPage,
   handleNextPage,
