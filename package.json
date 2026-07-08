@@ -54,8 +54,8 @@
     "sharp": "^0.35.3"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.43.0",
-    "@cloudflare/workers-types": "^5.20260707.1",
+    "@cloudflare/vite-plugin": "^1.43.2",
+    "@cloudflare/workers-types": "^5.20260708.1",
     "@next/bundle-analyzer": "^16.2.10",
     "@types/react": "^19.2.17",
     "@vitejs/plugin-react": "^6.0.3",
@@ -69,7 +69,7 @@
     "typescript": "^6.0.3",
     "vinext": "^0.2.1",
     "vite": "^8.1.3",
-    "wrangler": "^4.107.0"
+    "wrangler": "^4.108.0"
   },
   "resolutions": {
     "@emotion/react": "^11.14.0",
