@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Stack, Alert, Paper, Typography } from "@mui/material";
 import { getMcpCredentialsStatus } from "@/core/services/mcpApi";
-import { getStoredMcpSecret } from "@/core/utils/mcpSecretStorage";
 import CredentialPanel from "./CredentialPanel";
 import UsagePanel from "./UsagePanel";
 import BuyCreditsPanel from "./BuyCreditsPanel";
@@ -12,8 +11,6 @@ import SetupInstructions from "./SetupInstructions";
 function McpDashboard() {
   const [status, setStatus] = useState(null);
   const [statusError, setStatusError] = useState(null);
-  const [secret, setSecret] = useState(null);
-  const [refreshToken, setRefreshToken] = useState(0);
 
   const refreshStatus = useCallback(async () => {
     try {
@@ -26,41 +23,19 @@ function McpDashboard() {
 
   useEffect(() => {
     refreshStatus();
-    const stored = getStoredMcpSecret();
-    if (stored?.secret) {
-      setSecret(stored.secret);
-    }
   }, [refreshStatus]);
-
-  const handleSecretIssued = ({ clientSecret }) => {
-    setSecret(clientSecret);
-    setRefreshToken((n) => n + 1);
-  };
-
-  const handleSecretProvided = (value) => {
-    setSecret(value);
-  };
 
   return (
     <Stack spacing={4}>
       {statusError && <Alert severity="error">{statusError}</Alert>}
 
-      <CredentialPanel
-        status={status}
-        onRefreshStatus={refreshStatus}
-        onSecretIssued={handleSecretIssued}
-      />
+      <CredentialPanel status={status} onRefreshStatus={refreshStatus} />
 
-      <UsagePanel
-        secret={secret}
-        onSecretProvided={handleSecretProvided}
-        refreshToken={refreshToken}
-      />
+      <UsagePanel status={status} />
 
       <BuyCreditsPanel
-        secret={secret}
         currentCredits={status?.credits?.remaining}
-        onCreditsUpdated={() => setRefreshToken((n) => n + 1)}
+        onCreditsUpdated={refreshStatus}
       />
 
       {status?.exists && (
@@ -68,7 +43,7 @@ function McpDashboard() {
           <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
             Setup instructions
           </Typography>
-          <SetupInstructions secret={secret} />
+          <SetupInstructions />
         </Paper>
       )}
     </Stack>

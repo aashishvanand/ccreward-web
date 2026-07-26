@@ -11,7 +11,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { ShoppingCart as ShoppingCartIcon } from "@mui/icons-material";
-import { createMcpRazorpayOrder, getMcpUsage } from "@/core/services/mcpApi";
+import { createMcpRazorpayOrder, getMcpCredentialsStatus } from "@/core/services/mcpApi";
 import { loadRazorpayScript } from "@/core/utils/loadRazorpayScript";
 
 const PACKAGES = [
@@ -24,12 +24,13 @@ const POLL_INTERVAL_MS = 3000;
 const POLL_TIMEOUT_MS = 45000;
 
 /**
- * secret: the MCP clientSecret held for this session — required to poll /v4/usage
- * after checkout so we can confirm the webhook actually credited the account.
+ * currentCredits: status.credits.remaining before checkout, used as the baseline
+ * to detect the webhook has landed. onCreditsUpdated: called with the fresh status
+ * once credits increase, so the parent can refresh CredentialPanel/UsagePanel.
  */
-function BuyCreditsPanel({ secret, currentCredits, onCreditsUpdated }) {
+function BuyCreditsPanel({ currentCredits, onCreditsUpdated }) {
   const [selectedPkg, setSelectedPkg] = useState(null);
-  const [status, setStatus] = useState("idle"); // idle | ordering | processing | done | timeout | error
+  const [checkoutState, setCheckoutState] = useState("idle"); // idle | ordering | processing | done | timeout | error
   const [error, setError] = useState(null);
   const pollTimer = useRef(null);
   const pollDeadline = useRef(null);
@@ -45,11 +46,11 @@ function BuyCreditsPanel({ secret, currentCredits, onCreditsUpdated }) {
     pollDeadline.current = Date.now() + POLL_TIMEOUT_MS;
     pollTimer.current = setInterval(async () => {
       try {
-        const usage = await getMcpUsage(secret);
-        if (usage.mcpCreditsRemaining > baselineCredits) {
+        const latest = await getMcpCredentialsStatus();
+        if ((latest.credits?.remaining ?? 0) > baselineCredits) {
           stopPolling();
-          setStatus("done");
-          onCreditsUpdated?.(usage);
+          setCheckoutState("done");
+          onCreditsUpdated?.(latest);
           return;
         }
       } catch {
@@ -57,18 +58,14 @@ function BuyCreditsPanel({ secret, currentCredits, onCreditsUpdated }) {
       }
       if (Date.now() >= pollDeadline.current) {
         stopPolling();
-        setStatus("timeout");
+        setCheckoutState("timeout");
       }
     }, POLL_INTERVAL_MS);
   };
 
   const handleBuy = async (pkg) => {
-    if (!secret) {
-      setError("We need your MCP secret to confirm the purchase. Paste it in the balance card above first.");
-      return;
-    }
     setSelectedPkg(pkg);
-    setStatus("ordering");
+    setCheckoutState("ordering");
     setError(null);
     try {
       const order = await createMcpRazorpayOrder(pkg);
@@ -82,19 +79,19 @@ function BuyCreditsPanel({ secret, currentCredits, onCreditsUpdated }) {
         name: "ccreward",
         description: `${order.credits} MCP credits`,
         handler: () => {
-          setStatus("processing");
+          setCheckoutState("processing");
           startPolling(currentCredits ?? 0);
         },
         modal: {
           ondismiss: () => {
-            setStatus((prev) => (prev === "ordering" ? "idle" : prev));
+            setCheckoutState((prev) => (prev === "ordering" ? "idle" : prev));
           },
         },
       });
       rzp.open();
     } catch (err) {
       setError(err.message || "Failed to start checkout.");
-      setStatus("error");
+      setCheckoutState("error");
     }
   };
 
@@ -112,31 +109,31 @@ function BuyCreditsPanel({ secret, currentCredits, onCreditsUpdated }) {
           <Button
             key={pkg.id}
             onClick={() => handleBuy(pkg.id)}
-            disabled={status === "ordering" || status === "processing"}
+            disabled={checkoutState === "ordering" || checkoutState === "processing"}
           >
             {pkg.label}
           </Button>
         ))}
       </ButtonGroup>
 
-      {status === "ordering" && (
+      {checkoutState === "ordering" && (
         <Alert severity="info" icon={<CircularProgress size={18} />}>
           Opening checkout for {selectedPkg}...
         </Alert>
       )}
-      {status === "processing" && (
+      {checkoutState === "processing" && (
         <Alert severity="info" icon={<CircularProgress size={18} />}>
           Processing — crediting your account. This usually takes a few seconds.
         </Alert>
       )}
-      {status === "done" && <Alert severity="success">Credits added to your account.</Alert>}
-      {status === "timeout" && (
+      {checkoutState === "done" && <Alert severity="success">Credits added to your account.</Alert>}
+      {checkoutState === "timeout" && (
         <Alert severity="warning">
           Payment received — if your balance doesn&apos;t update within a few minutes,
           please contact support.
         </Alert>
       )}
-      {status === "error" && error && <Alert severity="error">{error}</Alert>}
+      {checkoutState === "error" && error && <Alert severity="error">{error}</Alert>}
     </Paper>
   );
 }

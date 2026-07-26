@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -10,14 +9,11 @@ import {
   Typography,
   Stack,
   Alert,
-  FormControlLabel,
-  Checkbox,
   Divider,
 } from "@mui/material";
 import { Download as DownloadIcon } from "@mui/icons-material";
 import CodeBlock from "./CodeBlock";
 import SetupInstructions from "./SetupInstructions";
-import { saveMcpSecret } from "@/core/utils/mcpSecretStorage";
 
 function downloadMcpConfig(secret) {
   const config = {
@@ -41,21 +37,11 @@ function downloadMcpConfig(secret) {
 
 /**
  * One-time reveal of a freshly generated/rotated clientId + clientSecret.
- * The backend never returns the plaintext secret again after this.
+ * The backend never returns the plaintext secret again after this closes.
  */
-function SecretRevealDialog({ open, onClose, clientId, clientSecret, onRemember }) {
-  const [remember, setRemember] = useState(false);
-
-  const handleClose = () => {
-    if (remember) {
-      saveMcpSecret(clientId, clientSecret);
-      onRemember?.(true);
-    }
-    onClose();
-  };
-
+function SecretRevealDialog({ open, onClose, clientId, clientSecret }) {
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Your MCP credentials</DialogTitle>
       <DialogContent>
         <Alert severity="warning" sx={{ mb: 2 }}>
@@ -85,19 +71,6 @@ function SecretRevealDialog({ open, onClose, clientId, clientSecret, onRemember 
             Download ccreward_mcp.json
           </Button>
 
-          <FormControlLabel
-            control={
-              <Checkbox checked={remember} onChange={(e) => setRemember(e.target.checked)} />
-            }
-            label="Remember this key on this device, so I can check my balance without pasting it back in"
-          />
-          {remember && (
-            <Typography variant="caption" color="text.secondary">
-              Stored in this browser only, in plaintext. You can remove it any time from
-              this page.
-            </Typography>
-          )}
-
           <Divider />
 
           <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
@@ -107,7 +80,7 @@ function SecretRevealDialog({ open, onClose, clientId, clientSecret, onRemember 
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} variant="contained">
+        <Button onClick={onClose} variant="contained">
           I&apos;ve saved my key
         </Button>
       </DialogActions>

@@ -1,7 +1,4 @@
-import axios from 'axios';
 import { api } from './api';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // Handle API errors the same way api.js does, plus MCP-specific error codes.
 const handleMcpError = (error) => {
@@ -81,24 +78,6 @@ export const rotateMcpCredentials = async () => {
 export const createMcpRazorpayOrder = async (pkg) => {
     try {
         const response = await api.post('/v4/payments/razorpay/order', { package: pkg });
-        return response.data;
-    } catch (error) {
-        return handleMcpError(error);
-    }
-};
-
-/**
- * Get MCP usage/balance. Authenticates via x-api-key (the clientSecret), not Firebase Bearer —
- * intentionally bypasses the shared `api` instance, which always injects a Bearer token and
- * requires a region to be set. Uses a bare axios call instead.
- * GET /v4/usage
- */
-export const getMcpUsage = async (clientSecret) => {
-    try {
-        const response = await axios.get(`${API_BASE_URL}/v4/usage`, {
-            headers: { 'x-api-key': clientSecret },
-            timeout: 10000,
-        });
         return response.data;
     } catch (error) {
         return handleMcpError(error);

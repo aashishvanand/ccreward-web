@@ -20,15 +20,14 @@ import {
   generateMcpCredentials,
   rotateMcpCredentials,
 } from "@/core/services/mcpApi";
-import { clearStoredMcpSecret } from "@/core/utils/mcpSecretStorage";
 import SecretRevealDialog from "./SecretRevealDialog";
 
 /**
  * status: result of GET /v4/mcp/credentials, or null while loading.
- * onCredentialsChanged: called with the fresh { clientId, clientSecret } after
- * generate/rotate, and asked to refresh status.
+ * onRefreshStatus: re-fetches status after generate/rotate so the balance/setup
+ * sections elsewhere on the page pick up the change.
  */
-function CredentialPanel({ status, onRefreshStatus, onSecretIssued }) {
+function CredentialPanel({ status, onRefreshStatus }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [reveal, setReveal] = useState(null); // { clientId, clientSecret }
@@ -40,7 +39,6 @@ function CredentialPanel({ status, onRefreshStatus, onSecretIssued }) {
     try {
       const result = await generateMcpCredentials();
       setReveal(result);
-      onSecretIssued?.(result);
       onRefreshStatus?.();
     } catch (err) {
       setError(err.message || "Failed to generate credentials.");
@@ -55,9 +53,7 @@ function CredentialPanel({ status, onRefreshStatus, onSecretIssued }) {
     setError(null);
     try {
       const result = await rotateMcpCredentials();
-      clearStoredMcpSecret();
       setReveal(result);
-      onSecretIssued?.(result);
       onRefreshStatus?.();
     } catch (err) {
       setError(err.message || "Failed to rotate credentials.");
@@ -159,7 +155,6 @@ function CredentialPanel({ status, onRefreshStatus, onSecretIssued }) {
           onClose={() => setReveal(null)}
           clientId={reveal.clientId}
           clientSecret={reveal.clientSecret}
-          onRemember={() => onRefreshStatus?.()}
         />
       )}
     </Paper>
