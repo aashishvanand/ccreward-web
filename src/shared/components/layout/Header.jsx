@@ -33,6 +33,7 @@ import {
   Search as SearchIcon,
   Delete as DeleteIcon,
   Person as PersonIcon,
+  Terminal as TerminalIcon,
 } from "@mui/icons-material";
 import Link from "@/shared/components/NextLink";
 import { useRouter, usePathname } from "next/navigation";
@@ -271,6 +272,12 @@ function Header() {
       path: "/best-card",
       icon: StarsIcon,
       description: "Top recommendations",
+    },
+    {
+      label: "MCP",
+      path: "/mcp",
+      icon: TerminalIcon,
+      description: "Connect ccreward to Claude Code & other MCP clients",
     },
   ];
 
