@@ -15,12 +15,12 @@ import { Download as DownloadIcon } from "@mui/icons-material";
 import CodeBlock from "./CodeBlock";
 import SetupInstructions from "./SetupInstructions";
 
-function downloadMcpConfig(secret) {
+function downloadMcpConfig(apiKey) {
   const config = {
     mcpServers: {
       ccreward: {
         url: "https://api.ccreward.app/mcp",
-        headers: { "x-api-key": secret },
+        headers: { "x-api-key": apiKey },
       },
     },
   };
@@ -36,37 +36,31 @@ function downloadMcpConfig(secret) {
 }
 
 /**
- * One-time reveal of a freshly generated/rotated clientId + clientSecret.
- * The backend never returns the plaintext secret again after this closes.
+ * One-time reveal of a freshly generated/rotated apiKey.
+ * The backend never returns the plaintext key again after this closes.
  */
-function SecretRevealDialog({ open, onClose, clientId, clientSecret }) {
+function SecretRevealDialog({ open, onClose, apiKey }) {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Your MCP credentials</DialogTitle>
+      <DialogTitle>Your MCP API key</DialogTitle>
       <DialogContent>
         <Alert severity="warning" sx={{ mb: 2 }}>
-          This secret is shown only once. Copy it or download the config now — you
+          This key is shown only once. Copy it or download the config now — you
           won&apos;t be able to view it again (you can always rotate it for a new one).
         </Alert>
 
         <Stack spacing={2}>
           <div>
             <Typography variant="caption" color="text.secondary">
-              Client ID
+              API Key
             </Typography>
-            <CodeBlock code={clientId} language="text" />
-          </div>
-          <div>
-            <Typography variant="caption" color="text.secondary">
-              Client Secret
-            </Typography>
-            <CodeBlock code={clientSecret} language="text" />
+            <CodeBlock code={apiKey} language="text" />
           </div>
 
           <Button
             variant="outlined"
             startIcon={<DownloadIcon />}
-            onClick={() => downloadMcpConfig(clientSecret)}
+            onClick={() => downloadMcpConfig(apiKey)}
           >
             Download ccreward_mcp.json
           </Button>
@@ -76,7 +70,7 @@ function SecretRevealDialog({ open, onClose, clientId, clientSecret }) {
           <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
             Setup instructions
           </Typography>
-          <SetupInstructions secret={clientSecret} />
+          <SetupInstructions secret={apiKey} />
         </Stack>
       </DialogContent>
       <DialogActions>

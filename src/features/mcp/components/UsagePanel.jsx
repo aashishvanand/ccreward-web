@@ -4,7 +4,7 @@ import { Paper, Typography, Stack, LinearProgress } from "@mui/material";
 import { AccountBalanceWallet as WalletIcon } from "@mui/icons-material";
 
 /**
- * status: result of GET /v4/mcp/credentials (Firebase-authenticated), which already
+ * status: result of GET /v4/mcp/api-key (Firebase-authenticated), which already
  * includes { credits: { limit, used, remaining } } — no need to re-authenticate with
  * the x-api-key secret just to show a balance the signed-in user already has access to.
  */

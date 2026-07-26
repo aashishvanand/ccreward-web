@@ -32,13 +32,13 @@ const handleMcpError = (error) => {
 };
 
 /**
- * Generate MCP credentials (one-time). Returns clientSecret in plaintext —
+ * Generate an MCP API key (one-time). Returns the plaintext apiKey —
  * it is never retrievable again after this call.
- * POST /v4/mcp/credentials
+ * POST /v4/mcp/api-key
  */
 export const generateMcpCredentials = async () => {
     try {
-        const response = await api.post('/v4/mcp/credentials');
+        const response = await api.post('/v4/mcp/api-key');
         return response.data;
     } catch (error) {
         return handleMcpError(error);
@@ -46,12 +46,12 @@ export const generateMcpCredentials = async () => {
 };
 
 /**
- * Get MCP credential status (existence, activity, expiry, credits) for the settings page.
- * GET /v4/mcp/credentials
+ * Get MCP key status (existence, activity, expiry, credits) for the settings page.
+ * GET /v4/mcp/api-key
  */
 export const getMcpCredentialsStatus = async () => {
     try {
-        const response = await api.get('/v4/mcp/credentials');
+        const response = await api.get('/v4/mcp/api-key');
         return response.data;
     } catch (error) {
         return handleMcpError(error);
@@ -59,12 +59,12 @@ export const getMcpCredentialsStatus = async () => {
 };
 
 /**
- * Reissue the secret for the existing clientId. Old secret is invalidated everywhere.
- * POST /v4/mcp/credentials/rotate
+ * Reissue the API key. The old key is invalidated everywhere.
+ * POST /v4/mcp/api-key/rotate
  */
 export const rotateMcpCredentials = async () => {
     try {
-        const response = await api.post('/v4/mcp/credentials/rotate');
+        const response = await api.post('/v4/mcp/api-key/rotate');
         return response.data;
     } catch (error) {
         return handleMcpError(error);

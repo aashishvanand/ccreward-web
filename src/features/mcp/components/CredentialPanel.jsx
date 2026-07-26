@@ -23,14 +23,14 @@ import {
 import SecretRevealDialog from "./SecretRevealDialog";
 
 /**
- * status: result of GET /v4/mcp/credentials, or null while loading.
+ * status: result of GET /v4/mcp/api-key, or null while loading.
  * onRefreshStatus: re-fetches status after generate/rotate so the balance/setup
  * sections elsewhere on the page pick up the change.
  */
 function CredentialPanel({ status, onRefreshStatus }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
-  const [reveal, setReveal] = useState(null); // { clientId, clientSecret }
+  const [reveal, setReveal] = useState(null); // { apiKey }
   const [confirmRotate, setConfirmRotate] = useState(false);
 
   const handleGenerate = async () => {
@@ -127,16 +127,16 @@ function CredentialPanel({ status, onRefreshStatus }) {
             disabled={busy}
             startIcon={busy ? <CircularProgress size={18} /> : <AutorenewIcon />}
           >
-            Regenerate secret
+            Regenerate key
           </Button>
         </>
       )}
 
       <Dialog open={confirmRotate} onClose={() => setConfirmRotate(false)}>
-        <DialogTitle>Regenerate secret?</DialogTitle>
+        <DialogTitle>Regenerate API key?</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            This invalidates your current secret everywhere it&apos;s pasted — in Claude
+            This invalidates your current key everywhere it&apos;s pasted — in Claude
             Code, downloaded config files, anywhere. You&apos;ll need to update it in
             every place you&apos;ve used it.
           </DialogContentText>
@@ -153,8 +153,7 @@ function CredentialPanel({ status, onRefreshStatus }) {
         <SecretRevealDialog
           open={Boolean(reveal)}
           onClose={() => setReveal(null)}
-          clientId={reveal.clientId}
-          clientSecret={reveal.clientSecret}
+          apiKey={reveal.apiKey}
         />
       )}
     </Paper>

@@ -36,7 +36,7 @@ function buildGenericJson(secret) {
 }
 
 /**
- * secret: the plaintext clientSecret, when available (reveal dialog / remembered).
+ * secret: the plaintext apiKey, when available (reveal dialog / remembered).
  * Falls back to a <your-secret-key> placeholder otherwise.
  */
 function SetupInstructions({ secret }) {
