@@ -17,12 +17,12 @@ const nextConfig = {
                             //  3. Static <script src="..."> tags (e.g. /scripts/*.js) get blocked
                             // Once vinext exposes nonce propagation to userland, we can switch to
                             // nonce-based CSP and drop 'unsafe-inline'.
-                            "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googletagmanager.com https://www.clarity.ms https://*.firebaseapp.com https://accounts.google.com https://apis.google.com https://challenges.cloudflare.com",
-                            "connect-src 'self' https://*.ccreward.app https://*.googleapis.com https://*.firebaseio.com https://www.clarity.ms https://*.google-analytics.com https://*.analytics.google.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseinstallations.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://files.ccreward.app https://react-tweet.vercel.app https://docs.google.com https://challenges.cloudflare.com",
+                            "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googletagmanager.com https://www.clarity.ms https://*.firebaseapp.com https://accounts.google.com https://apis.google.com https://challenges.cloudflare.com https://checkout.razorpay.com",
+                            "connect-src 'self' https://*.ccreward.app https://*.googleapis.com https://*.firebaseio.com https://www.clarity.ms https://*.google-analytics.com https://*.analytics.google.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebaseinstallations.googleapis.com https://firebase.googleapis.com https://accounts.google.com https://files.ccreward.app https://react-tweet.vercel.app https://docs.google.com https://challenges.cloudflare.com https://api.razorpay.com https://lumberjack.razorpay.com",
                             "img-src 'self' data: https: https://firebasestorage.googleapis.com",
-                            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com",
+                            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com https://checkout.razorpay.com",
                             "font-src 'self' https://fonts.gstatic.com data:",
-                            "frame-src 'self' https://www.youtube.com https://accounts.google.com https://*.firebaseapp.com https://challenges.cloudflare.com",
+                            "frame-src 'self' https://www.youtube.com https://accounts.google.com https://*.firebaseapp.com https://challenges.cloudflare.com https://api.razorpay.com https://checkout.razorpay.com",
                             "worker-src 'self' blob:",
                         ].join("; "),
                     },
