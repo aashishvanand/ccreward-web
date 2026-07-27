@@ -118,7 +118,7 @@
   ],
   "overrides": {
     "@isaacs/brace-expansion": "^5.0.5",
-    "brace-expansion": "^5.0.5",
+    "brace-expansion": "^5.0.8",
     "sirv": "^3.0.2",
     "fast-xml-parser": "^5.3.6",
     "qs": "^6.14.2",
@@ -126,7 +126,7 @@
     "minimatch": "^10.2.1",
     "undici": "^7.24.0",
     "form-data": "^4.0.6",
-    "postcss": "^8.5.10",
+    "postcss": "^8.5.18",
     "@babel/core": "^7.29.6",
     "websocket-driver": "^0.7.5",
     "sharp": "^0.35.3",

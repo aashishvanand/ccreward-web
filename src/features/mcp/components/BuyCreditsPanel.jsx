@@ -15,9 +15,9 @@ import { createMcpRazorpayOrder, getMcpCredentialsStatus } from "@/core/services
 import { loadRazorpayScript } from "@/core/utils/loadRazorpayScript";
 
 const PACKAGES = [
-  { id: "credits_100", label: "100 credits" },
-  { id: "credits_500", label: "500 credits" },
-  { id: "credits_1000", label: "1000 credits" },
+  { id: "credits_100", label: "100 credits", price: "₹25" },
+  { id: "credits_500", label: "500 credits", price: "₹110" },
+  { id: "credits_1000", label: "1000 credits", price: "₹200" },
 ];
 
 const POLL_INTERVAL_MS = 3000;
@@ -80,7 +80,7 @@ function BuyCreditsPanel({ currentCredits, onCreditsUpdated }) {
         description: `${order.credits} MCP credits`,
         handler: () => {
           setCheckoutState("processing");
-          startPolling(currentCredits ?? 0);
+          startPolling(currentCredits);
         },
         modal: {
           ondismiss: () => {
@@ -109,12 +109,20 @@ function BuyCreditsPanel({ currentCredits, onCreditsUpdated }) {
           <Button
             key={pkg.id}
             onClick={() => handleBuy(pkg.id)}
-            disabled={checkoutState === "ordering" || checkoutState === "processing"}
+            disabled={
+              currentCredits === undefined ||
+              checkoutState === "ordering" ||
+              checkoutState === "processing"
+            }
           >
-            {pkg.label}
+            {pkg.label} ({pkg.price})
           </Button>
         ))}
       </ButtonGroup>
+
+      <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 2 }}>
+        Purchased credits are valid for 1 year from the date of purchase.
+      </Typography>
 
       {checkoutState === "ordering" && (
         <Alert severity="info" icon={<CircularProgress size={18} />}>

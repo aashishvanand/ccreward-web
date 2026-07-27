@@ -47,6 +47,8 @@ export const generateMcpCredentials = async () => {
 
 /**
  * Get MCP key status (existence, activity, expiry, credits) for the settings page.
+ * A 404 means the account has never generated a key, so it's treated as { exists: false }
+ * rather than an error.
  * GET /v4/mcp/api-key
  */
 export const getMcpCredentialsStatus = async () => {
@@ -54,6 +56,9 @@ export const getMcpCredentialsStatus = async () => {
         const response = await api.get('/v4/mcp/api-key');
         return response.data;
     } catch (error) {
+        if (error.response?.status === 404) {
+            return { exists: false };
+        }
         return handleMcpError(error);
     }
 };

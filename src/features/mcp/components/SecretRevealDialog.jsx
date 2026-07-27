@@ -40,8 +40,13 @@ function downloadMcpConfig(apiKey) {
  * The backend never returns the plaintext key again after this closes.
  */
 function SecretRevealDialog({ open, onClose, apiKey }) {
+  const handleClose = (event, reason) => {
+    if (reason === "backdropClick" || reason === "escapeKeyDown") return;
+    onClose();
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>Your MCP API key</DialogTitle>
       <DialogContent>
         <Alert severity="warning" sx={{ mb: 2 }}>

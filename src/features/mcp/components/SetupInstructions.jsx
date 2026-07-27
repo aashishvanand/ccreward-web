@@ -23,14 +23,13 @@ function buildCliCommand(secret) {
   return `claude mcp add --transport http ccreward ${MCP_URL} --header "x-api-key: ${key}"`;
 }
 
-function buildProjectJson(secret) {
-  const key = secret || "<your-secret-key>";
+function buildProjectJson() {
   return `{
   "mcpServers": {
     "ccreward": {
       "type": "http",
       "url": "${MCP_URL}",
-      "headers": { "x-api-key": "${key}" }
+      "headers": { "x-api-key": "\${CCREWARD_MCP_KEY}" }
     }
   }
 }`;
@@ -140,9 +139,12 @@ function SetupInstructions({ secret }) {
           2. Or add it to <code>.mcp.json</code> directly
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-          Useful for project-scoped config that's checked into version control:
+          Useful for project-scoped config that&apos;s checked into version control.
+          Never commit your actual key — reference it via an environment variable
+          instead (set <code>CCREWARD_MCP_KEY</code> in your shell or a{" "}
+          <code>.env</code> file that&apos;s gitignored):
         </Typography>
-        <CodeBlock code={buildProjectJson(secret)} language="json" />
+        <CodeBlock code={buildProjectJson()} language="json" />
       </Box>
 
       <Divider />
