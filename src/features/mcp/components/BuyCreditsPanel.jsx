@@ -155,7 +155,7 @@ function BuyCreditsPanel({ currentCredits, onCreditsUpdated }) {
         </Typography>
       </Stack>
 
-      <ButtonGroup variant="outlined" sx={{ mb: 2, flexWrap: "wrap" }}>
+      <ButtonGroup variant="outlined" sx={{ mb: 2, flexWrap: "wrap", rowGap: 1 }}>
         {packages.map((pkg) => (
           <Button
             key={pkg.id}
@@ -171,7 +171,7 @@ function BuyCreditsPanel({ currentCredits, onCreditsUpdated }) {
         ))}
       </ButtonGroup>
 
-      <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 2 }}>
+      <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1, mb: 2 }}>
         Purchased credits are valid for 1 year from the date of purchase.
       </Typography>
 
