@@ -171,7 +171,7 @@ function BuyCreditsPanel({ currentCredits, onCreditsUpdated }) {
         ))}
       </ButtonGroup>
 
-      <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1, mb: 2 }}>
+      <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1, mb: 2 }}>
         Purchased credits are valid for 1 year from the date of purchase.
       </Typography>
 
