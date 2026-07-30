@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { Stack, Alert, Paper, Typography } from "@mui/material";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { Stack, Alert, Paper, Typography, CircularProgress, Box } from "@mui/material";
 import { getMcpCredentialsStatus } from "@/core/services/mcpApi";
 import CredentialPanel from "./CredentialPanel";
 import UsagePanel from "./UsagePanel";
@@ -33,10 +33,18 @@ function McpDashboard() {
 
       <UsagePanel status={status} />
 
-      <BuyCreditsPanel
-        currentCredits={status?.credits?.remaining}
-        onCreditsUpdated={refreshStatus}
-      />
+      <Suspense
+        fallback={
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+            <CircularProgress />
+          </Box>
+        }
+      >
+        <BuyCreditsPanel
+          currentCredits={status?.credits?.remaining}
+          onCreditsUpdated={refreshStatus}
+        />
+      </Suspense>
 
       {status?.exists && (
         <Paper elevation={0} variant="outlined" sx={{ p: { xs: 3, sm: 4 }, borderRadius: 2 }}>

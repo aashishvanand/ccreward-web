@@ -88,3 +88,17 @@ export const createMcpRazorpayOrder = async (pkg) => {
         return handleMcpError(error);
     }
 };
+
+/**
+ * Create a Stripe Checkout session to buy MCP credits (Singapore).
+ * Returns { url } — redirect the browser to it to reach Stripe-hosted Checkout.
+ * POST /v4/payments/stripe/checkout-session
+ */
+export const createMcpStripeCheckoutSession = async (pkg) => {
+    try {
+        const response = await api.post('/v4/payments/stripe/checkout-session', { package: pkg, country: 'sg' });
+        return response.data;
+    } catch (error) {
+        return handleMcpError(error);
+    }
+};
