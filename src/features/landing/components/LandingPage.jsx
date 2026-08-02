@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/core/providers/AuthContext";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { getCardsForUser } from "@/core/services/firebaseUtils";
+import { getUserCards } from "@/core/services/api";
 import useCardImagesData from "@/core/hooks/useCardImagesData";
 import { useRegion } from "@/core/providers/RegionContext";
 import Header, { MinimalHeader } from "@/shared/components/layout/Header";
@@ -269,7 +269,7 @@ const LandingPage = () => {
 
       const checkUserCards = async () => {
         try {
-          const fetchedCards = await getCardsForUser(user.uid);
+          const fetchedCards = await getUserCards();
 
           trackEvent("user_cards_checked", {
             user_id: user.uid,

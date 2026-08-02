@@ -16,12 +16,7 @@ import {
 import { Add as AddIcon, CreditCard as CreditCardIcon } from "@mui/icons-material";
 import { useAuth } from "@/core/providers/AuthContext";
 import {
-  getCardsForUser,
-  addCardForUser,
-  deleteCardForUser,
-  updateCardForUser,
-} from "@/core/services/firebaseUtils";
-import {
+  getUserCards,
   addUserCard,
   updateUserCard,
   deleteUserCard,
@@ -130,9 +125,7 @@ function MyCardsPage() {
     try {
       setIsLoading(true);
       const currentRegion = localStorage.getItem("app-region");
-      localStorage.removeItem(`userCardsCache_${user.uid}`);
-      localStorage.removeItem(`userCardsCacheTimestamp_${user.uid}`);
-      const fetchedCards = await getCardsForUser(user.uid);
+      const fetchedCards = await getUserCards();
       const fetchDuration = performance.now() - startTime;
       setCards(fetchedCards);
       regionRef.current = currentRegion;
@@ -278,7 +271,8 @@ function MyCardsPage() {
     update_type: "details",
   });
   try {
-    // Write to Firestore and CF API in parallel; Firestore is source of truth
+    // PATCH is a full upsert — omitted fields get cleared server-side, so send
+    // the card's full current state, not just the fields that changed.
     const country = updatedCard.country || localStorage.getItem('app-region')?.toLowerCase() || 'in';
     const apiPayload = {
       bank: updatedCard.bank,
@@ -289,19 +283,14 @@ function MyCardsPage() {
       ...(updatedCard.billingDate !== undefined && { billingDate: updatedCard.billingDate }),
       ...(updatedCard.limit !== undefined && { limit: updatedCard.limit }),
       ...(updatedCard.since !== undefined && { since: updatedCard.since }),
+      ...(updatedCard.noAnnualFee !== undefined && { noAnnualFee: updatedCard.noAnnualFee }),
     };
-    const [firestoreResult] = await Promise.allSettled([
-      updateCardForUser(user.uid, updatedCard),
-      updateUserCard(apiPayload).catch((err) => {
-        console.warn('CF API updateUserCard failed (non-critical):', err);
-      }),
-    ]);
-    if (firestoreResult.status === 'rejected') {
-      throw firestoreResult.reason;
-    }
+    await updateUserCard(apiPayload);
     setCards((prevCards) =>
       prevCards.map((card) =>
-        card.id === updatedCard.id ? updatedCard : card
+        card.bank === updatedCard.bank && card.cardName === updatedCard.cardName
+          ? updatedCard
+          : card
       )
     );
     notifyCardUpdate();
@@ -344,8 +333,7 @@ function MyCardsPage() {
   });
   
   try {
-    const existingCards = await getCardsForUser(user.uid);
-    const isDuplicate = existingCards.some(
+    const isDuplicate = cards.some(
       (card) =>
         card.bank === newCard.bank && card.cardName === newCard.cardName
     );
@@ -358,28 +346,19 @@ function MyCardsPage() {
       showAlert("This card is already in your collection.", "info");
       return;
     }
-    // Write to Firestore and CF API in parallel; Firestore is source of truth
     const country = localStorage.getItem('app-region')?.toLowerCase() || 'in';
     const apiPayload = {
       bank: newCard.bank,
       cardName: newCard.cardName,
       country,
       ...(newCard.network && { network: newCard.network }),
+      ...(newCard.lastFourDigits && { lastFourDigits: newCard.lastFourDigits }),
       ...(newCard.billingDate && { billingDate: newCard.billingDate }),
       ...(newCard.limit && { limit: newCard.limit }),
       ...(newCard.since && { since: newCard.since }),
-      addedAt: new Date().toISOString(),
+      ...(newCard.noAnnualFee !== undefined && { noAnnualFee: newCard.noAnnualFee }),
     };
-    const [firestoreResult] = await Promise.allSettled([
-      addCardForUser(user.uid, newCard),
-      addUserCard(apiPayload).catch((err) => {
-        console.warn('CF API addUserCard failed (non-critical):', err);
-      }),
-    ]);
-    // If Firestore write failed, surface the error
-    if (firestoreResult.status === 'rejected') {
-      throw firestoreResult.reason;
-    }
+    await addUserCard(apiPayload);
     await fetchUserCards();
     notifyCardUpdate();
     trackConversion("card_added", 1);
@@ -444,18 +423,8 @@ function MyCardsPage() {
       portfolio_size_before: cards.length,
     });
     try {
-      const cardKey = `${bank}_${cardName}`;
       const country = localStorage.getItem('app-region')?.toLowerCase() || 'in';
-      // Write to Firestore and CF API in parallel; Firestore is source of truth
-      const [firestoreResult] = await Promise.allSettled([
-        deleteCardForUser(user.uid, cardKey),
-        deleteUserCard({ bank, cardName, country }).catch((err) => {
-          console.warn('CF API deleteUserCard failed (non-critical):', err);
-        }),
-      ]);
-      if (firestoreResult.status === 'rejected') {
-        throw firestoreResult.reason;
-      }
+      await deleteUserCard({ bank, cardName, country });
       setCards((prevCards) =>
         prevCards.filter(
           (card) => card.bank !== bank || card.cardName !== cardName

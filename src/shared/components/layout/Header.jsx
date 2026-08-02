@@ -42,7 +42,7 @@ import { useAuth } from "@/core/providers/AuthContext";
 import SignInButtons from "@/shared/components/auth/SignInButtons";
 import { useAppTheme } from "@/core/providers/ThemeRegistry";
 import { useRegion } from "@/core/providers/RegionContext";
-import { getCardsForUser } from "@/core/services/firebaseUtils";
+import { getUserCards } from "@/core/services/api";
 import { onCardUpdate } from "@/core/utils/events";
 import { detectDevice } from "@/core/utils/deviceUtils";
 import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
@@ -140,7 +140,7 @@ function Header() {
     if (isAuthenticated() && user) {
       const updateCardCount = async () => {
         try {
-          const userCards = await getCardsForUser(user.uid);
+          const userCards = await getUserCards();
           setCardCount(userCards.length);
         } catch (error) {
           console.error("Error fetching user cards:", error);

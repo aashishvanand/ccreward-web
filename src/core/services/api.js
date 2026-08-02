@@ -572,29 +572,17 @@ export const deleteUserCard = async ({ bank, cardName, country }) => {
 
 /**
  * Get all cards for the authenticated user.
- * GET /v4/user/cards?country=xx  (country is optional)
+ * GET /v4/user/cards — the request interceptor already appends the
+ * user's current region as `?country=`, so no country needs to be passed here.
+ * Returns a flat array (unwrapped from the `{ cards, count }` envelope), with
+ * a synthesized `id` (`${bank}_${cardName}`) added to each card so existing
+ * UI code that keyed off Firestore's document-key `id` keeps working.
  */
-export const getUserCards = async (country) => {
+export const getUserCards = async () => {
     try {
-        const url = country
-            ? `/v4/user/cards?country=${encodeURIComponent(country)}`
-            : '/v4/user/cards';
-        const response = await api.get(url);
-        return response.data;
-    } catch (error) {
-        return handleApiError(error);
-    }
-};
-
-/**
- * Bulk sync (full replace) cards for the authenticated user.
- * Intended for Firestore-to-D1 migration, not day-to-day use.
- * PUT /v4/user/cards
- */
-export const bulkSyncUserCards = async ({ cards, country }) => {
-    try {
-        const response = await api.put('/v4/user/cards', { cards, country });
-        return response.data;
+        const response = await api.get('/v4/user/cards');
+        const cards = response.data?.cards ?? [];
+        return cards.map((card) => ({ ...card, id: `${card.bank}_${card.cardName}` }));
     } catch (error) {
         return handleApiError(error);
     }
