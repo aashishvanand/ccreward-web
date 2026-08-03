@@ -12,11 +12,7 @@ import {
   Paper,
 } from "@mui/material";
 import { useAuth } from "@/core/providers/AuthContext";
-import {
-  getCardsForUser,
-  addCardForUser,
-} from "@/core/services/firebaseUtils";
-import { addUserCard } from "@/core/services/api";
+import { getUserCards, addUserCard } from "@/core/services/api";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
 import PageHeader from "@/shared/components/layout/PageHeader";
@@ -125,7 +121,7 @@ function Calculator() {
       if (user) {
         setIsFetchingUserData(true);
         try {
-          const fetchedCards = await getCardsForUser(user.uid);
+          const fetchedCards = await getUserCards();
           setUserCards(fetchedCards);
           setError(null);
         } catch (err) {
@@ -151,31 +147,16 @@ function Calculator() {
   const handleAddCard = useCallback(async () => {
     if (user) {
       try {
-        const cardData = {
-          bank: selectedBank,
-          cardName: selectedCard,
-        };
         const country = localStorage.getItem('app-region')?.toLowerCase() || 'in';
         const apiPayload = {
           bank: selectedBank,
           cardName: selectedCard,
           country,
-          addedAt: new Date().toISOString(),
         };
-        // Write to Firestore and CF API in parallel; Firestore is source of truth
-        const [firestoreResult] = await Promise.allSettled([
-          addCardForUser(user.uid, cardData),
-          addUserCard(apiPayload).catch((err) => {
-            console.warn('CF API addUserCard failed (non-critical):', err);
-          }),
-        ]);
-        if (firestoreResult.status === 'rejected') {
-          throw firestoreResult.reason;
-        }
-        const newCardId = firestoreResult.value;
+        await addUserCard(apiPayload);
         setUserCards((prevCards) => [
           ...prevCards,
-          { ...cardData, id: newCardId },
+          { ...apiPayload, id: `${selectedBank}_${selectedCard}` },
         ]);
         setAlert({
           open: true,

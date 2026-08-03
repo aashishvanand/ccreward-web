@@ -31,7 +31,7 @@ import {
 } from "@mui/icons-material";
 import { useAuth } from "@/core/providers/AuthContext";
 import { useRegion } from "@/core/providers/RegionContext";
-import { getCardsForUser } from "@/core/services/firebaseUtils";
+import { getUserCards } from "@/core/services/api";
 import {
   fetchBanks,
   fetchCards,
@@ -122,7 +122,7 @@ const TransferCalculator = () => {
 
   useEffect(() => {
     if (!user || loading) return;
-    getCardsForUser(user.uid)
+    getUserCards()
       .then(setUserCards)
       .catch(() => {});
   }, [user, loading]);

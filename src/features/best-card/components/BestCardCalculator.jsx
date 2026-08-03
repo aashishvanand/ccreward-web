@@ -32,7 +32,7 @@ import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
 import PageHeader from "@/shared/components/layout/PageHeader";
 import { useAuth } from "@/core/providers/AuthContext";
-import { getCardsForUser } from "@/core/services/firebaseUtils";
+import { getUserCards } from "@/core/services/api";
 import dynamic from "next/dynamic";
 const Confetti = dynamic(() => import("react-confetti"), { ssr: false });
 import { CardListRenderer } from "./CardListRenderer";
@@ -219,7 +219,7 @@ const BestCardCalculator = () => {
 
           const startTime = performance.now();
           const fetchedCards = await trackAPICall(
-            () => getCardsForUser(user.uid),
+            () => getUserCards(),
             "get_user_cards",
             { user_id: user.uid }
           );
