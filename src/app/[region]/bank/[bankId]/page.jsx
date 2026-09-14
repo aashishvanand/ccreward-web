@@ -1,6 +1,6 @@
 import BankClient from './BankClient';
-import banksIN from '@/data/banks_in.json';
-import banksSG from '@/data/banks_sg.json';
+import banksIN from '@/data/bankImages_in.json';
+import banksSG from '@/data/bankImages_sg.json';
 import cardsIN from '@/data/cards_in.json';
 import cardsSG from '@/data/cards_sg.json';
 

@@ -14,8 +14,8 @@ const BankSection = () => {
   useEffect(() => {
     if (region) {
       const url = region === 'SG' 
-        ? 'https://files.ccreward.app/banks_sg.json'
-        : 'https://files.ccreward.app/banks_in.json';
+        ? 'https://files.ccreward.app/bankImages_sg.json'
+        : 'https://files.ccreward.app/bankImages_in.json';
         
       fetch(url)
         .then(res => res.json())
