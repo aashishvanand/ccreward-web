@@ -233,6 +233,21 @@ function Footer() {
                 © {new Date().getFullYear()} ccreward. All rights reserved.
               </Typography>
 
+              <Typography
+                variant="caption"
+                component="p"
+                sx={{
+                  color: "text.secondary",
+                  maxWidth: 720,
+                  mx: "auto",
+                  mb: 1
+                }}>
+                ccreward is an independent tool and is not affiliated with,
+                endorsed by, or sponsored by any bank or card issuer. Bank
+                names, logos and card images are trademarks or copyrights of
+                their respective owners and are used only for identification.
+              </Typography>
+
               <motion.div
                 initial={{ opacity: 0.6 }}
                 whileHover={{
