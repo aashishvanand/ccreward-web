@@ -127,7 +127,7 @@ const TermsOfServicePage = () => {
             Terms of Service
           </Typography>
           <Typography variant="subtitle1" gutterBottom sx={{ mb: 4, color: 'text.secondary' }}>
-            Last Updated: January 2, 2026
+            Last Updated: September 26, 2026
           </Typography>
           <Typography 
             variant="body1" 
@@ -174,6 +174,12 @@ const TermsOfServicePage = () => {
                   Manage a portfolio of credit cards for tracking purposes.
                 </li>
               </ul>
+              <p>
+                ccreward is not a bank, NBFC, card issuer, or authorised
+                agent/DSA of any financial institution. It does not offer,
+                sell, or process credit card applications, and nothing on the
+                Service constitutes financial advice.
+              </p>
             </div>
 
             <div
@@ -221,10 +227,11 @@ const TermsOfServicePage = () => {
                 third parties.
               </p>
               <p>
-                4.3. By using the Service, you consent to the use of anonymized
-                data for personalized advertisements, where applicable. You may
-                manage your advertising preferences through your device settings
-                or Google&apos;s Ad Settings page.
+                4.3. By using the Service, you consent to third-party
+                advertising partners such as Google using device identifiers
+                and usage data to show personalized advertisements, where
+                applicable. You may manage your advertising preferences through
+                your device settings or Google&apos;s Ad Settings page.
               </p>
             </div>
 
@@ -283,29 +290,32 @@ const TermsOfServicePage = () => {
                 </li>
               </ul>
               <p>
-                5.3. All bank logos, credit card images, and related visual
-                assets displayed on ccreward.app are the property of their
-                respective financial institutions and are used solely for
-                representational and identification purposes. The display of
-                these assets does not imply any endorsement, sponsorship, or
-                official relationship between ccreward.app and the financial
-                institutions.
+                5.3. All bank names, trademarks, service marks, logos, credit
+                card images, and related visual assets displayed on
+                ccreward.app are the trademarks or copyrighted works of their
+                respective owners and are used solely to identify the
+                corresponding banks and cards. Card and reward information is
+                compiled from publicly available sources. The display of these
+                assets does not imply any affiliation, endorsement,
+                sponsorship, or official relationship between ccreward.app and
+                their owners.
               </p>
               <p>
-                5.4. Financial institutions may request the removal of their
-                logos or card images by contacting{" "}
+                5.4. Rights holders may request the removal of their logos,
+                card images, or other assets by contacting{" "}
                 <a
-                  href="mailto:support@ccreward.app"
+                  href="mailto:legal@ccreward.app"
                   onClick={() =>
                     handleLinkClick(
-                      "support_email",
-                      "mailto:support@ccreward.app"
+                      "legal_email",
+                      "mailto:legal@ccreward.app"
                     )
                   }
                 >
-                  support@ccreward.app
+                  legal@ccreward.app
                 </a>
-                .
+                . We will review and remove the requested assets promptly,
+                typically within 72 hours of receiving the request.
               </p>
             </div>
 
@@ -334,9 +344,9 @@ const TermsOfServicePage = () => {
                   certified.
                 </li>
                 <li>
-                  By leveraging this certified infrastructure, ccreward ensures
-                  that the environment hosting your data meets rigorous industry
-                  security standards.
+                  By leveraging this certified infrastructure and never storing
+                  cardholder data, ccreward maintains a PCI DSS compliant
+                  environment that meets rigorous industry security standards.
                 </li>
               </ul>
             </div>

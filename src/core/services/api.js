@@ -195,19 +195,19 @@ api.interceptors.request.use(async (config) => {
 
 // Response interceptor: track feature usage from response headers
 api.interceptors.response.use(
-  (response) => {
-    handleSuccessHeaders(response.headers);
-    return response;
-  },
-  (error) => {
-    if (error.response?.status === 429) {
-      const code = error.response.data?.code || error.response.data?.error;
-      if (code === 'FEATURE_LIMIT_EXCEEDED') {
-        handleLimitExceeded(error.response.headers);
-      }
+    (response) => {
+        handleSuccessHeaders(response.headers);
+        return response;
+    },
+    (error) => {
+        if (error.response?.status === 429) {
+            const code = error.response.data?.code || error.response.data?.error;
+            if (code === 'FEATURE_LIMIT_EXCEEDED') {
+                handleLimitExceeded(error.response.headers);
+            }
+        }
+        return Promise.reject(error);
     }
-    return Promise.reject(error);
-  }
 );
 
 // Handle API errors
@@ -300,7 +300,7 @@ export const fetchBanks = async () => {
     const region = getCountryCode();
     if (!region) return []; // Early exit if no region
 
-    const cacheKey = `banks_${region}`;
+    const cacheKey = `bankImages_${region}`;
 
     return fetchWithCache(cacheKey, async () => {
         // Explicitly include region in request

@@ -32,6 +32,8 @@ const API_KEY = process.env.STATIC_DATA_API_KEY;
 const FILES_TO_FETCH = [
     'banks_in.json',
     'banks_sg.json',
+    'bankImages_in.json',
+    'bankImages_sg.json',
     'cardCategories_in.json',
     'cardCategories_sg.json',
     'cards_in.json',

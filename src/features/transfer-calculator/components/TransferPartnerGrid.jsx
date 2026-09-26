@@ -29,8 +29,8 @@ import airlineInData from "@/data/transfer_airline_in.json";
 import airlineSgData from "@/data/transfer_airline_sg.json";
 import hotelInData from "@/data/transfer_hotel_in.json";
 import hotelSgData from "@/data/transfer_hotel_sg.json";
-import banksInData from "@/data/banks_in.json";
-import banksSgData from "@/data/banks_sg.json";
+import banksInData from "@/data/bankImages_in.json";
+import banksSgData from "@/data/bankImages_sg.json";
 import { styled } from "@mui/material/styles";
 import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 

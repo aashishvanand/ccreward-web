@@ -127,7 +127,7 @@ const PrivacyPolicyPage = () => {
             Privacy Policy
           </Typography>
           <Typography variant="subtitle1" gutterBottom sx={{ mb: 4, color: 'text.secondary' }}>
-            Last Updated: January 2, 2026
+            Last Updated: September 26, 2026
           </Typography>
           <Typography 
             variant="body1" 
@@ -154,8 +154,10 @@ const PrivacyPolicyPage = () => {
                 <li>Email Address</li>
               </ul>
               <p>
-                We explicitly do not collect phone numbers, physical addresses,
-                passwords, or any other personal identifiers.
+                We do not ask for phone numbers, card numbers, physical addresses, or
+                passwords. Apart from your name and email, the only other data
+                we or our providers collect is the technical usage and
+                advertising data described in sections 1.3 and 1.4.
               </p>
 
               <p>
@@ -300,9 +302,10 @@ const PrivacyPolicyPage = () => {
                 advertisements. (See Google Advertising Privacy Policy).
               </p>
               <p>
-                5.3. <strong>Bank Assets:</strong> Bank logos and card images
-                are property of their respective institutions and are used
-                solely for identification.
+                5.3. <strong>Bank Assets:</strong> Bank names, logos and card
+                images are trademarks or copyrights of their respective owners
+                and are used solely for identification. ccreward is not
+                affiliated with any bank or card issuer.
               </p>
             </div>
 
@@ -325,9 +328,13 @@ const PrivacyPolicyPage = () => {
             <div onFocus={() => handleSectionInteraction("childrens_privacy")}>
               <h2>7. Children&apos;s Privacy</h2>
               <p>
-                Our Service does not address anyone under the age of 13. We do
-                not knowingly collect personally identifiable information from
-                children under 13.
+                Our Service is intended only for users aged 18 and above, and
+                is not directed at children as defined under India&apos;s
+                Digital Personal Data Protection Act, 2023. We do not knowingly
+                collect personal data from anyone under 18. If you believe a
+                child has provided us with personal data, contact us at{" "}
+                <a href="mailto:support@ccreward.app">support@ccreward.app</a>{" "}
+                and we will delete it.
               </p>
             </div>
 
