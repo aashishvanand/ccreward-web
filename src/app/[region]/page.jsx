@@ -1,6 +1,7 @@
 import HomeClient from '../HomeClient';
 import cardsIN from '@/data/cards_in.json';
 import cardsSG from '@/data/cards_sg.json';
+import { bankPath, categoryPath } from '@/core/utils/slug';
 
 // Only allow valid region values
 export const dynamicParams = false;
@@ -54,12 +55,14 @@ export default async function RegionPage({ params }) {
 
     return (
         <>
-            {/* Server-rendered SEO content */}
+            <HomeClient region={region} />
+            {/* Crawlable bank/category links; hidden by HomeClient after hydration. Kept after
+                the page so it never flashes above the header before hiding. */}
             <article data-ssr-content="region">
                 <header style={{ padding: '2rem 1rem', maxWidth: '1200px', margin: '0 auto' }}>
-                    <h1 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 0.5rem' }}>
+                    <h2 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 0.5rem' }}>
                         ccreward {countryName} - Compare &amp; Maximize Credit Card Rewards
-                    </h1>
+                    </h2>
                     <p style={{ fontSize: '1.1rem', color: '#666', maxWidth: '700px' }}>
                         Compare {totalCards}+ credit cards from {banks.length} banks in {countryName}.
                         Calculate exact rewards, find the best card for your spending, and maximize your credit card benefits.
@@ -73,7 +76,7 @@ export default async function RegionPage({ params }) {
                     <ul style={{ lineHeight: 2, listStyle: 'none', padding: 0, display: 'flex', flexWrap: 'wrap', gap: '0.5rem 2rem' }}>
                         {banks.map(bank => (
                             <li key={bank}>
-                                <a href={`/${region}/bank/${bank.toLowerCase()}`}>
+                                <a href={bankPath(region, bank)}>
                                     {bank} Credit Cards ({cardsData.issuers[bank]?.cards?.length || 0})
                                 </a>
                             </li>
@@ -84,16 +87,15 @@ export default async function RegionPage({ params }) {
                 <section style={{ padding: '1rem', maxWidth: '1200px', margin: '0 auto' }}>
                     <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Popular Categories</h2>
                     <ul style={{ lineHeight: 2 }}>
-                        <li><a href={`/${region}/top-cards/Online%20Shopping`}>Best Cards for Online Shopping</a></li>
-                        <li><a href={`/${region}/top-cards/Travel%20%26%20Transportation`}>Best Cards for Travel</a></li>
-                        <li><a href={`/${region}/top-cards/Food%20%26%20Dining`}>Best Cards for Dining</a></li>
-                        <li><a href={`/${region}/top-cards/Groceries`}>Best Cards for Groceries</a></li>
-                        <li><a href={`/${region}/top-cards/Petrol`}>Best Cards for Petrol</a></li>
+                        <li><a href={categoryPath(region, 'Online Shopping')}>Best Cards for Online Shopping</a></li>
+                        <li><a href={categoryPath(region, 'Travel & Transportation')}>Best Cards for Travel</a></li>
+                        <li><a href={categoryPath(region, 'Food & Dining')}>Best Cards for Dining</a></li>
+                        <li><a href={categoryPath(region, 'Groceries')}>Best Cards for Groceries</a></li>
+                        <li><a href={categoryPath(region, 'Petrol')}>Best Cards for Petrol</a></li>
                         <li><a href={`/${region}/top-cards`}>View all categories</a></li>
                     </ul>
                 </section>
             </article>
-            <HomeClient region={region} />
         </>
     );
 }

@@ -1,42 +1,48 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { bankPath, cardPath, categoryPath } from '../src/core/utils/slug.js';
 
 const BASE_URL = 'https://ccreward.app';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const DATA_DIR = path.join(__dirname, '../src/data');
-const SITEMAP_PATH = path.join(__dirname, '../public/sitemap.xml');
+const ROOT_DIR = path.join(__dirname, '..');
+const DATA_DIR = path.join(ROOT_DIR, 'src/data');
+const SITEMAP_PATH = path.join(ROOT_DIR, 'public/sitemap.xml');
 
-// Categories matching the TopCardsPage route generation
-const CATEGORIES = [
-    "Education",
-    "Entertainment",
-    "Food & Dining",
-    "Government/Tax",
-    "Groceries",
-    "Healthcare & Medical",
-    "Insurance",
-    "International Spends",
-    "Jewellery",
-    "Offline Shopping",
-    "Online Shopping",
-    "Petrol",
-    "Travel & Transportation",
-    "Utility Bill",
-    "Wallet Loading",
-];
+// Per-URL content hash + the date that content last changed. Committed to git
+// so <lastmod> only moves when a page's content actually changes, not on every
+// build (Google ignores lastmod values that are consistently inaccurate).
+const LASTMOD_PATH = path.join(__dirname, 'sitemap-lastmod.json');
 
-function getCardsData(region) {
+const REGIONS = ['in', 'sg'];
+
+function readJson(filePath) {
     try {
-        const dataPath = path.join(DATA_DIR, `cards_${region}.json`);
-        if (!fs.existsSync(dataPath)) return null;
-        const data = fs.readFileSync(dataPath, 'utf8');
-        return JSON.parse(data);
+        if (!fs.existsSync(filePath)) return null;
+        return JSON.parse(fs.readFileSync(filePath, 'utf8'));
     } catch (e) {
-        console.error(`Error reading cards_${region}.json:`, e);
+        console.error(`Error reading ${filePath}:`, e);
+        return null;
+    }
+}
+
+const hash = (value) =>
+    crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex').slice(0, 16);
+
+// Last commit date (YYYY-MM-DD) touching any of the given source paths
+function gitDate(paths) {
+    try {
+        const out = execFileSync('git', ['log', '-1', '--format=%cs', '--', ...paths], {
+            cwd: ROOT_DIR,
+            encoding: 'utf8',
+        }).trim();
+        return out || null;
+    } catch {
         return null;
     }
 }
@@ -45,61 +51,58 @@ function generateSitemap() {
     console.log('Generating sitemap...');
 
     const today = new Date().toISOString().split('T')[0];
-
-    // URL entries with priority and changefreq
+    const previous = readJson(LASTMOD_PATH) || {};
+    const next = {};
     const urls = [];
 
-    // Helper to add URL with metadata
-    const addUrl = (path, priority = 0.6, changefreq = 'weekly') => {
-        urls.push({ path, priority, changefreq });
+    // Data-driven pages: lastmod moves when the hash of their input data changes
+    const addDataUrl = (urlPath, content) => {
+        const contentHash = hash(content);
+        const prev = previous[urlPath];
+        const lastmod = prev && prev.hash === contentHash ? prev.lastmod : today;
+        next[urlPath] = { hash: contentHash, lastmod };
+        urls.push({ path: urlPath, lastmod });
+    };
+
+    // Source-driven pages: lastmod is the last commit touching their source
+    const addSourceUrl = (urlPath, sourcePaths) => {
+        urls.push({ path: urlPath, lastmod: gitDate(sourcePaths) || today });
     };
 
     // ===== Static pages =====
-    addUrl('/', 1.0, 'daily');
+    addSourceUrl('/', ['src/app/page.jsx', 'src/app/HomeClient.jsx', 'src/features/landing']);
+    addSourceUrl('/faq', ['src/app/faq']);
+    addSourceUrl('/in/howto', ['src/app/[region]/howto']);
+    addSourceUrl('/sg/howto', ['src/app/[region]/howto']);
+    addSourceUrl('/privacy', ['src/app/privacy']);
+    addSourceUrl('/terms', ['src/app/terms']);
 
-    // Region home pages
-    addUrl('/in', 0.9, 'daily');
-    addUrl('/sg', 0.9, 'daily');
+    for (const region of REGIONS) {
+        const cardsData = readJson(path.join(DATA_DIR, `cards_${region}.json`));
+        const categories = readJson(path.join(DATA_DIR, `cardCategories_${region}.json`)) || {};
+        if (!cardsData?.issuers) continue;
 
-    // Informational pages
-    addUrl('/faq', 0.5, 'monthly');
-    addUrl('/in/howto', 0.5, 'monthly');
-    addUrl('/sg/howto', 0.5, 'monthly');
-    addUrl('/privacy', 0.3, 'yearly');
-    addUrl('/terms', 0.3, 'yearly');
+        // Region home lists banks and card counts
+        addDataUrl(`/${region}`, Object.entries(cardsData.issuers).map(([bank, { cards }]) => [bank, cards.length]));
 
-    // Top cards pages (index)
-    addUrl('/in/top-cards', 0.8, 'weekly');
-    addUrl('/sg/top-cards', 0.8, 'weekly');
+        // Top cards: only categories that exist for this region
+        addDataUrl(`/${region}/top-cards`, Object.keys(categories));
+        for (const [name, category] of Object.entries(categories)) {
+            addDataUrl(categoryPath(region, name), category.cards);
+        }
 
-    // Top cards category pages
-    for (const category of CATEGORIES) {
-        const encodedCategory = encodeURIComponent(category);
-        addUrl(`/in/top-cards/${encodedCategory}`, 0.7, 'weekly');
-        addUrl(`/sg/top-cards/${encodedCategory}`, 0.7, 'weekly');
-    }
+        // Bank & card pages
+        for (const [bank, { cards = [] }] of Object.entries(cardsData.issuers)) {
+            addDataUrl(bankPath(region, bank), cards);
 
-    // ===== Dynamic bank & card pages =====
-    const regions = ['in', 'sg'];
-    for (const region of regions) {
-        const cardsData = getCardsData(region);
-        if (!cardsData || !cardsData.issuers) continue;
-
-        Object.keys(cardsData.issuers).forEach(bank => {
-            const bankLower = encodeURIComponent(bank.toLowerCase());
-
-            // Bank page
-            addUrl(`/${region}/bank/${bankLower}`, 0.8, 'weekly');
-
-            // Card pages
-            const cards = cardsData.issuers[bank].cards;
-            if (cards) {
-                cards.forEach(card => {
-                    const cardSlug = encodeURIComponent(card.toLowerCase());
-                    addUrl(`/${region}/bank/${bankLower}/${cardSlug}`, 0.6, 'weekly');
-                });
+            for (const card of cards) {
+                const topPicks = Object.values(categories).map(c => [
+                    c.name,
+                    c.cards.findIndex(x => x.bank === bank && x.cardName === card),
+                ]);
+                addDataUrl(cardPath(region, bank, card), { cards, topPicks });
             }
-        });
+        }
     }
 
     // NOTE: Intentionally excluding pages blocked by robots.txt:
@@ -108,15 +111,15 @@ function generateSitemap() {
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map(({ path: urlPath, priority, changefreq }) => `  <url>
+${urls.map(({ path: urlPath, lastmod }) => `  <url>
     <loc>${BASE_URL}${urlPath}</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>${changefreq}</changefreq>
-    <priority>${priority}</priority>
+    <lastmod>${lastmod}</lastmod>
   </url>`).join('\n')}
-</urlset>`;
+</urlset>
+`;
 
     fs.writeFileSync(SITEMAP_PATH, sitemap);
+    fs.writeFileSync(LASTMOD_PATH, `${JSON.stringify(next, null, 2)}\n`);
     console.log(`Sitemap generated with ${urls.length} URLs at ${SITEMAP_PATH}`);
 }
 

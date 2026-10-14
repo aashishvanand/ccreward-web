@@ -11,7 +11,7 @@ import {
   Paper,
   Chip,
 } from "@mui/material";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   School as SchoolIcon,
   Theaters as TheatersIcon,
@@ -32,6 +32,7 @@ import {
 import { motion } from "framer-motion";
 import { useRegion } from "@/core/providers/RegionContext";
 import TiltCard from "@/shared/components/ui/TiltCard";
+import { cardPath } from "@/core/utils/slug";
 
 // Use a prefix for the cache key to make it dynamic
 const CACHE_KEY_PREFIX = "referralData_";
@@ -64,7 +65,6 @@ const TopCardsGrid = ({
 }) => {
   // Get the current region from the context
   const { region, isInitialized } = useRegion();
-  const router = useRouter();
   const [referralData, setReferralData] = useState({});
   const cols = isMobile ? 2 : isTablet ? 3 : 4;
 
@@ -240,6 +240,8 @@ const TopCardsGrid = ({
 
                     <Stack direction="column" spacing={1} sx={{ mt: "auto" }}>
                         <Button
+                            component={Link}
+                            href={cardPath(region || 'in', card.bank, card.cardName)}
                             variant="outlined"
                             size="small"
                             fullWidth
@@ -248,14 +250,7 @@ const TopCardsGrid = ({
                                 textTransform: "none",
                                 fontSize: isMobile ? "0.8rem" : "0.875rem",
                             }}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                const country = region ? region.toLowerCase() : 'in';
-                                // Encode for URL but keep it clean
-                                const safeBank = encodeURIComponent(card.bank.toLowerCase());
-                                const safeCard = encodeURIComponent(card.cardName.toLowerCase());
-                                router.push(`/${country}/bank/${safeBank}/${safeCard}`);
-                            }}
+                            onClick={(e) => e.stopPropagation()}
                         >
                             View Card Details
                         </Button>

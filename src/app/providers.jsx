@@ -2,21 +2,13 @@
 "use client";
 
 import { memo } from "react";
-import dynamic from 'next/dynamic';
 import { ThemeRegistry } from "../core/providers/ThemeRegistry";
 import AmbientBackground from "../shared/components/layout/AmbientBackground";
 import { RegionProvider } from "../core/providers/RegionContext";
-
-// Dynamic imports to prevent server-side execution of Firebase dependencies (protobufjs eval error)
-const AuthProvider = dynamic(
-  () => import('../core/providers/AuthContext').then(mod => mod.AuthProvider),
-  { ssr: false }
-);
-
-const AnalyticsProvider = dynamic(
-  () => import('../core/providers/AnalyticsProvider').then(mod => mod.AnalyticsProvider),
-  { ssr: false }
-);
+// Rendered on the server so pages ship real HTML. Both providers only touch
+// Firebase/analytics inside effects, which never run during SSR.
+import { AuthProvider } from "../core/providers/AuthContext";
+import { AnalyticsProvider } from "../core/providers/AnalyticsProvider";
 
 const Providers = memo(({ children }) => {
   return (

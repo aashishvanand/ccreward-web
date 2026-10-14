@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRegion } from "@/core/providers/RegionContext";
 import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
+import { bankPath } from "@/core/utils/slug";
 
 const BankSection = () => {
   const { region, regionName, isInitialized } = useRegion();
@@ -58,7 +59,7 @@ const BankSection = () => {
               }}
             >
               <Link 
-                href={`/${(region === 'SG' ? 'sg' : 'in')}/bank/${encodeURIComponent(bank.bank.toLowerCase())}`}
+                href={bankPath(region === 'SG' ? 'sg' : 'in', bank.bank)}
                 style={{ textDecoration: 'none' }}
               >
                 <Card

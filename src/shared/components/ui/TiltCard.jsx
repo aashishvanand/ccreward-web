@@ -28,11 +28,18 @@ const TiltCard = ({
   const rotateX = useTransform(mouseY, [-0.5, 0.5], ["15deg", "-15deg"]);
   const rotateY = useTransform(mouseX, [-0.5, 0.5], ["-15deg", "15deg"]);
 
-  // Standard aspect ratio ~ 1.586
+  // ISO/IEC 7810 ID-1 card ratio (85.60 x 53.98 mm)
   const aspectRatio = 1.586;
-  
-  // Calculate aspect ratio string for CSS
-  const cssAspectRatio = orientation === 'vertical' ? `${1/aspectRatio}` : `${aspectRatio}`;
+  const cardRatio = orientation === 'vertical' ? 1 / aspectRatio : aspectRatio;
+
+  // The frame reserves layout space; the card inside is sized to its exact
+  // aspect ratio so tilt, scale, shadow and shine follow the card's edges.
+  // - height given: frame matches the card, shrinking to fit narrow screens.
+  // - width given: frame is landscape so grids line up; vertical cards are
+  //   centred at full frame height.
+  const frameSx = height
+    ? { width: `${Math.round(height * cardRatio)}px`, aspectRatio: `${cardRatio}` }
+    : { width: width || '100%', aspectRatio: `${aspectRatio}` };
 
   // Helper to resolve image source
   const resolveSrc = (imageSrc) => {
@@ -66,27 +73,29 @@ const TiltCard = ({
 
   return (
     <Box
-        ref={ref}
-        onMouseMove={handleMouseMove}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
         sx={{
             perspective: prefersReducedMotion ? 'none' : 1000,
-            display: "inline-block",
-            cursor: "pointer",
-            width: width || 'auto',
-            height: height || 'auto',
-            aspectRatio: width && !height ? cssAspectRatio : undefined,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            maxWidth: '100%',
+            ...frameSx,
             ...props.sx
         }}
     >
         <motion.div
+            ref={ref}
+            onMouseMove={handleMouseMove}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
             style={{
                 rotateX: prefersReducedMotion ? 0 : rotateX,
                 rotateY: prefersReducedMotion ? 0 : rotateY,
                 transformStyle: "preserve-3d",
-                width: "100%",
                 height: "100%",
+                aspectRatio: `${cardRatio}`,
+                maxWidth: "100%",
+                cursor: "pointer",
             }}
             whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -113,7 +122,7 @@ const TiltCard = ({
                        style={{
                            height: '100%',
                            width: '100%',
-                           objectFit: 'contain',
+                           objectFit: 'cover',
                            borderRadius: "16px",
                            position: 'relative',
                            zIndex: 10

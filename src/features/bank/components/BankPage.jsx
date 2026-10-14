@@ -344,13 +344,18 @@ const BankPage = ({ bank, cards }) => {
         <Container component="main" sx={{ py: 4, flexGrow: 1 }}>
           <Typography
             variant="h4"
+            component="h1"
             sx={{
               fontWeight: "bold",
-              mb: 4,
+              mb: 1,
               fontSize: { xs: "1.75rem", sm: "2.125rem" },
             }}
           >
             {bank} Credit Cards
+          </Typography>
+          <Typography sx={{ color: "text.secondary", mb: 4 }}>
+            Compare all {bankCards.length} {bank} credit cards. Find the best card for your
+            spending, calculate rewards, and check lounge access and fees.
           </Typography>
 
           {bankCards.length > 0 ? (

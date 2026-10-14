@@ -18,6 +18,7 @@ import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import useCardCategories from "@/core/hooks/useCardCategories";
 import { useRegion } from "@/core/providers/RegionContext";
+import { categoryPath } from "@/core/utils/slug";
 
 const categoryNames = [
   "Education",
@@ -202,11 +203,7 @@ const TopCardsSection = () => {
                         variant="outlined"
                         size="small"
                         onClick={() =>
-                          router.push(
-                            `/${region.toLowerCase()}/top-cards/${encodeURIComponent(
-                              categoryName
-                            )}`
-                          )
+                          router.push(categoryPath(region, categoryName))
                         }
                         sx={{
                           transition: "background-color 0.3s ease-in-out, color 0.3s ease-in-out",

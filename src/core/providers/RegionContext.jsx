@@ -107,7 +107,10 @@ export function RegionProvider({ children }) {
         // We use window.location because useSearchParams might not be available during initial hydration 
         // effectively outside of Next.js router context in some edge cases compared to Providers
         const urlParams = new URLSearchParams(window.location.search);
-        const urlRegion = urlParams.get('region');
+        // /in/... and /sg/... pages are region-specific: the path wins, so the
+        // content matches the URL and crawlers never see the region picker.
+        const pathRegion = window.location.pathname.match(/^\/(in|sg)(?:\/|$)/i)?.[1];
+        const urlRegion = pathRegion || urlParams.get('region');
 
         if (urlRegion && isValidRegion(urlRegion)) {
            const upperUrlRegion = urlRegion.toUpperCase();
