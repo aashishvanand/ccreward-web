@@ -501,6 +501,25 @@ export const calculateTransferPartners = async (data) => {
     }
 };
 
+// Fetch every transfer program (airlines, hotels, other) for the "who transfers to" picker
+export const fetchTransferPrograms = async () => {
+    const region = getCountryCode();
+    if (!region) return [];
+
+    return fetchWithCache(`transferPrograms_${region}`, async () => {
+        const response = await api.get('/transfer/partners');
+        return response.data.programs;
+    });
+};
+
+// Find every card and points balance that can transfer to a target program
+export const findTransferRoutes = async (data) => {
+    if (!isRegionInitialized()) {
+        throw new Error('Region not initialized. Please refresh the page and try again.');
+    }
+    return authenticatedRequest('post', '/v4/transfer/routes', data);
+};
+
 // Fetch Card Details
 export const fetchCardDetails = async (bank, card, country) => {
     // Check if region is initialized

@@ -48,3 +48,5 @@ missing_cards.json
 # static data (fetched at build time)
 /src/data/*.json
 /dist/
+
+TODO.md
