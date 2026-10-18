@@ -1,5 +1,14 @@
+// Search crawlers and link-preview fetchers. They must get the full page
+// content: no app-download screen, no region picker.
+const CRAWLER_UA = /bot|crawl|spider|slurp|mediapartners|google-inspectiontool|lighthouse|facebookexternalhit|embedly|whatsapp/i;
+
+export const isCrawler = () =>
+    typeof navigator !== "undefined" && CRAWLER_UA.test(navigator.userAgent || "");
+
 export const detectDevice = () => {
-    if (typeof window === "undefined") {
+    // Crawlers (Googlebot crawls as a smartphone) get the full desktop page,
+    // not the mobile app-download screen.
+    if (typeof window === "undefined" || isCrawler()) {
         return { isMobile: false, isAndroid: false, isIOS: false, isTablet: false };
     }
 

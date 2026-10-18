@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Container, Typography, Button, Paper, Fade, useTheme, alpha } from '@mui/material';
 import { Flag, Search } from '@mui/icons-material';
 import MccSearch from './MccSearch';
@@ -20,9 +20,11 @@ const MccLookup = () => {
     const [searchQuery, setSearchQuery] = useState('');
 
     // Read mcc URL parameter for deep linking
-    const initialMcc = useMemo(() => {
-        const params = new URLSearchParams(window.location.search);
-        return params.get('mcc') || '';
+    // Read in an effect (client only): window isn't available during SSR and
+    // useSearchParams() would opt the page out of server rendering.
+    const [initialMcc, setInitialMcc] = useState('');
+    useEffect(() => {
+        setInitialMcc(new URLSearchParams(window.location.search).get('mcc') || '');
     }, []);
 
     const handleSearch = async (query) => {

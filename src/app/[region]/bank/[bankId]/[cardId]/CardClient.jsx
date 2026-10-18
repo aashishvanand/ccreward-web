@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { CircularProgress, Box } from '@mui/material';
+import { useAuth } from '@/core/providers/AuthContext';
+import CardPublicView from '@/features/card/components/CardPublicView';
 
 const CardPage = dynamic(() => import('@/features/card/components/CardPage'), {
   ssr: false,
@@ -13,14 +14,21 @@ const CardPage = dynamic(() => import('@/features/card/components/CardPage'), {
   )
 });
 
-export default function CardClient({ bankName, cardName, country }) {
-  // Hide SSR content once client component mounts
-  useEffect(() => {
-    const ssrContent = document.querySelector('[data-ssr-content="card"]');
-    if (ssrContent) {
-      ssrContent.style.display = 'none';
-    }
-  }, []);
+// Signed-in users get the full card details; everyone else (including the
+// server render that crawlers index) gets the public preview.
+export default function CardClient({ bankName, cardName, country, ...publicProps }) {
+  const { user, loading } = useAuth();
 
-  return <CardPage bankName={bankName} cardName={cardName} country={country} />;
+  if (!loading && user) {
+    return <CardPage bankName={bankName} cardName={cardName} country={country} />;
+  }
+
+  return (
+    <CardPublicView
+      bankName={bankName}
+      cardName={cardName}
+      country={country}
+      {...publicProps}
+    />
+  );
 }

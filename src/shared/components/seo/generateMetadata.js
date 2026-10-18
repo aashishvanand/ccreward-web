@@ -52,7 +52,6 @@ export function generateMetadata({
             appArgument: "myapp://",
         },
         verification: {
-            google: "google-adsense-account",
             other: {
                 "google-adsense-account": "ca-pub-3745126880980552",
             },

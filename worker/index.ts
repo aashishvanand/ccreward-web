@@ -8,6 +8,7 @@
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import type { ImageConfig } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
+import { slugify, safeDecode } from "../src/core/utils/slug.js";
 
 // Local Env override for this worker — matches the vinext image-optimization
 // API shape. The global Env (from worker-configuration.d.ts) uses the stricter
@@ -31,6 +32,27 @@ interface Env {
 // dangerouslyAllowSVG: true in next.config.js and uncomment below:
 // const imageConfig: ImageConfig = { dangerouslyAllowSVG: true };
 
+// Legacy bank/card/category URLs used percent-encoded names
+// ("/in/bank/amex/platinum%20reserve", "/in/top-cards/Food%20%26%20Dining").
+// Returns the slug URL path they moved to, or null if already canonical.
+const SLUG_ROUTE = /^\/(in|sg)\/(bank|top-cards)\/(.+?)\/?$/;
+
+function legacySlugRedirect(pathname: string): string | null {
+  const match = pathname.match(SLUG_ROUTE);
+  if (!match) return null;
+  const [, region, section, rest] = match;
+
+  // Category names can contain "/" ("Government/Tax"), bank routes have <= 2 segments
+  const segments = section === "top-cards" ? [rest] : rest.split("/");
+  if (segments.length > 2) return null;
+
+  const slugs = segments.map((segment) => slugify(safeDecode(segment)));
+  if (slugs.some((slug) => !slug)) return null;
+
+  const target = `/${region}/${section}/${slugs.join("/")}`;
+  return target === pathname ? null : target;
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
@@ -46,6 +68,11 @@ export default {
           "Access-Control-Allow-Origin": url.origin,
         },
       });
+    }
+
+    const slugTarget = legacySlugRedirect(url.pathname);
+    if (slugTarget) {
+      return Response.redirect(`${url.origin}${slugTarget}${url.search}`, 301);
     }
 
     // Image optimization via Cloudflare Images binding.

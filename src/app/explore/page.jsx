@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useRegion } from "@/core/providers/RegionContext";
+import { bankPath, cardPath } from "@/core/utils/slug";
 import { Box, CircularProgress } from "@mui/material";
 
 export default function ExplorePage() {
@@ -18,9 +19,9 @@ export default function ExplorePage() {
     const regionSlug = (region || "in").toLowerCase();
 
     if (bank && card) {
-      router.replace(`/${regionSlug}/bank/${encodeURIComponent(bank)}/${encodeURIComponent(card)}`);
+      router.replace(cardPath(regionSlug, bank, card));
     } else if (bank) {
-      router.replace(`/${regionSlug}/bank/${encodeURIComponent(bank)}`);
+      router.replace(bankPath(regionSlug, bank));
     } else {
       router.replace(`/${regionSlug}`);
     }

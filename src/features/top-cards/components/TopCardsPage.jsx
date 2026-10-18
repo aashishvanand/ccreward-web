@@ -1,7 +1,7 @@
 "use client";
 // src/features/top-cards/components/TopCardsPage.jsx - Enhanced with Analytics
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/core/providers/AuthContext";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
@@ -11,6 +11,7 @@ import useCardCategories, {
   getCardsForCategory,
 } from "@/core/hooks/useCardCategories";
 import TopCardsGrid from "./TopCardsGrid";
+import { categoryPath } from "@/core/utils/slug";
 import {
   Box,
   Container,
@@ -78,7 +79,6 @@ const categories = [
 
 const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = "" }) => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
@@ -131,7 +131,9 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
       const validateAndSetCategory = async () => {
         setIsValidating(true);
         try {
-          const queryCategory = searchParams.get('category');
+          // Read in the effect (client only): useSearchParams() would opt the
+          // whole page out of server rendering.
+          const queryCategory = new URLSearchParams(window.location.search).get('category');
 
           if (queryCategory) {
             const decodedCategory = decodeURIComponent(queryCategory);
@@ -180,7 +182,7 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
 
       validateAndSetCategory();
     }
-  }, [searchParams, trackEvent, trackComponentError, initialCategory, category, currentRegion]);
+  }, [trackEvent, trackComponentError, initialCategory, category, currentRegion]);
 
   // Update URL when category changes
   // We handle navigation in handleCategoryChange now to prevent cycle, 
@@ -233,7 +235,7 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
       }
 
       // Navigate to the new static route
-      const newPath = `/${currentRegion}/top-cards/${encodeURIComponent(newCategory)}`;
+      const newPath = categoryPath(currentRegion, newCategory);
       trackNavigation(newPath, "category_filter");
       router.push(newPath);
 
@@ -391,30 +393,6 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
     );
   }
 
-  const { region, regionName } = useRegion(); // Get region name
-
-  const getSeoMetadata = () => {
-    let title = "Top Credit Cards - CCReward";
-    let description = "Discover the best credit cards for your spending needs.";
-
-    if (category) {
-      const regionText = regionName ? `in ${regionName}` : "";
-      title = `Top ${category} Credit Cards ${regionText} - CCReward`;
-      description = `Discover the best credit cards for ${category} spending ${regionText}. Compare rewards and benefits.`;
-    } else {
-      const regionText = regionName ? `in ${regionName}` : "";
-      title = `Top Credit Cards ${regionText} - CCReward`;
-      description = `Discover the best credit cards ${regionText}. Compare rewards across categories like Shopping, Travel, and Dining.`;
-    }
-
-    return (
-      <>
-        <title>{title}</title>
-        <meta name="description" content={description} />
-      </>
-    );
-  };
-
   return (
     <motion.div
       variants={pageVariants}
@@ -422,7 +400,6 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
       animate="visible"
       exit="exit"
     >
-      {getSeoMetadata()}
       <Box
         sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
@@ -431,13 +408,14 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
         <Container component="main" sx={{ py: 4, flexGrow: 1 }}>
           <Typography
             variant="h4"
+            component="h1"
             sx={{
               fontWeight: "bold",
               mb: 4,
               fontSize: { xs: "1.75rem", sm: "2.125rem" },
             }}
           >
-            Top Cards by Category
+            {category ? `Best Credit Cards for ${category}` : "Top Cards by Category"}
           </Typography>
 
           <Select

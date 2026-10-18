@@ -730,7 +730,7 @@ const CardPage = ({ bankName, cardName, country }) => {
                   alignItems: "center"
                 }}>
                   {/* Card Image */}
-                  <Grid item xs={12} md={5}>
+                  <Grid size={{ xs: 12, md: 5 }}>
                     <Box
                       sx={{
                         display: "flex",
@@ -749,7 +749,8 @@ const CardPage = ({ bankName, cardName, country }) => {
                         <Box
                           sx={{
                             height: 220,
-                            width: 350,
+                            width: "100%",
+                            maxWidth: 349,
                             bgcolor: alpha(theme.palette.divider, 0.3),
                             borderRadius: 4,
                             display: "flex",
@@ -766,7 +767,7 @@ const CardPage = ({ bankName, cardName, country }) => {
                   </Grid>
 
                   {/* Card Info */}
-                  <Grid item xs={12} md={7}>
+                  <Grid size={{ xs: 12, md: 7 }}>
                     <Box>
                       <Chip
                         label={bankName}
@@ -793,14 +794,14 @@ const CardPage = ({ bankName, cardName, country }) => {
 
                       {/* Fee Cards */}
                       <Grid container spacing={2}>
-                        <Grid item xs={6} sm={4}>
+                        <Grid size={{ xs: 6, sm: 4 }}>
                           <StatCard
                             label="Joining Fee"
                             value={formatCurrency(data.joiningFees, country)}
                             color="primary"
                           />
                         </Grid>
-                        <Grid item xs={6} sm={4}>
+                        <Grid size={{ xs: 6, sm: 4 }}>
                           <StatCard
                             label="Annual Fee"
                             value={formatCurrency(data.annualFees, country)}
@@ -808,7 +809,7 @@ const CardPage = ({ bankName, cardName, country }) => {
                           />
                         </Grid>
                         {data.incomeRequirement && data.incomeRequirement !== "NA" && (
-                          <Grid item xs={12} sm={4}>
+                          <Grid size={{ xs: 12, sm: 4 }}>
                             <StatCard
                               label="Min. Income"
                               value={formatCurrency(data.incomeRequirement, country)}
@@ -846,7 +847,7 @@ const CardPage = ({ bankName, cardName, country }) => {
 
                 <Grid container spacing={3}>
                   {/* Domestic */}
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <Box
                       sx={{
                         p: 3,
@@ -886,7 +887,7 @@ const CardPage = ({ bankName, cardName, country }) => {
                   </Grid>
 
                   {/* International */}
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <Box
                       sx={{
                         p: 3,
@@ -950,7 +951,7 @@ const CardPage = ({ bankName, cardName, country }) => {
 
                   <Grid container spacing={2}>
                     {isAccessAvailable(data.railwayLoungeAccess) && (
-                      <Grid item xs={12} sm={6} md={4}>
+                      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                         <PerkItem
                           icon={TrainIcon}
                           label="Railway Lounge"
@@ -960,7 +961,7 @@ const CardPage = ({ bankName, cardName, country }) => {
                       </Grid>
                     )}
                     {isAccessAvailable(data.golfAccess) && (
-                      <Grid item xs={12} sm={6} md={4}>
+                      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                         <PerkItem
                           icon={GolfCourseIcon}
                           label="Golf Access"
@@ -970,7 +971,7 @@ const CardPage = ({ bankName, cardName, country }) => {
                       </Grid>
                     )}
                     {isAccessAvailable(data.limoAccess) && (
-                      <Grid item xs={12} sm={6} md={4}>
+                      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                         <PerkItem
                           icon={LocalTaxiIcon}
                           label="Limo/Chauffeur Service"
@@ -1006,7 +1007,7 @@ const CardPage = ({ bankName, cardName, country }) => {
 
                   <Grid container spacing={3}>
                     {goals.map((goal, index) => (
-                      <Grid item xs={12} md={6} key={index}>
+                      <Grid size={{ xs: 12, md: 6 }} key={index}>
                         <MilestoneCard
                           goal={goal}
                           index={index}

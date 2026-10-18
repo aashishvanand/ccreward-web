@@ -9,6 +9,7 @@ import {
   useRef,
 } from "react";
 import RegionSelectionModal from '../../shared/components/layout/RegionSelectionModal';
+import { isCrawler } from '../utils/deviceUtils';
 
 // Define supported regions
 export const REGIONS = {
@@ -31,6 +32,13 @@ const RegionContext = createContext({
 const isValidRegion = (regionCode) => {
   return regionCode && Object.keys(REGIONS).includes(regionCode.toUpperCase());
 };
+
+// Pages whose content doesn't depend on the region
+const REGION_NEUTRAL_PATHS = ['/faq', '/privacy', '/terms', '/howto'];
+
+const shouldSkipRegionPicker = () =>
+  isCrawler() ||
+  REGION_NEUTRAL_PATHS.some((p) => window.location.pathname === p || window.location.pathname.startsWith(`${p}/`));
 
 // Global flag to prevent multiple modal instances
 let modalShown = false;
@@ -102,12 +110,31 @@ export function RegionProvider({ children }) {
         return;
       }
 
+      // Region couldn't be auto-detected: ask the visitor, unless it's a crawler
+      // or a region-neutral page, which get India without persisting it.
+      const requestRegionChoice = () => {
+        if (shouldSkipRegionPicker()) {
+          setRegion("IN");
+          setHasUserSetRegion(false);
+          setIsInitialized(true);
+          return;
+        }
+        // Show modal only if not already shown
+        if (!modalShown) {
+          modalShown = true;
+          setShowRegionModal(true);
+        }
+      };
+
       try {
         // 1. Check URL Parameter for SEO (Highest Priority)
         // We use window.location because useSearchParams might not be available during initial hydration 
         // effectively outside of Next.js router context in some edge cases compared to Providers
         const urlParams = new URLSearchParams(window.location.search);
-        const urlRegion = urlParams.get('region');
+        // /in/... and /sg/... pages are region-specific: the path wins, so the
+        // content matches the URL and crawlers never see the region picker.
+        const pathRegion = window.location.pathname.match(/^\/(in|sg)(?:\/|$)/i)?.[1];
+        const urlRegion = pathRegion || urlParams.get('region');
 
         if (urlRegion && isValidRegion(urlRegion)) {
            const upperUrlRegion = urlRegion.toUpperCase();
@@ -152,26 +179,14 @@ export function RegionProvider({ children }) {
               setHasUserSetRegion(false);
               setIsInitialized(true);
             } else {
-              // Show modal only if not already shown
-              if (!modalShown) {
-                modalShown = true;
-                setShowRegionModal(true);
-              }
+              requestRegionChoice();
             }
           } else {
-            // Show modal only if not already shown
-            if (!modalShown) {
-              modalShown = true;
-              setShowRegionModal(true);
-            }
+            requestRegionChoice();
           }
         } catch (error) {
           console.error("❌ [RegionContext] Error detecting region:", error);
-          // Show modal only if not already shown
-          if (!modalShown) {
-            modalShown = true;
-            setShowRegionModal(true);
-          }
+          requestRegionChoice();
         }
       } catch (error) {
         console.error("❌ [RegionContext] Unexpected error:", error);

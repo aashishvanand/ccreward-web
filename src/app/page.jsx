@@ -1,4 +1,5 @@
 import HomeClient from './HomeClient';
+import { appsJsonLd } from '../shared/constants/jsonLd';
 
 export const metadata = {
   title: {
@@ -20,5 +21,13 @@ export const metadata = {
 };
 
 export default function Home() {
-  return <HomeClient />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(appsJsonLd) }}
+      />
+      <HomeClient />
+    </>
+  );
 }

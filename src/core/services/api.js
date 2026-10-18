@@ -3,6 +3,24 @@ import axiosRetry from 'axios-retry';
 import { jwtDecode } from "jwt-decode";
 import { getTurnstileToken } from './turnstile';
 import { handleSuccessHeaders, handleLimitExceeded } from './usageLimitService';
+import { initAppCheck } from '@/firebase';
+
+/**
+ * Firebase App Check token (Turnstile-backed custom provider) for the API, so it can
+ * tell the genuine site from scripts. The SDK caches and refreshes it. Never throws:
+ * without a token the request goes out without the header and the server decides.
+ */
+const getAppCheckHeaderToken = async () => {
+    try {
+        const appCheck = await initAppCheck();
+        if (!appCheck) return null;
+        const { getToken } = await import('firebase/app-check');
+        const { token } = await getToken(appCheck, false);
+        return token;
+    } catch {
+        return null;
+    }
+};
 
 // Firebase auth is dynamically imported to reduce initial bundle size
 let _authModule = null;
@@ -171,6 +189,12 @@ api.interceptors.request.use(async (config) => {
         console.warn('Skipping API request because region is not initialized:', config.url);
         // Cancel the request
         return Promise.reject(new Error('Region not initialized'));
+    }
+
+    // Attach the App Check token on every request (non-blocking)
+    const appCheckToken = await getAppCheckHeaderToken();
+    if (appCheckToken) {
+        config.headers['X-Firebase-AppCheck'] = appCheckToken;
     }
 
     // Attach Turnstile token for bot protection on POST requests only (non-blocking)
@@ -475,6 +499,25 @@ export const calculateTransferPartners = async (data) => {
         }
         return handleApiError(error);
     }
+};
+
+// Fetch every transfer program (airlines, hotels, other) for the "who transfers to" picker
+export const fetchTransferPrograms = async () => {
+    const region = getCountryCode();
+    if (!region) return [];
+
+    return fetchWithCache(`transferPrograms_${region}`, async () => {
+        const response = await api.get('/transfer/partners');
+        return response.data.programs;
+    });
+};
+
+// Find every card and points balance that can transfer to a target program
+export const findTransferRoutes = async (data) => {
+    if (!isRegionInitialized()) {
+        throw new Error('Region not initialized. Please refresh the page and try again.');
+    }
+    return authenticatedRequest('post', '/v4/transfer/routes', data);
 };
 
 // Fetch Card Details

@@ -8,6 +8,7 @@ import {
   Stack,
   IconButton,
   Divider,
+  GlobalStyles,
 } from "@mui/material";
 import { Twitter, Instagram, Reddit, Telegram } from "@mui/icons-material";
 import { motion } from "framer-motion";
@@ -279,15 +280,17 @@ function Footer() {
         </Container>
       </Box>
       {/* Add keyframes for heartbeat animation */}
-      <style jsx global>{`
-        @keyframes heartbeat {
-          0% { transform: scale(1); }
-          15% { transform: scale(1.25); }
-          30% { transform: scale(1); }
-          45% { transform: scale(1.25); }
-          60% { transform: scale(1); }
-        }
-      `}</style>
+      <GlobalStyles
+        styles={{
+          "@keyframes heartbeat": {
+            "0%": { transform: "scale(1)" },
+            "15%": { transform: "scale(1.25)" },
+            "30%": { transform: "scale(1)" },
+            "45%": { transform: "scale(1.25)" },
+            "60%": { transform: "scale(1)" },
+          },
+        }}
+      />
     </motion.div>
   );
 }

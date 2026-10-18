@@ -28,6 +28,7 @@ import {
   Hotel as HotelIcon,
   AccessTime as AccessTimeIcon,
   Clear as ClearIcon,
+  SwapHoriz as SwapHorizIcon,
 } from "@mui/icons-material";
 import { useAuth } from "@/core/providers/AuthContext";
 import { useRegion } from "@/core/providers/RegionContext";
@@ -53,6 +54,7 @@ import {
 } from "@/core/hooks/useAnalytics";
 import usePartnerLogos from "@/core/hooks/usePartnerLogos";
 import TransferPartnerGrid from "./TransferPartnerGrid";
+import TransferRouteFinder from "./TransferRouteFinder";
 import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 const pageVariants = {
@@ -264,6 +266,8 @@ const TransferCalculator = () => {
         bank: selectedBank,
         card: selectedCard,
         points: Number(points),
+        // Also return other programs and partners reachable via another program
+        include_indirect: true,
       });
       setCalculationResult(result);
       trackFormSubmission(true);
@@ -290,7 +294,15 @@ const TransferCalculator = () => {
     }
   };
 
-  const renderPartnerList = (partners, type) => {
+  const partnerTypeIcon = (type, props) => {
+    if (type === "airline") return <FlightIcon {...props} />;
+    if (type === "hotel") return <HotelIcon {...props} />;
+    return <SwapHorizIcon {...props} />;
+  };
+
+  const defaultListTitle = { airline: "Airlines", hotel: "Hotels", other: "Other Programs" };
+
+  const renderPartnerList = (partners, type, title = defaultListTitle[type]) => {
     // Get currency from the API response, fallback to region
     const currency = calculationResult?.value_currency || region;
     return (
@@ -305,8 +317,8 @@ const TransferCalculator = () => {
               my: 2,
             }}
           >
-            {type === "airline" ? <FlightIcon /> : <HotelIcon />}
-            {type === "airline" ? "Airlines" : "Hotels"} ({partners.length})
+            {partnerTypeIcon(type)}
+            {title} ({partners.length})
           </Typography>
         }
       >
@@ -363,11 +375,7 @@ const TransferCalculator = () => {
                         justifyContent: "center",
                       }}
                     >
-                      {type === "airline" ? (
-                        <FlightIcon color="action" />
-                      ) : (
-                        <HotelIcon color="action" />
-                      )}
+                      {partnerTypeIcon(type, { color: "action" })}
                     </Box>
                   )}
                 </ListItemIcon>
@@ -383,6 +391,13 @@ const TransferCalculator = () => {
                   }}>
                     {new Intl.NumberFormat().format(partner.partner_points_received)} points
                   </Typography>
+                  {partner.via?.length > 0 && (
+                    <Typography variant="body2" sx={{
+                      color: "text.secondary"
+                    }}>
+                      via {partner.via.map((step) => step.partner_name).join(" → ")}
+                    </Typography>
+                  )}
                 </Box>
                 <Box sx={{ flex: "1 1 150px" }}>
                   <Typography variant="body2" sx={{
@@ -657,15 +672,47 @@ const TransferCalculator = () => {
                       {renderPartnerList(calculationResult.hotels, "hotel")}
                     </motion.div>
                   )}
+                  {calculationResult.indirect_airlines?.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                    >
+                      {renderPartnerList(calculationResult.indirect_airlines, "airline", "Airlines via Other Programs")}
+                    </motion.div>
+                  )}
+                  {calculationResult.indirect_hotels?.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      {renderPartnerList(calculationResult.indirect_hotels, "hotel", "Hotels via Other Programs")}
+                    </motion.div>
+                  )}
+                  {calculationResult.others?.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.7 }}
+                    >
+                      {renderPartnerList(calculationResult.others, "other")}
+                    </motion.div>
+                  )}
                 </AnimatePresence>
 
-                {calculationResult.total_partners === 0 && (
+                {calculationResult.total_partners === 0 &&
+                  !calculationResult.indirect_airlines?.length &&
+                  !calculationResult.indirect_hotels?.length &&
+                  !calculationResult.others?.length && (
                   <Alert severity="info" sx={{ mt: 2 }}>
                     No transfer partners found for this card.
                   </Alert>
                 )}
               </Box>
             )}
+
+            <TransferRouteFinder />
           </Stack>
            {/* Add the TransferPartnerGrid here */}
           <Box sx={{ mt: 8 }}>

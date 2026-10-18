@@ -13,7 +13,8 @@ const TOOLS = [
   { name: "ccreward_get_card_questions", purpose: "Get clarifying questions needed for an accurate reward calc. Call before calculate_reward if unsure." },
   { name: "ccreward_calculate_reward", purpose: "Calculate points/cashback/miles for a transaction on one card." },
   { name: "ccreward_get_best_card", purpose: "Compare a portfolio of cards and rank the best one for a transaction." },
-  { name: "ccreward_get_transfer_partners", purpose: "Airline/hotel transfer partners and ratios for a card's points." },
+  { name: "ccreward_get_transfer_partners", purpose: "Airline/hotel transfer partners and ratios for a card's points, including routes via another program." },
+  { name: "ccreward_find_transfer_routes", purpose: "Work backwards from a target program (e.g. 100k KrisFlyer miles): which cards and points balances can reach it, the points needed and how long it takes." },
   { name: "ccreward_search_bank_tnc", purpose: "Semantic search over official bank T&Cs/fee schedules (forex markup, grace periods, etc.)." },
   { name: "ccreward_submit_feedback", purpose: "Submit a vote/written feedback on a reward result. The only tool with a side effect." },
 ];

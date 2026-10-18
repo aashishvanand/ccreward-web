@@ -8,7 +8,7 @@ import PerformanceWrapper from '../shared/components/PerformanceWrapper';
 import PropTypes from 'prop-types';
 
 // Dynamically import LandingPage to enable client-side rendering
-const LandingPage = dynamic(() => import('../features/landing/components/LandingPage'), { ssr: false });
+const LandingPage = dynamic(() => import('../features/landing/components/LandingPage'));
 
 export default function HomeClient({ region }) {
     // Initialize performance monitoring and analytics on component mount
