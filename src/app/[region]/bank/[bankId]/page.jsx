@@ -3,6 +3,7 @@ import cardsIN from '@/data/cards_in.json';
 import cardsSG from '@/data/cards_sg.json';
 import { notFound } from 'next/navigation';
 import { slugify, findBySlug, bankPath, cardPath } from '@/core/utils/slug';
+import { serializeJsonLd } from '@/core/utils/jsonLd';
 
 export const dynamicParams = false;
 
@@ -83,7 +84,7 @@ export default async function BankPage({ params }) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <BankClient bank={bank} cards={cards} />
     </>

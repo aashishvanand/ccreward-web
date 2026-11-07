@@ -65,7 +65,6 @@ export default {
         headers: {
           "Content-Type": "application/json",
           "Cache-Control": "no-store",
-          "Access-Control-Allow-Origin": url.origin,
         },
       });
     }

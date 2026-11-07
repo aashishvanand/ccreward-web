@@ -76,6 +76,7 @@ function generateSitemap() {
     addSourceUrl('/sg/howto', ['src/app/[region]/howto']);
     addSourceUrl('/privacy', ['src/app/privacy']);
     addSourceUrl('/terms', ['src/app/terms']);
+    addSourceUrl('/accessibility', ['src/app/accessibility']);
 
     for (const region of REGIONS) {
         const cardsData = readJson(path.join(DATA_DIR, `cards_${region}.json`));

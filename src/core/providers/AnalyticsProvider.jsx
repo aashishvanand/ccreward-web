@@ -2,10 +2,7 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import Script from "next/script";
-import { firebaseApp } from "@/firebase";
 import { initTurnstile } from "../services/turnstile";
-import { initializeClarity } from "../services/clarity";
 import {
   initializeAnalytics,
   setUserAnalytics,
@@ -18,6 +15,27 @@ import {
 } from "../services/crashlytics";
 import { useAuth } from "./AuthContext";
 import { usePathname } from "next/navigation";
+import { getSafePageUrl, getSafeReferrer } from "../utils/safeUrl";
+
+// Point gtag at a URL without query string or fragment, so email-link codes and
+// checkout ids never reach analytics. Applies to every later event.
+const setSafePageLocation = () => {
+  if (typeof window.gtag !== "function") return;
+  window.gtag("set", {
+    page_location: getSafePageUrl(),
+    page_referrer: getSafeReferrer(),
+  });
+};
+
+// Run analytics setup when the browser is idle, so it never competes with rendering
+const whenIdle = (callback) => {
+  if ("requestIdleCallback" in window) {
+    const id = window.requestIdleCallback(callback, { timeout: 4000 });
+    return () => window.cancelIdleCallback(id);
+  }
+  const id = setTimeout(callback, 1500);
+  return () => clearTimeout(id);
+};
 
 export function AnalyticsProvider({ children }) {
   const initialized = useRef(false);
@@ -35,11 +53,13 @@ export function AnalyticsProvider({ children }) {
         window.dataLayer.push(arguments);
       };
       window.gtag("js", new Date());
+      setSafePageLocation();
 
       const measurementId = process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID;
       if (measurementId) {
         window.gtag("config", measurementId, {
           page_path: window.location.pathname,
+          page_location: getSafePageUrl(),
           send_page_view: false, // We'll handle page views manually
           custom_map: {
             custom_error: "error_name",
@@ -62,34 +82,26 @@ export function AnalyticsProvider({ children }) {
     const initializeAllAnalytics = async () => {
       if (!initialized.current && typeof window !== "undefined") {
         try {
-          // Initialize Firebase Analytics
+          // Firebase Analytics injects gtag.js itself (no separate <Script>), so
+          // loading it here in idle time keeps it off the critical path.
           let firebaseAnalyticsReady = false;
-          
           try {
-             const { getAnalytics, isSupported } = await import("firebase/analytics");
-             if (await isSupported()) {
-                getAnalytics(firebaseApp);
-                firebaseAnalyticsReady = true;
-             }
+            const { isSupported } = await import("firebase/analytics");
+            firebaseAnalyticsReady = await isSupported();
           } catch (e) {
-             console.warn("Firebase analytics import failed", e);
+            console.warn("Firebase analytics import failed", e);
           }
 
-          // Initialize enhanced analytics
-          const enhancedAnalyticsReady = await initializeAnalytics();
+          // Single entry point: initializeAnalytics() is idempotent and calls
+          // getAnalytics(), sets up web-vitals and network observers once.
+          const enhancedAnalyticsReady = firebaseAnalyticsReady
+            ? await initializeAnalytics()
+            : false;
 
           // Initialize Crashlytics-like error reporting
           const crashlyticsReady = await initializeCrashlytics();
 
-           // Initialize Microsoft Clarity
-          try {
-            initializeClarity();
-          } catch (clarityError) {
-            console.warn(
-              "⚠️ Microsoft Clarity initialization failed:",
-              clarityError
-            );
-          }
+          // Microsoft Clarity loads from /scripts/clarity.js in the root layout
 
           // Pre-load Turnstile for bot protection (non-blocking)
           initTurnstile();
@@ -121,7 +133,7 @@ export function AnalyticsProvider({ children }) {
       }
     };
 
-    initializeAllAnalytics();
+    return whenIdle(initializeAllAnalytics);
   }, []);
 
   // Track user authentication changes
@@ -150,42 +162,24 @@ export function AnalyticsProvider({ children }) {
     }
   }, [user, analyticsReady]);
 
-  // Track route changes
+  // Track page views: initial load and every client-side navigation
   useEffect(() => {
-    if (analyticsReady && typeof window !== "undefined") {
-      const handleRouteChange = () => {
-        const newPath = window.location.pathname;
-        if (newPath !== currentPath.current) {
-          currentPath.current = newPath;
+    if (!analyticsReady || typeof window === "undefined") return;
+    const newPath = window.location.pathname;
+    const previousPath = currentPath.current;
+    if (newPath === previousPath) return;
+    currentPath.current = newPath;
 
-          // Log page view
-          logPageView(newPath, {
-            previous_page: currentPath.current,
-            navigation_type: "route_change",
-          });
+    setSafePageLocation();
+    logPageView(newPath, previousPath
+      ? { previous_page: previousPath, navigation_type: "route_change" }
+      : { navigation_type: "initial_load" });
 
-          // Log breadcrumb for navigation
-          logBreadcrumb(`Navigated to ${newPath}`, "navigation", {
-            from: currentPath.current,
-            to: newPath,
-          });
-        }
-      };
-
-      // Initial page view
-      if (currentPath.current === "") {
-        currentPath.current = window.location.pathname;
-        logPageView(currentPath.current, {
-          navigation_type: "initial_load",
-        });
-      }
-
-      // Listen for route changes (for client-side navigation)
-      window.addEventListener("popstate", handleRouteChange);
-
-      return () => {
-        window.removeEventListener("popstate", handleRouteChange);
-      };
+    if (previousPath) {
+      logBreadcrumb(`Navigated to ${newPath}`, "navigation", {
+        from: previousPath,
+        to: newPath,
+      });
     }
   }, [analyticsReady, pathname]);
 
@@ -224,15 +218,6 @@ export function AnalyticsProvider({ children }) {
 
   return (
     <>
-      {/* Load Firebase Analytics scripts */}
-      <Script
-        src={`https://www.googletagmanager.com/gtag/js?l=dataLayer&id=${process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID}`}
-        strategy="afterInteractive"
-        onError={(error) => {
-          console.error("❌ Google Analytics script failed to load:", error);
-        }}
-      />
-
       {children}
     </>
   );

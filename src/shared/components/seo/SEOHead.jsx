@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { serializeJsonLd } from '@/core/utils/jsonLd';
 
 export const SEOHead = ({ metadata }) => {
     if (!metadata) return null;
@@ -47,7 +48,7 @@ export const SEOHead = ({ metadata }) => {
             {jsonLd && (
                 <script
                     type="application/ld+json"
-                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                    dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
                 />
             )}
         </Head>

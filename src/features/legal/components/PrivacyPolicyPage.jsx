@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { Box, Container, Typography } from "@mui/material";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 // Add analytics imports
 import {
@@ -103,7 +103,7 @@ const PrivacyPolicyPage = () => {
   }, [trackEvent]);
 
   return (
-    <motion.div
+    <m.div
       variants={pageVariants}
       initial="hidden"
       animate="visible"
@@ -444,7 +444,7 @@ const PrivacyPolicyPage = () => {
         </Container>
         <Footer />
       </Box>
-    </motion.div>
+    </m.div>
   );
 };
 

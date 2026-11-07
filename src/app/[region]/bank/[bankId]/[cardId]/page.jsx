@@ -5,6 +5,7 @@ import categoriesIN from '@/data/cardCategories_in.json';
 import categoriesSG from '@/data/cardCategories_sg.json';
 import { notFound } from 'next/navigation';
 import { slugify, findBySlug, bankPath, cardPath, categoryPath } from '@/core/utils/slug';
+import { serializeJsonLd } from '@/core/utils/jsonLd';
 
 export const dynamicParams = false;
 
@@ -156,7 +157,7 @@ export default async function CardPage({ params }) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <CardClient
         bankName={bankKey}

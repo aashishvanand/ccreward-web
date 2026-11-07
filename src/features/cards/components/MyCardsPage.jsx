@@ -32,7 +32,7 @@ import PortfolioShare from "./PortfolioShare";
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
 import ShareDialog from "./ShareDialog";
 import { useRegion } from "@/core/providers/RegionContext";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import {
   useAnalytics,
   usePagePerformance,
@@ -638,7 +638,7 @@ function MyCardsPage() {
   };
 
   return (
-    <motion.div
+    <m.div
       variants={pageVariants}
       initial="hidden"
       animate="visible"
@@ -731,7 +731,7 @@ function MyCardsPage() {
         )}
         <Footer />
       </Box>
-    </motion.div>
+    </m.div>
   );
 }
 

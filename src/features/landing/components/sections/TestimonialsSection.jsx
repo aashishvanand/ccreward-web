@@ -5,7 +5,7 @@ import { Box, Container, Typography, Grid, IconButton } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import TweetContainer from "./TweetContainer";
 import ErrorBoundary from "@/shared/components/ErrorBoundary";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 
 const TestimonialsSection = ({
   visibleTweets,
@@ -41,7 +41,7 @@ const TestimonialsSection = ({
           </IconButton>
 
           <AnimatePresence mode="wait">
-            <motion.div
+            <m.div
               key={visibleTweets[0]?.url || "empty"}
               initial={{ opacity: 0, x: prefersReducedMotion ? 0 : 50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -70,7 +70,7 @@ const TestimonialsSection = ({
                         md: 4,
                       }}
                     >
-                      <motion.div
+                      <m.div
                         initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{
@@ -99,12 +99,12 @@ const TestimonialsSection = ({
                         >
                           <TweetContainer tweetUrl={tweet.url} />
                         </ErrorBoundary>
-                      </motion.div>
+                      </m.div>
                     </Grid>
                   );
                 })}
               </Grid>
-            </motion.div>
+            </m.div>
           </AnimatePresence>
 
           <IconButton

@@ -1,51 +1,31 @@
 "use client";
 
 import { useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import Box from '@mui/material/Box';
-import { initializeAnalytics, setupNetworkMonitoring } from '../core/services/analytics';
 import PerformanceWrapper from '../shared/components/PerformanceWrapper';
 import PropTypes from 'prop-types';
 
-// Dynamically import LandingPage to enable client-side rendering
-const LandingPage = dynamic(() => import('../features/landing/components/LandingPage'));
+import LandingPage from '../features/landing/components/LandingPage';
 
-export default function HomeClient({ region }) {
-    // Initialize performance monitoring and analytics on component mount
+export default function HomeClient({ region, cardStats }) {
     useEffect(() => {
         // Hide SSR content once client component mounts
         const ssrContent = document.querySelector('[data-ssr-content="region"]');
         if (ssrContent) {
             ssrContent.style.display = 'none';
         }
-
-        const initPerformanceMonitoring = async () => {
-            try {
-                await initializeAnalytics();
-
-                // Setup network monitoring if functionality exists
-                // This helps in tracking network performance and errors
-                if (typeof setupNetworkMonitoring === 'function') {
-                    setupNetworkMonitoring();
-                }
-            } catch (error) {
-                // Log analytics initialization failures but don't break the app
-                console.warn('Analytics initialization failed:', error);
-            }
-        };
-
-        initPerformanceMonitoring();
     }, []);
 
     return (
         <PerformanceWrapper componentName="Home">
             <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-                <LandingPage region={region} />
+                <LandingPage region={region} cardStats={cardStats} />
             </Box>
         </PerformanceWrapper>
     );
 }
 
 HomeClient.propTypes = {
-    region: PropTypes.string
+    region: PropTypes.string,
+    cardStats: PropTypes.object,
 };

@@ -48,7 +48,7 @@ import UsageRemainingBadge from "@/shared/components/ui/UsageRemainingBadge";
 import debounce from "lodash/debounce";
 import groupBy from "lodash/groupBy";
 import { useRegion } from "@/core/providers/RegionContext";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { getCurrencySymbol, getNativeCurrency } from "@/core/utils";
 import CurrencyAmountField from "@/shared/components/ui/CurrencyAmountField";
 import CurrencyConversionInfo from "@/shared/components/ui/CurrencyConversionInfo";
@@ -673,7 +673,7 @@ const BestCardCalculator = () => {
   }, [isCalculated, userCards.length, trackCustomEngagement]);
 
   return (
-    <motion.div
+    <m.div
       variants={pageVariants}
       initial="hidden"
       animate="visible"
@@ -965,7 +965,7 @@ const BestCardCalculator = () => {
         )}
         <Footer />
       </Box>
-    </motion.div>
+    </m.div>
   );
 };
 

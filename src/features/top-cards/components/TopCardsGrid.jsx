@@ -29,10 +29,11 @@ import {
   Receipt as ReceiptIcon,
   AccountBalanceWallet as AccountBalanceWalletIcon,
 } from "@mui/icons-material";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useRegion } from "@/core/providers/RegionContext";
 import TiltCard from "@/shared/components/ui/TiltCard";
 import { cardPath } from "@/core/utils/slug";
+import { setCachedJson } from '@/core/utils/storage';
 
 // Use a prefix for the cache key to make it dynamic
 const CACHE_KEY_PREFIX = "referralData_";
@@ -96,10 +97,7 @@ const TopCardsGrid = ({
           setReferralData(data);
           
           // Cache the data with region-specific key
-          localStorage.setItem(cacheKey, JSON.stringify({
-            data,
-            timestamp: Date.now()
-          }));
+          setCachedJson(cacheKey, data);
         }
       } catch (error) {
         console.error('Error fetching referral data for region:', region, error);
@@ -127,7 +125,7 @@ const TopCardsGrid = ({
         
         return (
           <ImageListItem key={`${card.bank}-${card.cardName}-${index}`}>
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
@@ -270,7 +268,7 @@ const TopCardsGrid = ({
                     </Stack>
                 </Box>
               </Paper>
-            </motion.div>
+            </m.div>
           </ImageListItem>
         );
       })}

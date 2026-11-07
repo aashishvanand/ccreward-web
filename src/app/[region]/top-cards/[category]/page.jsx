@@ -76,6 +76,7 @@ export default async function TopCardsCategory({ params }) {
                     initialCategories={categories}
                     initialCardImages={images}
                     initialCategory={categoryName}
+                    initialRegion={region}
                 />
             </PerformanceWrapper>
         </Suspense>

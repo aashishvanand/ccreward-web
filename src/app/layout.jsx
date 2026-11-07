@@ -3,6 +3,7 @@ import Script from "next/script";
 import Providers from './providers'
 import { baseJsonLd } from '../shared/constants/jsonLd';
 import ErrorBoundary from '../shared/components/ErrorBoundary';
+import { serializeJsonLd } from '@/core/utils/jsonLd';
 
 // Root metadata — shared defaults. Pages override via generateMetadata().
 // IMPORTANT: Do NOT put <meta> for title, description, canonical, OG, or twitter
@@ -60,10 +61,10 @@ function RootLayout({ children }) {
         <meta name="theme-color" content="#ffffff" />
         {/* Preconnect to critical external origins for faster resource loading */}
         <link rel="preconnect" href="https://files.ccreward.app" />
+        <link rel="preconnect" href="https://imagedelivery.net" />
         <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.clarity.ms" />
-        <meta name="apple-itunes-app" content="app-id=6736835206" />
 
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -73,7 +74,7 @@ function RootLayout({ children }) {
 
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(baseJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(baseJsonLd) }}
           key="jsonld"
         />
       </head>
@@ -85,7 +86,6 @@ function RootLayout({ children }) {
         </ErrorBoundary>
 
         {/* Load analytics scripts without inline JS for CSP compliance */}
-        <Script src="/scripts/network-monitoring.js" strategy="afterInteractive" />
         <Script src="/scripts/clarity.js" strategy="lazyOnload" />
       </body>
     </html>

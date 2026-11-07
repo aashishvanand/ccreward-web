@@ -1,5 +1,6 @@
 // src/core/services/analytics.js - Client-Side Only Firebase Analytics & Performance
 import { firebaseApp } from '@/firebase';
+import { getSafeReferrer } from '@/core/utils/safeUrl';
 
 let analytics = null;
 let firebasePerformance = null;
@@ -11,16 +12,25 @@ let setUserIdFn = null;
 let setUserPropertiesFn = null;
 let traceFn = null;
 
-// Initialize analytics and performance monitoring (client-side only)
-const initializeAnalytics = async () => {
-    // Only run on client-side
+let initPromise = null;
+
+// Initialize analytics and performance monitoring (client-side only).
+// Idempotent: every caller shares one initialization, so events, observers and
+// listeners are only set up once.
+const initializeAnalytics = () => {
     if (typeof window === 'undefined') {
-        return false;
+        return Promise.resolve(false);
     }
+    if (!initPromise) {
+        initPromise = runInitializeAnalytics().then((ready) => {
+            if (!ready) initPromise = null; // Allow a later retry after a failure
+            return ready;
+        });
+    }
+    return initPromise;
+};
 
-    // Wait a bit to ensure everything is ready
-    await new Promise(resolve => setTimeout(resolve, 100));
-
+const runInitializeAnalytics = async () => {
     try {
         // Dynamic imports
         const { getAnalytics, logEvent, setUserId, setUserProperties } = await import('firebase/analytics');
@@ -42,6 +52,7 @@ const initializeAnalytics = async () => {
 
             // Set up automatic performance monitoring
             setupClientSidePerformanceMonitoring();
+            setupNetworkMonitoring();
 
 
         } catch (perfError) {
@@ -54,7 +65,7 @@ const initializeAnalytics = async () => {
         try {
             logAnalyticsEvent('app_open', {
                 timestamp: new Date().toISOString(),
-                referrer: document.referrer || 'direct',
+                referrer: getSafeReferrer(),
             });
         } catch (eventError) {
             console.warn('⚠️ Failed to log initial app_open event:', eventError);
@@ -193,8 +204,13 @@ const stopPerformanceTrace = (traceObj, customMetrics = {}) => {
 function setupClientSidePerformanceMonitoring() {
     if (typeof window === 'undefined') return;
 
-    // Monitor page load performance
-    window.addEventListener('load', () => {
+    // Monitor page load performance. Initialization runs in idle time, so the
+    // load event may already have fired.
+    const onLoad = (callback) => {
+        if (document.readyState === 'complete') callback();
+        else window.addEventListener('load', callback, { once: true });
+    };
+    onLoad(() => {
         setTimeout(() => {
             const navigation = window.performance.getEntriesByType('navigation')[0];
             if (navigation) {
@@ -338,7 +354,7 @@ const trackPageView = (path, additionalData = {}) => {
         logAnalyticsEvent('page_view', {
             page_path: path,
             page_title: document.title,
-            page_referrer: document.referrer || 'direct',
+            page_referrer: getSafeReferrer(),
             ...additionalData
         });
 
@@ -692,10 +708,13 @@ const logPageView = (path, additionalData = {}) => {
 //  3. Could mask real network errors if the wrapper threw
 // PerformanceObserver passively observes completed resource loads without
 // modifying any global prototypes.
+let networkMonitoringStarted = false;
 const setupNetworkMonitoring = () => {
     if (typeof window === 'undefined') {
         return false;
     }
+    if (networkMonitoringStarted) return true;
+    networkMonitoringStarted = true;
 
     try {
         if (!('PerformanceObserver' in window)) {

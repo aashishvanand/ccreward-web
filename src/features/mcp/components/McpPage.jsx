@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Container, CircularProgress, Stack } from "@mui/material";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useAuth } from "@/core/providers/AuthContext";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
@@ -22,7 +22,7 @@ function McpPage() {
   const { user, isAuthenticated, loading } = useAuth();
 
   return (
-    <motion.div variants={pageVariants} initial="hidden" animate="visible">
+    <m.div variants={pageVariants} initial="hidden" animate="visible">
       <Box
         sx={{
           display: "flex",
@@ -57,7 +57,7 @@ function McpPage() {
         )}
         <Footer />
       </Box>
-    </motion.div>
+    </m.div>
   );
 }
 

@@ -6,6 +6,17 @@ import { deleteUserData } from '../services/firebaseUtils';
 import { resetUsageState } from '../services/usageLimitService';
 import { useRouter, usePathname } from "next/navigation";
 
+// Drop the API client's cached ID token. Loaded lazily so axios stays out of the
+// root bundle; if the API client was never loaded there is nothing to clear.
+const clearCachedApiToken = async () => {
+  try {
+    const { clearAuthToken } = await import('../services/api');
+    clearAuthToken();
+  } catch {
+    // Ignore: the token is also keyed by uid, so another account can't reuse it
+  }
+};
+
 const AuthContext = createContext();
 
 // Define which routes require authentication
@@ -135,6 +146,7 @@ export function AuthProvider({ children }) {
     try {
       const { signOut } = await import('firebase/auth');
       await signOut(authRef.current);
+      await clearCachedApiToken();
       if (typeof window !== 'undefined') {
         const { getAnalytics, logEvent } = await import("firebase/analytics");
         const analytics = getAnalytics(firebaseApp);
@@ -180,6 +192,7 @@ export function AuthProvider({ children }) {
       // 2. Delete user from Firebase Auth
       const { deleteUser } = await import('firebase/auth');
       await deleteUser(authRef.current.currentUser);
+      await clearCachedApiToken();
 
       // 3. Analytics
       if (typeof window !== 'undefined') {

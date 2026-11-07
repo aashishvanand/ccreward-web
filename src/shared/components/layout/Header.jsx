@@ -37,7 +37,7 @@ import {
 } from "@mui/icons-material";
 import Link from "@/shared/components/NextLink";
 import { useRouter, usePathname } from "next/navigation";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useAuth } from "@/core/providers/AuthContext";
 import SignInButtons from "@/shared/components/auth/SignInButtons";
 import { useAppTheme } from "@/core/providers/ThemeRegistry";
@@ -506,7 +506,7 @@ function Header() {
   };
 
   return (
-    <motion.div variants={headerVariants} initial="hidden" animate="visible">
+    <m.div variants={headerVariants} initial="hidden" animate="visible">
       <AppBar
         position="sticky"
         elevation={0}
@@ -518,7 +518,7 @@ function Header() {
       >
         <Toolbar sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
           {/* Logo Section */}
-          <motion.div variants={logoVariants} whileHover="hover" whileTap="tap">
+          <m.div variants={logoVariants} whileHover="hover" whileTap="tap">
             <Box
               component={Link}
               href="/"
@@ -561,7 +561,7 @@ function Header() {
                 ccreward
               </Typography>
             </Box>
-          </motion.div>
+          </m.div>
 
           {/* Region Selector */}
           <RegionSelector />
@@ -701,7 +701,7 @@ function Header() {
           {isMobile && renderMobileMenu()}
         </Toolbar>
       </AppBar>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -719,7 +719,7 @@ export function MinimalHeader() {
   const ccrewardIconUrl = useMemo(() => buildCloudflareImageUrl(ccrewardIconId, "public"), [ccrewardIconId]);
 
   return (
-    <motion.div variants={headerVariants} initial="hidden" animate="visible">
+    <m.div variants={headerVariants} initial="hidden" animate="visible">
       <AppBar
         position="sticky"
         elevation={0}
@@ -730,7 +730,7 @@ export function MinimalHeader() {
         }}
       >
         <Toolbar sx={{ px: { xs: 2, sm: 3 } }}>
-          <motion.div variants={logoVariants} whileHover="hover" whileTap="tap">
+          <m.div variants={logoVariants} whileHover="hover" whileTap="tap">
             <Box
               component={Link}
               href="/"
@@ -759,7 +759,7 @@ export function MinimalHeader() {
                 ccreward
               </Typography>
             </Box>
-          </motion.div>
+          </m.div>
           <Box sx={{ flexGrow: 1 }} />
           <Tooltip title={`Switch to ${mode === "dark" ? "light" : "dark"} mode`} arrow>
             <IconButton
@@ -778,7 +778,7 @@ export function MinimalHeader() {
           </Tooltip>
         </Toolbar>
       </AppBar>
-    </motion.div>
+    </m.div>
   );
 }
 

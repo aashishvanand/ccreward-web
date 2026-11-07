@@ -16,7 +16,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import axios from "axios";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import Header from "../../shared/components/layout/Header";
 import Footer from "../../shared/components/layout/Footer";
 import StepRenderer from "./components/StepRenderer";
@@ -307,7 +307,7 @@ const HowToGuide = ({ initialGuidesData }) => {
   }
 
   return (
-    <motion.div
+    <m.div
       variants={pageVariants}
       initial="hidden"
       animate="visible"
@@ -337,7 +337,7 @@ const HowToGuide = ({ initialGuidesData }) => {
         >
           <AnimatePresence mode="wait">
             {!showGuide ? (
-              <motion.div
+              <m.div
                 key="search-ui"
                 initial="hidden"
                 animate="visible"
@@ -373,7 +373,7 @@ const HowToGuide = ({ initialGuidesData }) => {
                     mb: { xs: 4, md: 6 },
                   }}
                 >
-                  <motion.div variants={slideUp}>
+                  <m.div variants={slideUp}>
                     {/* Both Desktop and Mobile layout - simplified */}
                     <Box
                       sx={{
@@ -472,7 +472,7 @@ const HowToGuide = ({ initialGuidesData }) => {
                         </>
                       )}
                     </Box>
-                  </motion.div>
+                  </m.div>
 
                   {isLoading && (
                     <Box
@@ -510,9 +510,9 @@ const HowToGuide = ({ initialGuidesData }) => {
                     access our detailed step-by-step guides
                   </Typography>
                 </Box>
-              </motion.div>
+              </m.div>
             ) : (
-              <motion.div
+              <m.div
                 key="guide-content"
                 initial="hidden"
                 animate="visible"
@@ -713,14 +713,14 @@ const HowToGuide = ({ initialGuidesData }) => {
                     </Box>
                   )}
                 </Box>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </Container>
 
         <Footer />
       </Box>
-    </motion.div>
+    </m.div>
   );
 };
 

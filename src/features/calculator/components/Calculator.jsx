@@ -35,7 +35,7 @@ import dynamic from "next/dynamic";
 const Confetti = dynamic(() => import("react-confetti"), { ssr: false });
 import ReferralButton from "./ReferralButton";
 import { useRegion } from "@/core/providers/RegionContext";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import {
   useAnalytics,
   usePagePerformance,
@@ -330,7 +330,7 @@ function Calculator() {
   }), [selectedBank, selectedCard, selectedMcc, spentAmount, additionalInputs, calculationResult]);
 
   return (
-    <motion.div
+    <m.div
       variants={pageVariants}
       initial="hidden"
       animate="visible"
@@ -494,7 +494,7 @@ function Calculator() {
         )}
         <Footer />
       </Box>
-    </motion.div>
+    </m.div>
   );
 }
 

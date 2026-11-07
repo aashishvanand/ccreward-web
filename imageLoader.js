@@ -15,8 +15,13 @@ export default function smartLoader({ src, width, quality }) {
         return `/_vinext/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality || 75}`;
     }
 
-    if (src.startsWith('http')) {
+    if (src.startsWith('https://')) {
         return src;
+    }
+
+    // Never load remote images over plain http (mixed content / tampering).
+    if (src.startsWith('http://')) {
+        return `https://${src.slice('http://'.length)}`;
     }
 
     const params = [`width=${width}`];

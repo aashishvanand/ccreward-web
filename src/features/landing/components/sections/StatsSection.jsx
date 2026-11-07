@@ -5,134 +5,33 @@ import { Box, Container, Typography, Grid } from "@mui/material";
 import Counter from "./Counter";
 import { useRegion } from "@/core/providers/RegionContext";
 
-const StatsSection = () => {
+// Shown only if the server didn't pass counts
+const FALLBACK_STATS = {
+  IN: { cards: 300, banks: 20 },
+  SG: { cards: 200, banks: 13 },
+};
+
+// cardStats: { IN: { cards, banks }, SG: { cards, banks } }, computed on the server
+const StatsSection = ({ cardStats }) => {
   const { region, isInitialized } = useRegion();
-  const [stats, setStats] = useState({ cards: 0, banks: 0 });
-  const [isLoading, setIsLoading] = useState(true);
   const [hasAnimated, setHasAnimated] = useState(false);
   const sectionRef = useRef(null);
   const observerRef = useRef(null);
   const prevRegionRef = useRef(region);
 
-  const roundToNearestFifty = (num) => {
-    const rounded = Math.floor(num / 50) * 50;
-    return rounded;
-  };
+  const isLoading = !isInitialized || !region;
+  const stats = (region && (cardStats?.[region] || FALLBACK_STATS[region])) || { cards: 0, banks: 0 };
 
-  const roundToNearestTen = (num) => {
-    const rounded = Math.floor(num / 10) * 10;
-    return rounded;
-  };
+  const roundToNearestFifty = (num) => Math.floor(num / 50) * 50;
+  const roundToNearestTen = (num) => Math.floor(num / 10) * 10;
 
-  // Reset stats and loading state when region changes
+  // Replay the counter animation when the region changes
   useEffect(() => {
     if (prevRegionRef.current !== region) {
-      // Reset stats and trigger a refetch when region changes
-      setIsLoading(true);
-      setStats({ cards: 0, banks: 0 });
       setHasAnimated(false);
       prevRegionRef.current = region;
     }
   }, [region]);
-
-  // Data fetching effect - only run when region is initialized
-  useEffect(() => {
-    const fetchStats = async () => {
-      // Don't fetch if region is not initialized or not available
-      if (!isInitialized || !region) {
-        setIsLoading(true);
-        return;
-      }
-
-      try {
-
-        setIsLoading(true);
-        
-        // Generate cache key for cards data
-        const cacheKey = `cardsData_${region.toLowerCase()}`;
-        
-        // Check if we have recent cached cards data first
-        const cachedData = localStorage.getItem(cacheKey);
-        if (cachedData) {
-          try {
-            const { data: cardsData, timestamp } = JSON.parse(cachedData);
-            const cacheAge = Date.now() - timestamp;
-            const cacheExpirationTime = 24 * 60 * 60 * 1000; // 24 hours
-            
-            if (cacheAge < cacheExpirationTime && cardsData && cardsData.issuers) {
-
-              
-              // Count total cards and banks from the cached data
-              const issuers = Object.keys(cardsData.issuers);
-              const totalCards = Object.values(cardsData.issuers).reduce((total, issuer) => {
-                return total + (issuer.cards ? issuer.cards.length : 0);
-              }, 0);
-              
-              setStats({
-                cards: totalCards,
-                banks: issuers.length,
-              });
-              setIsLoading(false);
-              return;
-            }
-          } catch (cacheError) {
-            console.warn('Error parsing cached cards data:', cacheError);
-            localStorage.removeItem(cacheKey);
-          }
-        }
-        
-        // Fetch fresh cards data from the API
-        const url = `https://files.ccreward.app/cards_${region.toLowerCase()}.json`;
-
-        
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch cards data: ${response.status} ${response.statusText}`);
-        }
-        
-        const cardsData = await response.json();
-        
-        if (!cardsData || !cardsData.issuers) {
-          throw new Error('Invalid cards data format received');
-        }
-        
-        // Count total cards and banks from all issuers
-        const issuers = Object.keys(cardsData.issuers);
-        const totalCards = Object.values(cardsData.issuers).reduce((total, issuer) => {
-          return total + (issuer.cards ? issuer.cards.length : 0);
-        }, 0);
-        
-
-        
-        setStats({
-          cards: totalCards,
-          banks: issuers.length,
-        });
-        
-        // Save cards data to localStorage with region-specific key
-        localStorage.setItem(cacheKey, JSON.stringify({
-          data: cardsData,
-          timestamp: Date.now()
-        }));
-        
-      } catch (error) {
-        console.error('Error fetching stats for:', region, error);
-        
-        // Fallback to reasonable defaults based on region
-        const fallbackStats = {
-          cards: region === 'SG' ? 200 : region === 'IN' ? 300 : 100,
-          banks: region === 'SG' ? 13 : region === 'IN' ? 20 : 15,
-        };
-        
-
-        setStats(fallbackStats);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchStats();
-  }, [region, isInitialized]);
 
   // Setup and cleanup intersection observer
   useEffect(() => {

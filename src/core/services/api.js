@@ -4,6 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import { getTurnstileToken } from './turnstile';
 import { handleSuccessHeaders, handleLimitExceeded } from './usageLimitService';
 import { initAppCheck } from '@/firebase';
+import { safeSetItem } from '@/core/utils/storage';
 
 /**
  * Firebase App Check token (Turnstile-backed custom provider) for the API, so it can
@@ -41,9 +42,6 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000;
 const api = axios.create({
     baseURL: API_BASE_URL,
     timeout: 10000, // 10 seconds timeout
-    headers: {
-        'Accept-Encoding': 'gzip, deflate, br',
-    },
 });
 
 // Configure retries
@@ -55,38 +53,52 @@ axiosRetry(api, {
     }
 });
 
-let currentToken = null;
-let tokenRefreshPromise = null;
+// Cached ID token, keyed by uid so a different account never reuses it
+let currentToken = null; // { uid, token }
+let tokenRefreshPromise = null; // { uid, promise }
 
+/**
+ * Firebase ID token for the signed-in user, or null when nobody is signed in
+ * (public endpoints are called without an Authorization header).
+ */
 const getToken = async () => {
     const { getAuth, getIdToken } = await getAuthModule();
-    const auth = getAuth();
-    if (!auth.currentUser) {
-        throw new Error('No user is currently signed in');
+    const user = getAuth().currentUser;
+    if (!user) {
+        currentToken = null;
+        return null;
     }
-    if (currentToken && !isTokenExpired(currentToken)) {
-        return currentToken;
+    if (currentToken?.uid === user.uid && !isTokenExpired(currentToken.token)) {
+        return currentToken.token;
     }
-    if (!tokenRefreshPromise) {
-        tokenRefreshPromise = getIdToken(auth.currentUser, true)
+    if (tokenRefreshPromise?.uid !== user.uid) {
+        const promise = getIdToken(user, true)
             .then(token => {
-                currentToken = token;
-                tokenRefreshPromise = null;
+                currentToken = { uid: user.uid, token };
                 return token;
             })
-            .catch(error => {
-                tokenRefreshPromise = null;
-                throw error;
+            .finally(() => {
+                if (tokenRefreshPromise?.promise === promise) tokenRefreshPromise = null;
             });
+        tokenRefreshPromise = { uid: user.uid, promise };
     }
-    return tokenRefreshPromise;
+    return tokenRefreshPromise.promise;
 };
+
+/** Forget the cached ID token. Call on logout and account deletion. */
+export const clearAuthToken = () => {
+    currentToken = null;
+    tokenRefreshPromise = null;
+};
+
+// Treat tokens as expired a minute early so they don't lapse in flight
+const TOKEN_EXPIRY_MARGIN_MS = 60 * 1000;
 
 // Function to check if a token is expired
 export const isTokenExpired = (token) => {
     try {
         const decodedToken = jwtDecode(token);
-        return decodedToken.exp * 1000 < Date.now();
+        return decodedToken.exp * 1000 - TOKEN_EXPIRY_MARGIN_MS < Date.now();
     } catch (error) {
         console.error('Error decoding token:', error);
         return true;
@@ -113,12 +125,10 @@ const getFromCache = (key) => {
     return null;
 };
 
-// Helper function to set data to cache
+// Helper function to set data to cache. Never throws: a full or blocked
+// storage quota must not fail a request that already succeeded.
 const setToCache = (key, data) => {
-    if (typeof localStorage === 'undefined') {
-        return;
-    }
-    localStorage.setItem(key, JSON.stringify({ data, timestamp: Date.now() }));
+    safeSetItem(key, JSON.stringify({ data, timestamp: Date.now() }));
 };
 
 // Helper function to check if region is initialized
@@ -144,69 +154,38 @@ const getCountryCode = () => {
     return region.toLowerCase();
 };
 
-// Function to set the authentication token
-export const setAuthToken = (token) => {
-    if (token) {
-        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    } else {
-        delete api.defaults.headers.common['Authorization'];
-    }
-};
-
-// Initialize authentication
-export const initializeAuth = async () => {
-    const { getAuth, getIdToken } = await getAuthModule();
-    const auth = getAuth();
-    if (auth.currentUser) {
-        try {
-            const token = await getIdToken(auth.currentUser, true);
-            setAuthToken(token);
-            // Firebase Auth SDK manages token caching internally via IndexedDB.
-            // Do NOT store tokens in localStorage — they would be accessible to
-            // any JS on the page (XSS, third-party scripts).
-        } catch (error) {
-            console.error('Error initializing auth:', error);
-        }
-    }
-};
-
 // Interceptor to add the token to each request
 api.interceptors.request.use(async (config) => {
-    if (!config.headers['Authorization']) {
-        const token = await getToken();
-        config.headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    // Only add country parameter if region is initialized
-    const countryCode = getCountryCode();
-    if (countryCode) {
-        // Add country parameter to each request if not already present
-        if (!config.url.includes('country=')) {
-            const separator = config.url.includes('?') ? '&' : '?';
-            config.url = `${config.url}${separator}country=${countryCode}`;
+    // Add the country unless the caller passed one. Without a region, cancel the
+    // request before spending a Turnstile token on it.
+    const hasCountry = config.params?.country || config.url.includes('country=');
+    if (!hasCountry) {
+        const countryCode = getCountryCode();
+        if (!countryCode) {
+            console.warn('Skipping API request because region is not initialized:', config.url);
+            return Promise.reject(new Error('Region not initialized'));
         }
-    } else {
-        console.warn('Skipping API request because region is not initialized:', config.url);
-        // Cancel the request
-        return Promise.reject(new Error('Region not initialized'));
+        config.params = { ...config.params, country: countryCode };
     }
 
-    // Attach the App Check token on every request (non-blocking)
-    const appCheckToken = await getAppCheckHeaderToken();
+    const isPost = config.method?.toLowerCase() === 'post';
+
+    // Auth, App Check and Turnstile (POST only) are independent, so fetch them together.
+    // App Check and Turnstile are non-blocking: without them the request still goes out.
+    const [authToken, appCheckToken, turnstileToken] = await Promise.all([
+        config.headers['Authorization'] ? null : getToken(),
+        getAppCheckHeaderToken(),
+        isPost ? getTurnstileToken().catch(() => null) : null,
+    ]);
+
+    if (authToken) {
+        config.headers['Authorization'] = `Bearer ${authToken}`;
+    }
     if (appCheckToken) {
         config.headers['X-Firebase-AppCheck'] = appCheckToken;
     }
-
-    // Attach Turnstile token for bot protection on POST requests only (non-blocking)
-    if (config.method && config.method.toLowerCase() === 'post') {
-        try {
-            const turnstileToken = await getTurnstileToken();
-            if (turnstileToken) {
-                config.headers['X-Turnstile-Token'] = turnstileToken;
-            }
-        } catch {
-            // Non-critical — API should still work without Turnstile during rollout
-        }
+    if (turnstileToken) {
+        config.headers['X-Turnstile-Token'] = turnstileToken;
     }
 
     // Ensure URL has versioning — all endpoints now use v4
@@ -224,6 +203,14 @@ api.interceptors.response.use(
         return response;
     },
     (error) => {
+        // A rejected Turnstile token (expired or already used): retry once with a fresh one
+        const errorCode = error.response?.data?.code;
+        if (error.response?.status === 403 && errorCode === 'TURNSTILE_FAILED'
+            && error.config && !error.config._turnstileRetried) {
+            error.config._turnstileRetried = true;
+            delete error.config.headers['X-Turnstile-Token'];
+            return api.request(error.config);
+        }
         if (error.response?.status === 429) {
             const code = error.response.data?.code || error.response.data?.error;
             if (code === 'FEATURE_LIMIT_EXCEEDED') {
@@ -328,7 +315,7 @@ export const fetchBanks = async () => {
 
     return fetchWithCache(cacheKey, async () => {
         // Explicitly include region in request
-        const response = await api.get(`/bank?country=${region}`);
+        const response = await api.get('/bank', { params: { country: region } });
         return response.data;
     });
 };
@@ -341,7 +328,7 @@ export const fetchCards = async (bank) => {
     const cacheKey = `cards_${region}_${bank}`;
 
     return fetchWithCache(cacheKey, async () => {
-        const response = await api.get(`/card?bank=${bank}&country=${region}`);
+        const response = await api.get('/card', { params: { bank, country: region } });
         return response.data;
     });
 };
@@ -364,7 +351,8 @@ export const fetchMCC = async (search) => {
     mccCancelToken = axios.CancelToken.source();
 
     try {
-        const response = await api.get(`/mcc?search=${search}`, {
+        const response = await api.get('/mcc', {
+            params: { search },
             cancelToken: mccCancelToken.token,
         });
         return response.data;
@@ -388,8 +376,6 @@ let cardQuestionsCancelToken = null;
 
 // Fetch card questions for a specific bank and card
 export const fetchCardQuestions = async (bank, card) => {
-    const encodedBank = encodeURIComponent(bank);
-    const encodedCard = encodeURIComponent(card);
     const cacheKey = `questions_${bank}_${card}`;
 
     // Check cache first before cancelling — a cache hit needs no network request
@@ -405,7 +391,8 @@ export const fetchCardQuestions = async (bank, card) => {
     cardQuestionsCancelToken = axios.CancelToken.source();
 
     try {
-        const response = await api.get(`/cardQuestions?bank=${encodedBank}&card=${encodedCard}`, {
+        const response = await api.get('/cardQuestions', {
+            params: { bank, card },
             cancelToken: cardQuestionsCancelToken.token,
         });
         setToCache(cacheKey, response.data);
@@ -522,8 +509,8 @@ export const findTransferRoutes = async (data) => {
 
 // Fetch Card Details
 export const fetchCardDetails = async (bank, card, country) => {
-    // Check if region is initialized
-    if (!isRegionInitialized()) {
+    // Check if region is initialized (an explicit country is enough)
+    if (!country && !isRegionInitialized()) {
         console.warn('Cannot fetch card details: Region not initialized');
         return null;
     }
@@ -542,7 +529,7 @@ export const fetchCardDetails = async (bank, card, country) => {
     const cacheKey = `card_detail_${bank}_${encodedCard}_${region}`;
 
     return fetchWithCache(cacheKey, async () => {
-        const response = await api.get(`/v4/card/detail?bank=${bank}&card=${encodedCard}&country=${region}`);
+        const response = await api.get('/v4/card/detail', { params: { bank, card, country: region } });
         return response.data;
     });
 };
@@ -562,7 +549,7 @@ export const fetchCardGoals = async (bank, card, country) => {
     const cacheKey = `card_goals_${bank}_${encodedCard}_${region}`;
 
     return fetchWithCache(cacheKey, async () => {
-        const response = await api.get(`/v4/goals?bank=${bank}&card=${encodedCard}&country=${region}`);
+        const response = await api.get('/v4/goals', { params: { bank, card, country: region } });
         return response.data;
     });
 };

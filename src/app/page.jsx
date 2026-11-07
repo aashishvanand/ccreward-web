@@ -1,5 +1,7 @@
 import HomeClient from './HomeClient';
 import { appsJsonLd } from '../shared/constants/jsonLd';
+import { serializeJsonLd } from '@/core/utils/jsonLd';
+import { getCardStats } from '@/core/utils/cardStats';
 
 export const metadata = {
   title: {
@@ -25,9 +27,9 @@ export default function Home() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(appsJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(appsJsonLd) }}
       />
-      <HomeClient />
+      <HomeClient cardStats={getCardStats()} />
     </>
   );
 }

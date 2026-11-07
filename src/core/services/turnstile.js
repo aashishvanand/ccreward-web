@@ -20,7 +20,26 @@ const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 let _widgetId = null;
 let _scriptLoaded = false;
 let _scriptLoadPromise = null;
-let _tokenResolvers = [];
+// Resolver for the single in-flight token request (requests are serialized)
+let _pendingResolve = null;
+// Token produced when nobody was waiting (e.g. the first render). Used once.
+let _spareToken = null;
+// Tail of the request queue: each getTurnstileToken() waits for the previous one
+let _queue = Promise.resolve();
+
+// Turnstile tokens are valid for 300s; leave headroom for the request itself
+const SPARE_TOKEN_MAX_AGE_MS = 240 * 1000;
+const TOKEN_TIMEOUT_MS = 5000;
+
+const deliverToken = (token) => {
+  if (_pendingResolve) {
+    const resolve = _pendingResolve;
+    _pendingResolve = null;
+    resolve(token);
+  } else if (token) {
+    _spareToken = { token, at: Date.now() };
+  }
+};
 
 /**
  * Load the Turnstile script if not already loaded.
@@ -84,28 +103,44 @@ const renderWidget = () => {
   _widgetId = window.turnstile.render(container, {
     sitekey: SITE_KEY,
     size: 'invisible',
-    callback: (token) => {
-      // Resolve any pending token requests
-      const resolvers = _tokenResolvers;
-      _tokenResolvers = [];
-      resolvers.forEach((resolve) => resolve(token));
-    },
-    'error-callback': () => {
-      // Reject pending requests
-      const resolvers = _tokenResolvers;
-      _tokenResolvers = [];
-      resolvers.forEach((resolve) => resolve(null));
-    },
+    callback: (token) => deliverToken(token),
+    'error-callback': () => deliverToken(null),
     'expired-callback': () => {
-      // No-op: tokens are always freshly requested before each API call
+      _spareToken = null;
     },
   });
 };
 
 /**
- * Get a fresh Turnstile token. Always resets the widget and requests
- * a new token, since Turnstile tokens are single-use (consumed on
- * server-side verification).
+ * Request one fresh token from the widget. Callers must hold the queue.
+ */
+const requestToken = () => {
+  if (_spareToken) {
+    const { token, at } = _spareToken;
+    _spareToken = null;
+    if (Date.now() - at < SPARE_TOKEN_MAX_AGE_MS) return Promise.resolve(token);
+  }
+
+  return new Promise((resolve) => {
+    const timeoutId = setTimeout(() => {
+      if (_pendingResolve === finish) _pendingResolve = null;
+      resolve(null); // Don't block API calls indefinitely
+    }, TOKEN_TIMEOUT_MS);
+    const finish = (token) => {
+      clearTimeout(timeoutId);
+      resolve(token);
+    };
+    _pendingResolve = finish;
+
+    if (_widgetId !== null && window.turnstile) {
+      window.turnstile.reset(_widgetId);
+    }
+  });
+};
+
+/**
+ * Get a fresh Turnstile token. Tokens are single-use (consumed on server-side
+ * verification), so concurrent callers are queued and each gets its own token.
  *
  * @returns {Promise<string|null>} The Turnstile token, or null if unavailable
  */
@@ -115,27 +150,13 @@ export const getTurnstileToken = async () => {
   try {
     await loadScript();
     renderWidget();
-
-    // Always request a fresh token (tokens are single-use)
-    return new Promise((resolve) => {
-      _tokenResolvers.push(resolve);
-
-      // Timeout after 5s — don't block API calls indefinitely
-      setTimeout(() => {
-        const idx = _tokenResolvers.indexOf(resolve);
-        if (idx !== -1) {
-          _tokenResolvers.splice(idx, 1);
-          resolve(null);
-        }
-      }, 5000);
-
-      if (_widgetId !== null && window.turnstile) {
-        window.turnstile.reset(_widgetId);
-      }
-    });
   } catch {
     return null;
   }
+
+  const result = _queue.then(requestToken, requestToken);
+  _queue = result.catch(() => null);
+  return result;
 };
 
 /**

@@ -10,6 +10,7 @@ import {
 } from "react";
 import RegionSelectionModal from '../../shared/components/layout/RegionSelectionModal';
 import { isCrawler } from '../utils/deviceUtils';
+import { safeSetItem } from '../utils/storage';
 
 // Define supported regions
 export const REGIONS = {
@@ -92,9 +93,6 @@ export function RegionProvider({ children }) {
     updateRegion(selectedRegion);
   }, [updateRegion]);
 
-  // Add this import at the top
-  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-
   useEffect(() => {
     // Prevent multiple initializations
     if (initRef.current || initializationInProgress) {
@@ -138,6 +136,12 @@ export function RegionProvider({ children }) {
 
         if (urlRegion && isValidRegion(urlRegion)) {
            const upperUrlRegion = urlRegion.toUpperCase();
+           // The API layer reads app-region, so seed it for first-time visitors
+           // (without overriding a region they already have).
+           if (!localStorage.getItem("app-region")) {
+             safeSetItem("app-region", upperUrlRegion);
+             safeSetItem("user-set-region", "false");
+           }
            setRegion(upperUrlRegion);
            // We do NOT set user-set-region to true for URL params to avoid persistent override from a temporary link
            // But we treat it as initialized.
@@ -173,8 +177,8 @@ export function RegionProvider({ children }) {
             if (Object.keys(REGIONS).includes(countryCode)) {
               // Auto-detect supported region
               // Only save if we are auto-detecting, not overrides
-              localStorage.setItem("app-region", countryCode);
-              localStorage.setItem("user-set-region", "false");
+              safeSetItem("app-region", countryCode);
+              safeSetItem("user-set-region", "false");
               setRegion(countryCode);
               setHasUserSetRegion(false);
               setIsInitialized(true);
@@ -199,13 +203,10 @@ export function RegionProvider({ children }) {
       }
     }
 
-    // Small delay to ensure DOM is ready and prevent race conditions
-    const timeoutId = setTimeout(initializeRegion, 100);
-    
-    return () => {
-      clearTimeout(timeoutId);
-      initializationInProgress = false;
-    };
+    // Runs right away: the URL and localStorage checks are synchronous, so
+    // returning visitors get their region in the first effect pass. Only
+    // first-time visitors wait for the /_geo lookup.
+    initializeRegion();
   }, []);
 
   // Global event listener to prevent multiple modals across different provider instances

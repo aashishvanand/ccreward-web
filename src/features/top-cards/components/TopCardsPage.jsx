@@ -29,7 +29,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useRegion } from "@/core/providers/RegionContext";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 // Add analytics imports
 import {
@@ -59,7 +59,7 @@ const pageVariants = {
   },
 };
 
-const categories = [
+const ALL_CATEGORIES = [
   "Education",
   "Entertainment",
   "Food & Dining",
@@ -77,7 +77,7 @@ const categories = [
   "Wallet Loading",
 ];
 
-const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = "" }) => {
+const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = "", initialRegion = null }) => {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -92,6 +92,8 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
   const { trackCustomEngagement } = useEngagementTracking();
   const { trackComponentError } = useComponentAnalytics("TopCardsPage");
 
+  // Only offer categories this region has data (and a generated route) for.
+  const categories = ALL_CATEGORIES.filter((cat) => cat in (initialCategories || {}));
   const [category, setCategory] = useState(initialCategory || "");
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
@@ -101,12 +103,12 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
     severity: "success",
   });
   const { cardImagesData, isLoading: isLoadingCardImages } =
-    useCardImagesData(initialCardImages);
+    useCardImagesData(initialCardImages, initialRegion);
   const {
     categories: categoriesData,
     isLoading: isLoadingCategories,
     error: categoriesError,
-  } = useCardCategories(initialCategories);
+  } = useCardCategories(initialCategories, initialRegion);
   const [isValidating, setIsValidating] = useState(false);
 
   // Track page load
@@ -394,7 +396,7 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
   }
 
   return (
-    <motion.div
+    <m.div
       variants={pageVariants}
       initial="hidden"
       animate="visible"
@@ -499,7 +501,7 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
 
         <Footer />
       </Box>
-    </motion.div>
+    </m.div>
   );
 };
 

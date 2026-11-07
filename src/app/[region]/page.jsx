@@ -2,6 +2,7 @@ import HomeClient from '../HomeClient';
 import cardsIN from '@/data/cards_in.json';
 import cardsSG from '@/data/cards_sg.json';
 import { bankPath, categoryPath } from '@/core/utils/slug';
+import { getCardStats } from '@/core/utils/cardStats';
 
 // Only allow valid region values
 export const dynamicParams = false;
@@ -55,7 +56,7 @@ export default async function RegionPage({ params }) {
 
     return (
         <>
-            <HomeClient region={region} />
+            <HomeClient region={region} cardStats={getCardStats()} />
             {/* Crawlable bank/category links; hidden by HomeClient after hydration. Kept after
                 the page so it never flashes above the header before hiding. */}
             <article data-ssr-content="region">

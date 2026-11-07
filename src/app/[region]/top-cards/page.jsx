@@ -53,7 +53,7 @@ export default async function TopCards({ params }) {
     return (
         <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
             <PerformanceWrapper name="top_cards_page">
-                <TopCardsPage initialCategories={categories} initialCardImages={images} />
+                <TopCardsPage initialCategories={categories} initialCardImages={images} initialRegion={targetRegion} />
             </PerformanceWrapper>
         </Suspense>
     );

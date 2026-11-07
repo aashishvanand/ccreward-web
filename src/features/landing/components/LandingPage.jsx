@@ -28,7 +28,7 @@ import { detectDevice } from "@/core/utils/deviceUtils";
 import TopSearchs from "./sections/TopSearchs";
 import StatsSection from "./sections/StatsSection";
 import GoogleOneTap from "@/shared/components/auth/GoogleOneTap";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import debounce from "lodash/debounce";
 
 // Add analytics imports - FIXED
@@ -65,7 +65,7 @@ const pageVariants = {
 };
 
 // Main LandingPage component that orchestrates all sections and tracking
-const LandingPage = () => {
+const LandingPage = ({ cardStats }) => {
   const router = useRouter();
   const {
     signInWithGoogle,
@@ -486,6 +486,7 @@ const LandingPage = () => {
   );
 
   const commonProps = {
+    cardStats,
     visibleTweets,
     handlePrevPage,
     handleNextPage,
@@ -502,7 +503,7 @@ const LandingPage = () => {
   };
 
   return (
-    <motion.div
+    <m.div
       variants={pageVariants}
       initial="hidden"
       animate="visible"
@@ -528,12 +529,13 @@ const LandingPage = () => {
           />
         )}
       </Box>
-    </motion.div>
+    </m.div>
   );
 };
 
 // Enhanced Mobile View with analytics
 const MobileView = ({
+  cardStats,
   deviceInfo,
   visibleTweets,
   handlePrevPage,
@@ -649,7 +651,7 @@ const MobileView = ({
             data-section="stats"
             sx={{ bgcolor: "background.paper" }}
           >
-            <StatsSection />
+            <StatsSection cardStats={cardStats} />
           </Box>
 
           <>
@@ -718,6 +720,7 @@ const MobileView = ({
 
 // Enhanced Desktop View with analytics
 const DesktopView = ({
+  cardStats,
   cardImages,
   isMobile,
   isTablet,
@@ -793,7 +796,7 @@ const DesktopView = ({
           data-section="stats"
           sx={{ bgcolor: "background.paper" }}
         >
-          <StatsSection />
+          <StatsSection cardStats={cardStats} />
         </Box>
 
         <>

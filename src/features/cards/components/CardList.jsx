@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import useCardImagesData from "@/core/hooks/useCardImagesData";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
@@ -145,20 +145,20 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
   if (isLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-        <motion.div
+        <m.div
           variants={loadingSpinnerVariants}
           initial="hidden"
           animate="visible"
         >
           <CircularProgress />
-        </motion.div>
+        </m.div>
       </Box>
     );
   }
 
   if (error) {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
@@ -166,13 +166,13 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
         <Alert severity="error" sx={{ my: 2 }}>
           Error loading card data. Please try again later.
         </Alert>
-      </motion.div>
+      </m.div>
     );
   }
 
   if (!Array.isArray(cards) || cards.length === 0) {
     return (
-      <motion.div
+      <m.div
         variants={emptyStateVariants}
         initial="hidden"
         animate="visible"
@@ -196,7 +196,7 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
             to get started!
           </Typography>
 
-          <motion.div
+          <m.div
             initial={{ scale: 0, opacity: 0 }}
             animate={{
               scale: 1,
@@ -227,15 +227,15 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                 opacity: 0.7,
               }}
             />
-          </motion.div>
+          </m.div>
         </Box>
-      </motion.div>
+      </m.div>
     );
   }
 
   return (
     <>
-      <motion.div
+      <m.div
         variants={listContainerVariants}
         initial="hidden"
         animate="visible"
@@ -261,7 +261,7 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
               const isRemoving = removingCard === cardKey;
 
               return (
-                <motion.div
+                <m.div
                   key={cardKey}
                   layout
                   variants={cardVariants}
@@ -280,7 +280,7 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                   }}
                 >
                   <ImageListItem sx={{ width: "100%" }}>
-                    <motion.div
+                    <m.div
                       onClick={() => handleCardClick(card)}
                       style={{ cursor: "pointer" }}
                     >
@@ -301,7 +301,7 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                           }}
                         >
                           {card.image ? (
-                             <motion.div
+                             <m.div
                               initial={{ opacity: 0 }}
                               animate={{
                                 opacity: 1,
@@ -314,7 +314,7 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                                 orientation={card.orientation}
                                 width="100%"
                             />
-                            </motion.div>
+                            </m.div>
                           ) : (
                                 <Box sx={{ 
                                     aspectRatio: card.orientation === "vertical" ? "0.63/1" : "1.59/1",
@@ -338,7 +338,7 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                           }}
                         >
                           <Stack spacing={0.5}>
-                            <motion.div
+                            <m.div
                               initial={{ opacity: 0, x: -5 }}
                               animate={{
                                 opacity: 1,
@@ -363,8 +363,8 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                               >
                                 {card.cardName}
                               </Typography>
-                            </motion.div>
-                            <motion.div
+                            </m.div>
+                            <m.div
                               initial={{ opacity: 0, x: -5 }}
                               animate={{
                                 opacity: 1,
@@ -391,18 +391,18 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                                 }}>
                                 {card.bank}
                               </Typography>
-                            </motion.div>
+                            </m.div>
                           </Stack>
                         </Box>
                       </Paper>
-                    </motion.div>
+                    </m.div>
                   </ImageListItem>
-                </motion.div>
+                </m.div>
               );
             })}
           </AnimatePresence>
         </ImageList>
-      </motion.div>
+      </m.div>
       <CardDetailsModal
         open={detailsModalOpen}
         onClose={() => setDetailsModalOpen(false)}

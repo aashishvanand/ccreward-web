@@ -11,7 +11,7 @@ import {
   GlobalStyles,
 } from "@mui/material";
 import { Twitter, Instagram, Reddit, Telegram } from "@mui/icons-material";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 // Animation variants
 const footerVariants = {
@@ -79,7 +79,7 @@ const linkVariants = {
 
 function Footer() {
   return (
-    <motion.div
+    <m.div
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.3 }}
@@ -106,13 +106,13 @@ function Footer() {
               mb: 3,
             }}
           >
-            <motion.div variants={itemVariants}>
+            <m.div variants={itemVariants}>
               <Stack direction="row" spacing={2} sx={{ mb: { xs: 2, md: 0 } }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                   Follow Us
                 </Typography>
 
-                <motion.div
+                <m.div
                   variants={socialIconVariants}
                   whileHover="hover"
                   whileTap="tap"
@@ -127,9 +127,9 @@ function Footer() {
                   >
                     <Twitter aria-hidden="true" />
                   </IconButton>
-                </motion.div>
+                </m.div>
 
-                <motion.div
+                <m.div
                   variants={socialIconVariants}
                   whileHover="hover"
                   whileTap="tap"
@@ -144,9 +144,9 @@ function Footer() {
                   >
                     <Instagram aria-hidden="true" />
                   </IconButton>
-                </motion.div>
+                </m.div>
 
-                <motion.div
+                <m.div
                   variants={socialIconVariants}
                   whileHover="hover"
                   whileTap="tap"
@@ -161,9 +161,9 @@ function Footer() {
                   >
                     <Reddit aria-hidden="true" />
                   </IconButton>
-                </motion.div>
+                </m.div>
 
-                <motion.div
+                <m.div
                   variants={socialIconVariants}
                   whileHover="hover"
                   whileTap="tap"
@@ -178,11 +178,11 @@ function Footer() {
                   >
                     <Telegram aria-hidden="true" />
                   </IconButton>
-                </motion.div>
+                </m.div>
               </Stack>
-            </motion.div>
+            </m.div>
 
-            <motion.div variants={itemVariants}>
+            <m.div variants={itemVariants}>
               <Stack
                 direction={{ xs: "column", sm: "row" }}
                 spacing={{ xs: 1, sm: 3 }}
@@ -190,8 +190,8 @@ function Footer() {
                   alignItems: "center"
                 }}
               >
-                {["terms", "privacy", "howto", "faq"].map((page, idx) => (
-                  <motion.div
+                {["terms", "privacy", "accessibility", "howto", "faq"].map((page, idx) => (
+                  <m.div
                     key={page}
                     variants={linkVariants}
                     whileHover="hover"
@@ -209,21 +209,23 @@ function Footer() {
                         ? "Terms of Service"
                         : page === "privacy"
                         ? "Privacy Policy"
+                        : page === "accessibility"
+                        ? "Accessibility"
                         : page === "howto"
                         ? "How-to Guides"
                         : "FAQs"}
                     </Link>
-                  </motion.div>
+                  </m.div>
                 ))}
               </Stack>
-            </motion.div>
+            </m.div>
           </Box>
 
-          <motion.div variants={itemVariants}>
+          <m.div variants={itemVariants}>
             <Divider sx={{ my: 2 }} />
-          </motion.div>
+          </m.div>
 
-          <motion.div variants={itemVariants}>
+          <m.div variants={itemVariants}>
             <Box sx={{ textAlign: "center" }}>
               <Typography
                 variant="body2"
@@ -249,7 +251,7 @@ function Footer() {
                 their respective owners and are used only for identification.
               </Typography>
 
-              <motion.div
+              <m.div
                 initial={{ opacity: 0.6 }}
                 whileHover={{
                   opacity: 1,
@@ -274,9 +276,9 @@ function Footer() {
                   </Box>{" "}
                   for credit card enthusiasts
                 </Typography>
-              </motion.div>
+              </m.div>
             </Box>
-          </motion.div>
+          </m.div>
         </Container>
       </Box>
       {/* Add keyframes for heartbeat animation */}
@@ -291,7 +293,7 @@ function Footer() {
           },
         }}
       />
-    </motion.div>
+    </m.div>
   );
 }
 

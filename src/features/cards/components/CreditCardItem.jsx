@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
 const bankColors = {
@@ -72,7 +72,7 @@ function CreditCardItem({ card, onDelete }) {
   const isHorizontal = card.orientation === "horizontal";
 
   return (
-    <motion.div
+    <m.div
       initial="initial"
       animate="animate"
       whileHover="hover"
@@ -133,7 +133,7 @@ function CreditCardItem({ card, onDelete }) {
             {card.cardName}
           </Typography>
         </CardContent>
-        <motion.div variants={deleteButtonVariants}>
+        <m.div variants={deleteButtonVariants}>
           <IconButton
             aria-label="delete card"
             onClick={() => onDelete(card.id)}
@@ -150,9 +150,9 @@ function CreditCardItem({ card, onDelete }) {
           >
             <DeleteIcon sx={{ color: "white", fontSize: "1rem" }} />
           </IconButton>
-        </motion.div>
+        </m.div>
       </Card>
-    </motion.div>
+    </m.div>
   );
 }
 

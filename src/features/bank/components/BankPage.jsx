@@ -22,7 +22,7 @@ import TopCardsGrid from "../../top-cards/components/TopCardsGrid";
 import { useAuth } from "@/core/providers/AuthContext";
 import SignInDialog from "@/shared/components/auth/SignInDialog";
 import useCardImagesData from "@/core/hooks/useCardImagesData";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 // Add analytics imports
 import {
@@ -330,7 +330,7 @@ const BankPage = ({ bank, cards }) => {
   const bankCards = getCardsWithImages();
 
   return (
-    <motion.div
+    <m.div
       variants={pageVariants}
       initial="hidden"
       animate="visible"
@@ -405,7 +405,7 @@ const BankPage = ({ bank, cards }) => {
 
         <Footer />
       </Box>
-    </motion.div>
+    </m.div>
   );
 };
 
