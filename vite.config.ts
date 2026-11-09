@@ -31,7 +31,6 @@ export default defineConfig({
             if (id.includes("/auth")) return "firebase-auth";
             if (id.includes("/analytics")) return "firebase-analytics";
             if (id.includes("/performance")) return "firebase-performance";
-            if (id.includes("/firestore")) return "firebase-firestore";
             if (id.includes("/app-check")) return "firebase-app-check";
             if (id.includes("/app")) return "firebase-app";
             return "firebase-common";

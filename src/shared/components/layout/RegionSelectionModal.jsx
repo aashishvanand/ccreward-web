@@ -13,6 +13,7 @@ import {
   Chip,
   Alert,
   useTheme,
+  alpha,
 } from "@mui/material";
 import { LocationOn, VpnKey } from "@mui/icons-material";
 
@@ -149,13 +150,13 @@ const RegionSelectionModal = ({ open, onRegionSelect, detectedCountry }) => {
                 cursor: 'pointer',
                 border: 2,
                 borderColor: selectedRegion === region.code ? 'primary.main' : 'divider',
-                backgroundColor: selectedRegion === region.code ? 'primary.50' : 'background.paper',
+                backgroundColor: (t) => selectedRegion === region.code ? alpha(t.palette.primary.main, 0.12) : t.palette.background.paper,
                 transition: 'transform 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out',
                 transform: selectedRegion === region.code ? 'scale(1.02)' : 'scale(1)',
                 boxShadow: selectedRegion === region.code ? 4 : 1,
                 '&:hover': {
                   borderColor: 'primary.main',
-                  backgroundColor: 'primary.50',
+                  backgroundColor: (t) => alpha(t.palette.primary.main, selectedRegion === region.code ? 0.12 : 0.08),
                   transform: 'scale(1.01)',
                   boxShadow: 3,
                 }

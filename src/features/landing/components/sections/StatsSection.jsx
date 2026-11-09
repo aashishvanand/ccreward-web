@@ -139,7 +139,7 @@ const StatsSection = ({ cardStats }) => {
                 sx={{
                   color: "text.secondary",
                   fontSize: { xs: "1rem", sm: "1.25rem" },
-                  fontWeight: "regular"
+                  fontWeight: 400
                 }}>
                 Credit Cards
               </Typography>
@@ -172,7 +172,7 @@ const StatsSection = ({ cardStats }) => {
                 sx={{
                   color: "text.secondary",
                   fontSize: { xs: "1rem", sm: "1.25rem" },
-                  fontWeight: "regular"
+                  fontWeight: 400
                 }}>
                 Banks
               </Typography>

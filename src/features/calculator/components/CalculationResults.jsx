@@ -10,6 +10,7 @@ import {
   CircularProgress,
   useMediaQuery,
   useTheme,
+  alpha,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
@@ -139,13 +140,13 @@ const CalculationResults = ({ result, isLoading }) => {
               overflow: "hidden",
               position: "relative",
             },
-            hasRewards
-              ? {
-                  bgcolor: "success.light",
-                }
-              : {
-                  bgcolor: "error.light",
-                },
+            (theme) => {
+              const tone = hasRewards ? theme.palette.success.main : theme.palette.error.main;
+              return {
+                bgcolor: alpha(tone, 0.12),
+                border: `1px solid ${tone}`,
+              };
+            },
           ]}
         >
           {isLoading ? (

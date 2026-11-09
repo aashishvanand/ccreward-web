@@ -31,3 +31,28 @@ html.dark-mode body {
   background-color: #0F172A;
   color: #F9FAFB;
 }
+
+/* Skip link: hidden until focused with the keyboard */
+.skip-link {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10000;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: #1e40af;
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+main:focus {
+  outline: none;
+}

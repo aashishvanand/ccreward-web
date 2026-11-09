@@ -3,49 +3,22 @@
 import { Box, Container, Typography, Grid, Card } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { useRegion } from "@/core/providers/RegionContext";
 import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 import { bankPath } from "@/core/utils/slug";
+import bankImagesIN from "@/data/bankImages_in.json";
+import bankImagesSG from "@/data/bankImages_sg.json";
 
 const BankSection = () => {
-  const { region, regionName, isInitialized } = useRegion();
-  const [bankData, setBankData] = useState([]);
-  
-  useEffect(() => {
-    if (region) {
-      const url = region === 'SG' 
-        ? 'https://files.ccreward.app/bankImages_sg.json'
-        : 'https://files.ccreward.app/bankImages_in.json';
-        
-      fetch(url)
-        .then(res => res.json())
-        .then(data => setBankData(data))
-        .catch(err => console.error("Failed to fetch bank data", err));
-    }
-  }, [region]);
-  
-  // Don't render if region is not initialized or bankData is empty
-  if (!isInitialized || !region || bankData.length === 0) {
-    return (
-      <Box sx={{ py: 8 }}>
-        <Container maxWidth="lg">
-          <Typography variant="h3" align="center" gutterBottom sx={{ mb: 6 }}>
-            Loading Banks...
-          </Typography>
-        </Container>
-      </Box>
-    );
-  }
-  
-  // Select bank data based on region - already handled by state
-
+  const { region, regionName } = useRegion();
+  // Bundled at build time by scripts/fetch-static-data.js, so the logos render with the page
+  const bankData = region === "SG" ? bankImagesSG : bankImagesIN;
 
   return (
     <Box sx={{ py: 8 }}>
       <Container maxWidth="lg">
         <Typography variant="h3" align="center" gutterBottom sx={{ mb: 6 }}>
-          Supported Banks {regionName}
+          Supported Banks{region ? ` ${regionName}` : ""}
         </Typography>
         <Grid container spacing={2} sx={{ justifyContent: "center" }}>
           {bankData.map((bank) => (

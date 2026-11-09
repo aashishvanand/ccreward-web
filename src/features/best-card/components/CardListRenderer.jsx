@@ -9,6 +9,8 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
+  Chip,
+  alpha,
 } from "@mui/material";
 import Image from "next/image";
 import { CreditCard as CreditCardIcon } from "@mui/icons-material";
@@ -75,7 +77,7 @@ const CardListRenderer = ({
         alt={`${card.bank} ${card.cardName}`}
         width={isHorizontal ? 60 : 40}
         height={isHorizontal ? 40 : 60}
-        objectFit="contain"
+        style={{ objectFit: "contain" }}
         onError={() => handleImageError(card.id)}
         unoptimized
       />
@@ -121,9 +123,10 @@ const CardListRenderer = ({
             width: "100%",
           },
           index === 0
-            ? {
-                bgcolor: "success.light",
-              }
+            ? (theme) => ({
+                bgcolor: alpha(theme.palette.success.main, 0.1),
+                border: `1px solid ${theme.palette.success.main}`,
+              })
             : {
                 bgcolor: "background.paper",
               },
@@ -149,34 +152,19 @@ const CardListRenderer = ({
           </ListItemIcon>
           <ListItemText
             primary={
-              <Typography
-                variant="h6"
-                component="div"
-                sx={[
-                  index === 0
-                    ? {
-                        color: "success.contrastText",
-                      }
-                    : {
-                        color: "text.primary",
-                      },
-                ]}
-              >
-                {`${index + 1}. ${card.bank} - ${card.cardName}`}
-              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
+                <Typography variant="h6" component="div" sx={{ color: "text.primary" }}>
+                  {`${index + 1}. ${card.bank} - ${card.cardName}`}
+                </Typography>
+                {index === 0 && (
+                  <Chip label="Best match" color="success" size="small" sx={{ fontWeight: 600 }} />
+                )}
+              </Box>
             }
             secondary={
               <Typography
                 variant="body1"
-                sx={[
-                  index === 0
-                    ? {
-                        color: "success.contrastText",
-                      }
-                    : {
-                        color: "text.secondary",
-                      },
-                ]}
+                sx={{ color: "text.secondary" }}
               >
                 {card.rewardText}
               </Typography>

@@ -31,6 +31,7 @@ import {
   SwapHoriz as SwapHorizIcon,
 } from "@mui/icons-material";
 import { useAuth } from "@/core/providers/AuthContext";
+import SignInButtons from "@/shared/components/auth/SignInButtons";
 import { useRegion } from "@/core/providers/RegionContext";
 import { getUserCards } from "@/core/services/api";
 import {
@@ -78,7 +79,7 @@ const pageVariants = {
 const TransferCalculator = () => {
   const theme = useTheme();
   const { region, isInitialized } = useRegion();
-  const { user, isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading, signInWithGoogle, signInWithApple } = useAuth();
   const { remaining, limit, canUse, limitMessage } =
     useUsageLimit(RateLimitedFeature.TRANSFERS);
 
@@ -634,8 +635,16 @@ const TransferCalculator = () => {
                   </Button>
                 </Stack>
                 {!isAuthenticated() && (
-                  <Alert severity="warning">
-                    Please sign in to calculate transfer partners.
+                  <Alert severity="info" sx={{ "& .MuiAlert-message": { width: "100%" } }}>
+                    Sign in to calculate transfer partners.
+                    <Box sx={{ mt: 1.5, maxWidth: 360 }}>
+                      <SignInButtons
+                        onGoogleSignIn={signInWithGoogle}
+                        onAppleSignIn={signInWithApple}
+                        fullWidth
+                        size="medium"
+                      />
+                    </Box>
                   </Alert>
                 )}
               </Stack>

@@ -3,6 +3,7 @@ import Script from "next/script";
 import Providers from './providers'
 import { baseJsonLd } from '../shared/constants/jsonLd';
 import ErrorBoundary from '../shared/components/ErrorBoundary';
+import SkipLink from '../shared/components/layout/SkipLink';
 import { serializeJsonLd } from '@/core/utils/jsonLd';
 
 // Root metadata — shared defaults. Pages override via generateMetadata().
@@ -79,6 +80,7 @@ function RootLayout({ children }) {
         />
       </head>
       <body suppressHydrationWarning>
+        <SkipLink />
         <ErrorBoundary componentName="RootLayout">
           <Providers>
             {children}

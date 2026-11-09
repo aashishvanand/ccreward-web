@@ -11,6 +11,7 @@ import {
   Stack,
   useTheme,
   useScrollTrigger,
+  alpha,
   Button,
 } from "@mui/material";
 import { Add as AddIcon, CreditCard as CreditCardIcon } from "@mui/icons-material";
@@ -560,16 +561,15 @@ function MyCardsPage() {
               width: 80,
               height: 80,
               borderRadius: "50%",
-              bgcolor: "primary.light",
+              bgcolor: alpha(theme.palette.primary.main, 0.1),
               color: "primary.main",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               mb: 2,
-              opacity: 0.1,
             }}
           >
-            <CreditCardIcon sx={{ fontSize: 48, opacity: 1 }} />
+            <CreditCardIcon sx={{ fontSize: 48 }} />
           </Box>
           <Typography variant="h5" gutterBottom sx={{
             fontWeight: "bold"

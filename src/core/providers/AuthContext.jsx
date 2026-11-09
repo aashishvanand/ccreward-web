@@ -2,7 +2,6 @@
 import PropTypes from 'prop-types';
 import { createContext, use, useEffect, useState, useRef } from 'react';
 import { getFirebaseAuth, firebaseApp, initAppCheck } from '@/firebase';
-import { deleteUserData } from '../services/firebaseUtils';
 import { resetUsageState } from '../services/usageLimitService';
 import { useRouter, usePathname } from "next/navigation";
 
@@ -184,24 +183,20 @@ export function AuthProvider({ children }) {
     try {
       if (!authRef.current?.currentUser) throw new Error("No user logged in");
 
-      const uid = authRef.current.currentUser.uid;
-
-      // 1. Delete user data from Firestore
-      await deleteUserData(uid);
-
-      // 2. Delete user from Firebase Auth
+      // 1. Delete user from Firebase Auth. This triggers ccreward-api /webhook/user-deleted,
+      //    which deletes the user's cards from D1.
       const { deleteUser } = await import('firebase/auth');
       await deleteUser(authRef.current.currentUser);
       await clearCachedApiToken();
 
-      // 3. Analytics
+      // 2. Analytics
       if (typeof window !== 'undefined') {
         const { getAnalytics, logEvent } = await import("firebase/analytics");
         const analytics = getAnalytics(firebaseApp);
         logEvent(analytics, 'delete_account');
       }
 
-      // 4. Cleanup local state
+      // 3. Cleanup local state
       setUser(null);
       setToken(null);
       setIsNewUser(false);

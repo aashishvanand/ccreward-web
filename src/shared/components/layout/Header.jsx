@@ -18,6 +18,7 @@ import {
   Badge,
   Avatar,
   Divider,
+  alpha,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -67,6 +68,18 @@ const REGION_CURRENCY_MAP = {
   // Add more regions as needed
 };
 
+// Header bar colour, derived from the theme. Dark mode uses primary.dark (#2563EB) so white text
+// keeps ~5:1 contrast; the brighter dark-mode primary.main (#3B82F6) would drop below 4.5:1.
+const getHeaderSx = (theme) => ({
+  backdropFilter: "blur(20px)",
+  backgroundColor: alpha(
+    theme.palette.mode === "dark" ? theme.palette.primary.dark : theme.palette.primary.main,
+    0.9
+  ),
+  color: theme.palette.primary.contrastText,
+  borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+});
+
 const headerVariants = {
   hidden: { opacity: 0, y: -20 },
   visible: {
@@ -110,7 +123,10 @@ function Header() {
   const router = useRouter();
   const pathname = usePathname() || "/";
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  // The text nav (6–7 buttons + region, theme, account) needs ~1250px; below lg use the hamburger menu.
+  const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
+  // From lg to xl the labels don't fit on one line, so show icons only (the tooltips name them).
+  const isCompactNav = useMediaQuery(theme.breakpoints.down("xl"));
   const [deviceInfo, setDeviceInfo] = useState({
     isMobile: false,
     isAndroid: false,
@@ -118,6 +134,7 @@ function Header() {
     isTablet: false,
   });
   const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileAnchorEl, setMobileAnchorEl] = useState(null);
   const [signInAnchorEl, setSignInAnchorEl] = useState(null);
   const [cardCount, setCardCount] = useState(0);
 
@@ -165,6 +182,14 @@ function Header() {
     setAnchorEl(null);
   };
 
+  const handleMobileMenuOpen = (event) => {
+    setMobileAnchorEl(event.currentTarget);
+  };
+
+  const handleMobileMenuClose = () => {
+    setMobileAnchorEl(null);
+  };
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -174,6 +199,7 @@ function Header() {
       console.error("Logout error:", error);
     }
     handleMenuClose();
+    handleMobileMenuClose();
   };
 
   const handleDeleteAccount = async () => {
@@ -187,6 +213,7 @@ function Header() {
       }
     }
     handleMenuClose();
+    handleMobileMenuClose();
   };
 
   const handleSignInMenuOpen = (event) => {
@@ -201,6 +228,7 @@ function Header() {
     try {
       handleSignInMenuClose();
       handleMenuClose();
+      handleMobileMenuClose();
       await signInWithGoogle();
     } catch (error) {
       console.error("Login error:", error);
@@ -211,16 +239,10 @@ function Header() {
     try {
       handleSignInMenuClose();
       handleMenuClose();
+      handleMobileMenuClose();
       await signInWithApple();
     } catch (error) {
       console.error("Login error:", error);
-    }
-  };
-
-  const handleNavigation = (path) => {
-    router.push(path);
-    if (isMobile) {
-      handleMenuClose();
     }
   };
 
@@ -285,6 +307,42 @@ function Header() {
     return navItems.map((item) => {
       const Icon = item.icon;
       const active = isActive(item.path);
+      const icon = item.badge ? (
+        <Badge
+          badgeContent={item.badge}
+          color="secondary"
+          max={99}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+        >
+          <Icon />
+        </Badge>
+      ) : (
+        <Icon />
+      );
+
+      if (isCompactNav) {
+        return (
+          <Tooltip key={item.path} title={item.label} arrow placement="bottom">
+            <IconButton
+              component={Link}
+              href={item.path}
+              color="inherit"
+              aria-label={item.label}
+              aria-current={active ? "page" : undefined}
+              sx={{
+                backgroundColor: active ? "rgba(255, 255, 255, 0.15)" : "transparent",
+                color: active ? "inherit" : "rgba(255, 255, 255, 0.8)",
+                "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.1)", color: "inherit" },
+              }}
+            >
+              {icon}
+            </IconButton>
+          </Tooltip>
+        );
+      }
 
       return (
         <Tooltip
@@ -297,26 +355,12 @@ function Header() {
             component={Link}
             href={item.path}
             color="inherit"
-            startIcon={
-              item.badge ? (
-                <Badge
-                  badgeContent={item.badge}
-                  color="secondary"
-                  max={99}
-                  anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                >
-                  <Icon />
-                </Badge>
-              ) : (
-                <Icon />
-              )
-            }
+            aria-current={active ? "page" : undefined}
+            startIcon={icon}
             sx={{
               mx: 0.5,
               px: 2,
+              whiteSpace: "nowrap",
               py: 1,
               borderRadius: 2,
               textTransform: "none",
@@ -340,12 +384,32 @@ function Header() {
     });
   };
 
+  const renderAccountSummary = () => (
+    <Box sx={{ px: 2, py: 1.5, display: "flex", alignItems: "center" }}>
+      <Avatar
+        src={user?.photoURL}
+        alt={user?.displayName || "User"}
+        sx={{ width: 40, height: 40, mr: 1.5 }}
+      >
+        {user?.displayName?.charAt(0) || <PersonIcon />}
+      </Avatar>
+      <Box sx={{ overflow: "hidden" }}>
+        <Typography variant="subtitle2" noWrap sx={{ fontWeight: 600 }}>
+          {user?.displayName || "User"}
+        </Typography>
+        <Typography variant="caption" noWrap sx={{ color: "text.secondary", display: "block" }}>
+          {user?.email}
+        </Typography>
+      </Box>
+    </Box>
+  );
+
   const renderMobileMenu = () => {
     return (
       <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
+        anchorEl={mobileAnchorEl}
+        open={Boolean(mobileAnchorEl)}
+        onClose={handleMobileMenuClose}
         slotProps={{
           paper: {
             sx: {
@@ -369,15 +433,15 @@ function Header() {
                 key={item.path}
                 component={Link}
                 href={item.path}
-                onClick={isMobile ? handleMenuClose : undefined}
+                onClick={handleMobileMenuClose}
                 sx={{
                   py: 1.5,
                   px: 2,
                   backgroundColor: active
-                    ? "rgba(25, 118, 210, 0.08)"
+                    ? alpha(theme.palette.primary.main, 0.08)
                     : "transparent",
                   "&:hover": {
-                    backgroundColor: "rgba(25, 118, 210, 0.04)",
+                    backgroundColor: alpha(theme.palette.primary.main, 0.04),
                   },
                 }}
               >
@@ -423,6 +487,32 @@ function Header() {
             </Box>
           )}
         </Box>
+
+        {isAuthenticated() && (
+          <Box sx={{ borderTop: 1, borderColor: "divider", mt: 1, pt: 1 }}>
+            {renderAccountSummary()}
+            <MenuItem onClick={handleLogout} sx={{ py: 1.5, px: 2 }}>
+              <ListItemIcon>
+                <LogoutIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary="Logout" />
+            </MenuItem>
+            <MenuItem
+              onClick={handleDeleteAccount}
+              sx={{
+                py: 1.5,
+                px: 2,
+                color: "error.main",
+                "&:hover": { backgroundColor: alpha(theme.palette.error.main, 0.04) },
+              }}
+            >
+              <ListItemIcon>
+                <DeleteIcon fontSize="small" color="error" />
+              </ListItemIcon>
+              <ListItemText primary="Delete Account" />
+            </MenuItem>
+          </Box>
+        )}
       </Menu>
     );
   };
@@ -447,33 +537,7 @@ function Header() {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        {isAuthenticated() && (
-          <Box sx={{ px: 2, py: 1.5 }}>
-             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-              <Avatar
-                src={user?.photoURL}
-                alt={user?.displayName || "User"}
-                 sx={{ width: 40, height: 40, mr: 1.5 }}
-              >
-                  {user?.displayName?.charAt(0) || <PersonIcon />}
-              </Avatar>
-              <Box sx={{ overflow: 'hidden' }}>
-                 <Typography variant="subtitle2" noWrap sx={{ fontWeight: 600 }}>
-                    {user?.displayName || "User"}
-                </Typography>
-                <Typography
-                  variant="caption"
-                  noWrap
-                  sx={{
-                    color: "text.secondary",
-                    display: 'block'
-                  }}>
-                    {user?.email}
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-        )}
+        {isAuthenticated() && renderAccountSummary()}
         <Divider />
         <MenuItem onClick={handleLogout} sx={{ py: 1.5, px: 2 }}>
           <ListItemIcon>
@@ -492,7 +556,7 @@ function Header() {
                     py: 1, 
                     px: 0, 
                     color: 'error.main',
-                    '&:hover': { backgroundColor: 'rgba(211, 47, 47, 0.04)' }
+                    '&:hover': { backgroundColor: alpha(theme.palette.error.main, 0.04) }
                 }}
             >
               <ListItemIcon sx={{ minWidth: 36 }}>
@@ -510,11 +574,7 @@ function Header() {
       <AppBar
         position="sticky"
         elevation={0}
-        sx={{
-          backdropFilter: "blur(20px)",
-          backgroundColor: "rgba(25, 118, 210, 0.9)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-        }}
+        sx={getHeaderSx}
       >
         <Toolbar sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
           {/* Logo Section */}
@@ -570,7 +630,7 @@ function Header() {
 
           {/* Desktop Navigation */}
           {!isMobile && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0 }}>
               {renderNavItems()}
 
               {/* Theme Toggle */}
@@ -639,6 +699,7 @@ function Header() {
                     onClick={handleSignInMenuOpen}
                     sx={{
                       ml: 1,
+                      whiteSpace: "nowrap",
                       borderColor: "rgba(255, 255, 255, 0.5)",
                       color: "inherit",
                       "&:hover": {
@@ -684,8 +745,10 @@ function Header() {
           {isMobile && (
             <IconButton
               color="inherit"
-              aria-label="menu"
-              onClick={handleMenuOpen}
+              aria-label="Open menu"
+              aria-haspopup="true"
+              aria-expanded={Boolean(mobileAnchorEl)}
+              onClick={handleMobileMenuOpen}
               sx={{
                 backgroundColor: "rgba(255, 255, 255, 0.1)",
                 "&:hover": {
@@ -723,11 +786,7 @@ export function MinimalHeader() {
       <AppBar
         position="sticky"
         elevation={0}
-        sx={{
-          backdropFilter: "blur(20px)",
-          backgroundColor: "rgba(25, 118, 210, 0.9)",
-          borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
-        }}
+        sx={getHeaderSx}
       >
         <Toolbar sx={{ px: { xs: 2, sm: 3 } }}>
           <m.div variants={logoVariants} whileHover="hover" whileTap="tap">

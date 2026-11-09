@@ -12,6 +12,7 @@ import {
   Chip,
 } from "@mui/material";
 import Link from "next/link";
+import { getCurrencySymbol } from "@/core/utils/currency";
 import {
   School as SchoolIcon,
   Theaters as TheatersIcon,
@@ -156,7 +157,7 @@ const TopCardsGrid = ({
                 {/* Referral badge */}
                 {referralInfo && (
                   <Chip
-                    label={`₹${referralInfo.amount} Referral`}
+                    label={`${getCurrencySymbol(region)}${referralInfo.amount} Referral`}
                     size="small"
                     color="success"
                     sx={{

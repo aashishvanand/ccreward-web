@@ -106,8 +106,8 @@ function CreditCardItem({ card, onDelete }) {
             <Image
               src={buildCloudflareImageUrl(card.imageId, "public")}
               alt={`${card.bank} ${card.cardName}`}
-              layout="fill"
-              objectFit="contain"
+              fill
+              style={{ objectFit: "contain" }}
               unoptimized
               sizes={
                 isHorizontal
