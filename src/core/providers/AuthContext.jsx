@@ -184,7 +184,8 @@ export function AuthProvider({ children }) {
       if (!authRef.current?.currentUser) throw new Error("No user logged in");
 
       // 1. Delete user from Firebase Auth. This triggers ccreward-api /webhook/user-deleted,
-      //    which deletes the user's cards from D1.
+      //    which deletes the user's cards from D1 and revokes the MCP key (which also ends
+      //    any OAuth access, since OAuth tokens run on the same mcp:<uid> credentials).
       const { deleteUser } = await import('firebase/auth');
       await deleteUser(authRef.current.currentUser);
       await clearCachedApiToken();

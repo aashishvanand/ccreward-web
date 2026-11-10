@@ -1,7 +1,5 @@
 import HomeClient from '../HomeClient';
-import cardsIN from '@/data/cards_in.json';
-import cardsSG from '@/data/cards_sg.json';
-import { bankPath, categoryPath } from '@/core/utils/slug';
+import { getLandingBrowseData } from '@/features/landing/landingBrowseData';
 import { getCardStats } from '@/core/utils/cardStats';
 
 // Only allow valid region values
@@ -47,56 +45,6 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function RegionPage({ params }) {
-    const resolvedParams = await params;
-    const { region } = resolvedParams;
-    const countryName = region === 'sg' ? 'Singapore' : 'India';
-    const cardsData = region === 'sg' ? cardsSG : cardsIN;
-    const banks = Object.keys(cardsData.issuers);
-    const totalCards = banks.reduce((sum, bank) => sum + (cardsData.issuers[bank]?.cards?.length || 0), 0);
-
-    return (
-        <>
-            <HomeClient region={region} cardStats={getCardStats()} />
-            {/* Crawlable bank/category links; hidden by HomeClient after hydration. Kept after
-                the page so it never flashes above the header before hiding. */}
-            <article data-ssr-content="region">
-                <header style={{ padding: '2rem 1rem', maxWidth: '1200px', margin: '0 auto' }}>
-                    <h2 style={{ fontSize: '2rem', fontWeight: 800, margin: '0 0 0.5rem' }}>
-                        ccreward {countryName} - Compare &amp; Maximize Credit Card Rewards
-                    </h2>
-                    <p style={{ fontSize: '1.1rem', color: '#666', maxWidth: '700px' }}>
-                        Compare {totalCards}+ credit cards from {banks.length} banks in {countryName}.
-                        Calculate exact rewards, find the best card for your spending, and maximize your credit card benefits.
-                    </p>
-                </header>
-
-                <section style={{ padding: '1rem', maxWidth: '1200px', margin: '0 auto' }}>
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>
-                        Supported Banks in {countryName}
-                    </h2>
-                    <ul style={{ lineHeight: 2, listStyle: 'none', padding: 0, display: 'flex', flexWrap: 'wrap', gap: '0.5rem 2rem' }}>
-                        {banks.map(bank => (
-                            <li key={bank}>
-                                <a href={bankPath(region, bank)}>
-                                    {bank} Credit Cards ({cardsData.issuers[bank]?.cards?.length || 0})
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
-                </section>
-
-                <section style={{ padding: '1rem', maxWidth: '1200px', margin: '0 auto' }}>
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Popular Categories</h2>
-                    <ul style={{ lineHeight: 2 }}>
-                        <li><a href={categoryPath(region, 'Online Shopping')}>Best Cards for Online Shopping</a></li>
-                        <li><a href={categoryPath(region, 'Travel & Transportation')}>Best Cards for Travel</a></li>
-                        <li><a href={categoryPath(region, 'Food & Dining')}>Best Cards for Dining</a></li>
-                        <li><a href={categoryPath(region, 'Groceries')}>Best Cards for Groceries</a></li>
-                        <li><a href={categoryPath(region, 'Petrol')}>Best Cards for Petrol</a></li>
-                        <li><a href={`/${region}/top-cards`}>View all categories</a></li>
-                    </ul>
-                </section>
-            </article>
-        </>
-    );
+    const { region } = await params;
+    return <HomeClient region={region} cardStats={getCardStats()} browse={getLandingBrowseData()} />;
 }

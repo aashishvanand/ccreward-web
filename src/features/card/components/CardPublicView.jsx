@@ -63,6 +63,7 @@ const CardPublicView = ({
   topPickCategories = [],
   similarCards = [],
   relatedCards = [],
+  facts = [],
 }) => {
   const theme = useTheme();
   const { signInWithGoogle, signInWithApple } = useAuth();
@@ -160,8 +161,9 @@ const CardPublicView = ({
                       .map((c) => c.name.toLowerCase())
                       .join(", ")}. `
                   : `An overview of the ${bankName} ${cardName} credit card in ${countryName}. `}
-                Sign in to see its joining and annual fees, reward rates by spend category, airport lounge
-                access, milestone benefits and excluded categories, and to calculate your exact rewards.
+                {facts.length > 0
+                  ? "Sign in to see its reward rates by spend category, milestone benefits and excluded categories, and to calculate your exact rewards."
+                  : "Sign in to see its joining and annual fees, reward rates by spend category, airport lounge access, milestone benefits and excluded categories, and to calculate your exact rewards."}
               </Typography>
               <Button
                 variant="contained"
@@ -170,11 +172,49 @@ const CardPublicView = ({
                 onClick={() => setOpenDialog(true)}
                 sx={{ borderRadius: 2, px: 4 }}
               >
-                Sign in to see fees & rewards
+                {facts.length > 0 ? "Sign in to see rewards" : "Sign in to see fees & rewards"}
               </Button>
             </Grid>
           </Grid>
         </Paper>
+
+        {/* KEY FACTS (public) */}
+        {facts.length > 0 && (
+          <Paper
+            elevation={0}
+            sx={{ p: { xs: 3, md: 4 }, mb: 4, borderRadius: 4, border: "1px solid", borderColor: "divider" }}
+          >
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 700, mb: 2 }}>
+              {bankName} {cardName} at a glance
+            </Typography>
+            <Box
+              component="dl"
+              sx={{
+                m: 0,
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" },
+                gap: 2,
+              }}
+            >
+              {facts.map((fact) => (
+                <Box
+                  key={fact.label}
+                  sx={{ p: 2, borderRadius: 2, bgcolor: alpha(theme.palette.primary.main, 0.04) }}
+                >
+                  <Typography component="dt" variant="body2" sx={{ color: "text.secondary", mb: 0.5 }}>
+                    {fact.label}
+                  </Typography>
+                  <Typography component="dd" sx={{ m: 0, fontWeight: 700 }}>
+                    {fact.value}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+            <Typography variant="caption" component="p" sx={{ color: "text.secondary", mt: 2 }}>
+              Fees exclude taxes. Check the bank&apos;s website for the latest terms before applying.
+            </Typography>
+          </Paper>
+        )}
 
         {/* TOP PICK CATEGORIES */}
         {topPickCategories.length > 0 && (

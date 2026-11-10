@@ -7,6 +7,7 @@ import CredentialPanel from "./CredentialPanel";
 import UsagePanel from "./UsagePanel";
 import BuyCreditsPanel from "./BuyCreditsPanel";
 import SetupInstructions from "./SetupInstructions";
+import ConnectedAppsPanel from "./ConnectedAppsPanel";
 
 function McpDashboard() {
   const [status, setStatus] = useState(null);
@@ -31,6 +32,8 @@ function McpDashboard() {
 
       <CredentialPanel status={status} onRefreshStatus={refreshStatus} />
 
+      <ConnectedAppsPanel onChange={refreshStatus} />
+
       <UsagePanel status={status} />
 
       <Suspense
@@ -46,14 +49,13 @@ function McpDashboard() {
         />
       </Suspense>
 
-      {status?.exists && (
-        <Paper elevation={0} variant="outlined" sx={{ p: { xs: 3, sm: 4 }, borderRadius: 2 }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
-            Setup instructions
-          </Typography>
-          <SetupInstructions />
-        </Paper>
-      )}
+      {/* Shown even without an API key: OAuth sign-in doesn't need one */}
+      <Paper elevation={0} variant="outlined" sx={{ p: { xs: 3, sm: 4 }, borderRadius: 2 }}>
+        <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 600, mb: 2 }}>
+          Setup instructions
+        </Typography>
+        <SetupInstructions />
+      </Paper>
     </Stack>
   );
 }

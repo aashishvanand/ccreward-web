@@ -9,8 +9,15 @@ import { bankPath } from "@/core/utils/slug";
 import bankImagesIN from "@/data/bankImages_in.json";
 import bankImagesSG from "@/data/bankImages_sg.json";
 
-const BankSection = () => {
-  const { region, regionName } = useRegion();
+/**
+ * region: "IN" | "SG" from the page (falls back to the visitor's region).
+ * banksWithoutLogo: [{ bank, count }] listed as text links under the logos.
+ */
+const BankSection = ({ region: regionProp, banksWithoutLogo = [] }) => {
+  const { region: contextRegion } = useRegion();
+  const region = regionProp || contextRegion;
+  const regionName = region === "SG" ? "in Singapore" : region === "IN" ? "in India" : "";
+  const code = region === "SG" ? "sg" : "in";
   // Bundled at build time by scripts/fetch-static-data.js, so the logos render with the page
   const bankData = region === "SG" ? bankImagesSG : bankImagesIN;
 
@@ -18,7 +25,7 @@ const BankSection = () => {
     <Box sx={{ py: 8 }}>
       <Container maxWidth="lg">
         <Typography variant="h3" align="center" gutterBottom sx={{ mb: 6 }}>
-          Supported Banks{region ? ` ${regionName}` : ""}
+          Supported Banks{regionName ? ` ${regionName}` : ""}
         </Typography>
         <Grid container spacing={2} sx={{ justifyContent: "center" }}>
           {bankData.map((bank) => (
@@ -32,7 +39,7 @@ const BankSection = () => {
               }}
             >
               <Link 
-                href={bankPath(region === 'SG' ? 'sg' : 'in', bank.bank)}
+                href={bankPath(code, bank.bank)}
                 style={{ textDecoration: 'none' }}
               >
                 <Card
@@ -77,6 +84,19 @@ const BankSection = () => {
             </Grid>
           ))}
         </Grid>
+        {banksWithoutLogo.length > 0 && (
+          <Typography align="center" sx={{ mt: 3, color: "text.secondary" }}>
+            Also:{" "}
+            {banksWithoutLogo.map((b, i) => (
+              <span key={b.bank}>
+                {i > 0 && ", "}
+                <Link href={bankPath(code, b.bank)}>
+                  {b.bank} ({b.count} {b.count === 1 ? "card" : "cards"})
+                </Link>
+              </span>
+            ))}
+          </Typography>
+        )}
       </Container>
     </Box>
   );

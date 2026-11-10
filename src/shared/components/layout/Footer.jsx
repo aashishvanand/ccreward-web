@@ -12,6 +12,12 @@ import {
 } from "@mui/material";
 import { Twitter, Instagram, Reddit, Telegram } from "@mui/icons-material";
 import { m } from "framer-motion";
+import { useState } from "react";
+import dynamic from "next/dynamic";
+import { useAuth } from "@/core/providers/AuthContext";
+
+// Only loaded when a signed-in user opens it
+const AppFeedbackDialog = dynamic(() => import("../ui/AppFeedbackDialog"), { ssr: false });
 
 // Animation variants
 const footerVariants = {
@@ -78,6 +84,9 @@ const linkVariants = {
 };
 
 function Footer() {
+  const { user } = useAuth();
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+
   return (
     <m.div
       initial="hidden"
@@ -190,7 +199,7 @@ function Footer() {
                   alignItems: "center"
                 }}
               >
-                {["terms", "privacy", "accessibility", "howto", "faq"].map((page, idx) => (
+                {["tools", "terms", "privacy", "accessibility", "howto", "faq"].map((page, idx) => (
                   <m.div
                     key={page}
                     variants={linkVariants}
@@ -205,7 +214,9 @@ function Footer() {
                         textDecoration: "none",
                       }}
                     >
-                      {page === "terms"
+                      {page === "tools"
+                        ? "Tools"
+                        : page === "terms"
                         ? "Terms of Service"
                         : page === "privacy"
                         ? "Privacy Policy"
@@ -217,6 +228,19 @@ function Footer() {
                     </Link>
                   </m.div>
                 ))}
+                {user && (
+                  <m.div variants={linkVariants} whileHover="hover" whileTap="tap">
+                    <Link
+                      component="button"
+                      type="button"
+                      color="inherit"
+                      onClick={() => setFeedbackOpen(true)}
+                      sx={{ textDecoration: "none", font: "inherit", verticalAlign: "baseline" }}
+                    >
+                      Send feedback
+                    </Link>
+                  </m.div>
+                )}
               </Stack>
             </m.div>
           </Box>
@@ -293,6 +317,7 @@ function Footer() {
           },
         }}
       />
+      {feedbackOpen && <AppFeedbackDialog open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />}
     </m.div>
   );
 }

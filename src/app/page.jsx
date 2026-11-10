@@ -2,6 +2,7 @@ import HomeClient from './HomeClient';
 import { appsJsonLd } from '../shared/constants/jsonLd';
 import { serializeJsonLd } from '@/core/utils/jsonLd';
 import { getCardStats } from '@/core/utils/cardStats';
+import { getLandingBrowseData } from '@/features/landing/landingBrowseData';
 
 export const metadata = {
   title: {
@@ -29,7 +30,7 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(appsJsonLd) }}
       />
-      <HomeClient cardStats={getCardStats()} />
+      <HomeClient cardStats={getCardStats()} browse={getLandingBrowseData()} />
     </>
   );
 }

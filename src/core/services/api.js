@@ -634,5 +634,17 @@ export const submitFeedback = async ({ type = 'calculator_feedback', vote, userF
     }
 };
 
+// General feedback about the app (same type the iOS/Android apps send). Requires sign-in.
+export const APP_FEEDBACK_MAX_LENGTH = 5000;
+
+export const submitAppFeedback = async (feedback) => {
+    try {
+        const response = await api.post('/v4/feedback', { type: 'app_feedback', feedback });
+        return response.data;
+    } catch (error) {
+        return handleApiError(error);
+    }
+};
+
 // Export the API instance
 export { api };

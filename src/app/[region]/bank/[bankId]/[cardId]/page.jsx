@@ -3,6 +3,9 @@ import cardsIN from '@/data/cards_in.json';
 import cardsSG from '@/data/cards_sg.json';
 import categoriesIN from '@/data/cardCategories_in.json';
 import categoriesSG from '@/data/cardCategories_sg.json';
+import summaryIN from '@/data/cardSummary_in.json';
+import summarySG from '@/data/cardSummary_sg.json';
+import { buildCardFacts, findCardSummary } from '@/features/card/cardFacts';
 import { notFound } from 'next/navigation';
 import { slugify, findBySlug, bankPath, cardPath, categoryPath } from '@/core/utils/slug';
 import { serializeJsonLd } from '@/core/utils/jsonLd';
@@ -12,8 +15,8 @@ export const dynamicParams = false;
 const BASE_URL = 'https://ccreward.app';
 
 const REGION_DATA = {
-  in: { cards: cardsIN, categories: categoriesIN, countryName: 'India' },
-  sg: { cards: cardsSG, categories: categoriesSG, countryName: 'Singapore' },
+  in: { cards: cardsIN, categories: categoriesIN, summaries: summaryIN, countryName: 'India' },
+  sg: { cards: cardsSG, categories: categoriesSG, summaries: summarySG, countryName: 'Singapore' },
 };
 
 export async function generateStaticParams() {
@@ -47,11 +50,15 @@ export async function generateMetadata({ params }) {
   const resolved = resolveCard(await params);
   if (!resolved) return {};
 
-  const { region, bankKey, cardName, countryName } = resolved;
+  const { region, bankKey, cardName, summaries, countryName } = resolved;
   const url = `${BASE_URL}${cardPath(region, bankKey, cardName)}`;
 
   const title = `${bankKey} ${cardName} Credit Card Review, Benefits & Rewards - ${new Date().getFullYear()}`;
-  const description = `Comprehensive review of ${bankKey} ${cardName} credit card. Check joining fee, annual fee, reward rates, airport lounge access, milestone benefits and calculate your exact rewards in ${countryName}.`;
+  const fees = buildCardFacts(findCardSummary(summaries, bankKey, cardName), region)
+    .filter(f => f.label === 'Joining fee' || f.label === 'Annual fee');
+  const description = fees.length > 0
+    ? `${bankKey} ${cardName} credit card: ${fees.map(f => `${f.label.toLowerCase()} ${f.value}`).join(', ')}. Compare lounge access, reward rates and milestone benefits, and calculate your exact rewards in ${countryName}.`
+    : `Comprehensive review of ${bankKey} ${cardName} credit card. Check joining fee, annual fee, reward rates, airport lounge access, milestone benefits and calculate your exact rewards in ${countryName}.`;
 
   return {
     title,
@@ -118,12 +125,14 @@ export default async function CardPage({ params }) {
     notFound();
   }
 
-  const { region, bankKey, cardName, cards, categories, countryName } = resolved;
+  const { region, bankKey, cardName, cards, categories, summaries, countryName } = resolved;
   const url = `${BASE_URL}${cardPath(region, bankKey, cardName)}`;
 
   const topPickCategories = getTopPickCategories(categories, bankKey, cardName, region);
   const similarCards = getSimilarCards(categories, bankKey, cardName, topPickCategories, region);
   const relatedCards = getRelatedCards(cards, bankKey, cardName, region);
+  const facts = buildCardFacts(findCardSummary(summaries, bankKey, cardName), region);
+  const fees = facts.filter(f => f.label === 'Joining fee' || f.label === 'Annual fee');
 
   const jsonLd = [
     {
@@ -137,6 +146,9 @@ export default async function CardPage({ params }) {
       },
       "url": url,
       "category": "Credit Card",
+      ...(fees.length > 0 && {
+        "feesAndCommissionsSpecification": fees.map(f => `${f.label}: ${f.value}`).join('; ')
+      }),
       "audience": {
         "@type": "Audience",
         "audienceType": `Credit Card Users in ${countryName}`
@@ -168,6 +180,7 @@ export default async function CardPage({ params }) {
         topPickCategories={topPickCategories}
         similarCards={similarCards}
         relatedCards={relatedCards}
+        facts={facts}
       />
     </>
   );

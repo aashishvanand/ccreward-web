@@ -99,7 +99,7 @@ const StatsSection = ({ cardStats }) => {
           variant="h5"
           align="center"
           sx={{
-            mb: 10,
+            mb: 6,
             maxWidth: "800px",
             mx: "auto",
             color: "text.secondary",

@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { bankPath, cardPath, categoryPath } from '../src/core/utils/slug.js';
+import { TOOL_SLUGS } from '../src/features/tools/toolSlugs.js';
 
 const BASE_URL = 'https://ccreward.app';
 
@@ -77,6 +78,10 @@ function generateSitemap() {
     addSourceUrl('/privacy', ['src/app/privacy']);
     addSourceUrl('/terms', ['src/app/terms']);
     addSourceUrl('/accessibility', ['src/app/accessibility']);
+    addSourceUrl('/tools', ['src/app/tools', 'src/features/tools']);
+    for (const slug of TOOL_SLUGS) {
+        addSourceUrl(`/tools/${slug}`, ['src/app/tools', 'src/features/tools']);
+    }
 
     for (const region of REGIONS) {
         const cardsData = readJson(path.join(DATA_DIR, `cards_${region}.json`));

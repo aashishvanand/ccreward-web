@@ -142,7 +142,7 @@ function PortfolioShare({ cards, ref }) {
 
       // Draw creative header text
       ctx.fillStyle = theme.palette.mode === "dark" ? "#ffffff" : "#000000";
-      ctx.font = "bold 24px Inter";
+      ctx.font = "bold 24px 'Inter Variable', sans-serif";
       ctx.textAlign = "left";
       ctx.fillText(
         "ccreward.app - Maximize Your Rewards with the Right Credit Card - MyCards",
@@ -150,7 +150,7 @@ function PortfolioShare({ cards, ref }) {
         textStartY + 15
       );
 
-      ctx.font = "18px Inter";
+      ctx.font = "18px 'Inter Variable', sans-serif";
       ctx.fillStyle = theme.palette.mode === "dark" ? "#aaaaaa" : "#666666";
       ctx.fillText(
         "Compare cards, calculate rewards, and find the perfect credit card for your spending habits.",
@@ -169,19 +169,19 @@ function PortfolioShare({ cards, ref }) {
 
           // Draw card info
           ctx.fillStyle = theme.palette.mode === "dark" ? "#ffffff" : "#000000";
-          ctx.font = `bold ${14 * scale}px Inter`;
+          ctx.font = `bold ${14 * scale}px 'Inter Variable', sans-serif`;
           ctx.textAlign = "left";
           ctx.fillText(card.cardName, x + 8, y + cardHeight + 18 * scale);
 
           ctx.fillStyle = theme.palette.mode === "dark" ? "#aaaaaa" : "#666666";
-          ctx.font = `${12 * scale}px Inter`;
+          ctx.font = `${12 * scale}px 'Inter Variable', sans-serif`;
           ctx.fillText(card.bank, x + 8, y + cardHeight + 35 * scale);
         }
       );
 
       // Draw footer text
       ctx.fillStyle = theme.palette.mode === "dark" ? "#ffffff" : "#000000";
-      ctx.font = "bold 20px Inter";
+      ctx.font = "bold 20px 'Inter Variable', sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(
         "Get ccreward App on Your Device",
@@ -189,7 +189,7 @@ function PortfolioShare({ cards, ref }) {
         maxHeight - footerHeight + 30
       );
 
-      ctx.font = "16px Inter";
+      ctx.font = "16px 'Inter Variable', sans-serif";
       ctx.fillStyle = theme.palette.mode === "dark" ? "#aaaaaa" : "#666666";
       ctx.fillText(
         "Download the app to maximize your credit card rewards on the go!",

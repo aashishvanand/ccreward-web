@@ -51,7 +51,7 @@ function McpMarketing() {
             </Stack>
           ))}
         </Stack>
-        <Chip label="Sign in to generate your API key" size="small" sx={{ mb: 2 }} />
+        <Chip label="Sign in to connect your MCP client" size="small" sx={{ mb: 2 }} />
         <SignInButtons
           onGoogleSignIn={signInWithGoogle}
           onAppleSignIn={signInWithApple}

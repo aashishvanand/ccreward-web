@@ -75,7 +75,7 @@ function CredentialPanel({ status, onRefreshStatus }) {
       <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
         <KeyIcon color="primary" />
         <Typography variant="h6" sx={{ fontWeight: 700 }}>
-          API credentials
+          API key
         </Typography>
         {status.exists && (
           <Chip
@@ -95,8 +95,9 @@ function CredentialPanel({ status, onRefreshStatus }) {
       {!status.exists ? (
         <>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            You haven&apos;t generated an MCP key yet. Generate one to connect ccreward to
-            Claude Code or another MCP client.
+            Most clients (Claude Code, Claude Desktop, Cursor, VS Code) can sign in with
+            your ccreward account instead — no key needed, see Setup instructions below.
+            Generate a key for clients without OAuth support, or for scripts and CI.
           </Typography>
           <Button
             variant="contained"
@@ -104,7 +105,7 @@ function CredentialPanel({ status, onRefreshStatus }) {
             disabled={busy}
             startIcon={busy ? <CircularProgress size={18} /> : <KeyIcon />}
           >
-            Generate credentials
+            Generate API key
           </Button>
         </>
       ) : (
@@ -129,6 +130,10 @@ function CredentialPanel({ status, onRefreshStatus }) {
           >
             Regenerate key
           </Button>
+          <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 1.5 }}>
+            Regenerating only replaces the API key. Apps you connected by signing in
+            (OAuth) keep working; disconnect those under Connected apps.
+          </Typography>
         </>
       )}
 
@@ -138,7 +143,8 @@ function CredentialPanel({ status, onRefreshStatus }) {
           <DialogContentText>
             This invalidates your current key everywhere it&apos;s pasted — in Claude
             Code, downloaded config files, anywhere. You&apos;ll need to update it in
-            every place you&apos;ve used it.
+            every place you&apos;ve used it. Apps connected by signing in (OAuth) are
+            not affected.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

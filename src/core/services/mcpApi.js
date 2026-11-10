@@ -102,3 +102,35 @@ export const createMcpStripeCheckoutSession = async (pkg) => {
         return handleMcpError(error);
     }
 };
+
+/**
+ * OAuth clients (ChatGPT, Claude, VS Code, ...) the user approved on /authorize.
+ * Returns { grants: [{ id, clientId, clientName, clientUri, redirectHosts, scope, createdAt, expiresAt }], cursor }.
+ * A 503 (OAUTH_UNAVAILABLE) means OAuth isn't configured on this API deploy; it comes back as
+ * { unavailable: true } so the page can hide the list instead of showing an error.
+ * GET /v4/mcp/oauth/grants
+ */
+export const listMcpOAuthGrants = async (cursor) => {
+    try {
+        const response = await api.get('/v4/mcp/oauth/grants', { params: cursor ? { cursor } : undefined });
+        return response.data;
+    } catch (error) {
+        if (error.response?.status === 503) {
+            return { grants: [], cursor: null, unavailable: true };
+        }
+        return handleMcpError(error);
+    }
+};
+
+/**
+ * Disconnect an OAuth client. Ends its access and refresh tokens; the API key is not affected.
+ * DELETE /v4/mcp/oauth/grants/:id
+ */
+export const revokeMcpOAuthGrant = async (grantId) => {
+    try {
+        const response = await api.delete(`/v4/mcp/oauth/grants/${encodeURIComponent(grantId)}`);
+        return response.data;
+    } catch (error) {
+        return handleMcpError(error);
+    }
+};

@@ -3,7 +3,7 @@ import PerformanceWrapper from '@/shared/components/PerformanceWrapper';
 
 export const metadata = {
   title: 'MCP Access',
-  description: 'Connect ccreward to Claude Code and other MCP clients. Generate an API key and use reward calculations right from your workflow.',
+  description: 'Connect ccreward to Claude Code and other MCP clients. Sign in or generate an API key to use reward calculations right from your workflow.',
   alternates: {
     canonical: 'https://ccreward.app/mcp',
   },

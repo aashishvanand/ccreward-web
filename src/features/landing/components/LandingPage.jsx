@@ -15,6 +15,7 @@ import { useRegion } from "@/core/providers/RegionContext";
 import Header, { MinimalHeader } from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
 import HeroSection from "./HeroSection";
+import BrowseCategoriesSection from "./sections/BrowseCategoriesSection";
 import FeaturesSection from "./sections/FeaturesSection";
 import BankSection from "./sections/BankSection";
 import CallToActionSection from "./sections/CallToActionSection";
@@ -65,7 +66,7 @@ const pageVariants = {
 };
 
 // Main LandingPage component that orchestrates all sections and tracking
-const LandingPage = ({ cardStats }) => {
+const LandingPage = ({ cardStats, region: pageRegion, browse }) => {
   const router = useRouter();
   const {
     signInWithGoogle,
@@ -76,6 +77,9 @@ const LandingPage = ({ cardStats }) => {
   } = useAuth();
   const theme = useTheme();
   const { region } = useRegion();
+  // On /in and /sg the URL decides which bank and category links to show, so the server HTML
+  // matches the page (the context region is still null while rendering on the server)
+  const sectionRegion = pageRegion ? pageRegion.toUpperCase() : region === "SG" ? "SG" : "IN";
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
@@ -531,6 +535,8 @@ const LandingPage = ({ cardStats }) => {
     setAlert,
     deviceInfo,
     region,
+    sectionRegion,
+    browse,
     // Add analytics tracking functions
     trackButtonClick,
     trackFeatureUsage,
@@ -570,6 +576,8 @@ const LandingPage = ({ cardStats }) => {
 
 // Enhanced Mobile View with analytics
 const MobileView = ({
+  sectionRegion,
+  browse,
   cardStats,
   deviceInfo,
   visibleTweets,
@@ -713,7 +721,21 @@ const MobileView = ({
             data-section="banks"
             sx={{ bgcolor: "background.default" }}
           >
-            <BankSection />
+            <BankSection
+              region={sectionRegion}
+              banksWithoutLogo={browse?.[sectionRegion]?.banksWithoutLogo}
+            />
+          </Box>
+
+          <Box
+            component="section"
+            data-section="categories"
+            sx={{ bgcolor: "background.paper" }}
+          >
+            <BrowseCategoriesSection
+              region={sectionRegion}
+              categories={browse?.[sectionRegion]?.categories}
+            />
           </Box>
 
           <Box
@@ -757,6 +779,8 @@ const MobileView = ({
 
 // Enhanced Desktop View with analytics
 const DesktopView = ({
+  sectionRegion,
+  browse,
   cardStats,
   cardImages,
   isMobile,
@@ -861,7 +885,21 @@ const DesktopView = ({
           data-section="banks"
           sx={{ bgcolor: "background.default" }}
         >
-          <BankSection />
+          <BankSection
+            region={sectionRegion}
+            banksWithoutLogo={browse?.[sectionRegion]?.banksWithoutLogo}
+          />
+        </Box>
+
+        <Box
+          component="section"
+          data-section="categories"
+          sx={{ bgcolor: "background.paper" }}
+        >
+          <BrowseCategoriesSection
+            region={sectionRegion}
+            categories={browse?.[sectionRegion]?.categories}
+          />
         </Box>
 
         <Box component="section" data-section="cta">
