@@ -140,7 +140,7 @@
     "@grpc/grpc-js": "~1.13.6",
     "source-map-js": "^1.2.2",
     "js-yaml": "^4.1.0",
-    "follow-redirects": "^1.16.2",
+    "follow-redirects": "^1.16.3",
     "re2js": "2.8.8"
   },
   "type": "module"
