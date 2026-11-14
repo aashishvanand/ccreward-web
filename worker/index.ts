@@ -125,6 +125,15 @@ export default {
       });
     }
 
+    // robots.txt runs through the worker first (assets.run_worker_first) so non-production
+    // hosts (dev, previews, workers.dev) are blocked even when the build wrote production rules.
+    if (url.pathname === "/robots.txt") {
+      if (url.hostname === "ccreward.app") return env.ASSETS.fetch(request);
+      return new Response("User-Agent: *\nDisallow: /\n", {
+        headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
+      });
+    }
+
     const slugTarget = legacySlugRedirect(url.pathname);
     if (slugTarget) {
       return Response.redirect(`${url.origin}${slugTarget}${url.search}`, 301);

@@ -1,6 +1,8 @@
 // Writes public/robots.txt so it's served as a static asset instead of by the worker.
 // DEPLOY_ENV=dev (set by `npm run deploy:dev`) blocks everything; anything else gets the
 // production rules. Run as part of prebuild:site, so each deploy writes its own file.
+// The worker also intercepts /robots.txt and serves `Disallow: /` on any host other than
+// ccreward.app, so dev stays blocked even if a build runs without DEPLOY_ENV.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

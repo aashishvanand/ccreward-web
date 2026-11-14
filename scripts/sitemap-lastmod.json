@@ -1,7 +1,7 @@
 {
   "/in": {
-    "hash": "7cc55afe39a041a9",
-    "lastmod": "2026-10-14"
+    "hash": "0aa27f9f2900a0e1",
+    "lastmod": "2026-11-14"
   },
   "/in/top-cards": {
     "hash": "84f1ee744fac315b",
@@ -16,24 +16,24 @@
     "lastmod": "2026-10-14"
   },
   "/in/top-cards/food-and-dining": {
-    "hash": "f489c0e317e7dfdc",
-    "lastmod": "2026-10-14"
+    "hash": "a4f8a1a6e9f496c1",
+    "lastmod": "2026-11-14"
   },
   "/in/top-cards/government-tax": {
     "hash": "9922668ab68d253a",
     "lastmod": "2026-10-14"
   },
   "/in/top-cards/groceries": {
-    "hash": "385dc4e32322e90d",
-    "lastmod": "2026-10-14"
+    "hash": "8e67b21ea52d1c3d",
+    "lastmod": "2026-11-14"
   },
   "/in/top-cards/healthcare-and-medical": {
     "hash": "17f845b565229d56",
     "lastmod": "2026-10-14"
   },
   "/in/top-cards/insurance": {
-    "hash": "b86665b2b113ac81",
-    "lastmod": "2026-10-14"
+    "hash": "c80433ceb0a8fde5",
+    "lastmod": "2026-11-14"
   },
   "/in/top-cards/international-spends": {
     "hash": "bced00acb264b320",
@@ -48,8 +48,8 @@
     "lastmod": "2026-10-14"
   },
   "/in/top-cards/online-shopping": {
-    "hash": "782dd640b48c2fe5",
-    "lastmod": "2026-10-14"
+    "hash": "8f56f9e19da18e47",
+    "lastmod": "2026-11-14"
   },
   "/in/top-cards/petrol": {
     "hash": "a0714ae55c54d658",
@@ -88,8 +88,8 @@
     "lastmod": "2026-10-14"
   },
   "/in/bank/amex/platinum-travel": {
-    "hash": "405e99a2c45c22b9",
-    "lastmod": "2026-10-14"
+    "hash": "45b93f24b0798e38",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/amex/smartearn": {
     "hash": "63fd51211cc3036b",
@@ -208,288 +208,312 @@
     "lastmod": "2026-10-14"
   },
   "/in/bank/axis": {
-    "hash": "528d8fe912b15251",
-    "lastmod": "2026-10-14"
+    "hash": "709559b8eb887977",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/ace": {
-    "hash": "dc7b2b93101e32e7",
-    "lastmod": "2026-10-14"
+    "hash": "00491da1f2d11c42",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/airtel": {
-    "hash": "87a619d6c0de4eb5",
-    "lastmod": "2026-10-14"
+    "hash": "7be9221fc7dbb621",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/atlas": {
-    "hash": "de5ab73dd363fdfc",
-    "lastmod": "2026-10-14"
+    "hash": "86f4c1aa752ec5e2",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/aura": {
-    "hash": "dd8fd8467b234606",
-    "lastmod": "2026-10-14"
+    "hash": "50ac06797065cb0e",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/burgundy-private": {
-    "hash": "d234bc7121855860",
-    "lastmod": "2026-10-14"
+    "hash": "526bad6e25a8aaeb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/cashback": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/fibe": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/flex": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/flipkart": {
-    "hash": "ce82b0556e9a70fe",
-    "lastmod": "2026-10-14"
+    "hash": "fe56af29c9747890",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/flipkart-super-elite": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/freecharge": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/freecharge-plus": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/horizon": {
-    "hash": "430cf486f827d882",
-    "lastmod": "2026-10-14"
+    "hash": "5fcc3d643bdcf9da",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/ikea-family": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/indian-oil": {
-    "hash": "0bd3efc466d99d10",
-    "lastmod": "2026-10-14"
+    "hash": "03981a5b9201c653",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/indian-oil-premium": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/indigo": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/indigo-premium": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
-  },
-  "/in/bank/axis/kwik": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/lic": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/magnus": {
-    "hash": "bdfab1ff1f706404",
-    "lastmod": "2026-10-14"
+    "hash": "e507a891fcabc4c2",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/magnus-for-burgundy": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/miles-and-more-world": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/miles-and-more-world-select": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/myzone": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/neo": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/olympus": {
-    "hash": "2a6617c3edd55305",
-    "lastmod": "2026-10-14"
+    "hash": "aa58023dd5c2fe4d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/pride-platinum": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/pride-signature": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/primus": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/privilege": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/reserve": {
-    "hash": "b16d72d11c2cc5e1",
-    "lastmod": "2026-10-14"
+    "hash": "c40cf9f67497c555",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/rewards": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/samsung-infinite": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/samsung-signature": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/axis/scapia": {
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/select": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/shoppers-stop": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/supermoney": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/vistara": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/vistara-infinite": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/vistara-signature": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/voyage": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/axis/voyage-black": {
-    "hash": "b1d444be6e83f489",
-    "lastmod": "2026-10-14"
+    "hash": "9fb4e4c9d8a451bb",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob": {
-    "hash": "0f4a983221dff2f8",
-    "lastmod": "2026-10-14"
+    "hash": "69aa52275a50d0c8",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/cashback": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/cma-one": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/corporate": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/easy": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/empower": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/eterna": {
-    "hash": "128d456912b1804a",
-    "lastmod": "2026-10-14"
+    "hash": "ee61f77a1efd401c",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/etihad-guest": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/etihad-guest-premium": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/hpcl-energie": {
-    "hash": "577c1c1537e181ed",
-    "lastmod": "2026-10-14"
+    "hash": "65ec2a654cb87a29",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/icai-exclusive": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/icsi-diamond": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/indian-army-yoddha": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/indian-coast-guard-rakshamah": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/indian-navy-varunah": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/irctc": {
-    "hash": "533598d4fd54ea42",
-    "lastmod": "2026-10-14"
+    "hash": "847588e3098f1b8a",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/nainital-renaissance": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/pragati": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/premier": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/prime": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/bob/scapia": {
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/select": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/sentinel": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/snapdeal": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/swavlamban": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/tiara": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/uni-goldx": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/bob/vikram": {
-    "hash": "eccbc52ed885f83e",
-    "lastmod": "2026-10-14"
+    "hash": "9da28e1dda7c8ba4",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/bandhan": {
+    "hash": "355de13714e55fb2",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/bandhan/flare": {
+    "hash": "b35c2b7abc974625",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/bandhan/ignite": {
+    "hash": "b35c2b7abc974625",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/bandhan/lumina": {
+    "hash": "b35c2b7abc974625",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/bandhan/sparks": {
+    "hash": "b35c2b7abc974625",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/canara": {
     "hash": "b1ce00b17ea9963b",
@@ -530,6 +554,30 @@
   "/in/bank/csb/edge-plus": {
     "hash": "d52893f1a270bbc5",
     "lastmod": "2026-10-14"
+  },
+  "/in/bank/cub": {
+    "hash": "7a20b5accd6dd41b",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/cub/csk": {
+    "hash": "e4005c62fc64e694",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/cub/dhi": {
+    "hash": "e4005c62fc64e694",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/cub/kavach": {
+    "hash": "e4005c62fc64e694",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/cub/salaryse-level-up": {
+    "hash": "e4005c62fc64e694",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/cub/srh": {
+    "hash": "e4005c62fc64e694",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/dbs": {
     "hash": "9bf7a02811c847f0",
@@ -576,8 +624,8 @@
     "lastmod": "2026-10-14"
   },
   "/in/bank/equitas/powermiles": {
-    "hash": "fdf64938a3d829cf",
-    "lastmod": "2026-10-14"
+    "hash": "7e8b07d4b9ba6bf3",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/equitas/selfe": {
     "hash": "cec3535b0062255c",
@@ -588,204 +636,216 @@
     "lastmod": "2026-10-14"
   },
   "/in/bank/federal": {
-    "hash": "757a1c5b022202d1",
-    "lastmod": "2026-10-14"
+    "hash": "db023acf2898445e",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/federal/amplifi": {
-    "hash": "444f645812c4cf31",
-    "lastmod": "2026-10-14"
+    "hash": "e5dfe71dbed2f853",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/federal/celesta": {
-    "hash": "444f645812c4cf31",
-    "lastmod": "2026-10-14"
+    "hash": "e5dfe71dbed2f853",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/federal/imperio": {
-    "hash": "444f645812c4cf31",
-    "lastmod": "2026-10-14"
+    "hash": "e5dfe71dbed2f853",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/federal/magnifi": {
-    "hash": "444f645812c4cf31",
-    "lastmod": "2026-10-14"
+    "hash": "e5dfe71dbed2f853",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/federal/paisabazaar-paisaback": {
+    "hash": "e5dfe71dbed2f853",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/federal/scapia": {
-    "hash": "e3b18303c76d737c",
-    "lastmod": "2026-10-14"
+    "hash": "20eb5bdc2dbd587e",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/federal/signet": {
-    "hash": "444f645812c4cf31",
-    "lastmod": "2026-10-14"
+    "hash": "e5dfe71dbed2f853",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/federal/simplifi": {
-    "hash": "444f645812c4cf31",
-    "lastmod": "2026-10-14"
+    "hash": "e5dfe71dbed2f853",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/federal/starbiz": {
+    "hash": "e5dfe71dbed2f853",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/federal/wave": {
-    "hash": "444f645812c4cf31",
-    "lastmod": "2026-10-14"
+    "hash": "e5dfe71dbed2f853",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc": {
-    "hash": "15712fdda4d8156d",
-    "lastmod": "2026-10-14"
+    "hash": "0abec1e35d8749f1",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/biz-black-metal-edition": {
-    "hash": "4592d0df6b0bfd99",
-    "lastmod": "2026-10-14"
+    "hash": "bf6ecb34cd12a8d3",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/biz-first": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/biz-grow": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/biz-power": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/business-moneyback": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/business-regalia": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/diners-club-black": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/diners-club-black-metal": {
-    "hash": "34e97b49184bd69a",
-    "lastmod": "2026-10-14"
+    "hash": "abf2c5aaa9604c46",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/diners-club-privilege": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/freedom": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/giga-business": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/hog-diners": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/harley-davidson": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/indianoil": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/infinia-metal": {
-    "hash": "002542dafe1084d0",
-    "lastmod": "2026-10-14"
+    "hash": "9ac2c1704b5ea8f7",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/irctc": {
-    "hash": "8199c1a7a0d29813",
-    "lastmod": "2026-10-14"
+    "hash": "f1f9832ad1592d8a",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/marriott-bonvoy": {
-    "hash": "12d7716f2cb4b3b7",
-    "lastmod": "2026-10-14"
+    "hash": "53b0e9e31f05fb6b",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/millennia": {
-    "hash": "382fdc0c06678d9c",
-    "lastmod": "2026-10-14"
+    "hash": "f5c82ff7dbc65f17",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/moneyback-plus": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/paytm": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/paytm-digital": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/paytm-mobile": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/paytm-select": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/phonepe-ultimo": {
-    "hash": "500e96e865f545d5",
-    "lastmod": "2026-10-14"
+    "hash": "0931d1ae8537c81c",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/phonepe-uno": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/pixel-go": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/pixel-play": {
-    "hash": "e7e4a986ef71297c",
-    "lastmod": "2026-10-14"
+    "hash": "add7d308b57f9e91",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/hdfc/pixel-times-move": {
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/hdfc/pixel-times-rush": {
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/regalia": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/regalia-first": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/regalia-gold": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/shoppers-stop": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/shoppers-stop-black": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
-  },
-  "/in/bank/hdfc/swiggy": {
-    "hash": "f100c3c347177eb5",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/swiggy-blck": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/swiggy-ornge": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/tata-neu-infinity": {
-    "hash": "2d659e67d1a9b29b",
-    "lastmod": "2026-10-14"
+    "hash": "e6baab0769adecff",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/tata-neu-plus": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/times": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/times-platinum": {
-    "hash": "13d4f09dd18ce780",
-    "lastmod": "2026-10-14"
+    "hash": "f5ab5e2059169895",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hdfc/upi-rupay": {
-    "hash": "4015497df9769d5c",
-    "lastmod": "2026-10-14"
+    "hash": "a494916365d7df0d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hsbc": {
     "hash": "208150e95810f93d",
@@ -796,8 +856,8 @@
     "lastmod": "2026-10-14"
   },
   "/in/bank/hsbc/live-plus": {
-    "hash": "e1f5d5a5c8b08777",
-    "lastmod": "2026-10-14"
+    "hash": "215ae9ceef992879",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hsbc/platinum": {
     "hash": "3e208c5842a5519b",
@@ -808,8 +868,8 @@
     "lastmod": "2026-10-14"
   },
   "/in/bank/hsbc/premier": {
-    "hash": "a7fdbf7e7e30da11",
-    "lastmod": "2026-10-14"
+    "hash": "ca07184df25c9911",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/hsbc/prive": {
     "hash": "3e208c5842a5519b",
@@ -824,104 +884,108 @@
     "lastmod": "2026-10-14"
   },
   "/in/bank/icici": {
-    "hash": "4a252e2e3fe3353c",
-    "lastmod": "2026-10-14"
+    "hash": "8376ef8b24f36b3d",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/icici/1838-reserve": {
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/adani-one-platinum": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/adani-one-signature": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/amazonpay": {
-    "hash": "1bea9d1a1c5512dd",
-    "lastmod": "2026-10-14"
+    "hash": "2365c75c7a7bbebc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/chennai-super-kings": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/coral": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/emeralde": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/emeralde-private": {
-    "hash": "e75878e3f6dfcab3",
-    "lastmod": "2026-10-14"
+    "hash": "819940b40b6cc77c",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/emeralde-skywards": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/expressions": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/hpcl-coral": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/hpcl-super-saver": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/manchester-united-platinum": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/manchester-united-signature": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/mmt": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/mmt-platinum": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/mmt-signature": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/parakram": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/parakram-select": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/platinum": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/rubyx": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/rubyx-skywards": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/sapphiro": {
-    "hash": "7d71839cf612d786",
-    "lastmod": "2026-10-14"
+    "hash": "c54cfaeca09e2c6e",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/sapphiro-skywards": {
-    "hash": "f8739a76734f86bc",
-    "lastmod": "2026-10-14"
+    "hash": "39a06501454a9335",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/icici/times-black": {
-    "hash": "d975aaa1051bcebe",
-    "lastmod": "2026-10-14"
+    "hash": "7dd0d86c53c2cd3d",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idbi": {
     "hash": "7e9c9269dea27e0c",
@@ -956,200 +1020,240 @@
     "lastmod": "2026-10-14"
   },
   "/in/bank/idfcfirst": {
-    "hash": "1a261819db7bbd37",
-    "lastmod": "2026-10-14"
+    "hash": "f62067ac364b8b26",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/ashva": {
-    "hash": "6e226fd9943cfbff",
-    "lastmod": "2026-10-14"
+    "hash": "4bb7c21c533ee576",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/business": {
-    "hash": "7e67401f0e708ef9",
-    "lastmod": "2026-10-14"
+    "hash": "7cab31a65d298883",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/classic": {
-    "hash": "b474b8f6fd6d332a",
-    "lastmod": "2026-10-14"
-  },
-  "/in/bank/idfcfirst/club-vistara": {
-    "hash": "7e67401f0e708ef9",
-    "lastmod": "2026-10-14"
+    "hash": "494eb4ccc8a1a6d3",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/diamond-reserve": {
-    "hash": "7e67401f0e708ef9",
-    "lastmod": "2026-10-14"
+    "hash": "7cab31a65d298883",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/gaj": {
-    "hash": "7e67401f0e708ef9",
-    "lastmod": "2026-10-14"
+    "hash": "7cab31a65d298883",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/hello-cashback": {
-    "hash": "7e67401f0e708ef9",
-    "lastmod": "2026-10-14"
+    "hash": "7cab31a65d298883",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/indigo": {
-    "hash": "7e67401f0e708ef9",
-    "lastmod": "2026-10-14"
+    "hash": "7cab31a65d298883",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/lic-classic": {
-    "hash": "7e67401f0e708ef9",
-    "lastmod": "2026-10-14"
+    "hash": "7cab31a65d298883",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/lic-select": {
-    "hash": "7e67401f0e708ef9",
-    "lastmod": "2026-10-14"
+    "hash": "7cab31a65d298883",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/mayura": {
-    "hash": "3c2657f5f6583e1a",
-    "lastmod": "2026-10-14"
+    "hash": "5c27178b5b1681fa",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/millennia": {
-    "hash": "839b1396775eceed",
-    "lastmod": "2026-10-14"
+    "hash": "9d0b4b3c2ed587ef",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/power": {
-    "hash": "7e67401f0e708ef9",
-    "lastmod": "2026-10-14"
+    "hash": "7cab31a65d298883",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/power-plus": {
-    "hash": "d58bb936eec86453",
-    "lastmod": "2026-10-14"
+    "hash": "99c4b8a31c43e0d7",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/private": {
-    "hash": "7e67401f0e708ef9",
-    "lastmod": "2026-10-14"
+    "hash": "7cab31a65d298883",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/quantum-plus": {
-    "hash": "7e67401f0e708ef9",
-    "lastmod": "2026-10-14"
+    "hash": "7cab31a65d298883",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/select": {
-    "hash": "2745ac5eaa170106",
-    "lastmod": "2026-10-14"
+    "hash": "bc98e5ffb721080f",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/swyp": {
-    "hash": "7e67401f0e708ef9",
-    "lastmod": "2026-10-14"
+    "hash": "7cab31a65d298883",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/wealth": {
-    "hash": "8e3fb705acfe1e47",
-    "lastmod": "2026-10-14"
+    "hash": "9d756b36c5b9af73",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/wow": {
-    "hash": "f83ba84804615380",
-    "lastmod": "2026-10-14"
+    "hash": "1c75c89da31b8871",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/idfcfirst/wow-black": {
-    "hash": "7e67401f0e708ef9",
-    "lastmod": "2026-10-14"
+    "hash": "7cab31a65d298883",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind": {
-    "hash": "5c64b0ed859998a0",
-    "lastmod": "2026-10-14"
+    "hash": "3933c87fae080646",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/avios": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/celesta": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/club-vistara-explorer": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/cred": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/crest": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/duo": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/eazydiner-platinum": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/eazydiner-signature": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/epay-amex": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/indulge": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/intermiles-odyssey": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/intermiles-voyage": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/legend": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/mobility-plus": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/nexxt": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/indusind/odcc": {
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/pinnacle": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/pioneer-heritage": {
-    "hash": "fde76be3bf5fc188",
-    "lastmod": "2026-10-14"
+    "hash": "7ec31d85317576b7",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/pioneer-legacy": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/pioneer-private": {
-    "hash": "d97b8dfc67e3bb58",
-    "lastmod": "2026-10-14"
+    "hash": "a61a1967831d2d05",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/platinum": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/platinum-aura-edge": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/platinum-rupay": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/poonawalla-fincorp-elite": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/samman": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/solitaire": {
-    "hash": "e54f8d4879a9318a",
-    "lastmod": "2026-10-14"
+    "hash": "ed48b6ff4afd4e84",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/indusind/tiger": {
-    "hash": "51687a150ff49b24",
-    "lastmod": "2026-10-14"
+    "hash": "4e9415394abfacc3",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/iob": {
+    "hash": "911776e59b416c74",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/iob/classic": {
+    "hash": "ab398324484d8ad7",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/iob/gold-visa": {
+    "hash": "ab398324484d8ad7",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/iob/novio-platinum": {
+    "hash": "ab398324484d8ad7",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/iob/novio-select": {
+    "hash": "ab398324484d8ad7",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/iob/platinum": {
+    "hash": "ab398324484d8ad7",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/iob/salaryse-rise-up": {
+    "hash": "ab398324484d8ad7",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/iob/select-rupay": {
+    "hash": "ab398324484d8ad7",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/iob/signature-visa": {
+    "hash": "ab398324484d8ad7",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/iob/zet": {
+    "hash": "ab398324484d8ad7",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/kvb": {
     "hash": "864b30a891521b83",
@@ -1260,8 +1364,8 @@
     "lastmod": "2026-10-14"
   },
   "/in/bank/kotak/zen": {
-    "hash": "7890aeb1c2ce7716",
-    "lastmod": "2026-10-14"
+    "hash": "11f046e20caf4c9a",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/onecard": {
     "hash": "b5ff435d10e3698e",
@@ -1340,220 +1444,224 @@
     "lastmod": "2026-10-14"
   },
   "/in/bank/rbl": {
-    "hash": "9cd6e81a66ae3781",
-    "lastmod": "2026-10-14"
+    "hash": "8571563ee41348c5",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/apex": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/aspire": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/bankbazaar-savemax": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/bankbazaar-savemax-pro": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/binge": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/cookies": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/dmi-finance": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/easysaver": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/icon": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/iglobe": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/indianoil": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/indianoil-xtra": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/insignia-preferred-banking": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/irctc": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
+  },
+  "/in/bank/rbl/jalsa": {
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/lazypay": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/myfirst": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/nova": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/paisabazaar-duet": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/paisabazaar-duet-plus": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/patanjali-swarn": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/patanjali-vishisht": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-advantage": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-bonus": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-choice": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-classic": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-delight": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-edge": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-lifeeasy": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-max": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-maxima": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-maxima-plus": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-plus": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-prime": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-shopdaily": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-shopgain": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-shopsmart": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-traveleasy": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/platinum-valueplus": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/play": {
-    "hash": "3e6daedee4a28055",
-    "lastmod": "2026-10-14"
+    "hash": "fd6b8055ac687252",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/quickpay": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/salaryse-up": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/shoprite": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/shoppers-stop-black": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/shoppers-stop-gold": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/shoppers-stop-platinum": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/signature": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/tvs-credit": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/tvs-credit-gold": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/world-max": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/world-plus": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/world-prime": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/world-safari": {
-    "hash": "0e22d39e218fc339",
-    "lastmod": "2026-10-14"
+    "hash": "8602eeab5083db2f",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/rbl/world-safari-lite": {
-    "hash": "a60c14d26f98c306",
-    "lastmod": "2026-10-14"
+    "hash": "9e4c02b2b38589dc",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/sbi": {
     "hash": "feb27691d6aba22a",
@@ -1588,8 +1696,8 @@
     "lastmod": "2026-10-14"
   },
   "/in/bank/sbi/cashback": {
-    "hash": "5300552af3e40853",
-    "lastmod": "2026-10-14"
+    "hash": "6b4b5ac82a161a99",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/sbi/elite": {
     "hash": "4393487efd769ec6",
@@ -1680,8 +1788,8 @@
     "lastmod": "2026-10-14"
   },
   "/in/bank/sbi/phonepe-select-black": {
-    "hash": "b44b1818f598d777",
-    "lastmod": "2026-10-14"
+    "hash": "7d98a11d07a44bd6",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/sbi/prime": {
     "hash": "4ffaef0d7e7c7e66",
@@ -1732,8 +1840,8 @@
     "lastmod": "2026-10-14"
   },
   "/in/bank/sbi/tata-neu-infinity": {
-    "hash": "a2056ef342b17d09",
-    "lastmod": "2026-10-14"
+    "hash": "86810086af6b481a",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/sbi/tata-neu-plus": {
     "hash": "4ffaef0d7e7c7e66",
@@ -1812,8 +1920,8 @@
     "lastmod": "2026-10-14"
   },
   "/in/bank/sc/ultimate": {
-    "hash": "59c269a65df0207e",
-    "lastmod": "2026-10-14"
+    "hash": "cf55cae259bf5c7a",
+    "lastmod": "2026-11-14"
   },
   "/in/bank/union": {
     "hash": "6b318fdedab453f9",
@@ -2468,16 +2576,16 @@
     "lastmod": "2026-10-14"
   },
   "/sg/bank/trustbank": {
-    "hash": "b3908378bfe4631d",
-    "lastmod": "2026-10-14"
+    "hash": "04403898a18bc780",
+    "lastmod": "2026-11-14"
   },
-  "/sg/bank/trustbank/cashback": {
-    "hash": "ad7a8e9fa7905a79",
-    "lastmod": "2026-10-14"
+  "/sg/bank/trustbank/freedom": {
+    "hash": "03bffdea626817e7",
+    "lastmod": "2026-11-14"
   },
   "/sg/bank/trustbank/link": {
-    "hash": "b6467f2c32828e6e",
-    "lastmod": "2026-10-14"
+    "hash": "03bffdea626817e7",
+    "lastmod": "2026-11-14"
   },
   "/sg/bank/uob": {
     "hash": "3e3eabb7587ac5d8",

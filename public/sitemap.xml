@@ -2,11 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://ccreward.app/</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-11-10</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/faq</loc>
-    <lastmod>2026-03-18</lastmod>
+    <lastmod>2026-11-07</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/howto</loc>
@@ -18,15 +18,39 @@
   </url>
   <url>
     <loc>https://ccreward.app/privacy</loc>
-    <lastmod>2026-03-18</lastmod>
+    <lastmod>2026-10-15</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/terms</loc>
-    <lastmod>2026-03-18</lastmod>
+    <lastmod>2026-10-15</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/accessibility</loc>
+    <lastmod>2026-11-07</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/tools</loc>
+    <lastmod>2026-11-10</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/tools/credit-card-reward-calculator</loc>
+    <lastmod>2026-11-10</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/tools/mcc-code-lookup</loc>
+    <lastmod>2026-11-10</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/tools/best-credit-card-finder</loc>
+    <lastmod>2026-11-10</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/tools/points-transfer-calculator</loc>
+    <lastmod>2026-11-10</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/top-cards</loc>
@@ -42,7 +66,7 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/top-cards/food-and-dining</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/top-cards/government-tax</loc>
@@ -50,7 +74,7 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/top-cards/groceries</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/top-cards/healthcare-and-medical</loc>
@@ -58,7 +82,7 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/top-cards/insurance</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/top-cards/international-spends</loc>
@@ -74,7 +98,7 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/top-cards/online-shopping</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/top-cards/petrol</loc>
@@ -114,7 +138,7 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/amex/platinum-travel</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/amex/smartearn</loc>
@@ -234,287 +258,311 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/ace</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/airtel</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/atlas</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/aura</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/burgundy-private</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/cashback</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/fibe</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/flex</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/flipkart</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/flipkart-super-elite</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/freecharge</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/freecharge-plus</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/horizon</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/ikea-family</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/indian-oil</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/indian-oil-premium</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/indigo</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/indigo-premium</loc>
-    <lastmod>2026-10-14</lastmod>
-  </url>
-  <url>
-    <loc>https://ccreward.app/in/bank/axis/kwik</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/lic</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/magnus</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/magnus-for-burgundy</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/miles-and-more-world</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/miles-and-more-world-select</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/myzone</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/neo</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/olympus</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/pride-platinum</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/pride-signature</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/primus</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/privilege</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/reserve</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/rewards</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/samsung-infinite</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/samsung-signature</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/axis/scapia</loc>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/select</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/shoppers-stop</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/supermoney</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/vistara</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/vistara-infinite</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/vistara-signature</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/voyage</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/axis/voyage-black</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/cashback</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/cma-one</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/corporate</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/easy</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/empower</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/eterna</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/etihad-guest</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/etihad-guest-premium</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/hpcl-energie</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/icai-exclusive</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/icsi-diamond</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/indian-army-yoddha</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/indian-coast-guard-rakshamah</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/indian-navy-varunah</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/irctc</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/nainital-renaissance</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/pragati</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/premier</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/prime</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/bob/scapia</loc>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/select</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/sentinel</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/snapdeal</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/swavlamban</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/tiara</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/uni-goldx</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/bob/vikram</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/bandhan</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/bandhan/flare</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/bandhan/ignite</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/bandhan/lumina</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/bandhan/sparks</loc>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/canara</loc>
@@ -555,6 +603,30 @@
   <url>
     <loc>https://ccreward.app/in/bank/csb/edge-plus</loc>
     <lastmod>2026-10-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/cub</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/cub/csk</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/cub/dhi</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/cub/kavach</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/cub/salaryse-level-up</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/cub/srh</loc>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/dbs</loc>
@@ -602,7 +674,7 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/equitas/powermiles</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/equitas/selfe</loc>
@@ -614,203 +686,215 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/federal</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/federal/amplifi</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/federal/celesta</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/federal/imperio</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/federal/magnifi</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/federal/paisabazaar-paisaback</loc>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/federal/scapia</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/federal/signet</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/federal/simplifi</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/federal/starbiz</loc>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/federal/wave</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/biz-black-metal-edition</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/biz-first</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/biz-grow</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/biz-power</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/business-moneyback</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/business-regalia</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/diners-club-black</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/diners-club-black-metal</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/diners-club-privilege</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/freedom</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/giga-business</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/hog-diners</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/harley-davidson</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/indianoil</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/infinia-metal</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/irctc</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/marriott-bonvoy</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/millennia</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/moneyback-plus</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/paytm</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/paytm-digital</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/paytm-mobile</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/paytm-select</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/phonepe-ultimo</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/phonepe-uno</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/pixel-go</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/pixel-play</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/hdfc/pixel-times-move</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/hdfc/pixel-times-rush</loc>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/regalia</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/regalia-first</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/regalia-gold</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/shoppers-stop</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/shoppers-stop-black</loc>
-    <lastmod>2026-10-14</lastmod>
-  </url>
-  <url>
-    <loc>https://ccreward.app/in/bank/hdfc/swiggy</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/swiggy-blck</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/swiggy-ornge</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/tata-neu-infinity</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/tata-neu-plus</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/times</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/times-platinum</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hdfc/upi-rupay</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hsbc</loc>
@@ -822,7 +906,7 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hsbc/live-plus</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hsbc/platinum</loc>
@@ -834,7 +918,7 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hsbc/premier</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/hsbc/prive</loc>
@@ -850,103 +934,107 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/icici/1838-reserve</loc>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/adani-one-platinum</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/adani-one-signature</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/amazonpay</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/chennai-super-kings</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/coral</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/emeralde</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/emeralde-private</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/emeralde-skywards</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/expressions</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/hpcl-coral</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/hpcl-super-saver</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/manchester-united-platinum</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/manchester-united-signature</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/mmt</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/mmt-platinum</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/mmt-signature</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/parakram</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/parakram-select</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/platinum</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/rubyx</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/rubyx-skywards</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/sapphiro</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/sapphiro-skywards</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/icici/times-black</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idbi</loc>
@@ -982,199 +1070,239 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/ashva</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/business</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/classic</loc>
-    <lastmod>2026-10-14</lastmod>
-  </url>
-  <url>
-    <loc>https://ccreward.app/in/bank/idfcfirst/club-vistara</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/diamond-reserve</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/gaj</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/hello-cashback</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/indigo</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/lic-classic</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/lic-select</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/mayura</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/millennia</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/power</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/power-plus</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/private</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/quantum-plus</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/select</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/swyp</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/wealth</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/wow</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/idfcfirst/wow-black</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/avios</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/celesta</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/club-vistara-explorer</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/cred</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/crest</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/duo</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/eazydiner-platinum</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/eazydiner-signature</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/epay-amex</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/indulge</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/intermiles-odyssey</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/intermiles-voyage</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/legend</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/mobility-plus</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/nexxt</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/indusind/odcc</loc>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/pinnacle</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/pioneer-heritage</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/pioneer-legacy</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/pioneer-private</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/platinum</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/platinum-aura-edge</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/platinum-rupay</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/poonawalla-fincorp-elite</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/samman</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/solitaire</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/indusind/tiger</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/iob</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/iob/classic</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/iob/gold-visa</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/iob/novio-platinum</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/iob/novio-select</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/iob/platinum</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/iob/salaryse-rise-up</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/iob/select-rupay</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/iob/signature-visa</loc>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/iob/zet</loc>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/kvb</loc>
@@ -1286,7 +1414,7 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/kotak/zen</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/onecard</loc>
@@ -1366,219 +1494,223 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/apex</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/aspire</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/bankbazaar-savemax</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/bankbazaar-savemax-pro</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/binge</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/cookies</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/dmi-finance</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/easysaver</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/icon</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/iglobe</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/indianoil</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/indianoil-xtra</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/insignia-preferred-banking</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/irctc</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
+  </url>
+  <url>
+    <loc>https://ccreward.app/in/bank/rbl/jalsa</loc>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/lazypay</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/myfirst</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/nova</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/paisabazaar-duet</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/paisabazaar-duet-plus</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/patanjali-swarn</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/patanjali-vishisht</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-advantage</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-bonus</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-choice</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-classic</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-delight</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-edge</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-lifeeasy</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-max</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-maxima</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-maxima-plus</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-plus</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-prime</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-shopdaily</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-shopgain</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-shopsmart</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-traveleasy</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/platinum-valueplus</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/play</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/quickpay</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/salaryse-up</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/shoprite</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/shoppers-stop-black</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/shoppers-stop-gold</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/shoppers-stop-platinum</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/signature</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/tvs-credit</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/tvs-credit-gold</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/world-max</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/world-plus</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/world-prime</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/world-safari</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/rbl/world-safari-lite</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/sbi</loc>
@@ -1614,7 +1746,7 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/sbi/cashback</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/sbi/elite</loc>
@@ -1706,7 +1838,7 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/sbi/phonepe-select-black</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/sbi/prime</loc>
@@ -1758,7 +1890,7 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/sbi/tata-neu-infinity</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/sbi/tata-neu-plus</loc>
@@ -1838,7 +1970,7 @@
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/sc/ultimate</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/in/bank/union</loc>
@@ -2494,15 +2626,15 @@
   </url>
   <url>
     <loc>https://ccreward.app/sg/bank/trustbank</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
-    <loc>https://ccreward.app/sg/bank/trustbank/cashback</loc>
-    <lastmod>2026-10-14</lastmod>
+    <loc>https://ccreward.app/sg/bank/trustbank/freedom</loc>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/sg/bank/trustbank/link</loc>
-    <lastmod>2026-10-14</lastmod>
+    <lastmod>2026-11-14</lastmod>
   </url>
   <url>
     <loc>https://ccreward.app/sg/bank/uob</loc>
