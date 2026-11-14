@@ -9,6 +9,10 @@ import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } fr
 import type { ImageConfig } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
 import { slugify, safeDecode } from "../src/core/utils/slug.js";
+import cardsIN from "../src/data/cards_in.json";
+import cardsSG from "../src/data/cards_sg.json";
+import categoriesIN from "../src/data/cardCategories_in.json";
+import categoriesSG from "../src/data/cardCategories_sg.json";
 
 // Local Env override for this worker — matches the vinext image-optimization
 // API shape. The global Env (from worker-configuration.d.ts) uses the stricter
@@ -32,25 +36,77 @@ interface Env {
 // dangerouslyAllowSVG: true in next.config.js and uncomment below:
 // const imageConfig: ImageConfig = { dangerouslyAllowSVG: true };
 
-// Legacy bank/card/category URLs used percent-encoded names
-// ("/in/bank/amex/platinum%20reserve", "/in/top-cards/Food%20%26%20Dining").
-// Returns the slug URL path they moved to, or null if already canonical.
+// Legacy URLs Google still crawls, and where they moved to:
+//   "/in/bank/amex/platinum%20reserve"  -> "/in/bank/amex/platinum-reserve"  (old percent-encoded names)
+//   "/in/bank/sbi/pulse:28ukd2"         -> "/in/bank/sbi/pulse"              (":hash" suffixes from an old build)
+//   "/in/bank/dcs/ultimate"             -> "/sg/bank/dcs/ultimate"           (SG cards once linked under /in/)
+//   "/sg/bank/sc/simply-cash"           -> "/sg/bank/sc/simplycash"          (renamed: same words, different spacing)
+// Only redirects to pages that exist: anything else falls through to a real 404,
+// since a 301 to a 404 is reported as a 404 anyway and wastes a crawl.
+const REGIONS = ["in", "sg"] as const;
+type Region = (typeof REGIONS)[number];
+
 const SLUG_ROUTE = /^\/(in|sg)\/(bank|top-cards)\/(.+?)\/?$/;
+const HASH_SUFFIX = /:[a-z0-9]{4,8}(?::\d+)?$/i;
+
+// "simply-cash" and "simplycash" name the same card
+const compact = (slug: string) => slug.replace(/-/g, "");
+
+const toSlugMap = (names: string[]) => new Map(names.map((name) => [compact(slugify(name)), slugify(name)]));
+
+const SLUG_INDEX: Record<Region, { banks: Map<string, { slug: string; cards: Map<string, string> }>; categories: Map<string, string> }> = {
+  in: buildIndex(cardsIN, categoriesIN),
+  sg: buildIndex(cardsSG, categoriesSG),
+};
+
+function buildIndex(cards: { issuers: Record<string, { cards: string[] }> }, categories: Record<string, unknown>) {
+  return {
+    banks: new Map(
+      Object.entries(cards.issuers).map(([bank, { cards: names }]) => [
+        compact(slugify(bank)),
+        { slug: slugify(bank), cards: toSlugMap(names) },
+      ])
+    ),
+    categories: toSlugMap(Object.keys(categories)),
+  };
+}
+
+const segmentSlug = (segment: string) => compact(slugify(safeDecode(segment).replace(HASH_SUFFIX, "")));
+
+function resolveBankPath(region: Region, segments: string[]): string | null {
+  const [bankKey, cardKey] = segments.map(segmentSlug);
+  if (!bankKey || (segments.length === 2 && !cardKey)) return null;
+
+  // The URL's own region first, then the other one
+  for (const r of [region, ...REGIONS.filter((x) => x !== region)]) {
+    const bank = SLUG_INDEX[r].banks.get(bankKey);
+    if (!bank) continue;
+    if (segments.length === 1) return `/${r}/bank/${bank.slug}`;
+    const card = bank.cards.get(cardKey);
+    if (card) return `/${r}/bank/${bank.slug}/${card}`;
+  }
+  return null;
+}
 
 function legacySlugRedirect(pathname: string): string | null {
   const match = pathname.match(SLUG_ROUTE);
-  if (!match) return null;
-  const [, region, section, rest] = match;
+  if (!match) {
+    // "/sg:7ifgit", "/in/howto:n3ymir"
+    const stripped = pathname.replace(HASH_SUFFIX, "");
+    return stripped !== pathname ? stripped : null;
+  }
+  const [, region, section, rest] = match as unknown as [string, Region, string, string];
 
-  // Category names can contain "/" ("Government/Tax"), bank routes have <= 2 segments
-  const segments = section === "top-cards" ? [rest] : rest.split("/");
-  if (segments.length > 2) return null;
-
-  const slugs = segments.map((segment) => slugify(safeDecode(segment)));
-  if (slugs.some((slug) => !slug)) return null;
-
-  const target = `/${region}/${section}/${slugs.join("/")}`;
-  return target === pathname ? null : target;
+  let target: string | null = null;
+  if (section === "top-cards") {
+    // Category names can contain "/" ("Government/Tax"), so the rest is one segment
+    const category = SLUG_INDEX[region].categories.get(segmentSlug(rest));
+    if (category) target = `/${region}/top-cards/${category}`;
+  } else {
+    const segments = rest.split("/");
+    if (segments.length <= 2) target = resolveBankPath(region, segments);
+  }
+  return target && target !== pathname ? target : null;
 }
 
 export default {

@@ -12,6 +12,7 @@ import {
   Chip,
 } from "@mui/material";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { getCurrencySymbol } from "@/core/utils/currency";
 import {
   School as SchoolIcon,
@@ -67,6 +68,11 @@ const TopCardsGrid = ({
 }) => {
   // Get the current region from the context
   const { region, isInitialized } = useRegion();
+  // Card links follow the page's region (/sg/... lists SG cards). The context
+  // region is null during the server render, which used to emit /in/ links
+  // for Singapore cards that crawlers then followed into 404s.
+  const pathRegion = usePathname()?.match(/^\/(in|sg)(?:\/|$)/)?.[1];
+  const linkRegion = pathRegion || region?.toLowerCase() || 'in';
   const [referralData, setReferralData] = useState({});
   const cols = isMobile ? 2 : isTablet ? 3 : 4;
 
@@ -240,7 +246,7 @@ const TopCardsGrid = ({
                     <Stack direction="column" spacing={1} sx={{ mt: "auto" }}>
                         <Button
                             component={Link}
-                            href={cardPath(region || 'in', card.bank, card.cardName)}
+                            href={cardPath(linkRegion, card.bank, card.cardName)}
                             variant="outlined"
                             size="small"
                             fullWidth

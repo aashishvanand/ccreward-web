@@ -34,6 +34,11 @@ const DEFAULT_CHECKS = [
     // Legacy URL formats must 301 to the clean slug
     ['/in/bank/AMEX/Platinum%20Reserve', 200, '/in/bank/amex/platinum-reserve'],
     ['/in/top-cards/Online%20Shopping', 200, '/in/top-cards/online-shopping'],
+    // ":hash" suffixes, SG cards under /in/, and renamed cards also redirect (worker/index.ts)
+    ['/in/bank/sbi/pulse:28ukd2', 200, '/in/bank/sbi/pulse'],
+    ['/in/bank/dcs/ultimate', 200, '/sg/bank/dcs/ultimate'],
+    ['/sg/bank/sc/simply-cash', 200, '/sg/bank/sc/simplycash'],
+    ['/mcp', 200],
     // Unknown pages must be real 404s, not soft 404s
     ['/in/bank/amex/this-card-does-not-exist', 404],
     ['/this-page-does-not-exist', 404],
