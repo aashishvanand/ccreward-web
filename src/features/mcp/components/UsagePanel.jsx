@@ -19,7 +19,8 @@ function UsagePanel({ status }) {
           </Typography>
         </Stack>
         <Typography variant="body2" color="text.secondary">
-          Generate credentials above to start using your MCP credits.
+          Your balance appears here once you generate an API key or connect an app by
+          signing in.
         </Typography>
       </Paper>
     );
@@ -53,6 +54,12 @@ function UsagePanel({ status }) {
         {credits && (
           <Typography variant="caption" color="text.secondary">
             {credits.used} of {credits.limit} used
+          </Typography>
+        )}
+        {status.freeCalls && (
+          <Typography variant="body2" color="text.secondary">
+            Free calls today: {status.freeCalls.remaining} of {status.freeCalls.limit} left
+            (used before credits, reset at 00:00 UTC)
           </Typography>
         )}
         {status.lastUsedAt && (

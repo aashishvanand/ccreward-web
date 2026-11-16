@@ -12,6 +12,8 @@ import {
   Chip,
 } from "@mui/material";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { getCurrencySymbol } from "@/core/utils/currency";
 import {
   School as SchoolIcon,
   Theaters as TheatersIcon,
@@ -29,10 +31,11 @@ import {
   Receipt as ReceiptIcon,
   AccountBalanceWallet as AccountBalanceWalletIcon,
 } from "@mui/icons-material";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useRegion } from "@/core/providers/RegionContext";
 import TiltCard from "@/shared/components/ui/TiltCard";
 import { cardPath } from "@/core/utils/slug";
+import { setCachedJson } from '@/core/utils/storage';
 
 // Use a prefix for the cache key to make it dynamic
 const CACHE_KEY_PREFIX = "referralData_";
@@ -65,6 +68,11 @@ const TopCardsGrid = ({
 }) => {
   // Get the current region from the context
   const { region, isInitialized } = useRegion();
+  // Card links follow the page's region (/sg/... lists SG cards). The context
+  // region is null during the server render, which used to emit /in/ links
+  // for Singapore cards that crawlers then followed into 404s.
+  const pathRegion = usePathname()?.match(/^\/(in|sg)(?:\/|$)/)?.[1];
+  const linkRegion = pathRegion || region?.toLowerCase() || 'in';
   const [referralData, setReferralData] = useState({});
   const cols = isMobile ? 2 : isTablet ? 3 : 4;
 
@@ -96,10 +104,7 @@ const TopCardsGrid = ({
           setReferralData(data);
           
           // Cache the data with region-specific key
-          localStorage.setItem(cacheKey, JSON.stringify({
-            data,
-            timestamp: Date.now()
-          }));
+          setCachedJson(cacheKey, data);
         }
       } catch (error) {
         console.error('Error fetching referral data for region:', region, error);
@@ -127,7 +132,7 @@ const TopCardsGrid = ({
         
         return (
           <ImageListItem key={`${card.bank}-${card.cardName}-${index}`}>
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
@@ -158,7 +163,7 @@ const TopCardsGrid = ({
                 {/* Referral badge */}
                 {referralInfo && (
                   <Chip
-                    label={`₹${referralInfo.amount} Referral`}
+                    label={`${getCurrencySymbol(region)}${referralInfo.amount} Referral`}
                     size="small"
                     color="success"
                     sx={{
@@ -241,7 +246,7 @@ const TopCardsGrid = ({
                     <Stack direction="column" spacing={1} sx={{ mt: "auto" }}>
                         <Button
                             component={Link}
-                            href={cardPath(region || 'in', card.bank, card.cardName)}
+                            href={cardPath(linkRegion, card.bank, card.cardName)}
                             variant="outlined"
                             size="small"
                             fullWidth
@@ -270,7 +275,7 @@ const TopCardsGrid = ({
                     </Stack>
                 </Box>
               </Paper>
-            </motion.div>
+            </m.div>
           </ImageListItem>
         );
       })}

@@ -18,7 +18,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
 import faqs from "@/shared/constants/faq";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 
 // Add analytics imports
 import {
@@ -242,7 +242,7 @@ const FAQPage = () => {
   const popularQuestions = getPopularQuestions();
 
   return (
-    <motion.div
+    <m.div
       variants={pageVariants}
       initial="hidden"
       animate="visible"
@@ -455,7 +455,7 @@ const FAQPage = () => {
         </Container>
         <Footer />
       </Box>
-    </motion.div>
+    </m.div>
   );
 };
 

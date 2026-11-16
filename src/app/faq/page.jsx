@@ -1,5 +1,6 @@
 import faqs from '@/shared/constants/faq';
 import FAQClient from './FAQClient';
+import { serializeJsonLd } from '@/core/utils/jsonLd';
 
 export const metadata = {
   title: 'Frequently Asked Questions',
@@ -39,7 +40,7 @@ export default function FAQ() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <FAQClient />
     </>

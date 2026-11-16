@@ -75,6 +75,10 @@ const RegionSelector = () => {
     <>
       <Tooltip title={`Region: ${regionName}${regionIndicator}`}>
         <IconButton
+          id="region-button"
+          aria-controls={open ? "region-menu" : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? "true" : undefined}
           onClick={handleClick}
           color="inherit"
           aria-label="select region"

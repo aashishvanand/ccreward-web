@@ -1,10 +1,12 @@
 // src/core/services/crashlytics.js - Firebase Crashlytics Implementation
+import { getSafePageUrl } from '@/core/utils/safeUrl';
 let crashlytics = null;
 let isInitialized = false;
 
 // Initialize Crashlytics (web version uses different approach)
 export const initializeCrashlytics = async () => {
     if (typeof window === 'undefined') return false;
+    if (isInitialized) return true;
 
     try {
         // For web, we'll implement a custom crash reporting system
@@ -39,7 +41,7 @@ function setupGlobalErrorHandlers() {
             colno: event.colno,
             stack: event.error?.stack,
             timestamp: new Date().toISOString(),
-            url: window.location.href,
+            url: getSafePageUrl(),
             userAgent: navigator.userAgent,
             type: 'javascript_error'
         };
@@ -55,7 +57,7 @@ function setupUnhandledRejectionHandler() {
             reason: event.reason?.toString() || 'Unknown promise rejection',
             stack: event.reason?.stack,
             timestamp: new Date().toISOString(),
-            url: window.location.href,
+            url: getSafePageUrl(),
             userAgent: navigator.userAgent,
             type: 'unhandled_promise_rejection'
         };
@@ -87,26 +89,7 @@ function setupPerformanceMonitoring() {
                 console.warn('Long task observer not supported');
             }
         }
-
-        // Monitor Layout Shifts
-        try {
-            const clsObserver = new PerformanceObserver((list) => {
-                for (const entry of list.getEntries()) {
-                    if (entry.value > 0.1) { // Significant layout shift
-                        recordPerformanceIssue('layout_shift', {
-                            value: entry.value,
-                            startTime: entry.startTime,
-                            timestamp: new Date().toISOString()
-                        });
-                    }
-                }
-            });
-            clsObserver.observe({ entryTypes: ['layout-shift'] });
-        } catch (error) {
-            if (process.env.NODE_ENV === 'development') {
-                console.warn('Layout shift observer not supported');
-            }
-        }
+        // Layout shifts are measured once, as CLS, in analytics.js
     }
 }
 
@@ -121,7 +104,7 @@ export const recordError = (errorName, errorInfo = {}) => {
             timestamp: new Date().toISOString(),
             session_id: getSessionId(),
             user_id: getCurrentUserId(),
-            page_url: window.location.href,
+            page_url: getSafePageUrl(),
             page_title: document.title,
             user_agent: navigator.userAgent,
             viewport: `${window.innerWidth}x${window.innerHeight}`,
@@ -176,7 +159,7 @@ export const recordPerformanceIssue = (issueName, issueInfo = {}) => {
             issue_name: issueName,
             timestamp: new Date().toISOString(),
             session_id: getSessionId(),
-            page_url: window.location.href,
+            page_url: getSafePageUrl(),
             ...issueInfo
         };
 

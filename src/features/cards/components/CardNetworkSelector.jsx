@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Box, Typography, useTheme, Tooltip, Fade, Skeleton } from "@mui/material";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { useRegion } from "@/core/providers/RegionContext";
 import PropTypes from 'prop-types';
 import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
@@ -106,7 +106,7 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
                             transition: { timeout: 400 }
                         }}>
                             <Box sx={{ position: "relative", textAlign: "center" }}>
-                                <motion.div
+                                <m.div
                                     custom={index}
                                     initial="hidden"
                                     whileHover="hover"
@@ -153,7 +153,7 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
                                             </Typography>
                                         )}
                                     </Box>
-                                </motion.div>
+                                </m.div>
                                 {isSelected && (
                                     <Box sx={{
                                         position: 'absolute', top: -5, right: -5, width: 24, height: 24, borderRadius: '50%',

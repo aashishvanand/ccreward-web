@@ -3,13 +3,7 @@ import TopCardsPage from '@/features/top-cards/components/TopCardsPage';
 import { generateMetadata as generateMetadataHelper, pageMetadata, commonMetadata } from '@/shared/components/seo';
 import PerformanceWrapper from '@/shared/components/PerformanceWrapper';
 
-import categoriesIN from '@/data/cardCategories_in.json';
-import categoriesSG from '@/data/cardCategories_sg.json';
-
-const DATA = {
-    in: { categories: categoriesIN, images: [] },
-    sg: { categories: categoriesSG, images: [] }
-};
+import { getTopCardsData as getData } from '@/features/top-cards/topCardsServerData';
 
 export async function generateStaticParams() {
     return [
@@ -37,11 +31,6 @@ export async function generateMetadata({ params }) {
     });
 }
 
-function getData(region = 'in') {
-    const key = region.toLowerCase() === 'sg' ? 'sg' : 'in';
-    return DATA[key] || DATA['in'];
-}
-
 export default async function TopCards({ params }) {
     const { region } = await params;
 
@@ -53,7 +42,7 @@ export default async function TopCards({ params }) {
     return (
         <Suspense fallback={<div style={{ minHeight: '100vh' }} />}>
             <PerformanceWrapper name="top_cards_page">
-                <TopCardsPage initialCategories={categories} initialCardImages={images} />
+                <TopCardsPage initialCategories={categories} initialCardImages={images} initialRegion={targetRegion} />
             </PerformanceWrapper>
         </Suspense>
     );

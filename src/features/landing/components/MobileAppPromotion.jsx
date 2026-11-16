@@ -80,8 +80,8 @@ const MobileAppPromotion = ({ isAndroid }) => {
               <Image
                 src={buildCloudflareImageUrl(screenshot, "public")}
                 alt={`App Screenshot ${index + 1}`}
-                layout="fill"
-                objectFit="cover"
+                fill
+                style={{ objectFit: "cover" }}
                 priority={index === 0}
                 unoptimized
               />

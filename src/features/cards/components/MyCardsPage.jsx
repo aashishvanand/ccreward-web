@@ -11,6 +11,7 @@ import {
   Stack,
   useTheme,
   useScrollTrigger,
+  alpha,
   Button,
 } from "@mui/material";
 import { Add as AddIcon, CreditCard as CreditCardIcon } from "@mui/icons-material";
@@ -32,7 +33,7 @@ import PortfolioShare from "./PortfolioShare";
 import { SpeedDial, SpeedDialAction, SpeedDialIcon } from "@mui/material";
 import ShareDialog from "./ShareDialog";
 import { useRegion } from "@/core/providers/RegionContext";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import {
   useAnalytics,
   usePagePerformance,
@@ -560,16 +561,15 @@ function MyCardsPage() {
               width: 80,
               height: 80,
               borderRadius: "50%",
-              bgcolor: "primary.light",
+              bgcolor: alpha(theme.palette.primary.main, 0.1),
               color: "primary.main",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               mb: 2,
-              opacity: 0.1,
             }}
           >
-            <CreditCardIcon sx={{ fontSize: 48, opacity: 1 }} />
+            <CreditCardIcon sx={{ fontSize: 48 }} />
           </Box>
           <Typography variant="h5" gutterBottom sx={{
             fontWeight: "bold"
@@ -638,7 +638,7 @@ function MyCardsPage() {
   };
 
   return (
-    <motion.div
+    <m.div
       variants={pageVariants}
       initial="hidden"
       animate="visible"
@@ -731,7 +731,7 @@ function MyCardsPage() {
         )}
         <Footer />
       </Box>
-    </motion.div>
+    </m.div>
   );
 }
 

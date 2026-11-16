@@ -1,3 +1,7 @@
+# Cloudflare static-asset headers. These apply only to files served from
+# dist/client (turnstile.html, /scripts/*, images); pages rendered by the
+# Worker get their headers from next.config.mjs. Both use security-headers.mjs.
+
 # Allow access to OG image from any origin
 /og.png
   Access-Control-Allow-Origin: *
@@ -8,11 +12,6 @@
 
 /ccreward_light.png
   Access-Control-Allow-Origin: *
-
-# Allow framing for the embeddable calculator only from selected domains
-/embeddable-calculator
-  X-Frame-Options: ALLOW-FROM https://www.professorcardz.com/ https://creditcardz.in/
-  Content-Security-Policy: frame-ancestors 'self' https://www.professorcardz.com/ https://creditcardz.in/
 
 # Allow access to app-ads.txt and ads.txt
 /app-ads.txt
@@ -33,39 +32,39 @@
 
 # Allow access to security.txt
 /security.txt
-Content-Type: text/plain
-Cache-Control: no-cache
-Access-Control-Allow-Origin: *
-X-Robots-Tag: all
+  Content-Type: text/plain
+  Cache-Control: no-cache
+  Access-Control-Allow-Origin: *
+  X-Robots-Tag: all
 
 # Apple App Site Association
 /.well-known/apple-app-site-association
   Content-Type: application/json
 
-# CORS headers for API endpoint
-/bank
-  Access-Control-Allow-Origin: https://ccreward.app
-  Access-Control-Allow-Methods: GET, POST, OPTIONS
-  Access-Control-Allow-Headers: Origin, Content-Type, Accept
-
-# Block access to development domain
+# Keep the development domain out of search and caches
 https://dev.ccreward.app/*
   X-Robots-Tag: noindex, nofollow
-  X-Frame-Options: DENY
-  Content-Security-Policy: frame-ancestors 'none'
-  X-Content-Type-Options: nosniff
-  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   Cache-Control: no-store, no-cache, must-revalidate
-  Access-Control-Allow-Origin: https://ccreward.app
 
-# Security headers for all other pages
+# Unhashed static files: cache for a day, revalidate in the background for a week
+/scripts/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/*.png
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+
+# Hashed build output
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# BEGIN generated security headers (npm run generate:headers; edit security-headers.mjs)
 /*
-  X-Frame-Options: DENY
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googletagmanager.com https://*.clarity.ms https://*.firebaseapp.com https://accounts.google.com https://apis.google.com https://challenges.cloudflare.com https://checkout.razorpay.com; connect-src 'self' https://*.ccreward.app https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.clarity.ms https://c.bing.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://accounts.google.com https://react-tweet.vercel.app https://docs.google.com https://challenges.cloudflare.com https://api.razorpay.com https://lumberjack.razorpay.com; img-src 'self' data: blob: https://imagedelivery.net https://files.ccreward.app https://firebasestorage.googleapis.com https://lh3.googleusercontent.com https://pbs.twimg.com https://img.youtube.com https://*.clarity.ms https://c.bing.com https://*.google-analytics.com https://*.googletagmanager.com https://*.razorpay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com https://checkout.razorpay.com; font-src 'self' https://fonts.gstatic.com data:; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://accounts.google.com https://*.firebaseapp.com https://challenges.cloudflare.com https://api.razorpay.com https://checkout.razorpay.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Content-Security-Policy: default-src 'self' https://*.clarity.ms https://c.bing.com https://*.google.com https://apis.google.com https://*.firebaseapp.com https://*.firebase.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://*.clarity.ms https://c.bing.com local.adguard.org https://static.cloudflareinsights.com https://pagead2.googlesyndication.com https://tpc.googlesyndication.com https://googleads.g.doubleclick.net https://*.google-analytics.com https://www.googletagmanager.com https://*.google.com https://accounts.google.com https://challenges.cloudflare.com https://checkout.razorpay.com; style-src 'self' 'unsafe-inline' https://accounts.google.com https://*.google.com https://checkout.razorpay.com; font-src 'self' data:; img-src 'self' data: https://imagedelivery.net https://pbs.twimg.com https://lh3.googleusercontent.com https://*.google-analytics.com https://www.googletagmanager.com https://*.razorpay.com; connect-src 'self' https: wss://*.firebaseio.com https://files.ccreward.app https://imagedelivery.net https://*.google-analytics.com https://www.googletagmanager.com https://www.google.com https://challenges.cloudflare.com; frame-src 'self' https://*.firebaseapp.com https://*.firebase.com https://googleads.g.doubleclick.net https://accounts.google.com https://*.google.com https://challenges.cloudflare.com https://api.razorpay.com https://checkout.razorpay.com; child-src 'self' https://googleads.g.doubleclick.net;
-  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-
-# Static asset caching
-/_next/static/*
-  Cache-Control: public,max-age=31536000,immutable
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  X-XSS-Protection: 0
+# END generated security headers

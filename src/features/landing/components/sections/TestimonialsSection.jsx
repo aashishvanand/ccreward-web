@@ -2,18 +2,28 @@
 
 import { useReducedMotion } from "framer-motion";
 import { Box, Container, Typography, Grid, IconButton } from "@mui/material";
-import { ChevronLeft, ChevronRight } from "@mui/icons-material";
+import { ChevronLeft, ChevronRight, Pause, PlayArrow } from "@mui/icons-material";
 import TweetContainer from "./TweetContainer";
 import ErrorBoundary from "@/shared/components/ErrorBoundary";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 
 const TestimonialsSection = ({
   visibleTweets,
   handlePrevPage,
   handleNextPage,
   isMobile,
+  autoplayAvailable = false,
+  isAutoplayStopped = false,
+  onToggleAutoplay,
+  onHoverChange,
+  onFocusChange,
 }) => {
   const prefersReducedMotion = useReducedMotion();
+
+  // Focus moving between elements inside the carousel shouldn't resume autoplay
+  const handleBlur = (event) => {
+    if (!event.currentTarget.contains(event.relatedTarget)) onFocusChange?.(false);
+  };
 
   return (
     <Box sx={{ py: 8 }}>
@@ -22,7 +32,16 @@ const TestimonialsSection = ({
           Recommended by the X Community
         </Typography>
 
-        <Box sx={{ position: "relative", px: { xs: 4, sm: 6, md: 8 } }}>
+        <Box
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Testimonials"
+          onMouseEnter={() => onHoverChange?.(true)}
+          onMouseLeave={() => onHoverChange?.(false)}
+          onFocus={() => onFocusChange?.(true)}
+          onBlur={handleBlur}
+          sx={{ position: "relative", px: { xs: 4, sm: 6, md: 8 } }}
+        >
           <IconButton
             onClick={handlePrevPage}
             aria-label="Previous testimonials"
@@ -41,7 +60,7 @@ const TestimonialsSection = ({
           </IconButton>
 
           <AnimatePresence mode="wait">
-            <motion.div
+            <m.div
               key={visibleTweets[0]?.url || "empty"}
               initial={{ opacity: 0, x: prefersReducedMotion ? 0 : 50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -70,7 +89,7 @@ const TestimonialsSection = ({
                         md: 4,
                       }}
                     >
-                      <motion.div
+                      <m.div
                         initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{
@@ -99,12 +118,12 @@ const TestimonialsSection = ({
                         >
                           <TweetContainer tweetUrl={tweet.url} />
                         </ErrorBoundary>
-                      </motion.div>
+                      </m.div>
                     </Grid>
                   );
                 })}
               </Grid>
-            </motion.div>
+            </m.div>
           </AnimatePresence>
 
           <IconButton
@@ -124,6 +143,19 @@ const TestimonialsSection = ({
             <ChevronRight />
           </IconButton>
         </Box>
+
+        {autoplayAvailable && onToggleAutoplay && (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+            <IconButton
+              onClick={onToggleAutoplay}
+              aria-label={isAutoplayStopped ? "Resume testimonial autoplay" : "Pause testimonial autoplay"}
+              size="small"
+              sx={{ border: 1, borderColor: "divider" }}
+            >
+              {isAutoplayStopped ? <PlayArrow fontSize="small" /> : <Pause fontSize="small" />}
+            </IconButton>
+          </Box>
+        )}
       </Container>
     </Box>
   );

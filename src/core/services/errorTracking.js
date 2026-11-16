@@ -1,5 +1,6 @@
 // src/core/services/errorTracking.js - Client-Side Error Tracking for Cloudflare Pages
 import { logAnalyticsEvent } from './analytics';
+import { getSafePageUrl } from '@/core/utils/safeUrl';
 
 let isInitialized = false;
 
@@ -105,7 +106,7 @@ const recordError = (errorName, errorInfo = {}, isFatal = false) => {
             error_type: categoryType,
             timestamp: new Date().toISOString(),
             session_id: getOrCreateSessionId(),
-            page_url: window.location.href,
+            page_url: getSafePageUrl(),
             page_title: document.title,
             user_agent: navigator.userAgent,
             viewport: `${window.innerWidth}x${window.innerHeight}`,
@@ -167,7 +168,7 @@ const recordPerformanceIssue = (issueName, issueInfo = {}) => {
             issue_name: issueName,
             issue_type: 'performance',
             timestamp: new Date().toISOString(),
-            page_url: window.location.href,
+            page_url: getSafePageUrl(),
             ...getPerformanceContext(),
             ...issueInfo
         };
@@ -433,7 +434,7 @@ const logBreadcrumb = (message, category = 'info', data = {}) => {
             message,
             category,
             timestamp: new Date().toISOString(),
-            page_url: window.location.href,
+            page_url: getSafePageUrl(),
             ...data
         };
 
@@ -485,7 +486,7 @@ const recordAPIError = (endpoint, statusCode, errorMessage, requestData = {}) =>
             request_method: requestData.method || 'unknown',
             request_data: requestData.data ? JSON.stringify(requestData.data).substring(0, 500) : '',
             timestamp: new Date().toISOString(),
-            page_url: window.location.href,
+            page_url: getSafePageUrl(),
             user_agent: navigator.userAgent
         };
 

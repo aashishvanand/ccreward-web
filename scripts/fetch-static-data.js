@@ -36,6 +36,8 @@ const FILES_TO_FETCH = [
     'bankImages_sg.json',
     'cardCategories_in.json',
     'cardCategories_sg.json',
+    'cardImages_in.json',
+    'cardImages_sg.json',
     'cards_in.json',
     'cards_sg.json',
     'transfer_airline_in.json',
@@ -44,11 +46,11 @@ const FILES_TO_FETCH = [
     'transfer_hotel_sg.json'
 ];
 
-// Additional files fetched from files CDN (no API key needed).
-// These are optional — if Cloudflare blocks the request, the build continues without them.
-const CDN_FILES_TO_FETCH = [
-    { url: 'https://files.ccreward.app/cardImages_in.json', filename: 'cardImages_in.json' },
-    { url: 'https://files.ccreward.app/cardImages_sg.json', filename: 'cardImages_sg.json' },
+// Fetched if available; when the API doesn't serve them (yet), an empty list is written so the
+// pages that import them still build and simply leave that content out.
+const OPTIONAL_FILES = [
+    'cardSummary_in.json',
+    'cardSummary_sg.json',
 ];
 
 if (!API_KEY) {
@@ -105,36 +107,6 @@ const downloadFile = async (filename) => {
     }
 };
 
-const downloadCdnFile = async ({ url, filename }) => {
-    const filePath = path.join(DATA_DIR, filename);
-
-    try {
-        const response = await axios.get(url, {
-            responseType: 'stream'
-        });
-
-        const writer = fs.createWriteStream(filePath);
-
-        return new Promise((resolve, reject) => {
-            response.data.pipe(writer);
-            writer.on('finish', () => {
-                writer.close();
-                console.log(`✅ Fetched ${filename} (CDN)`);
-                resolve();
-            });
-            writer.on('error', (err) => {
-                writer.close();
-                fs.unlink(filePath, () => { });
-                reject(err);
-            });
-        });
-
-    } catch (error) {
-        // CDN files are optional - don't fail the build
-        console.warn(`⚠️ Could not fetch ${filename} from CDN: ${error.message}`);
-    }
-};
-
 async function fetchAll() {
     console.log('🚀 Starting static data fetch...');
     try {
@@ -145,10 +117,14 @@ async function fetchAll() {
             await new Promise(r => setTimeout(r, 500));
         }
 
-        // Fetch card images data from CDN (for SSR)
-        for (const cdnFile of CDN_FILES_TO_FETCH) {
-            await downloadCdnFile(cdnFile);
-            await new Promise(r => setTimeout(r, 300));
+        for (const file of OPTIONAL_FILES) {
+            try {
+                await downloadFile(file);
+            } catch (error) {
+                console.warn(`⚠️ ${error.message}; writing an empty ${file}`);
+                fs.writeFileSync(path.join(DATA_DIR, file), '[]');
+            }
+            await new Promise(r => setTimeout(r, 500));
         }
 
         console.log('✨ All static data fetched successfully.');

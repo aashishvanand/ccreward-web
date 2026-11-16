@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { setCachedJson } from '@/core/utils/storage';
 
-const CACHE_KEY = 'partnerLogos';
+// v2: adds `other` logos (yuu, HeyMax, Mag Miles); old cache entries don't have them
+const CACHE_KEY = 'partnerLogos_v2';
 const CACHE_EXPIRATION = 24 * 60 * 60 * 1000; // 24 hours
 
 // Fetch function for a single JSON file
@@ -15,7 +17,7 @@ async function fetchLogoData(url) {
 }
 
 function usePartnerLogos() {
-    const [logos, setLogos] = useState({ airline: {}, hotel: {} });
+    const [logos, setLogos] = useState({ airline: {}, hotel: {}, other: {} });
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -37,9 +39,11 @@ function usePartnerLogos() {
                 }
 
                 // Fetch fresh data
-                const [airlineData, hotelData] = await Promise.all([
+                const [airlineData, hotelData, otherData] = await Promise.all([
                     fetchLogoData('https://files.ccreward.app/airline_logo.json'),
-                    fetchLogoData('https://files.ccreward.app/hotel_logo.json')
+                    fetchLogoData('https://files.ccreward.app/hotel_logo.json'),
+                    // Optional: missing other logos shouldn't hide airline/hotel logos
+                    fetchLogoData('https://files.ccreward.app/other_logo.json').catch(() => [])
                 ]);
 
                 // Process data into lookup objects
@@ -54,15 +58,18 @@ function usePartnerLogos() {
                     return acc;
                 }, {});
 
-                const combinedLogos = { airline: airlineLogos, hotel: hotelLogos };
+                // Other programs (yuu, HeyMax, Mag Miles) are matched on the exact brand name
+                const otherLogos = otherData.reduce((acc, item) => {
+                    acc[item.brand_name.toLowerCase()] = item.id;
+                    return acc;
+                }, {});
+
+                const combinedLogos = { airline: airlineLogos, hotel: hotelLogos, other: otherLogos };
 
                 setLogos(combinedLogos);
 
                 // Update cache
-                localStorage.setItem(CACHE_KEY, JSON.stringify({
-                    data: combinedLogos,
-                    timestamp: Date.now()
-                }));
+                setCachedJson(CACHE_KEY, combinedLogos);
 
             } catch (err) {
                 setError(err);

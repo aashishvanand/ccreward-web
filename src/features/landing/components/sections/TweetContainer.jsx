@@ -1,76 +1,40 @@
 "use client";
 
-import { Suspense } from "react";
-import { EmbeddedTweet, TweetNotFound, TweetSkeleton, useTweet } from "react-tweet";
-import { Box, Typography, Skeleton } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import { Box } from "@mui/material";
+import TweetLoading from "./TweetLoading";
 import { useTheme } from "@mui/material/styles";
 
-/**
- * Loading placeholder that mimics a tweet card shape.
- */
-const TweetLoading = () => (
-  <Box
-    sx={{
-      minHeight: "200px",
-      p: 2,
-      display: "flex",
-      flexDirection: "column",
-      gap: 1.5,
-      bgcolor: "background.paper",
-      borderRadius: 2,
-      border: "1px solid",
-      borderColor: "divider",
-    }}
-  >
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-      <Skeleton variant="circular" width={48} height={48} />
-      <Box sx={{ flex: 1 }}>
-        <Skeleton width="60%" height={20} />
-        <Skeleton width="40%" height={16} />
-      </Box>
-    </Box>
-    <Skeleton width="100%" height={16} />
-    <Skeleton width="90%" height={16} />
-    <Skeleton width="70%" height={16} />
-  </Box>
-);
-
-/**
- * Fallback when a tweet cannot be loaded.
- */
-const TweetError = () => (
-  <Box
-    sx={{
-      p: 4,
-      minHeight: "200px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      bgcolor: "background.paper",
-      borderRadius: 2,
-      border: "1px solid",
-      borderColor: "divider",
-      color: "text.secondary",
-    }}
-  >
-    <Typography variant="body2">Tweet could not be loaded.</Typography>
-  </Box>
-);
-
-/**
- * Inner component that uses the useTweet SWR hook for client-side fetching.
- */
-const TweetContent = ({ tweetId }) => {
-  const { data, error, isLoading } = useTweet(tweetId);
-
-  if (isLoading) return <TweetLoading />;
-  if (error || !data) return <TweetError />;
-
-  return <EmbeddedTweet tweet={data} />;
-};
+const TweetContent = dynamic(() => import("./TweetContent"), {
+  ssr: false,
+  loading: () => <TweetLoading />,
+});
 
 const TweetContainer = ({ tweetUrl }) => {
   const theme = useTheme();
+  const containerRef = useRef(null);
+  const [isNearViewport, setIsNearViewport] = useState(false);
+
+  // Don't load react-tweet or fetch the tweet until it's about to be seen
+  useEffect(() => {
+    if (isNearViewport || !containerRef.current) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setIsNearViewport(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setIsNearViewport(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "400px" }
+    );
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [isNearViewport]);
 
   const getTweetId = (url) => {
     if (!url) return null;
@@ -84,6 +48,7 @@ const TweetContainer = ({ tweetUrl }) => {
 
   return (
     <Box
+      ref={containerRef}
       className={theme.palette.mode}
       data-theme={theme.palette.mode}
       sx={{
@@ -106,9 +71,7 @@ const TweetContainer = ({ tweetUrl }) => {
         },
       }}
     >
-      <Suspense fallback={<TweetLoading />}>
-        <TweetContent tweetId={tweetId} />
-      </Suspense>
+      {isNearViewport ? <TweetContent tweetId={tweetId} /> : <TweetLoading />}
     </Box>
   );
 };

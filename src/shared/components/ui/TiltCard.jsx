@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { m, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Box, useMediaQuery } from "@mui/material";
 import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
 
@@ -83,7 +83,7 @@ const TiltCard = ({
             ...props.sx
         }}
     >
-        <motion.div
+        <m.div
             ref={ref}
             onMouseMove={handleMouseMove}
             onMouseEnter={handleMouseEnter}
@@ -174,7 +174,7 @@ const TiltCard = ({
                  />
 
             </Box>
-        </motion.div>
+        </m.div>
     </Box>
   );
 };

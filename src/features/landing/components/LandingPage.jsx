@@ -15,6 +15,7 @@ import { useRegion } from "@/core/providers/RegionContext";
 import Header, { MinimalHeader } from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
 import HeroSection from "./HeroSection";
+import BrowseCategoriesSection from "./sections/BrowseCategoriesSection";
 import FeaturesSection from "./sections/FeaturesSection";
 import BankSection from "./sections/BankSection";
 import CallToActionSection from "./sections/CallToActionSection";
@@ -28,7 +29,7 @@ import { detectDevice } from "@/core/utils/deviceUtils";
 import TopSearchs from "./sections/TopSearchs";
 import StatsSection from "./sections/StatsSection";
 import GoogleOneTap from "@/shared/components/auth/GoogleOneTap";
-import { motion } from "framer-motion";
+import { m, useReducedMotion } from "framer-motion";
 import debounce from "lodash/debounce";
 
 // Add analytics imports - FIXED
@@ -65,7 +66,7 @@ const pageVariants = {
 };
 
 // Main LandingPage component that orchestrates all sections and tracking
-const LandingPage = () => {
+const LandingPage = ({ cardStats, region: pageRegion, browse }) => {
   const router = useRouter();
   const {
     signInWithGoogle,
@@ -76,6 +77,9 @@ const LandingPage = () => {
   } = useAuth();
   const theme = useTheme();
   const { region } = useRegion();
+  // On /in and /sg the URL decides which bank and category links to show, so the server HTML
+  // matches the page (the context region is still null while rendering on the server)
+  const sectionRegion = pageRegion ? pageRegion.toUpperCase() : region === "SG" ? "SG" : "IN";
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
@@ -111,7 +115,27 @@ const LandingPage = () => {
   // Fetch card images data for the application
   const { cardImagesData } = useCardImagesData();
 
-  const [allTweets] = useState(() => [...(tweets || [])].sort(() => Math.random() - 0.5));
+  // Start in source order so server and client render the same markup, then shuffle after mount.
+  const [allTweets, setAllTweets] = useState(() => tweets || []);
+  useEffect(() => {
+    setAllTweets((prev) => {
+      const shuffled = [...prev];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    });
+  }, []);
+
+  // Autoplay pauses while the carousel is hovered or focused, when the user pauses it,
+  // and is off entirely under prefers-reduced-motion (WCAG 2.2.2).
+  const prefersReducedMotion = useReducedMotion();
+  const [isCarouselHovered, setIsCarouselHovered] = useState(false);
+  const [isCarouselFocused, setIsCarouselFocused] = useState(false);
+  const [isAutoplayStopped, setIsAutoplayStopped] = useState(false);
+  const isAutoplayActive =
+    !prefersReducedMotion && !isAutoplayStopped && !isCarouselHovered && !isCarouselFocused;
 
   // Calculate number of tweets per page based on screen size
   const tweetsPerPage = isMobile ? 1 : isTablet ? 2 : 3;
@@ -122,14 +146,28 @@ const LandingPage = () => {
     [currentPage, tweetsPerPage, allTweets]
   );
 
+  // Keep the page index valid when tweetsPerPage changes (e.g. on resize)
+  useEffect(() => {
+    if (totalPages > 0 && currentPage >= totalPages) setCurrentPage(0);
+  }, [currentPage, totalPages]);
+
   // Auto-scroll testimonials every 5 seconds
   useEffect(() => {
+    if (!isAutoplayActive || totalPages <= 1) return undefined;
     const interval = setInterval(() => {
       setCurrentPage((prev) => (prev + 1) % totalPages);
-    }, 5000); // Scroll every 5 seconds
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, [totalPages]);
+  }, [totalPages, isAutoplayActive]);
+
+  const carouselProps = {
+    autoplayAvailable: !prefersReducedMotion,
+    isAutoplayStopped,
+    onToggleAutoplay: () => setIsAutoplayStopped((v) => !v),
+    onHoverChange: setIsCarouselHovered,
+    onFocusChange: setIsCarouselFocused,
+  };
 
   // Track landing page visit with analytics
   useEffect(() => {
@@ -486,7 +524,9 @@ const LandingPage = () => {
   );
 
   const commonProps = {
+    cardStats,
     visibleTweets,
+    carouselProps,
     handlePrevPage,
     handleNextPage,
     isMobile,
@@ -495,6 +535,8 @@ const LandingPage = () => {
     setAlert,
     deviceInfo,
     region,
+    sectionRegion,
+    browse,
     // Add analytics tracking functions
     trackButtonClick,
     trackFeatureUsage,
@@ -502,7 +544,7 @@ const LandingPage = () => {
   };
 
   return (
-    <motion.div
+    <m.div
       variants={pageVariants}
       initial="hidden"
       animate="visible"
@@ -528,12 +570,15 @@ const LandingPage = () => {
           />
         )}
       </Box>
-    </motion.div>
+    </m.div>
   );
 };
 
 // Enhanced Mobile View with analytics
 const MobileView = ({
+  sectionRegion,
+  browse,
+  cardStats,
   deviceInfo,
   visibleTweets,
   handlePrevPage,
@@ -546,6 +591,7 @@ const MobileView = ({
   trackButtonClick,
   trackFeatureUsage,
   trackEvent,
+  carouselProps,
 }) => {
   // Track mobile app promotion interaction
   const handleAppStoreClick = (store) => {
@@ -649,7 +695,7 @@ const MobileView = ({
             data-section="stats"
             sx={{ bgcolor: "background.paper" }}
           >
-            <StatsSection />
+            <StatsSection cardStats={cardStats} />
           </Box>
 
           <>
@@ -675,7 +721,21 @@ const MobileView = ({
             data-section="banks"
             sx={{ bgcolor: "background.default" }}
           >
-            <BankSection />
+            <BankSection
+              region={sectionRegion}
+              banksWithoutLogo={browse?.[sectionRegion]?.banksWithoutLogo}
+            />
+          </Box>
+
+          <Box
+            component="section"
+            data-section="categories"
+            sx={{ bgcolor: "background.paper" }}
+          >
+            <BrowseCategoriesSection
+              region={sectionRegion}
+              categories={browse?.[sectionRegion]?.categories}
+            />
           </Box>
 
           <Box
@@ -688,6 +748,7 @@ const MobileView = ({
               handlePrevPage={handlePrevPage}
               handleNextPage={handleNextPage}
               isMobile={isMobile}
+              {...carouselProps}
             />
           </Box>
         </Box>
@@ -718,6 +779,9 @@ const MobileView = ({
 
 // Enhanced Desktop View with analytics
 const DesktopView = ({
+  sectionRegion,
+  browse,
+  cardStats,
   cardImages,
   isMobile,
   isTablet,
@@ -736,6 +800,7 @@ const DesktopView = ({
   region,
   trackButtonClick,
   trackFeatureUsage,
+  carouselProps,
 }) => {
   // Enhanced CTA click tracking
   const handleCTAClick = () => {
@@ -768,6 +833,7 @@ const DesktopView = ({
       <Box className="relative z-10">
         <Header />
 
+        <Box component="main">
         <Box component="section" data-section="hero">
           <HeroSection
             cardImages={cardImages}
@@ -793,7 +859,7 @@ const DesktopView = ({
           data-section="stats"
           sx={{ bgcolor: "background.paper" }}
         >
-          <StatsSection />
+          <StatsSection cardStats={cardStats} />
         </Box>
 
         <>
@@ -819,7 +885,21 @@ const DesktopView = ({
           data-section="banks"
           sx={{ bgcolor: "background.default" }}
         >
-          <BankSection />
+          <BankSection
+            region={sectionRegion}
+            banksWithoutLogo={browse?.[sectionRegion]?.banksWithoutLogo}
+          />
+        </Box>
+
+        <Box
+          component="section"
+          data-section="categories"
+          sx={{ bgcolor: "background.paper" }}
+        >
+          <BrowseCategoriesSection
+            region={sectionRegion}
+            categories={browse?.[sectionRegion]?.categories}
+          />
         </Box>
 
         <Box component="section" data-section="cta">
@@ -856,7 +936,9 @@ const DesktopView = ({
             handlePrevPage={handlePrevPage}
             handleNextPage={handleNextPage}
             isMobile={isMobile}
+            {...carouselProps}
           />
+        </Box>
         </Box>
 
         <Footer />

@@ -5,13 +5,7 @@ import { generateMetadata as generateMetadataHelper, pageMetadata, commonMetadat
 import PerformanceWrapper from '@/shared/components/PerformanceWrapper';
 import { slugify, findBySlug, categoryPath } from '@/core/utils/slug';
 
-import categoriesIN from '@/data/cardCategories_in.json';
-import categoriesSG from '@/data/cardCategories_sg.json';
-
-const DATA = {
-    in: { categories: categoriesIN, images: [] },
-    sg: { categories: categoriesSG, images: [] }
-};
+import { TOP_CARDS_DATA as DATA, getTopCardsData as getData } from '@/features/top-cards/topCardsServerData';
 
 export const dynamicParams = false;
 
@@ -55,11 +49,6 @@ export async function generateMetadata({ params }) {
     });
 }
 
-function getData(region = 'in') {
-    const key = region.toLowerCase() === 'sg' ? 'sg' : 'in';
-    return DATA[key] || DATA['in'];
-}
-
 export default async function TopCardsCategory({ params }) {
     const { region, category } = await params;
     const categoryName = resolveCategory(region, category);
@@ -76,6 +65,7 @@ export default async function TopCardsCategory({ params }) {
                     initialCategories={categories}
                     initialCardImages={images}
                     initialCategory={categoryName}
+                    initialRegion={region}
                 />
             </PerformanceWrapper>
         </Suspense>

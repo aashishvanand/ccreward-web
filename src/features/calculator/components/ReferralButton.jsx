@@ -3,6 +3,7 @@
 import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useRegion } from "@/core/providers/RegionContext";
+import { setCachedJson } from '@/core/utils/storage';
 
 // Use a prefix for the cache key to make it dynamic
 const CACHE_KEY_PREFIX = "referralData_";
@@ -57,23 +58,14 @@ const ReferralButton = ({
           // Handle cases where a region-specific file might not exist
           console.warn(`Referral file for region "${region}" not found.`);
           // Set empty data in cache to avoid refetching on every render
-          localStorage.setItem(
-            cacheKey,
-            JSON.stringify({ data: [], timestamp: Date.now() })
-          );
+          setCachedJson(cacheKey, []);
           return;
         }
 
         const data = await response.json();
 
         // Use the dynamic cache key to store the data
-        localStorage.setItem(
-          cacheKey,
-          JSON.stringify({
-            data,
-            timestamp: Date.now(),
-          })
-        );
+        setCachedJson(cacheKey, data);
 
         const cardReferral = data.find(
           (item) =>

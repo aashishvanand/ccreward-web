@@ -10,10 +10,11 @@ import {
   CircularProgress,
   useMediaQuery,
   useTheme,
+  alpha,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import CurrencyConversionInfo from "@/shared/components/ui/CurrencyConversionInfo";
 
 const CalculationResults = ({ result, isLoading }) => {
@@ -122,7 +123,7 @@ const CalculationResults = ({ result, isLoading }) => {
 
   return (
     <AnimatePresence mode="wait">
-      <motion.div
+      <m.div
         initial="hidden"
         animate="visible"
         exit="exit"
@@ -139,24 +140,24 @@ const CalculationResults = ({ result, isLoading }) => {
               overflow: "hidden",
               position: "relative",
             },
-            hasRewards
-              ? {
-                  bgcolor: "success.light",
-                }
-              : {
-                  bgcolor: "error.light",
-                },
+            (theme) => {
+              const tone = hasRewards ? theme.palette.success.main : theme.palette.error.main;
+              return {
+                bgcolor: alpha(tone, 0.12),
+                border: `1px solid ${tone}`,
+              };
+            },
           ]}
         >
           {isLoading ? (
             <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
-              <motion.div
+              <m.div
                 variants={spinnerVariants}
                 initial="hidden"
                 animate="visible"
               >
                 <CircularProgress />
-              </motion.div>
+              </m.div>
             </Box>
           ) : (
             <>
@@ -170,7 +171,7 @@ const CalculationResults = ({ result, isLoading }) => {
               >
                 {hasRewards && (
                   <>
-                    <motion.div
+                    <m.div
                       style={{
                         position: "absolute",
                         left: 10,
@@ -179,8 +180,8 @@ const CalculationResults = ({ result, isLoading }) => {
                       variants={celebrationVariants}
                     >
                       <Typography variant="h4">🎉</Typography>
-                    </motion.div>
-                    <motion.div
+                    </m.div>
+                    <m.div
                       style={{
                         position: "absolute",
                         right: 10,
@@ -189,7 +190,7 @@ const CalculationResults = ({ result, isLoading }) => {
                       variants={celebrationVariants}
                     >
                       <Typography variant="h4">🎉</Typography>
-                    </motion.div>
+                    </m.div>
                   </>
                 )}
 
@@ -217,22 +218,22 @@ const CalculationResults = ({ result, isLoading }) => {
                   ]}
                 >
                   {hasRewards ? (
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.4, delay: 0.2 }}
                     >
                       {/* Split the text to animate numbers separately */}
                       {renderAnimatedRewardText(result.rewardText)}
-                    </motion.div>
+                    </m.div>
                   ) : (
-                    <motion.span
+                    <m.span
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.4, delay: 0.2 }}
                     >
                       😢 No rewards earned 😢
-                    </motion.span>
+                    </m.span>
                   )}
                 </Typography>
 
@@ -259,7 +260,7 @@ const CalculationResults = ({ result, isLoading }) => {
             </>
           )}
         </Paper>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 };
@@ -275,7 +276,7 @@ const renderAnimatedRewardText = (text) => {
         // Check if this part is a number
         if (/^\d+(?:\.\d+)?$/.test(part)) {
           return (
-            <motion.span
+            <m.span
               key={index}
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{
@@ -291,7 +292,7 @@ const renderAnimatedRewardText = (text) => {
               style={{ display: "inline-block", fontWeight: "bold" }}
             >
               {part}
-            </motion.span>
+            </m.span>
           );
         }
 

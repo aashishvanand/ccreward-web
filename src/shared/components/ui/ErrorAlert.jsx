@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { Alert, Collapse, IconButton, Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 
 // Animation variants
 const alertVariants = {
@@ -65,7 +65,7 @@ const ErrorAlert = ({ message, onClose }) => {
   return (
     <AnimatePresence>
       {Boolean(message) && (
-        <motion.div
+        <m.div
           variants={alertVariants}
           initial="hidden"
           animate="visible"
@@ -79,7 +79,7 @@ const ErrorAlert = ({ message, onClose }) => {
               icon: "span",
             }}
             action={
-              <motion.div
+              <m.div
                 variants={iconVariants}
                 initial="hidden"
                 animate="visible"
@@ -94,7 +94,7 @@ const ErrorAlert = ({ message, onClose }) => {
                 >
                   <CloseIcon fontSize="inherit" />
                 </IconButton>
-              </motion.div>
+              </m.div>
             }
             sx={{ 
               mb: 2,
@@ -114,7 +114,7 @@ const ErrorAlert = ({ message, onClose }) => {
               }
             }}
           >
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: -5 }}
               animate={{ 
                 opacity: 1, 
@@ -126,9 +126,9 @@ const ErrorAlert = ({ message, onClose }) => {
               }}
             >
               {message}
-            </motion.div>
+            </m.div>
           </Alert>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

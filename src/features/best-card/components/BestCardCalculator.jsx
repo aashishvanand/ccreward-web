@@ -48,7 +48,7 @@ import UsageRemainingBadge from "@/shared/components/ui/UsageRemainingBadge";
 import debounce from "lodash/debounce";
 import groupBy from "lodash/groupBy";
 import { useRegion } from "@/core/providers/RegionContext";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { getCurrencySymbol, getNativeCurrency } from "@/core/utils";
 import CurrencyAmountField from "@/shared/components/ui/CurrencyAmountField";
 import CurrencyConversionInfo from "@/shared/components/ui/CurrencyConversionInfo";
@@ -673,7 +673,7 @@ const BestCardCalculator = () => {
   }, [isCalculated, userCards.length, trackCustomEngagement]);
 
   return (
-    <motion.div
+    <m.div
       variants={pageVariants}
       initial="hidden"
       animate="visible"
@@ -897,22 +897,37 @@ const BestCardCalculator = () => {
 
               {isCalculated && (
                 <Box
-                  sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}
+                  sx={{
+                    display: "flex",
+                    flexDirection: { xs: "column", sm: "row" },
+                    alignItems: { xs: "stretch", sm: "center" },
+                    justifyContent: "flex-end",
+                    gap: 1,
+                    mb: 2,
+                  }}
                 >
+                  <Typography
+                    id="rank-by-label"
+                    variant="body2"
+                    sx={{ color: "text.secondary" }}
+                  >
+                    Rank by
+                  </Typography>
                   <ToggleButtonGroup
                     value={sortMethod}
                     exclusive
                     onChange={handleSortMethodChange}
-                    aria-label="sort method"
+                    aria-labelledby="rank-by-label"
+                    sx={{ width: { xs: "100%", sm: "auto" } }}
                   >
-                    <ToggleButton value="points" aria-label="sort by points">
-                      Ranking by Points/Cashback
+                    <ToggleButton value="points" sx={{ flex: { xs: 1, sm: "initial" } }}>
+                      Points/Cashback
                     </ToggleButton>
-                    <ToggleButton value="value" aria-label="sort by value">
-                      Ranking by Value ({getCurrencySymbol(region)})
+                    <ToggleButton value="value" sx={{ flex: { xs: 1, sm: "initial" } }}>
+                      Value ({getCurrencySymbol(region)})
                     </ToggleButton>
-                    <ToggleButton value="miles" aria-label="sort by miles">
-                      Ranking by Miles
+                    <ToggleButton value="miles" sx={{ flex: { xs: 1, sm: "initial" } }}>
+                      Miles
                     </ToggleButton>
                   </ToggleButtonGroup>
                 </Box>
@@ -965,7 +980,7 @@ const BestCardCalculator = () => {
         )}
         <Footer />
       </Box>
-    </motion.div>
+    </m.div>
   );
 };
 

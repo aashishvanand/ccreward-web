@@ -14,8 +14,8 @@ const PageHeader = ({ title, subtitle, children }) => {
                 sx={{
                     fontWeight: "800",
                     background: (theme) => theme.palette.mode === 'dark'
-                        ? 'linear-gradient(45deg, #90caf9 30%, #ce93d8 90%)'
-                        : 'linear-gradient(45deg, #1976d2 30%, #9c27b0 90%)',
+                        ? `linear-gradient(45deg, ${theme.palette.primary.light} 30%, ${theme.palette.secondary.light} 90%)`
+                        : `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
@@ -38,7 +38,8 @@ const PageHeader = ({ title, subtitle, children }) => {
                     {subtitle}
                 </Typography>
             )}
-            <Box sx={{ maxWidth: 700, mx: 'auto', position: 'relative' }}>
+            {/* isolation keeps the zIndex: -1 glow inside this box, so a parent background can't cover it */}
+            <Box sx={{ maxWidth: 700, mx: 'auto', position: 'relative', isolation: 'isolate' }}>
                 {/* Glow effect */}
                 <Box sx={{
                     position: 'absolute',

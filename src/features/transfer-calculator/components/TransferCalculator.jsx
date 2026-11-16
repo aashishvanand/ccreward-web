@@ -31,6 +31,7 @@ import {
   SwapHoriz as SwapHorizIcon,
 } from "@mui/icons-material";
 import { useAuth } from "@/core/providers/AuthContext";
+import SignInButtons from "@/shared/components/auth/SignInButtons";
 import { useRegion } from "@/core/providers/RegionContext";
 import { getUserCards } from "@/core/services/api";
 import {
@@ -46,7 +47,7 @@ import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
 import PageHeader from "@/shared/components/layout/PageHeader";
 import { getCurrencySymbol } from "@/core/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from "framer-motion";
 import {
   useAnalytics,
   usePagePerformance,
@@ -78,7 +79,7 @@ const pageVariants = {
 const TransferCalculator = () => {
   const theme = useTheme();
   const { region, isInitialized } = useRegion();
-  const { user, isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading, signInWithGoogle, signInWithApple } = useAuth();
   const { remaining, limit, canUse, limitMessage } =
     useUsageLimit(RateLimitedFeature.TRANSFERS);
 
@@ -335,6 +336,8 @@ const TransferCalculator = () => {
             if (hotelKey) {
               logoId = logos.hotel[hotelKey];
             }
+          } else if (type === "other" && partner.brand_name) {
+            logoId = logos.other?.[partner.brand_name.toLowerCase()];
           }
           // --- END LOGO LOGIC ---
 
@@ -450,7 +453,7 @@ const TransferCalculator = () => {
   };
 
   return (
-    <motion.div
+    <m.div
       variants={pageVariants}
       initial="hidden"
       animate="visible"
@@ -632,8 +635,16 @@ const TransferCalculator = () => {
                   </Button>
                 </Stack>
                 {!isAuthenticated() && (
-                  <Alert severity="warning">
-                    Please sign in to calculate transfer partners.
+                  <Alert severity="info" sx={{ "& .MuiAlert-message": { width: "100%" } }}>
+                    Sign in to calculate transfer partners.
+                    <Box sx={{ mt: 1.5, maxWidth: 360 }}>
+                      <SignInButtons
+                        onGoogleSignIn={signInWithGoogle}
+                        onAppleSignIn={signInWithApple}
+                        fullWidth
+                        size="medium"
+                      />
+                    </Box>
                   </Alert>
                 )}
               </Stack>
@@ -655,49 +666,49 @@ const TransferCalculator = () => {
 
                 <AnimatePresence>
                   {calculationResult.airlines?.length > 0 && (
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 }}
                     >
                       {renderPartnerList(calculationResult.airlines, "airline")}
-                    </motion.div>
+                    </m.div>
                   )}
                   {calculationResult.hotels?.length > 0 && (
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
                     >
                       {renderPartnerList(calculationResult.hotels, "hotel")}
-                    </motion.div>
+                    </m.div>
                   )}
                   {calculationResult.indirect_airlines?.length > 0 && (
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 }}
                     >
                       {renderPartnerList(calculationResult.indirect_airlines, "airline", "Airlines via Other Programs")}
-                    </motion.div>
+                    </m.div>
                   )}
                   {calculationResult.indirect_hotels?.length > 0 && (
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.6 }}
                     >
                       {renderPartnerList(calculationResult.indirect_hotels, "hotel", "Hotels via Other Programs")}
-                    </motion.div>
+                    </m.div>
                   )}
                   {calculationResult.others?.length > 0 && (
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.7 }}
                     >
                       {renderPartnerList(calculationResult.others, "other")}
-                    </motion.div>
+                    </m.div>
                   )}
                 </AnimatePresence>
 
@@ -741,7 +752,7 @@ const TransferCalculator = () => {
         )}
         <Footer />
       </Box>
-    </motion.div>
+    </m.div>
   );
 };
 
