@@ -30,6 +30,10 @@ const CurrencyAmountField = ({
 }) => {
   const { region } = useRegion();
   const nativeCurrency = getNativeCurrency(region);
+  // Validation feedback only appears once the user has left the field, never
+  // on page load or while they are typing.
+  const [touched, setTouched] = useState(false);
+  const isInvalid = touched && !disabled && !(Number(amount) >= 1);
 
   // Native currency first, then the rest alphabetically
   const sortedCurrencies = [
@@ -38,7 +42,7 @@ const CurrencyAmountField = ({
   ];
 
   return (
-    <Box sx={{ display: "flex", gap: 0 }}>
+    <Box sx={{ display: "flex", gap: 0, alignItems: "flex-start" }}>
       {/* Currency selector — ~20% width */}
       <Select
         value={currency}
@@ -111,11 +115,23 @@ const CurrencyAmountField = ({
         type="number"
         value={amount}
         onChange={(e) => {
+          // Allow an empty field while editing (clamping to 1 made the value
+          // impossible to clear with backspace).
+          if (e.target.value === "") {
+            onAmountChange("");
+            return;
+          }
           const value = Math.max(1, Number(e.target.value));
           onAmountChange(value.toString());
         }}
+        onBlur={() => setTouched(true)}
         required
         disabled={disabled}
+        // MUI sets aria-invalid from `error` and only links the helper text via
+        // aria-describedby while it is rendered, so screen readers hear the
+        // same error, at the same time, as sighted users see it.
+        error={isInvalid}
+        helperText={isInvalid ? "Error: enter an amount of 1 or more." : undefined}
         slotProps={{
           input: {
             endAdornment: amount && (

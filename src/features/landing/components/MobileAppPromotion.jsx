@@ -82,7 +82,8 @@ const MobileAppPromotion = ({ isAndroid }) => {
                 alt={`App Screenshot ${index + 1}`}
                 fill
                 style={{ objectFit: "cover" }}
-                priority={index === 0}
+                // Below the fold: lazy (next/image default). `priority` here
+                // competed with the hero card, the landing page's LCP image.
                 unoptimized
               />
             </Box>

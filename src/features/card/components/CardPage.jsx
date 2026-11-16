@@ -744,6 +744,7 @@ const CardPage = ({ bankName, cardName, country }) => {
                           alt={`${bankName} ${cardName}`}
                           height={orientation === "vertical" ? 320 : 220}
                           orientation={orientation}
+                          fetchPriority="high"
                         />
                       ) : (
                         <Box

@@ -92,8 +92,6 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
   const { trackCustomEngagement } = useEngagementTracking();
   const { trackComponentError } = useComponentAnalytics("TopCardsPage");
 
-  // Only offer categories this region has data (and a generated route) for.
-  const categories = ALL_CATEGORIES.filter((cat) => cat in (initialCategories || {}));
   const [category, setCategory] = useState(initialCategory || "");
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
@@ -109,6 +107,10 @@ const TopCardsPage = ({ initialCategories, initialCardImages, initialCategory = 
     isLoading: isLoadingCategories,
     error: categoriesError,
   } = useCardCategories(initialCategories, initialRegion);
+  // Only offer categories the current region has data (and a generated route) for.
+  // categoriesData follows the context region, so switching IN → SG drops IN-only
+  // categories that would push a /sg/top-cards/... URL with no route.
+  const categories = ALL_CATEGORIES.filter((cat) => cat in (categoriesData || {}));
   const [isValidating, setIsValidating] = useState(false);
 
   // Track page load

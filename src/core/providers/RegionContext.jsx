@@ -136,9 +136,10 @@ export function RegionProvider({ children }) {
 
         if (urlRegion && isValidRegion(urlRegion)) {
            const upperUrlRegion = urlRegion.toUpperCase();
-           // The API layer reads app-region, so seed it for first-time visitors
-           // (without overriding a region they already have).
-           if (!localStorage.getItem("app-region")) {
+           // The API layer and the calculator read app-region, so keep it in step
+           // with the URL; otherwise a visitor saved as SG gets SG API data on an
+           // /in page. A changed region no longer counts as the visitor's own choice.
+           if (localStorage.getItem("app-region") !== upperUrlRegion) {
              safeSetItem("app-region", upperUrlRegion);
              safeSetItem("user-set-region", "false");
            }

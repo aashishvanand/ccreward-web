@@ -125,6 +125,7 @@ const CardPublicView = ({
                     alt={`${bankName} ${cardName} credit card`}
                     height={orientation === "vertical" ? 320 : 220}
                     orientation={orientation}
+                    fetchPriority="high"
                   />
                 ) : (
                   <Box

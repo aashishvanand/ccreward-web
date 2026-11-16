@@ -126,6 +126,14 @@ function ConnectedAppsPanel({ onChange }) {
             const hosts = g.redirectHosts?.length ? g.redirectHosts.join(", ") : null;
             const connected = formatDate(g.createdAt);
             const expires = formatDate(g.expiresAt);
+            // lastUsedAt is recorded at most once an hour per app. An older API leaves the
+            // field out (undefined), so show nothing then; null means not used yet.
+            const lastUsed =
+              g.lastUsedAt === undefined
+                ? null
+                : g.lastUsedAt
+                  ? `Last used ${formatDate(g.lastUsedAt)}`
+                  : "Not used yet";
             return (
               <ListItem
                 key={g.id}
@@ -139,6 +147,7 @@ function ConnectedAppsPanel({ onChange }) {
                   secondary={[
                     hosts && `Returns to ${hosts}`,
                     connected && `Connected ${connected}`,
+                    lastUsed,
                     expires && `Expires ${expires} unless used`,
                   ]
                     .filter(Boolean)

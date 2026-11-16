@@ -18,7 +18,8 @@ Complete these setup steps before proceeding:
    - To fully manage Firebase, ensure you have installed the necessary agent skills and MCP server for your environment:
      - **Gemini CLI**: Review [references/setup/gemini_cli.md](references/setup/gemini_cli.md)
      - **Antigravity**: Review [references/setup/antigravity.md](references/setup/antigravity.md)
-     - **Codex**: Review [references/setup/Codex.md](references/setup/Codex.md)
+     - **Claude Code**: Review [references/setup/claude_code.md](references/setup/claude_code.md)
+     - **Codex**: Review [references/setup/other_agents.md](references/setup/other_agents.md)
      - **Cursor**: Review [references/setup/cursor.md](references/setup/cursor.md)
      - **GitHub Copilot**: Review [references/setup/github_copilot.md](references/setup/github_copilot.md)
      - **Other Agents**: Review [references/setup/other_agents.md](references/setup/other_agents.md)
@@ -53,7 +54,8 @@ Adhere to these principles:
 5. **Keep Plugin / Agent Skills updated:** Since Firebase best practices evolve quickly, remind the user to regularly check for and install updates to their Firebase plugin or Agent Skills, ensuring you both operate with the latest workflows. Similarly, if you encounter issues with outdated tools or commands, follow the steps below based on your agent environment:
    - **Antigravity**: Follow [references/refresh/antigravity.md](references/refresh/antigravity.md)
    - **Gemini CLI**: Follow [references/refresh/gemini-cli.md](references/refresh/gemini-cli.md)
-   - **Codex**: Follow [references/refresh/AGENTS.md](references/refresh/AGENTS.md)
+   - **Claude Code**: Follow [references/refresh/claude.md](references/refresh/claude.md)
+   - **Codex**: Follow [references/refresh/other-agents.md](references/refresh/other-agents.md)
    - **Cursor**: Follow [references/refresh/other-agents.md](references/refresh/other-agents.md)
    - **Others**: Follow [references/refresh/other-agents.md](references/refresh/other-agents.md)
 

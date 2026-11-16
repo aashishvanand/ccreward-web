@@ -94,7 +94,7 @@ const QuickCardSelector = ({ userCards = [], selectedBank, selectedCard, onSelec
             pb: 0.5,
           }}
         >
-          {processedCards.map((card) => {
+          {processedCards.map((card, index) => {
             const isSelected = selectedBank === card.bank && selectedCard === card.cardName;
             const aspect = card.isVertical ? ASPECT_V : ASPECT_H;
 
@@ -152,6 +152,8 @@ const QuickCardSelector = ({ userCards = [], selectedBank, selectedCard, onSelec
                       <img
                         src={buildCloudflareImageUrl(card.imageId, "public")}
                         alt={`${card.bank} ${card.cardName}`}
+                        // Cards past the first few sit off-screen in the scroller.
+                        loading={index >= 4 ? "lazy" : undefined}
                         style={{ width: "100%", height: "100%", objectFit: "cover" }}
                       />
                     ) : (

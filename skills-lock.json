@@ -49,6 +49,12 @@
       "sourceType": "github",
       "computedHash": "b14b593094e779e0e32d1ce0175be9576366476507f7dde0c30bfeeb31e0e74e"
     },
+    "modern-web-guidance": {
+      "source": "GoogleChrome/modern-web-guidance",
+      "sourceType": "github",
+      "skillPath": "skills/modern-web-guidance/SKILL.md",
+      "computedHash": "9e69ce00dc314b64f6664031b70295ea46c7de93ac682c624808df6e48e08b66"
+    },
     "next-best-practices": {
       "source": "vercel-labs/next-skills",
       "sourceType": "github",

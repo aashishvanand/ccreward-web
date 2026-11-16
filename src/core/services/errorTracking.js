@@ -299,16 +299,19 @@ function setupPerformanceErrorMonitoring() {
                 }
             }
 
-            // Report if CLS exceeds threshold
+            // Report once when CLS crosses the threshold (previously this fired
+            // on every later shift too). The exact final CLS is reported by
+            // analytics.js as a core_web_vital event.
             if (cumulativeLayoutShift > 0.25) {
                 recordPerformanceIssue('poor_cls', {
                     cls_value: Math.round(cumulativeLayoutShift * 1000) / 1000,
                     threshold_exceeded: 0.25
                 });
+                layoutShiftObserver.disconnect();
             }
         });
 
-        layoutShiftObserver.observe({ entryTypes: ['layout-shift'] });
+        layoutShiftObserver.observe({ type: 'layout-shift', buffered: true });
     } catch (error) {
         console.warn('⚠️ Layout shift monitoring not available:', error);
     }

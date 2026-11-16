@@ -12,6 +12,10 @@ const TiltCard = ({
   width,
   height,
   children,
+  // Image loading hints: pass fetchPriority="high" for the page's LCP image
+  // and loading="lazy" for images below the fold.
+  loading,
+  fetchPriority,
   ...props 
 }) => { 
   const ref = useRef(null);
@@ -119,6 +123,9 @@ const TiltCard = ({
                    <img
                        src={finalSrc}
                        alt={alt || "Card Image"}
+                       loading={loading}
+                       fetchPriority={fetchPriority}
+                       decoding={loading === "lazy" ? "async" : undefined}
                        style={{
                            height: '100%',
                            width: '100%',

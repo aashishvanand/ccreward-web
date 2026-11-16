@@ -127,7 +127,7 @@ const PrivacyPolicyPage = () => {
             Privacy Policy
           </Typography>
           <Typography variant="subtitle1" gutterBottom sx={{ mb: 4, color: 'text.secondary' }}>
-            Last Updated: November 14, 2026
+            Last Updated: November 16, 2026
           </Typography>
           <Typography 
             variant="body1" 
@@ -310,9 +310,9 @@ const PrivacyPolicyPage = () => {
               </p>
               <p>
                 4.4. <strong>Feedback:</strong> Kept to improve calculation
-                accuracy. Email{" "}
-                <a href="mailto:support@ccreward.app">support@ccreward.app</a>{" "}
-                to have your feedback deleted.
+                accuracy, and deleted when you delete your account. To have it
+                deleted sooner, email{" "}
+                <a href="mailto:support@ccreward.app">support@ccreward.app</a>.
               </p>
               <p>
                 4.5. <strong>Purchase Records:</strong> Kept as long as needed
@@ -332,8 +332,8 @@ const PrivacyPolicyPage = () => {
               <ul>
                 <li>
                   <strong>Immediate Effect:</strong> Clicking this button
-                  immediately deletes your account and saved cards and turns off
-                  your MCP API key.
+                  immediately deletes your account, saved cards and feedback, and
+                  turns off your MCP API key.
                 </li>
                 <li>
                   <strong>Verification:</strong> You can verify this by

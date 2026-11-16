@@ -1,6 +1,7 @@
 // src/core/services/analytics.js - Client-Side Only Firebase Analytics & Performance
 import { firebaseApp } from '@/firebase';
 import { getSafeReferrer } from '@/core/utils/safeUrl';
+import { runAfterYield } from '@/core/utils/scheduler';
 
 let analytics = null;
 let firebasePerformance = null;
@@ -118,9 +119,17 @@ const logAnalyticsEvent = (eventName, eventParams = {}) => {
             page_title: document.title,
         };
 
-        // Log to Firebase Analytics
+        // Log to Firebase Analytics. Params are captured above, at the time of
+        // the event; sending is deferred so it never adds to the processing
+        // time of the interaction that triggered it (INP).
         if (logEventFn) {
-            logEventFn(analytics, eventName, enrichedParams);
+            runAfterYield(() => {
+                try {
+                    logEventFn(analytics, eventName, enrichedParams);
+                } catch (error) {
+                    console.error('❌ Error logging analytics event:', error);
+                }
+            });
         }
 
     } catch (error) {
@@ -216,79 +225,85 @@ function setupClientSidePerformanceMonitoring() {
             if (navigation) {
                 logAnalyticsEvent('page_load_performance', {
                     load_time: Math.round(navigation.loadEventEnd - navigation.loadEventStart),
-                    dom_interactive: Math.round(navigation.domInteractive - navigation.navigationStart),
-                    dom_complete: Math.round(navigation.domComplete - navigation.navigationStart),
+                    // PerformanceNavigationTiming values are already relative
+                    // to navigation start (it has no navigationStart field).
+                    dom_interactive: Math.round(navigation.domInteractive),
+                    dom_complete: Math.round(navigation.domComplete),
                     first_paint: getFirstPaint(),
-                    first_contentful_paint: getFirstContentfulPaint(),
-                    largest_contentful_paint: getLargestContentfulPaint()
+                    first_contentful_paint: getFirstContentfulPaint()
+                    // LCP is reported once, as a core_web_vital event.
                 });
             }
         }, 1000);
     });
 
     // Monitor Core Web Vitals (client-side only)
-    if ('PerformanceObserver' in window) {
-        setupCoreWebVitals();
-    }
+    setupCoreWebVitals();
 
     // Monitor page visibility changes
     setupVisibilityTracking();
 }
 
-// Setup Core Web Vitals monitoring (client-side only)
-function setupCoreWebVitals() {
+// Setup Core Web Vitals monitoring (client-side only).
+// Uses the web-vitals library, which reports each metric once with its final
+// value (LCP and CLS when the page is hidden, INP for the slowest interaction)
+// and handles bfcache restores and other edge cases. INP replaces FID, which
+// is no longer a Core Web Vital.
+async function setupCoreWebVitals() {
     if (typeof window === 'undefined') return;
 
     try {
-        // Largest Contentful Paint
-        const lcpObserver = new PerformanceObserver((list) => {
-            const entries = list.getEntries();
-            const lastEntry = entries[entries.length - 1];
+        const { onLCP, onINP, onCLS } = await import('web-vitals/attribution');
+        const toRating = (rating) => rating.replace('-', '_'); // needs-improvement -> needs_improvement
+
+        onLCP((metric) => {
             logAnalyticsEvent('core_web_vital', {
                 metric_name: 'largest_contentful_paint',
-                value: Math.round(lastEntry.startTime),
-                rating: getLCPRating(lastEntry.startTime)
+                value: Math.round(metric.value),
+                rating: toRating(metric.rating),
+                lcp_element: metric.attribution.element,
+                lcp_resource_load_delay: Math.round(metric.attribution.resourceLoadDelay),
+                lcp_render_delay: Math.round(metric.attribution.elementRenderDelay),
             });
         });
-        lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
 
-        // First Input Delay
-        const fidObserver = new PerformanceObserver((list) => {
-            const entries = list.getEntries();
-            entries.forEach((entry) => {
-                const delay = entry.processingStart - entry.startTime;
-                logAnalyticsEvent('core_web_vital', {
-                    metric_name: 'first_input_delay',
-                    value: Math.round(delay),
-                    rating: getFIDRating(delay)
-                });
-            });
-        });
-        fidObserver.observe({ type: 'first-input', buffered: true });
-
-        // Cumulative Layout Shift
-        let clsValue = 0;
-        const clsObserver = new PerformanceObserver((list) => {
-            const entries = list.getEntries();
-            entries.forEach((entry) => {
-                if (!entry.hadRecentInput) {
-                    clsValue += entry.value;
+        onINP((metric) => {
+            const { attribution } = metric;
+            // Find the longest script that ran in the interaction's long
+            // animation frames (Long Animation Frames API, Chromium only).
+            let longestScript;
+            for (const frame of attribution.longAnimationFrameEntries || []) {
+                for (const script of frame.scripts || []) {
+                    if (!longestScript || script.duration > longestScript.duration) {
+                        longestScript = script;
+                    }
                 }
+            }
+            logAnalyticsEvent('core_web_vital', {
+                metric_name: 'interaction_to_next_paint',
+                value: Math.round(metric.value),
+                rating: toRating(metric.rating),
+                // INP subparts: where the time went.
+                inp_target: attribution.interactionTarget,
+                inp_input_delay: Math.round(attribution.inputDelay),
+                inp_processing_duration: Math.round(attribution.processingDuration),
+                inp_presentation_delay: Math.round(attribution.presentationDelay),
+                // Long Animation Frame attribution (Chromium only).
+                inp_script_source: longestScript?.sourceURL || undefined,
+                inp_script_function: longestScript?.sourceFunctionName || undefined,
+                inp_script_duration: longestScript ? Math.round(longestScript.duration) : undefined,
+                inp_forced_style_layout: longestScript ? Math.round(longestScript.forcedStyleAndLayoutDuration) : undefined,
             });
         });
-        clsObserver.observe({ type: 'layout-shift', buffered: true });
 
-        // Report CLS when page becomes hidden
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden' && clsValue > 0) {
-                logAnalyticsEvent('core_web_vital', {
-                    metric_name: 'cumulative_layout_shift',
-                    value: Math.round(clsValue * 1000) / 1000,
-                    rating: getCLSRating(clsValue)
-                });
-            }
+        onCLS((metric) => {
+            logAnalyticsEvent('core_web_vital', {
+                metric_name: 'cumulative_layout_shift',
+                value: Math.round(metric.value * 1000) / 1000,
+                rating: toRating(metric.rating),
+                cls_largest_shift_target: metric.attribution.largestShiftTarget,
+            });
         });
-
     } catch (error) {
         console.warn('⚠️ Core Web Vitals monitoring not available:', error);
     }
@@ -324,19 +339,9 @@ function setupVisibilityTracking() {
         }
     };
 
+    // visibilitychange to 'hidden' is the reliable end-of-session signal; it
+    // also fires before unload, so no unload/beforeunload handler is needed.
     document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // Track before page unload
-    window.addEventListener('beforeunload', () => {
-        if (isPageVisible) {
-            const engagementTime = Date.now() - pageStartTime;
-            logAnalyticsEvent('page_engagement', {
-                engagement_time_ms: engagementTime,
-                page_path: window.location.pathname,
-                visibility_state: 'unload'
-            });
-        }
-    });
 }
 
 // Enhanced page view tracking (client-side only)
@@ -547,17 +552,6 @@ function getFirstContentfulPaint() {
     }
 }
 
-function getLargestContentfulPaint() {
-    if (typeof window === 'undefined' || !window.performance || !window.performance.getEntriesByType) return 0;
-
-    try {
-        const lcpEntries = performance.getEntriesByType('largest-contentful-paint');
-        return lcpEntries.length > 0 ? Math.round(lcpEntries[lcpEntries.length - 1].startTime) : 0;
-    } catch (error) {
-        return 0;
-    }
-}
-
 // Safe storage functions (client-side only)
 function getStorageItem(key, storageType = 'local') {
     if (typeof window === 'undefined') return null;
@@ -580,25 +574,6 @@ function setStorageItem(key, value, storageType = 'local') {
     } catch (error) {
         console.warn(`Storage write failed for key: ${key}`, error);
     }
-}
-
-// Helper functions for performance ratings
-function getLCPRating(value) {
-    if (value <= 2500) return 'good';
-    if (value <= 4000) return 'needs_improvement';
-    return 'poor';
-}
-
-function getFIDRating(value) {
-    if (value <= 100) return 'good';
-    if (value <= 300) return 'needs_improvement';
-    return 'poor';
-}
-
-function getCLSRating(value) {
-    if (value <= 0.1) return 'good';
-    if (value <= 0.25) return 'needs_improvement';
-    return 'poor';
 }
 
 // Specific helper functions for backward compatibility

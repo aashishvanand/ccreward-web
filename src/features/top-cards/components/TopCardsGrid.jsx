@@ -59,6 +59,10 @@ const categoryIcons = {
   "Wallet Loading": <AccountBalanceWalletIcon sx={{ fontSize: 16 }} />,
 };
 
+// Cards from this index on are usually below the fold (masonry has up to 4
+// columns), so their images are lazy-loaded.
+const LAZY_IMAGE_START_INDEX = 4;
+
 const TopCardsGrid = ({
   cards,
   isMobile,
@@ -137,7 +141,9 @@ const TopCardsGrid = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{
                 duration: 0.4,
-                delay: index * 0.1,
+                // Cap the stagger so cards far down a long list don't wait
+                // seconds to appear.
+                delay: Math.min(index, 8) * 0.1,
                 ease: "easeOut",
               }}
               whileHover={{
@@ -181,6 +187,9 @@ const TopCardsGrid = ({
                   alt={`${card.bank} ${card.cardName}`}
                   orientation={card.orientation}
                   width="100%"
+                  // The first row loads right away; later cards wait until
+                  // they are scrolled near.
+                  loading={index >= LAZY_IMAGE_START_INDEX ? "lazy" : undefined}
                 />
 
                 <Box sx={{ p: 2 }}>

@@ -313,6 +313,7 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
                                 alt={`${card.bank} ${card.cardName}`}
                                 orientation={card.orientation}
                                 width="100%"
+                                loading={index >= 4 ? "lazy" : undefined}
                             />
                             </m.div>
                           ) : (
