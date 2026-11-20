@@ -3,8 +3,11 @@
 import { Box, Container, Typography } from "@mui/material";
 import Image from "next/image";
 import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
+import { useAppTheme } from "@/core/providers/ThemeRegistry";
 
-const AppStoreSection = ({ isMobile, theme }) => {
+const AppStoreSection = ({ isMobile }) => {
+  // The App Store badge is a white image; the dark-mode variant is inverted
+  const { resolvedMode } = useAppTheme();
   return (
     <Box sx={{ bgcolor: "background.paper", py: 8 }}>
       <Container maxWidth="md">
@@ -50,7 +53,7 @@ const AppStoreSection = ({ isMobile, theme }) => {
             <AppStoreButton
               href="https://apps.apple.com/in/app/ccreward/id6736835206"
               imageId={
-                theme.palette.mode === "dark"
+                resolvedMode === "dark"
                   ? "d6909a96-9073-4189-84ea-54475d93ac00"
                   : "60ca24d3-0052-4177-4da7-ce7fc0d24a00"
               }

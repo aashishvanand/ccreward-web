@@ -22,6 +22,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Close as CloseIcon, ReportProblem as ReportIcon } from "@mui/icons-material";
+import { submitFeedback } from "@/core/services/api";
 
 const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
   const theme = useTheme();
@@ -41,41 +42,30 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
-    const form = event.target;
-    const formData = new FormData(form);
 
-    let submitUrl = "";
-    if (reportType === "bank_or_card") {
-      submitUrl =
-        "https://docs.google.com/forms/u/0/d/e/1FAIpQLScN5YIru311tyglwI3vLjAbeOEHnW8BRWE2ce1qwgch-1mDbQ/formResponse";
-    } else if (reportType === "mcc") {
-      submitUrl =
-        "https://docs.google.com/forms/u/0/d/e/1FAIpQLSc7xUzKZe9EGWt6p35mTl8Cf0ZlUDFe2ZGWPIKr5PysZSfqIQ/formResponse";
+    // Reports go through the API's /v4/feedback endpoint (Turnstile + App Check
+    // protected, rate limited) instead of a Google Form.
+    try {
+      if (reportType === "bank_or_card") {
+        await submitFeedback({ type: "missing_card", bank: bankName, cardName: cardName });
+      } else if (reportType === "mcc") {
+        await submitFeedback({ type: "merchant", merchantName, mccCode: mcc });
+      }
+      onSubmitSuccess("Submitted successfully!");
+      clearForm();
+      onClose();
+    } catch (error) {
+      console.error("Error:", error);
+      onSubmitSuccess(
+        error.message || "There was an error submitting. Please try again.",
+        "error"
+      );
+    } finally {
+      setIsSubmitting(false);
     }
-
-    fetch(submitUrl, {
-      method: "POST",
-      body: formData,
-      mode: "no-cors",
-    })
-      .then(() => {
-        onSubmitSuccess("Submitted successfully!");
-        clearForm();
-        onClose();
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        onSubmitSuccess(
-          "There was an error submitting. Please try again.",
-          "error"
-        );
-      })
-      .finally(() => {
-        setIsSubmitting(false);
-      });
   };
 
   const clearForm = () => {
@@ -139,7 +129,6 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
               <TextField
                 fullWidth
                 label="Bank Name"
-                name="entry.1393850936"
                 value={bankName}
                 onChange={(e) => setBankName(e.target.value)}
                 required
@@ -149,7 +138,6 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
               <TextField
                 fullWidth
                 label="Card Name"
-                name="entry.576605505"
                 value={cardName}
                 onChange={(e) => setCardName(e.target.value)}
                 required
@@ -164,7 +152,6 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
               <TextField
                 fullWidth
                 label="MCC"
-                name="entry.2005151650"
                 value={mcc}
                 onChange={(e) => setMcc(e.target.value)}
                 required
@@ -182,7 +169,6 @@ const MissingBankCardForm = ({ open, onClose, onSubmitSuccess }) => {
               <TextField
                 fullWidth
                 label="Merchant Name"
-                name="entry.60356500"
                 value={merchantName}
                 onChange={(e) => setMerchantName(e.target.value)}
                 required

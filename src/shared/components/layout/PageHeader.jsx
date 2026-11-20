@@ -13,9 +13,12 @@ const PageHeader = ({ title, subtitle, children }) => {
                 gutterBottom
                 sx={{
                     fontWeight: "800",
-                    background: (theme) => theme.palette.mode === 'dark'
-                        ? `linear-gradient(45deg, ${theme.palette.primary.light} 30%, ${theme.palette.secondary.light} 90%)`
-                        : `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
+                    background: (theme) => ({
+                      background: `linear-gradient(45deg, ${theme.vars.palette.primary.main} 30%, ${theme.vars.palette.secondary.main} 90%)`,
+                      ...theme.applyStyles('dark', {
+                        background: `linear-gradient(45deg, ${theme.vars.palette.primary.light} 30%, ${theme.vars.palette.secondary.light} 90%)`,
+                      }),
+                    }),
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',

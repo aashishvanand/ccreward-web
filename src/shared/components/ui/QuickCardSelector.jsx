@@ -150,8 +150,12 @@ const QuickCardSelector = ({ userCards = [], selectedBank, selectedCard, onSelec
                   >
                     {card.imageId ? (
                       <img
-                        src={buildCloudflareImageUrl(card.imageId, "public")}
+                        // w=200 (~22 KB) instead of the ~113 KB public
+                        // variant: these thumbnails render at 50–128px wide.
+                        src={buildCloudflareImageUrl(card.imageId, "w=200")}
                         alt={`${card.bank} ${card.cardName}`}
+                        width={200}
+                        height={Math.round(200 / aspect)}
                         // Cards past the first few sit off-screen in the scroller.
                         loading={index >= 4 ? "lazy" : undefined}
                         style={{ width: "100%", height: "100%", objectFit: "cover" }}

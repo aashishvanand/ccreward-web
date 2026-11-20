@@ -460,16 +460,16 @@ function Calculator() {
         <MissingBankCardForm
           open={missingFormOpen}
           onClose={() => setMissingFormOpen(false)}
-          onSubmitSuccess={(message) =>
-            setAlert({ open: true, message, severity: "success" })
+          onSubmitSuccess={(message, severity) =>
+            setAlert({ open: true, message, severity: severity || "success" })
           }
         />
 
         <IncorrectRewardReportForm
           open={incorrectRewardReportOpen}
           onClose={() => setIncorrectRewardReportOpen(false)}
-          onSubmitSuccess={(message) =>
-            setAlert({ open: true, message, severity: "success" })
+          onSubmitSuccess={(message, severity) =>
+            setAlert({ open: true, message, severity: severity || "success" })
           }
           formData={incorrectReportFormData}
         />

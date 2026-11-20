@@ -678,10 +678,10 @@ const HowToGuide = ({ initialGuidesData }) => {
                                       variant="outlined"
                                       sx={{
                                         p: 1.5,
-                                        bgcolor:
-                                          theme.palette.mode === "dark"
-                                            ? "rgba(255, 255, 255, 0.05)"
-                                            : "rgba(0, 0, 0, 0.02)",
+                                        bgcolor: (theme) => ({
+                                          bgcolor: "rgba(0, 0, 0, 0.02)",
+                                          ...theme.applyStyles("dark", { bgcolor: "rgba(255, 255, 255, 0.05)" }),
+                                        }),
                                         borderRadius: 1.5,
                                         borderLeft: `3px solid ${getCurrentPlatformColor()}`,
                                       }}

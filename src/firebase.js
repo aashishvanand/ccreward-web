@@ -43,7 +43,7 @@ export const initAppCheck = () => {
         return Promise.resolve(null);
     }
 
-    _appCheckInitPromise = (async () => {
+    const promise = (async () => {
         const { initializeAppCheck, CustomProvider } = await import('firebase/app-check');
         const { getTurnstileToken } = await import('./core/services/turnstile');
 
@@ -75,7 +75,15 @@ export const initAppCheck = () => {
         });
     })();
 
-    return _appCheckInitPromise;
+    _appCheckInitPromise = promise;
+
+    // A failed init (e.g. a chunk that didn't load) must not be cached
+    // forever: forget the rejection so the next call can retry.
+    promise.catch(() => {
+        if (_appCheckInitPromise === promise) _appCheckInitPromise = null;
+    });
+
+    return promise;
 };
 
 // Lazy-loaded auth and provider instances (ESM live bindings)

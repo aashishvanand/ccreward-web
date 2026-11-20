@@ -408,10 +408,8 @@ const setUserAnalytics = (userId, userProperties = {}) => {
         // Mark user as visited
         setStorageItem('user_visited_before', 'true');
 
-        // Log user identification event
-        logAnalyticsEvent('user_identified', {
-            user_id: userId,
-        });
+        // The user's identity is carried by setUserId above; no separate
+        // identification event is needed.
 
     } catch (error) {
         console.error('❌ Error setting user analytics:', error);

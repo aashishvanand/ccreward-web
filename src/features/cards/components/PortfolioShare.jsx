@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTheme } from "@mui/material";
 import useCardImagesData from "@/core/hooks/useCardImagesData";
 import { useImperativeHandle } from "react";
 import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
+import { useAppTheme } from "@/core/providers/ThemeRegistry";
 
 function PortfolioShare({ cards, ref }) {
-  const theme = useTheme();
+  // The canvas draws with literal colors; it only needs to know the scheme
+  const { resolvedMode } = useAppTheme();
+  const dark = resolvedMode === "dark";
   const [shareUrl, setShareUrl] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const { cardImagesData } = useCardImagesData();
@@ -117,14 +119,14 @@ function PortfolioShare({ cards, ref }) {
       finalCanvas.height = maxHeight;
       const ctx = finalCanvas.getContext("2d");
 
-      ctx.fillStyle = theme.palette.mode === "dark" ? "#121212" : "#ffffff";
+      ctx.fillStyle = dark ? "#121212" : "#ffffff";
       ctx.fillRect(0, 0, width, maxHeight);
 
       // Add ccreward logo
       const logo = new Image();
       logo.crossOrigin = "anonymous";
       logo.src =
-        theme.palette.mode === "dark"
+        dark
           ? buildCloudflareImageUrl("f4bf16b1-527e-4d80-47b4-99989a1ded00", "public")
           : buildCloudflareImageUrl("b6c3c6f1-a744-4e47-8c50-4c33c84c3900", "public");
       await new Promise((resolve) => {
@@ -141,7 +143,7 @@ function PortfolioShare({ cards, ref }) {
       ctx.drawImage(logo, padding, textStartY - 20, logoWidth, logoHeight);
 
       // Draw creative header text
-      ctx.fillStyle = theme.palette.mode === "dark" ? "#ffffff" : "#000000";
+      ctx.fillStyle = dark ? "#ffffff" : "#000000";
       ctx.font = "bold 24px 'Inter Variable', sans-serif";
       ctx.textAlign = "left";
       ctx.fillText(
@@ -151,7 +153,7 @@ function PortfolioShare({ cards, ref }) {
       );
 
       ctx.font = "18px 'Inter Variable', sans-serif";
-      ctx.fillStyle = theme.palette.mode === "dark" ? "#aaaaaa" : "#666666";
+      ctx.fillStyle = dark ? "#aaaaaa" : "#666666";
       ctx.fillText(
         "Compare cards, calculate rewards, and find the perfect credit card for your spending habits.",
         textStartX,
@@ -161,26 +163,26 @@ function PortfolioShare({ cards, ref }) {
       layouts.forEach(
         ({ x, y, card, img, cardWidth, cardHeight, textHeight }) => {
           // Card background
-          ctx.fillStyle = theme.palette.mode === "dark" ? "#1e1e1e" : "#ffffff";
+          ctx.fillStyle = dark ? "#1e1e1e" : "#ffffff";
           ctx.fillRect(x, y, cardWidth, cardHeight + textHeight);
 
           // Draw card image maintaining aspect ratio
           ctx.drawImage(img, x, y, cardWidth, cardHeight);
 
           // Draw card info
-          ctx.fillStyle = theme.palette.mode === "dark" ? "#ffffff" : "#000000";
+          ctx.fillStyle = dark ? "#ffffff" : "#000000";
           ctx.font = `bold ${14 * scale}px 'Inter Variable', sans-serif`;
           ctx.textAlign = "left";
           ctx.fillText(card.cardName, x + 8, y + cardHeight + 18 * scale);
 
-          ctx.fillStyle = theme.palette.mode === "dark" ? "#aaaaaa" : "#666666";
+          ctx.fillStyle = dark ? "#aaaaaa" : "#666666";
           ctx.font = `${12 * scale}px 'Inter Variable', sans-serif`;
           ctx.fillText(card.bank, x + 8, y + cardHeight + 35 * scale);
         }
       );
 
       // Draw footer text
-      ctx.fillStyle = theme.palette.mode === "dark" ? "#ffffff" : "#000000";
+      ctx.fillStyle = dark ? "#ffffff" : "#000000";
       ctx.font = "bold 20px 'Inter Variable', sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(
@@ -190,7 +192,7 @@ function PortfolioShare({ cards, ref }) {
       );
 
       ctx.font = "16px 'Inter Variable', sans-serif";
-      ctx.fillStyle = theme.palette.mode === "dark" ? "#aaaaaa" : "#666666";
+      ctx.fillStyle = dark ? "#aaaaaa" : "#666666";
       ctx.fillText(
         "Download the app to maximize your credit card rewards on the go!",
         width / 2,
@@ -201,7 +203,7 @@ function PortfolioShare({ cards, ref }) {
       const appStoreLogo = new Image();
       appStoreLogo.crossOrigin = "anonymous";
       appStoreLogo.src =
-        theme.palette.mode === "dark"
+        dark
           ? buildCloudflareImageUrl("d6909a96-9073-4189-84ea-54475d93ac00", "public")
           : buildCloudflareImageUrl("60ca24d3-0052-4177-4da7-ce7fc0d24a00", "public");
 

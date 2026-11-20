@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { Box } from "@mui/material";
 import TweetLoading from "./TweetLoading";
 import { useTheme } from "@mui/material/styles";
+import { useAppTheme } from "@/core/providers/ThemeRegistry";
 
 const TweetContent = dynamic(() => import("./TweetContent"), {
   ssr: false,
@@ -13,6 +14,8 @@ const TweetContent = dynamic(() => import("./TweetContent"), {
 
 const TweetContainer = ({ tweetUrl }) => {
   const theme = useTheme();
+  // react-tweet needs the resolved mode ('light'/'dark') as a value, not CSS
+  const { resolvedMode } = useAppTheme();
   const containerRef = useRef(null);
   const [isNearViewport, setIsNearViewport] = useState(false);
 
@@ -49,8 +52,8 @@ const TweetContainer = ({ tweetUrl }) => {
   return (
     <Box
       ref={containerRef}
-      className={theme.palette.mode}
-      data-theme={theme.palette.mode}
+      className={resolvedMode}
+      data-theme={resolvedMode}
       sx={{
         display: "flex",
         justifyContent: "center",
@@ -60,10 +63,10 @@ const TweetContainer = ({ tweetUrl }) => {
         "& .react-tweet-theme": {
           "--tweet-container-margin": "0",
           "--tweet-font-family": "inherit",
-          "--tweet-bg-color": theme.palette.background.paper,
-          "--tweet-border-color": theme.palette.divider,
-          "--tweet-text-color": theme.palette.text.primary,
-          "--tweet-link-color": theme.palette.primary.main,
+          "--tweet-bg-color": theme.vars.palette.background.paper,
+          "--tweet-border-color": theme.vars.palette.divider,
+          "--tweet-text-color": theme.vars.palette.text.primary,
+          "--tweet-link-color": theme.vars.palette.primary.main,
         },
         "& img": {
           maxWidth: "100%",

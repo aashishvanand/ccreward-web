@@ -16,6 +16,7 @@ import {
 import { useAuth } from "./AuthContext";
 import { usePathname } from "next/navigation";
 import { getSafePageUrl, getSafeReferrer } from "../utils/safeUrl";
+import { whenIdle } from "@/core/utils/scheduler";
 
 // Point gtag at a URL without query string or fragment, so email-link codes and
 // checkout ids never reach analytics. Applies to every later event.
@@ -27,15 +28,7 @@ const setSafePageLocation = () => {
   });
 };
 
-// Run analytics setup when the browser is idle, so it never competes with rendering
-const whenIdle = (callback) => {
-  if ("requestIdleCallback" in window) {
-    const id = window.requestIdleCallback(callback, { timeout: 4000 });
-    return () => window.cancelIdleCallback(id);
-  }
-  const id = setTimeout(callback, 1500);
-  return () => clearTimeout(id);
-};
+// whenIdle now lives in core/utils/scheduler.js and is shared with AuthContext.
 
 export function AnalyticsProvider({ children }) {
   const initialized = useRef(false);
@@ -151,9 +144,9 @@ export function AnalyticsProvider({ children }) {
         // Set user ID for crashlytics
         setCrashlyticsUserId(user.uid);
 
-        // Log breadcrumb for user authentication
+        // Log breadcrumb for user authentication. The user id itself goes
+        // through setUserId above, not as an event parameter.
         logBreadcrumb("User authenticated", "user", {
-          user_id: user.uid,
           email_verified: user.emailVerified || false,
         });
       } catch (error) {

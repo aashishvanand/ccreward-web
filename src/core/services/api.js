@@ -1,6 +1,5 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
-import { jwtDecode } from "jwt-decode";
 import { getTurnstileToken } from './turnstile';
 import { handleSuccessHeaders, handleLimitExceeded } from './usageLimitService';
 import { initAppCheck } from '@/firebase';
@@ -44,65 +43,35 @@ const api = axios.create({
     timeout: 10000, // 10 seconds timeout
 });
 
-// Configure retries
+// Configure retries — idempotent methods only. A POST that timed out may
+// already have reached the API, so retrying it could add a card twice,
+// double-send feedback or create a second payment order. A caller that needs
+// retry-on-failure for a POST should send an idempotency key with it.
+// (The one-shot retry for a rejected Turnstile token in the response
+// interceptor is unaffected: that request was rejected by the server,
+// never processed.)
 axiosRetry(api, {
     retries: 3,
     retryDelay: axiosRetry.exponentialDelay,
     retryCondition: (error) => {
+        const method = error.config?.method?.toLowerCase();
+        const isIdempotent = ['get', 'head', 'options', 'put', 'delete'].includes(method);
+        if (!isIdempotent) return false;
         return axiosRetry.isNetworkOrIdempotentRequestError(error) || error.code === 'ECONNABORTED';
     }
 });
 
-// Cached ID token, keyed by uid so a different account never reuses it
-let currentToken = null; // { uid, token }
-let tokenRefreshPromise = null; // { uid, promise }
-
 /**
  * Firebase ID token for the signed-in user, or null when nobody is signed in
- * (public endpoints are called without an Authorization header).
+ * (public endpoints are called without an Authorization header). The SDK
+ * caches and refreshes the token itself: getIdToken(user) returns the cached
+ * token and only hits the network when it's about to expire.
  */
 const getToken = async () => {
     const { getAuth, getIdToken } = await getAuthModule();
     const user = getAuth().currentUser;
-    if (!user) {
-        currentToken = null;
-        return null;
-    }
-    if (currentToken?.uid === user.uid && !isTokenExpired(currentToken.token)) {
-        return currentToken.token;
-    }
-    if (tokenRefreshPromise?.uid !== user.uid) {
-        const promise = getIdToken(user, true)
-            .then(token => {
-                currentToken = { uid: user.uid, token };
-                return token;
-            })
-            .finally(() => {
-                if (tokenRefreshPromise?.promise === promise) tokenRefreshPromise = null;
-            });
-        tokenRefreshPromise = { uid: user.uid, promise };
-    }
-    return tokenRefreshPromise.promise;
-};
-
-/** Forget the cached ID token. Call on logout and account deletion. */
-export const clearAuthToken = () => {
-    currentToken = null;
-    tokenRefreshPromise = null;
-};
-
-// Treat tokens as expired a minute early so they don't lapse in flight
-const TOKEN_EXPIRY_MARGIN_MS = 60 * 1000;
-
-// Function to check if a token is expired
-export const isTokenExpired = (token) => {
-    try {
-        const decodedToken = jwtDecode(token);
-        return decodedToken.exp * 1000 - TOKEN_EXPIRY_MARGIN_MS < Date.now();
-    } catch (error) {
-        console.error('Error decoding token:', error);
-        return true;
-    }
+    if (!user) return null;
+    return getIdToken(user);
 };
 
 // Helper function to get data from cache
@@ -258,6 +227,10 @@ const handleApiError = (error) => {
             throw new Error(`Too many requests. Limited to ${limit} per ${period}.`);
         }
         throw new Error("You've made too many requests. Please take a coffee break and try again later.");
+    }
+
+    if (error.response && error.response.status === 401) {
+        throw new Error("Please sign in first, then try again.");
     }
 
     if (!error.response && error.request) {
@@ -618,13 +591,21 @@ export const getUserCards = async () => {
     }
 };
 
-// Submit feedback for a calculation
-export const submitFeedback = async ({ type = 'calculator_feedback', vote, userFeedback, calculationId, calculationPayload }) => {
-    const body = { type };
-    if (vote) body.vote = vote;
-    if (userFeedback) body.userFeedback = userFeedback;
-    if (calculationId) body.calculationId = calculationId;
-    if (calculationPayload) body.calculationPayload = calculationPayload;
+// Submit feedback (POST /v4/feedback): calculation votes and reports, missing
+// cards and merchants/MCCs, and general app feedback. Only the fields the
+// feedback schema accepts are copied through, and empty values are dropped.
+const FEEDBACK_FIELDS = [
+    'vote', 'userFeedback', 'calculationId', 'calculationPayload',
+    'merchantName', 'mccCode', 'country', 'bin', 'bank', 'cardName', 'feedback',
+];
+
+export const submitFeedback = async (payload = {}) => {
+    const body = { type: payload.type || 'calculator_feedback' };
+    for (const key of FEEDBACK_FIELDS) {
+        if (payload[key] !== undefined && payload[key] !== null && payload[key] !== '') {
+            body[key] = payload[key];
+        }
+    }
 
     try {
         const response = await api.post('/v4/feedback', body);

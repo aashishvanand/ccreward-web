@@ -47,7 +47,6 @@ class ErrorBoundary extends React.Component {
       component_name: this.props.componentName || 'Unknown',
       page_url: typeof window !== 'undefined' ? window.location.href : 'unknown',
       timestamp: new Date().toISOString(),
-      user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown',
       react_version: React.version
     });
 

@@ -20,7 +20,7 @@ import {
   fetchMCC,
   fetchCardQuestions,
 } from "@/core/services/api";
-import debounce from "lodash/debounce";
+import { debounce } from "@/core/utils/functions";
 import PropTypes from "prop-types";
 import { useSearchParams } from "next/navigation";
 import { useRegion } from "@/core/providers/RegionContext";

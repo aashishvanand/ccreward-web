@@ -152,10 +152,10 @@ const HowToSelector = ({
           flexDirection: "column",
           gap: 2,
           p: 3,
-          bgcolor:
-            theme.palette.mode === "dark"
-              ? "rgba(255, 255, 255, 0.05)"
-              : "rgba(0, 0, 0, 0.02)",
+          bgcolor: (theme) => ({
+            bgcolor: "rgba(0, 0, 0, 0.02)",
+            ...theme.applyStyles("dark", { bgcolor: "rgba(255, 255, 255, 0.05)" }),
+          }),
           borderRadius: 2,
           width: "100%",
         }}

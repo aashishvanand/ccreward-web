@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { TextField, InputAdornment, IconButton, useTheme, alpha } from '@mui/material';
 import { Search, Clear } from '@mui/icons-material';
-import debounce from 'lodash/debounce';
+import { debounce } from '@/core/utils/functions';
 
 const MccSearch = ({ onSearch, initialValue = '', placeholder = "Search by merchant name (e.g., Netflix, Amazon)…" }) => {
     const theme = useTheme();

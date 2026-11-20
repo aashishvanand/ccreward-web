@@ -45,8 +45,7 @@ import {
 import useUsageLimit from "@/core/hooks/useUsageLimit";
 import { RateLimitedFeature } from "@/core/services/usageLimitService";
 import UsageRemainingBadge from "@/shared/components/ui/UsageRemainingBadge";
-import debounce from "lodash/debounce";
-import groupBy from "lodash/groupBy";
+import { debounce, groupBy } from "@/core/utils/functions";
 import { useRegion } from "@/core/providers/RegionContext";
 import { m } from "framer-motion";
 import { getCurrencySymbol, getNativeCurrency } from "@/core/utils";

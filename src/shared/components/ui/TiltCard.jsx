@@ -12,6 +12,10 @@ const TiltCard = ({
   width,
   height,
   children,
+  // Cloudflare Images variant to request. w=400 (~77 KB vs 113 KB for
+  // public) is plenty for the sizes TiltCard renders at; pass "public"
+  // if a caller ever displays card art larger than ~400px.
+  variant = "w=400",
   // Image loading hints: pass fetchPriority="high" for the page's LCP image
   // and loading="lazy" for images below the fold.
   loading,
@@ -49,10 +53,14 @@ const TiltCard = ({
   const resolveSrc = (imageSrc) => {
       if (!imageSrc) return '';
       if (imageSrc.startsWith('http') || imageSrc.startsWith('/')) return imageSrc;
-      return buildCloudflareImageUrl(imageSrc, "public");
+      return buildCloudflareImageUrl(imageSrc, variant);
   };
 
   const finalSrc = resolveSrc(src);
+
+  // Intrinsic dimensions of the requested variant (width 400, height from
+  // the card's aspect ratio). CSS still sizes the rendered box.
+  const intrinsicHeight = Math.round(400 / cardRatio);
 
   const handleMouseMove = (e) => {
     if (prefersReducedMotion || !ref.current) return;
@@ -123,6 +131,8 @@ const TiltCard = ({
                    <img
                        src={finalSrc}
                        alt={alt || "Card Image"}
+                       width={400}
+                       height={intrinsicHeight}
                        loading={loading}
                        fetchPriority={fetchPriority}
                        decoding={loading === "lazy" ? "async" : undefined}

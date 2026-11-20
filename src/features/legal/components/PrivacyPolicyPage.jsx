@@ -185,8 +185,9 @@ const PrivacyPolicyPage = () => {
                 request to our servers carries your device&apos;s Internet
                 Protocol (IP) address. We use it to apply rate limits, block
                 bots and abuse, and keep request logs (see section 4). We may
-                also collect browser type, pages visited, time spent on pages
-                and diagnostic data to improve performance.
+                also collect pages visited, time spent on pages, coarse device
+                type (phone, tablet or desktop) and diagnostic data (such as
+                timing and error summaries) to improve performance.
               </p>
 
               <p>

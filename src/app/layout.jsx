@@ -1,5 +1,6 @@
 import './globals.css'
 import Script from "next/script";
+import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import Providers from './providers'
 import { baseJsonLd } from '../shared/constants/jsonLd';
 import ErrorBoundary from '../shared/components/ErrorBoundary';
@@ -52,18 +53,33 @@ function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Inline script to prevent theme FOUC - must run before first paint */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('app-theme');var isDark=t==='dark'||((!t)&&window.matchMedia('(prefers-color-scheme:dark)').matches);if(isDark){document.documentElement.classList.add('dark-mode');document.documentElement.setAttribute('data-mui-color-scheme','dark')}var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=isDark?'#0F172A':'#ffffff'}catch(e){}})()`,
-          }}
-        />
+        {/* MUI's pre-paint script: reads the stored choice ('light' | 'dark' |
+            'system' under MUI's default 'mui-mode' key) and sets the
+            data-light / data-dark attribute before first paint — the same
+            attribute the theme's `colorSchemeSelector: 'data'` CSS and the
+            provider's runtime effect use, so dark mode applies with no
+            flash. */}
+        <InitColorSchemeScript defaultMode="system" attribute="data" />
         <meta name="color-scheme" content="light dark" />
         <meta name="theme-color" content="#ffffff" />
-        {/* Preconnect to critical external origins for faster resource loading */}
+        {/* Pre-paint sync for what MUI doesn't manage: the dark-mode class
+            used by globals.css and the theme-color meta above. Runs AFTER the
+            meta tag so querySelector finds it (it used to run before and
+            silently never updated the meta). Reads MUI's 'mui-mode' key, with
+            the legacy 'app-theme' value as a fallback on the first load after
+            the migration. Stored 'dark' wins; 'light' is light; anything else
+            (including 'system') follows the OS. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('mui-mode')||localStorage.getItem('app-theme');var isDark=t==='dark'||((t!=='light')&&window.matchMedia('(prefers-color-scheme:dark)').matches);if(isDark){document.documentElement.classList.add('dark-mode')}var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=isDark?'#0F172A':'#ffffff'}catch(e){}})()`,
+          }}
+        />
+        {/* Preconnect to critical external origins for faster resource loading.
+            identitytoolkit.googleapis.com is deliberately absent: only
+            signed-in visitors ever reach it, so a preconnect on every page
+            wastes a connection for everyone else. */}
         <link rel="preconnect" href="https://files.ccreward.app" />
         <link rel="preconnect" href="https://imagedelivery.net" />
-        <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.clarity.ms" />
 

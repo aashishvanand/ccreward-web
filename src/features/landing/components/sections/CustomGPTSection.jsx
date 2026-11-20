@@ -4,7 +4,7 @@ import { Box, Container, Typography, Button } from "@mui/material";
 import SmartToyIcon from "@mui/icons-material/SmartToy"; // Robot icon for GPT
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
-const CustomGPTSection = ({ theme }) => {
+const CustomGPTSection = () => {
   return (
     <Box sx={{ py: 8 }}>
       <Container maxWidth="md">
@@ -39,10 +39,12 @@ const CustomGPTSection = ({ theme }) => {
               mb: 2,
               fontWeight: "bold",
               fontSize: { xs: "1.75rem", sm: "2.5rem" },
-              background: (theme) =>
-                theme.palette.mode === "light"
-                  ? `linear-gradient(90deg, ${theme.palette.success.main} 0%, ${theme.palette.primary.main} 100%)`
-                  : `linear-gradient(90deg, ${theme.palette.success.light} 0%, ${theme.palette.primary.light} 100%)`,
+              background: (theme) => ({
+                background: `linear-gradient(90deg, ${theme.vars.palette.success.main} 0%, ${theme.vars.palette.primary.main} 100%)`,
+                ...theme.applyStyles("dark", {
+                  background: `linear-gradient(90deg, ${theme.vars.palette.success.light} 0%, ${theme.vars.palette.primary.light} 100%)`,
+                }),
+              }),
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}
@@ -90,7 +92,7 @@ const CustomGPTSection = ({ theme }) => {
               borderRadius: 3,
               fontSize: "1.1rem",
               textTransform: "none",
-              boxShadow: (theme) => `0 8px 20px ${theme.palette.primary.main}40`,
+              boxShadow: (theme) => `0 8px 20px rgba(${theme.vars.palette.primary.mainChannel} / 0.25)`,
               transition: "transform 0.2s, box-shadow 0.2s",
               "&:hover": {
                 transform: "translateY(-2px)",

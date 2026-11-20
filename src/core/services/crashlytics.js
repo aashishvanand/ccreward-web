@@ -42,7 +42,6 @@ function setupGlobalErrorHandlers() {
             stack: event.error?.stack,
             timestamp: new Date().toISOString(),
             url: getSafePageUrl(),
-            userAgent: navigator.userAgent,
             type: 'javascript_error'
         };
 
@@ -58,7 +57,6 @@ function setupUnhandledRejectionHandler() {
             stack: event.reason?.stack,
             timestamp: new Date().toISOString(),
             url: getSafePageUrl(),
-            userAgent: navigator.userAgent,
             type: 'unhandled_promise_rejection'
         };
 
@@ -103,14 +101,8 @@ export const recordError = (errorName, errorInfo = {}) => {
             error_name: errorName,
             timestamp: new Date().toISOString(),
             session_id: getSessionId(),
-            user_id: getCurrentUserId(),
             page_url: getSafePageUrl(),
             page_title: document.title,
-            user_agent: navigator.userAgent,
-            viewport: `${window.innerWidth}x${window.innerHeight}`,
-            screen: `${screen.width}x${screen.height}`,
-            connection: getConnectionInfo(),
-            memory: getMemoryInfo(),
             app_version: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
             build_time: process.env.NEXT_PUBLIC_BUILD_TIME || 'unknown',
             environment: process.env.NODE_ENV || 'unknown'
@@ -283,34 +275,6 @@ export const recordAPIError = (endpoint, statusCode, errorMessage, requestData =
 // Helper functions
 function getSessionId() {
     return sessionStorage.getItem('analytics_session_id') || 'unknown';
-}
-
-function getCurrentUserId() {
-    return sessionStorage.getItem('crashlytics_user_id') || 'anonymous';
-}
-
-function getConnectionInfo() {
-    if (typeof navigator !== 'undefined' && 'connection' in navigator) {
-        const conn = navigator.connection;
-        return {
-            effective_type: conn.effectiveType,
-            downlink: conn.downlink,
-            rtt: conn.rtt,
-            save_data: conn.saveData
-        };
-    }
-    return {};
-}
-
-function getMemoryInfo() {
-    if (typeof performance !== 'undefined' && 'memory' in performance) {
-        return {
-            used_js_heap_size: performance.memory.usedJSHeapSize,
-            total_js_heap_size: performance.memory.totalJSHeapSize,
-            js_heap_size_limit: performance.memory.jsHeapSizeLimit
-        };
-    }
-    return {};
 }
 
 function getBreadcrumbLevel(category) {

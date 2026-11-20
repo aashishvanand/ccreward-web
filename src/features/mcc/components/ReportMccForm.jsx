@@ -14,6 +14,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Close as CloseIcon, ReportProblem as ReportIcon } from "@mui/icons-material";
+import { submitFeedback } from "@/core/services/api";
 
 const ReportMccForm = ({ open, onClose, onSubmitSuccess }) => {
   const theme = useTheme();
@@ -21,35 +22,32 @@ const ReportMccForm = ({ open, onClose, onSubmitSuccess }) => {
   const [merchantName, setMerchantName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Google Form URL and Field IDs for MCC Reporting
-  const GOOGLE_FORM_URL = "https://docs.google.com/forms/u/0/d/e/1FAIpQLSc7xUzKZe9EGWt6p35mTl8Cf0ZlUDFe2ZGWPIKr5PysZSfqIQ/formResponse";
-  const FIELD_MCC = "entry.2005151650";
-  const FIELD_MERCHANT_NAME = "entry.60356500";
-
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
-    const formData = new FormData();
-    formData.append(FIELD_MCC, mcc);
-    formData.append(FIELD_MERCHANT_NAME, merchantName);
 
-    fetch(GOOGLE_FORM_URL, {
-      method: "POST",
-      body: formData,
-      mode: "no-cors",
-    })
-      .then(() => {
-        if (onSubmitSuccess) onSubmitSuccess("Report submitted successfully!");
-        clearForm();
-        onClose();
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        if (onSubmitSuccess) onSubmitSuccess("Error submitting report. Please try again.", "error");
-      })
-      .finally(() => {
-        setIsSubmitting(false);
+    // Reports go through the API's /v4/feedback endpoint (Turnstile + App Check
+    // protected, rate limited) instead of a Google Form.
+    try {
+      await submitFeedback({
+        type: "merchant",
+        merchantName,
+        mccCode: mcc || undefined,
       });
+      if (onSubmitSuccess) onSubmitSuccess("Report submitted successfully!");
+      clearForm();
+      onClose();
+    } catch (error) {
+      console.error("Error:", error);
+      if (onSubmitSuccess) {
+        onSubmitSuccess(
+          error.message || "Error submitting report. Please try again.",
+          "error"
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const clearForm = () => {

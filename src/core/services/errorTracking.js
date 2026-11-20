@@ -108,11 +108,6 @@ const recordError = (errorName, errorInfo = {}, isFatal = false) => {
             session_id: getOrCreateSessionId(),
             page_url: getSafePageUrl(),
             page_title: document.title,
-            user_agent: navigator.userAgent,
-            viewport: `${window.innerWidth}x${window.innerHeight}`,
-            screen: `${screen.width}x${screen.height}`,
-            connection: getConnectionInfo(),
-            memory: getMemoryInfo(),
             app_version: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
             environment: process.env.NODE_ENV || 'production',
             deployment_platform: 'cloudflare_pages',
@@ -331,29 +326,6 @@ function getOrCreateSessionId() {
     return sessionId;
 }
 
-function getConnectionInfo() {
-    if (typeof window === 'undefined') return {};
-
-    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-    return connection ? {
-        effective_type: connection.effectiveType,
-        downlink: connection.downlink,
-        rtt: connection.rtt,
-        save_data: connection.saveData
-    } : { effective_type: 'unknown' };
-}
-
-function getMemoryInfo() {
-    if (typeof window === 'undefined') return {};
-
-    const memory = performance.memory;
-    return memory ? {
-        used_heap_size: Math.round(memory.usedJSHeapSize / 1048576), // MB
-        total_heap_size: Math.round(memory.totalJSHeapSize / 1048576), // MB
-        heap_size_limit: Math.round(memory.jsHeapSizeLimit / 1048576) // MB
-    } : {};
-}
-
 function getPerformanceContext() {
     if (typeof window === 'undefined') return {};
 
@@ -490,7 +462,6 @@ const recordAPIError = (endpoint, statusCode, errorMessage, requestData = {}) =>
             request_data: requestData.data ? JSON.stringify(requestData.data).substring(0, 500) : '',
             timestamp: new Date().toISOString(),
             page_url: getSafePageUrl(),
-            user_agent: navigator.userAgent
         };
 
         // Log to analytics

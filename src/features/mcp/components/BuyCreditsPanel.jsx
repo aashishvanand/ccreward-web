@@ -102,14 +102,18 @@ function BuyCreditsPanel({ currentCredits, onCreditsUpdated }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Clean up the poll interval if the component unmounts mid-poll
+  useEffect(() => stopPolling, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleBuy = async (pkg) => {
+    // pkg is the package object so the UI can show its label, not the id
     setSelectedPkg(pkg);
     setCheckoutState("ordering");
     setError(null);
 
     if (region === "SG") {
       try {
-        const session = await createMcpStripeCheckoutSession(pkg);
+        const session = await createMcpStripeCheckoutSession(pkg.id);
         window.location.href = session.url;
       } catch (err) {
         setError(err.message || "Failed to start checkout.");
@@ -119,7 +123,7 @@ function BuyCreditsPanel({ currentCredits, onCreditsUpdated }) {
     }
 
     try {
-      const order = await createMcpRazorpayOrder(pkg);
+      const order = await createMcpRazorpayOrder(pkg.id);
       const Razorpay = await loadRazorpayScript();
 
       const rzp = new Razorpay({
@@ -159,7 +163,7 @@ function BuyCreditsPanel({ currentCredits, onCreditsUpdated }) {
         {packages.map((pkg) => (
           <Button
             key={pkg.id}
-            onClick={() => handleBuy(pkg.id)}
+            onClick={() => handleBuy(pkg)}
             disabled={
               currentCredits === undefined ||
               checkoutState === "ordering" ||
@@ -177,7 +181,7 @@ function BuyCreditsPanel({ currentCredits, onCreditsUpdated }) {
 
       {checkoutState === "ordering" && (
         <Alert severity="info" icon={<CircularProgress size={18} />}>
-          Opening checkout for {selectedPkg}...
+          Opening checkout for {selectedPkg?.label ?? "credits"}...
         </Alert>
       )}
       {checkoutState === "processing" && (
@@ -189,8 +193,9 @@ function BuyCreditsPanel({ currentCredits, onCreditsUpdated }) {
       {checkoutState === "cancelled" && <Alert severity="info">Checkout was cancelled.</Alert>}
       {checkoutState === "timeout" && (
         <Alert severity="warning">
-          Payment received — if your balance doesn&apos;t update within a few minutes,
-          please contact support.
+          We couldn&apos;t confirm your payment within 45 seconds. If it went
+          through, your credits will appear within a few minutes — otherwise
+          no charge was made and you can try again. Still stuck? Contact support.
         </Alert>
       )}
       {checkoutState === "error" && error && <Alert severity="error">{error}</Alert>}

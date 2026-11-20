@@ -10,6 +10,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { submitFeedback } from "@/core/services/api";
+
+// /v4/feedback rejects a calculationPayload longer than 20,000 characters
+const CALCULATION_PAYLOAD_MAX = 20000;
 
 const IncorrectRewardReportForm = ({
   open,
@@ -19,33 +23,25 @@ const IncorrectRewardReportForm = ({
 }) => {
   const [userFeedback, setUserFeedback] = useState("");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const consoleLog = JSON.stringify(formData);
-    const submissionData = new FormData();
-    submissionData.append("entry.1871812572", consoleLog);
-    submissionData.append("entry.507295039", userFeedback);
-
-    fetch(
-      "https://docs.google.com/forms/u/0/d/e/1FAIpQLSeW-n8et15bE8wajTKTVXi39dn_sJ4LFzPy9K2BOjlaeSul5A/formResponse",
-      {
-        method: "POST",
-        body: submissionData,
-        mode: "no-cors",
-      }
-    )
-      .then(() => {
-        onSubmitSuccess("Report submitted successfully!");
-        setUserFeedback("");
-        onClose();
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        onSubmitSuccess(
-          "There was an error submitting the report. Please try again.",
-          "error"
-        );
+    try {
+      await submitFeedback({
+        type: "calculator_feedback",
+        userFeedback,
+        calculationPayload: JSON.stringify(formData).slice(0, CALCULATION_PAYLOAD_MAX),
       });
+      onSubmitSuccess("Report submitted successfully!");
+      setUserFeedback("");
+      onClose();
+    } catch (error) {
+      console.error("Error:", error);
+      onSubmitSuccess(
+        error.message ||
+          "There was an error submitting the report. Please try again.",
+        "error"
+      );
+    }
   };
 
   return (

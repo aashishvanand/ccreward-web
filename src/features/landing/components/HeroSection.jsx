@@ -27,9 +27,13 @@ const HeroSection = ({
     <Box
       sx={{
         bgcolor: "transparent",
-        background: theme => theme.palette.mode === 'light'
-          ? `radial-gradient(circle at 50% 0%, ${theme.palette.primary.light}15 0%, transparent 50%), ${theme.palette.background.default}`
-          : `radial-gradient(circle at 50% 0%, ${theme.palette.primary.dark}20 0%, transparent 50%), ${theme.palette.background.default}`,
+        // Vars + scheme-scoped rule: one stylesheet is correct in both modes
+        background: (theme) => ({
+          background: `radial-gradient(circle at 50% 0%, rgba(${theme.vars.palette.primary.lightChannel} / 0.082) 0%, transparent 50%), ${theme.vars.palette.background.default}`,
+          ...theme.applyStyles('dark', {
+            background: `radial-gradient(circle at 50% 0%, rgba(${theme.vars.palette.primary.darkChannel} / 0.125) 0%, transparent 50%), ${theme.vars.palette.background.default}`,
+          }),
+        }),
         minHeight: { md: "80vh" },
         display: "flex",
         alignItems: "center",
@@ -53,9 +57,12 @@ const HeroSection = ({
                 fontWeight: 800,
                 mb: 3,
                 lineHeight: 1.1,
-                background: theme => theme.palette.mode === 'light'
-                  ? `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`
-                  : `linear-gradient(90deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.light} 100%)`,
+                background: (theme) => ({
+                  background: `linear-gradient(90deg, ${theme.vars.palette.primary.main} 0%, ${theme.vars.palette.secondary.main} 100%)`,
+                  ...theme.applyStyles('dark', {
+                    background: `linear-gradient(90deg, ${theme.vars.palette.primary.light} 0%, ${theme.vars.palette.secondary.light} 100%)`,
+                  }),
+                }),
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 letterSpacing: "-0.02em",

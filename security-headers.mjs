@@ -20,9 +20,9 @@ const CSP_DIRECTIVES = {
         "'self'",
         "'unsafe-inline'",
         'https://www.googletagmanager.com',
-        'https://*.googletagmanager.com',
-        'https://*.clarity.ms',
-        'https://*.firebaseapp.com',
+        'https://www.clarity.ms',
+        // This project's Firebase auth domain only — not every *.firebaseapp.com project
+        'https://ccreward-7cf93.firebaseapp.com',
         'https://accounts.google.com',
         'https://apis.google.com',
         'https://challenges.cloudflare.com',
@@ -31,9 +31,14 @@ const CSP_DIRECTIVES = {
     'connect-src': [
         "'self'",
         'https://*.ccreward.app',
-        'https://*.googleapis.com',
-        'https://*.firebaseio.com',
-        'wss://*.firebaseio.com',
+        // The Firebase JS SDK endpoints this app actually uses: Auth (identitytoolkit,
+        // securetoken), App Check installs, Performance log upload, and the Firebase
+        // REST host — instead of every *.googleapis.com project.
+        'https://identitytoolkit.googleapis.com',
+        'https://securetoken.googleapis.com',
+        'https://firebaseinstallations.googleapis.com',
+        'https://firebaselogging.googleapis.com',
+        'https://firebase.googleapis.com',
         'https://*.clarity.ms',
         'https://c.bing.com',
         'https://*.google-analytics.com',
@@ -41,7 +46,6 @@ const CSP_DIRECTIVES = {
         'https://*.googletagmanager.com',
         'https://accounts.google.com',
         'https://react-tweet.vercel.app',
-        'https://docs.google.com',
         'https://challenges.cloudflare.com',
         'https://api.razorpay.com',
         'https://lumberjack.razorpay.com',
@@ -59,7 +63,7 @@ const CSP_DIRECTIVES = {
         'https://*.clarity.ms',
         'https://c.bing.com',
         'https://*.google-analytics.com',
-        'https://*.googletagmanager.com',
+        'https://www.googletagmanager.com',
         'https://*.razorpay.com',
     ],
     'style-src': [
@@ -75,7 +79,8 @@ const CSP_DIRECTIVES = {
         'https://www.youtube.com',
         'https://www.youtube-nocookie.com',
         'https://accounts.google.com',
-        'https://*.firebaseapp.com',
+        // This project's auth-domain iframe only (Firebase sign-in popups)
+        'https://ccreward-7cf93.firebaseapp.com',
         'https://challenges.cloudflare.com',
         'https://api.razorpay.com',
         'https://checkout.razorpay.com',
@@ -85,10 +90,14 @@ const CSP_DIRECTIVES = {
     'base-uri': ["'self'"],
     'form-action': ["'self'"],
     'frame-ancestors': ["'self'"],
+    // Rewrite any leftover http:// subresource requests to https
+    'upgrade-insecure-requests': [],
 };
 
 export const contentSecurityPolicy = Object.entries(CSP_DIRECTIVES)
-    .map(([directive, sources]) => `${directive} ${sources.join(' ')}`)
+    .map(([directive, sources]) =>
+        sources.length ? `${directive} ${sources.join(' ')}` : directive
+    )
     .join('; ');
 
 export const securityHeaders = [

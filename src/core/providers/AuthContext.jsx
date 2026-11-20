@@ -1,20 +1,12 @@
 'use client';
 import PropTypes from 'prop-types';
-import { createContext, use, useEffect, useState, useRef } from 'react';
-import { getFirebaseAuth, firebaseApp, initAppCheck } from '@/firebase';
+import { createContext, use, useEffect, useState, useRef, useMemo, useCallback } from 'react';
+import { getFirebaseAuth, firebaseApp } from '@/firebase';
 import { resetUsageState } from '../services/usageLimitService';
+import { whenIdle } from '@/core/utils/scheduler';
 import { useRouter, usePathname } from "next/navigation";
-
-// Drop the API client's cached ID token. Loaded lazily so axios stays out of the
-// root bundle; if the API client was never loaded there is nothing to clear.
-const clearCachedApiToken = async () => {
-  try {
-    const { clearAuthToken } = await import('../services/api');
-    clearAuthToken();
-  } catch {
-    // Ignore: the token is also keyed by uid, so another account can't reuse it
-  }
-};
+import SignInDialog from '@/shared/components/auth/SignInDialog';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
 
 const AuthContext = createContext();
 
@@ -23,69 +15,63 @@ const PROTECTED_ROUTES = ['/my-cards'];
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isNewUser, setIsNewUser] = useState(false);
   const authRef = useRef(null);
   const providerRef = useRef(null);
   const appleProviderRef = useRef(null);
-  const router = useRouter();
-  const pathname = usePathname() || '';
 
   useEffect(() => {
     let unsubscribe;
+    let cancelled = false;
 
-    // Dynamically load firebase/auth, then set up the auth state listener
-    (async () => {
-      // Initialize App Check before any Firebase service call
-      await initAppCheck();
-      const { auth, googleProvider, appleProvider } = await getFirebaseAuth();
-      const { onAuthStateChanged } = await import('firebase/auth');
-      authRef.current = auth;
-      providerRef.current = googleProvider;
-      appleProviderRef.current = appleProvider;
+    // Auth startup is deferred to idle time so it never competes with the
+    // initial render: anonymous visitors on landing/SEO pages don't wait for
+    // Firebase Auth, and the Turnstile script (pulled in by App Check) stays
+    // off the critical path. App Check itself is initialized by the first
+    // API call instead (see getAppCheckHeaderToken in api.js), so it only
+    // loads for visitors who actually use the API.
+    const cancelIdle = whenIdle(() => {
+      (async () => {
+        const { auth, googleProvider, appleProvider } = await getFirebaseAuth();
+        const { onAuthStateChanged } = await import('firebase/auth');
+        if (cancelled) return;
+        authRef.current = auth;
+        providerRef.current = googleProvider;
+        appleProviderRef.current = appleProvider;
 
-      unsubscribe = onAuthStateChanged(auth, (user) => {
-        if (user) {
-          const isNew = user.metadata.creationTime === user.metadata.lastSignInTime;
-          setUser(user);
-          setIsNewUser(isNew);
-          // Log sign_up event if it's a new user
-          if (isNew && typeof window !== 'undefined') {
-            const signInMethod = user.providerData?.[0]?.providerId === 'apple.com' ? 'apple' : 'google';
-            import("firebase/analytics").then(({ getAnalytics, logEvent }) => {
-              const analytics = getAnalytics(firebaseApp);
-              logEvent(analytics, 'sign_up', {
-                method: signInMethod,
-              });
-            }).catch(e => console.warn("Analytics error", e));
+        unsubscribe = onAuthStateChanged(auth, (user) => {
+          if (user) {
+            const isNew = user.metadata.creationTime === user.metadata.lastSignInTime;
+            setUser(user);
+            setIsNewUser(isNew);
+            // Log sign_up event if it's a new user
+            if (isNew && typeof window !== 'undefined') {
+              const signInMethod = user.providerData?.[0]?.providerId === 'apple.com' ? 'apple' : 'google';
+              import("firebase/analytics").then(({ getAnalytics, logEvent }) => {
+                const analytics = getAnalytics(firebaseApp);
+                logEvent(analytics, 'sign_up', {
+                  method: signInMethod,
+                });
+              }).catch(e => console.warn("Analytics error", e));
+            }
+          } else {
+            setUser(null);
+            setIsNewUser(false);
           }
-        } else {
-          setUser(null);
-          setIsNewUser(false);
-        }
-        setLoading(false);
-      });
-    })();
+          setLoading(false);
+        });
+      })();
+    });
 
     return () => {
+      cancelled = true;
+      cancelIdle();
       if (unsubscribe) unsubscribe();
     };
   }, []);
 
-  // Handle route protection
-  useEffect(() => {
-    const isProtectedRoute = PROTECTED_ROUTES.some(
-      (route) => pathname === route || pathname.startsWith(`${route}/`)
-    );
-
-    // Only redirect after authentication state is determined and if the route is protected
-    if (!loading && !user && isProtectedRoute) {
-      router.push('/');
-    }
-  }, [user, loading, pathname, router]);
-
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = useCallback(async () => {
     try {
       const { signInWithPopup } = await import('firebase/auth');
       const result = await signInWithPopup(authRef.current, providerRef.current);
@@ -111,9 +97,9 @@ export function AuthProvider({ children }) {
       }
       throw error;
     }
-  };
+  }, []);
 
-  const signInWithApple = async () => {
+  const signInWithApple = useCallback(async () => {
     try {
       const { signInWithPopup } = await import('firebase/auth');
       const result = await signInWithPopup(authRef.current, appleProviderRef.current);
@@ -139,20 +125,18 @@ export function AuthProvider({ children }) {
       }
       throw error;
     }
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       const { signOut } = await import('firebase/auth');
       await signOut(authRef.current);
-      await clearCachedApiToken();
       if (typeof window !== 'undefined') {
         const { getAnalytics, logEvent } = await import("firebase/analytics");
         const analytics = getAnalytics(firebaseApp);
         logEvent(analytics, 'logout');
       }
       setUser(null);
-      setToken(null);
       setIsNewUser(false);
       resetUsageState();
       if (typeof window !== 'undefined') {
@@ -177,9 +161,9 @@ export function AuthProvider({ children }) {
       }
       throw error;
     }
-  };
+  }, []);
 
-  const deleteAccount = async () => {
+  const deleteAccount = useCallback(async () => {
     try {
       if (!authRef.current?.currentUser) throw new Error("No user logged in");
 
@@ -188,7 +172,6 @@ export function AuthProvider({ children }) {
       //    any OAuth access, since OAuth tokens run on the same mcp:<uid> credentials).
       const { deleteUser } = await import('firebase/auth');
       await deleteUser(authRef.current.currentUser);
-      await clearCachedApiToken();
 
       // 2. Analytics
       if (typeof window !== 'undefined') {
@@ -199,7 +182,6 @@ export function AuthProvider({ children }) {
 
       // 3. Cleanup local state
       setUser(null);
-      setToken(null);
       setIsNewUser(false);
       resetUsageState();
 
@@ -211,7 +193,6 @@ export function AuthProvider({ children }) {
         localStorage.removeItem('calculationCount');
       }
 
-      router.push('/');
     } catch (error) {
       console.error("Error deleting account", error);
       if (typeof window !== 'undefined') {
@@ -226,17 +207,19 @@ export function AuthProvider({ children }) {
       }
       throw error;
     }
-  };
+  }, []);
 
-  const isAuthenticated = () => {
+  const isAuthenticated = useCallback(() => {
     return !!user;
-  };
+  }, [user]);
 
-  const markUserAsNotNew = () => {
+  const markUserAsNotNew = useCallback(() => {
     setIsNewUser(false);
-  };
+  }, []);
 
-  const value = {
+  // Memoized value: consumers only re-render when the auth state actually
+  // changes, not on every provider render.
+  const value = useMemo(() => ({
     user,
     signInWithGoogle,
     signInWithApple,
@@ -246,14 +229,48 @@ export function AuthProvider({ children }) {
     isNewUser,
     markUserAsNotNew,
     deleteAccount,
-  };
-
-
+  }), [user, loading, isNewUser, signInWithGoogle, signInWithApple, logout, isAuthenticated, markUserAsNotNew, deleteAccount]);
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      <RouteGuard>
+        {children}
+      </RouteGuard>
     </AuthContext.Provider>
+  );
+}
+
+// Route protection lives in this child component so the AuthProvider itself
+// doesn't depend on usePathname/useRouter and re-render on every navigation.
+// Only RouteGuard re-renders when the route changes. Signed-out visitors on
+// a protected route get the sign-in dialog on the page itself — not a silent
+// redirect to / with no explanation.
+function RouteGuard({ children }) {
+  const { user, loading, signInWithGoogle, signInWithApple } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname() || '';
+
+  const isProtectedRoute = PROTECTED_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
+  const needsSignIn = !loading && !user && isProtectedRoute;
+
+  return (
+    <>
+      {needsSignIn && (
+        <SignInDialog
+          open
+          onGoogleSignIn={signInWithGoogle}
+          onAppleSignIn={signInWithApple}
+          title="Sign in to see your cards"
+          message="Your saved cards belong to your account. Sign in to view and manage them."
+          icon={<CreditCardIcon color="primary" sx={{ fontSize: 40 }} />}
+          cancelLabel="Go home"
+          onCancel={() => router.push('/')}
+        />
+      )}
+      {children}
+    </>
   );
 }
 

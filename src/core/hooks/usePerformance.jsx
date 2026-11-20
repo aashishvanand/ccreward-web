@@ -30,8 +30,7 @@ export const usePagePerformance = (pageName, options = {}) => {
         startTimeRef.current = performance.now();
         traceRef.current = startPerformanceTrace(`page_${pageName}`, {
             page_name: pageName,
-            page_url: window.location.href,
-            user_agent: navigator.userAgent
+            page_url: window.location.href
         });
 
         // Track page mount

@@ -56,19 +56,25 @@
      *     { event: "expired" }                — token expired (request a new one)
      *
      * Query parameters:
-     *   ?sitekey=...   Override the default site key (optional)
-     *   ?theme=light|dark|auto   Widget theme (default: auto)
-     *   ?action=...    Optional Turnstile action tag
+     *   ?theme=light|dark   Widget theme (default: auto; any other value is ignored)
+     *   ?action=...         Optional Turnstile action tag (max 32 chars, [A-Za-z0-9_-])
+     *
+     * The site key is fixed. This page is only ever loaded from ccreward.app
+     * by the mobile apps, and neither app passes query parameters, so there
+     * is no ?sitekey= override to accept.
      */
 
     (function () {
       'use strict';
 
       var DEFAULT_SITE_KEY = '0x4AAAAAAAiHL1oxsRX9VAgH';
+      var siteKey = DEFAULT_SITE_KEY;
+
       var params = new URLSearchParams(window.location.search);
-      var siteKey = params.get('sitekey') || DEFAULT_SITE_KEY;
-      var theme = params.get('theme') || 'auto';
-      var action = params.get('action') || undefined;
+      var themeParam = params.get('theme');
+      var theme = themeParam === 'light' || themeParam === 'dark' ? themeParam : 'auto';
+      var actionParam = params.get('action');
+      var action = /^[A-Za-z0-9_-]{1,32}$/.test(actionParam || '') ? actionParam : undefined;
 
       var widgetId = null;
       var statusEl = document.getElementById('status');
@@ -83,9 +89,17 @@
           window.webkit.messageHandlers.turnstile.postMessage(payload);
         }
 
-        // Android: injected JS interface
-        if (window.TurnstileInterface && typeof window.TurnstileInterface.onMessage === 'function') {
-          window.TurnstileInterface.onMessage(json);
+        // Android: injected JS interface. Prefer the postMessage-only object
+        // injected by WebViewCompat.addWebMessageListener, and fall back to
+        // the older addJavascriptInterface bridge, which only exposes
+        // onMessage. Keeping the fallback makes this fully backward
+        // compatible with every shipped app version.
+        if (window.TurnstileInterface) {
+          if (typeof window.TurnstileInterface.postMessage === 'function') {
+            window.TurnstileInterface.postMessage(json);
+          } else if (typeof window.TurnstileInterface.onMessage === 'function') {
+            window.TurnstileInterface.onMessage(json);
+          }
         }
 
         // Flutter: postMessage channel

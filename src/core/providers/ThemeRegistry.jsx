@@ -1,20 +1,26 @@
-// src/core/providers/ThemeRegistry.js
+// src/core/providers/ThemeRegistry.jsx
 'use client';
-import { useState, useMemo, createContext, use, useEffect, useCallback } from 'react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { createContext, use, useEffect, useMemo } from 'react';
+import { ThemeProvider, createTheme, useColorScheme } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
-import useMediaQuery from '@mui/material/useMediaQuery';
 
 const ThemeContext = createContext({
-  mode: 'light',
+  mode: 'system',
+  resolvedMode: 'light',
   toggleTheme: () => { },
   setMode: () => { },
 });
 
-const STORAGE_KEY = 'app-theme';
+// MUI's ThemeProvider hardcodes 'mui-mode' as its mode storage key, so the
+// InitColorSchemeScript and this bridge use it too. 'app-theme' is the legacy
+// key of the previous two-mode implementation; it is migrated on first mount.
+const STORAGE_KEY = 'mui-mode';
+const LEGACY_STORAGE_KEY = 'app-theme'; // 'light' | 'dark' written by the old toggle
+const VALID_MODES = ['light', 'dark', 'system'];
 
 const colorPalette = {
   light: {
+    mode: 'light',
     primary: {
       main: "#2563EB", // Vibrant Blue
       light: "#60A5FA",
@@ -57,6 +63,7 @@ const colorPalette = {
     },
   },
   dark: {
+    mode: 'dark',
     primary: {
       main: "#3B82F6", // Blue 500
       light: "#60A5FA",
@@ -100,168 +107,181 @@ const colorPalette = {
   },
 };
 
-// Hoisted: avoids recreating a default theme object on every pre-mount render.
-const DEFAULT_THEME = createTheme();
-
-function getInitialMode() {
-  // Only return a default mode during server-side rendering to avoid hydration mismatch
-  if (typeof window === 'undefined') {
-    return 'light';
-  }
-
-  const savedMode = localStorage.getItem(STORAGE_KEY);
-  if (savedMode) {
-    return savedMode;
-  }
-  return 'light';
-}
+// One theme for both color schemes, hoisted and created once. With
+// `cssVariables: true` every palette slot becomes a CSS variable scoped by
+// `data-mui-color-scheme`, so the server and the first client render use the
+// same stylesheet: no theme swap after hydration, no flash, and switching
+// modes never re-creates the theme.
+const theme = createTheme({
+  // `colorSchemeSelector: 'data'` scopes each scheme's CSS variables to
+  // [data-mui-color-scheme="…"], so setMode()/InitColorSchemeScript drive
+  // the attribute and switching modes never regenerates styles. The default
+  // ('media') would pin the scheme to the OS and ignore the user's choice.
+  cssVariables: { colorSchemeSelector: 'data' },
+  colorSchemes: {
+    light: { palette: colorPalette.light },
+    dark: { palette: colorPalette.dark },
+  },
+  typography: {
+    fontFamily: 'var(--font-inter), "Roboto", "Helvetica", "Arial", sans-serif',
+    h1: { fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 700 },
+    h2: { fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 700 },
+    h3: { fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 600 },
+    h4: { fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 600 },
+    h5: { fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 500 },
+    h6: { fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 500 },
+    button: { fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 600, textTransform: 'none' },
+  },
+  shape: {
+    borderRadius: 12,
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: ({ theme }) => ({
+          scrollbarColor: '#959595 #f1f1f1',
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            borderRadius: '8px',
+            backgroundColor: '#959595',
+            '&:hover': {
+              backgroundColor: '#6b6b6b',
+            },
+          },
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: '#f1f1f1',
+          },
+          // Scheme-scoped rules: no runtime mode checks, no restyle on switch
+          ...theme.applyStyles('dark', {
+            scrollbarColor: '#6b6b6b #2b2b2b',
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: '#6b6b6b',
+              '&:hover': {
+                backgroundColor: '#959595',
+              },
+            },
+            '&::-webkit-scrollbar-track': {
+              backgroundColor: '#2b2b2b',
+            },
+          }),
+        }),
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: '50px', // Pill shape
+          padding: '8px 24px',
+          boxShadow: 'none',
+          '&:hover': {
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            transform: 'translateY(-1px)',
+          },
+          transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+        },
+        contained: ({ theme }) => ({
+          background: `linear-gradient(135deg, ${theme.vars.palette.primary.main} 0%, ${theme.vars.palette.primary.dark} 100%)`,
+        }),
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          borderRadius: 16,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+          border: '1px solid rgba(0,0,0,0.05)',
+          ...theme.applyStyles('dark', {
+            boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+            border: '1px solid rgba(255,255,255,0.05)',
+          }),
+        }),
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          borderRadius: theme.spacing(2),
+        }),
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+        },
+      },
+    },
+  },
+});
 
 export function ThemeRegistry({ children }) {
-  // Initialize with null to avoid hydration mismatch
-  const [mode, setMode] = useState(null);
-  const [mounted, setMounted] = useState(false);
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-
-  // Only run once the component is mounted on client
-  useEffect(() => {
-    setMounted(true);
-    // Set the actual mode once we're on the client
-    const initialMode = getInitialMode();
-    setMode(initialMode);
-
-    // If no saved preference, use system preference
-    if (!localStorage.getItem(STORAGE_KEY) && prefersDarkMode) {
-      setMode('dark');
-      localStorage.setItem(STORAGE_KEY, 'dark');
-    }
-  }, [prefersDarkMode]);
-
-  const toggleTheme = useCallback(() => {
-    if (!mode) return;
-    const newMode = mode === 'light' ? 'dark' : 'light';
-    setMode(newMode);
-    localStorage.setItem(STORAGE_KEY, newMode);
-  }, [mode]);
-
-  const theme = useMemo(() => {
-    if (!mode) return DEFAULT_THEME;
-
-    return createTheme({
-      palette: {
-        mode,
-        ...colorPalette[mode],
-      },
-      typography: {
-        fontFamily: 'var(--font-inter), "Roboto", "Helvetica", "Arial", sans-serif',
-        h1: { fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 700 },
-        h2: { fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 700 },
-        h3: { fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 600 },
-        h4: { fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 600 },
-        h5: { fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 500 },
-        h6: { fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 500 },
-        button: { fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 600, textTransform: 'none' },
-      },
-      shape: {
-        borderRadius: 12,
-      },
-      components: {
-        MuiCssBaseline: {
-          styleOverrides: {
-            // Use ({ theme }) callback so mode-specific values are evaluated lazily
-            // against the live theme, not captured in a stale closure.
-            body: ({ theme }) => ({
-              scrollbarColor: theme.palette.mode === 'dark' ? '#6b6b6b #2b2b2b' : '#959595 #f1f1f1',
-              '&::-webkit-scrollbar': {
-                width: '8px',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                borderRadius: '8px',
-                backgroundColor: theme.palette.mode === 'dark' ? '#6b6b6b' : '#959595',
-                '&:hover': {
-                  backgroundColor: theme.palette.mode === 'dark' ? '#959595' : '#6b6b6b',
-                },
-              },
-              '&::-webkit-scrollbar-track': {
-                backgroundColor: theme.palette.mode === 'dark' ? '#2b2b2b' : '#f1f1f1',
-              },
-            }),
-          },
-        },
-        MuiButton: {
-          styleOverrides: {
-            root: {
-              borderRadius: '50px', // Pill shape
-              padding: '8px 24px',
-              boxShadow: 'none',
-              '&:hover': {
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                transform: 'translateY(-1px)',
-              },
-              transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-            },
-            contained: ({ theme }) => ({
-              background: theme.palette.mode === 'light'
-                ? `linear-gradient(135deg, ${colorPalette.light.primary.main} 0%, ${colorPalette.light.primary.dark} 100%)`
-                : `linear-gradient(135deg, ${colorPalette.dark.primary.main} 0%, ${colorPalette.dark.primary.dark} 100%)`,
-            }),
-          },
-        },
-        MuiCard: {
-          styleOverrides: {
-            root: ({ theme }) => ({
-              borderRadius: 16,
-              boxShadow: theme.palette.mode === 'light'
-                ? '0 4px 20px rgba(0,0,0,0.05)'
-                : '0 4px 20px rgba(0,0,0,0.2)',
-              border: `1px solid ${theme.palette.mode === 'light' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
-            }),
-          },
-        },
-        MuiOutlinedInput: {
-          styleOverrides: {
-            root: ({ theme }) => ({
-              borderRadius: theme.spacing(2),
-            }),
-          },
-        },
-        MuiPaper: {
-          styleOverrides: {
-            root: {
-              backgroundImage: 'none',
-            },
-          },
-        },
-      },
-    });
-  }, [mode]);
-
-  useEffect(() => {
-    if (mounted && mode) {
-      document.documentElement.setAttribute('data-mui-color-scheme', mode);
-      // Sync the dark-mode class used by globals.css for body background/color
-      document.documentElement.classList.toggle('dark-mode', mode === 'dark');
-    }
-  }, [mode, mounted]);
-
-  // Render a "blank" theme on server so hydration works properly
-  if (!mounted) {
-    return (
-      <ThemeContext.Provider value={{ mode: 'light', toggleTheme, setMode }}>
-        <ThemeProvider theme={DEFAULT_THEME}>
-          {children}
-        </ThemeProvider>
-      </ThemeContext.Provider>
-    );
-  }
-
   return (
-    <ThemeContext.Provider value={{ mode, toggleTheme, setMode }}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <ThemeContextBridge>
         {children}
-      </ThemeProvider>
-    </ThemeContext.Provider>
+      </ThemeContextBridge>
+    </ThemeProvider>
   );
+}
+
+/**
+ * Bridges MUI's color-scheme state to the app's useAppTheme() context.
+ * `mode` is the user's choice ('light' | 'dark' | 'system');
+ * `resolvedMode` is the scheme actually applied after system resolution.
+ */
+function ThemeContextBridge({ children }) {
+  // `mode` and `systemMode` are undefined until mounted — SSR renders with
+  // the default scheme, and the pre-paint InitColorSchemeScript in layout.jsx
+  // has already applied the right attribute for the browser.
+  const { mode, setMode, systemMode } = useColorScheme();
+
+  const resolvedMode = mode === 'system' || !mode ? (systemMode ?? 'light') : mode;
+
+  // Validate the stored mode and migrate the legacy 'app-theme' value so
+  // existing users keep the choice their old toggle made.
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored && !VALID_MODES.includes(stored)) {
+        setMode('system');
+        return;
+      }
+      if (!stored) {
+        const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+        if (legacy === 'light' || legacy === 'dark') {
+          setMode(legacy);
+        }
+      }
+    } catch {
+      // localStorage throws when site data is blocked; the default
+      // (system) applies, nothing to persist.
+    }
+  }, [setMode]);
+
+  // Keep the non-MUI integrations in sync: the dark-mode class used by
+  // globals.css and the theme-color meta for mobile browser chrome. (The
+  // data-mui-color-scheme attribute itself is managed by MUI's provider.)
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark-mode', resolvedMode === 'dark');
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = resolvedMode === 'dark' ? '#0F172A' : '#ffffff';
+  }, [resolvedMode]);
+
+  const value = useMemo(() => ({
+    mode: mode && VALID_MODES.includes(mode) ? mode : 'system',
+    resolvedMode,
+    setMode,
+    // Cycle light → dark → system so every choice is reachable from one button
+    toggleTheme: () => {
+      const current = mode && VALID_MODES.includes(mode) ? mode : 'system';
+      setMode({ light: 'dark', dark: 'system', system: 'light' }[current]);
+    },
+  }), [mode, resolvedMode, setMode]);
+
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export function useAppTheme() {

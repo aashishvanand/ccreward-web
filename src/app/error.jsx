@@ -5,6 +5,7 @@ import { Box, Container, Typography, Button, Stack, Paper, Alert } from "@mui/ma
 import { Refresh as RefreshIcon, BugReport as BugReportIcon } from "@mui/icons-material";
 import Header from "@/shared/components/layout/Header";
 import Footer from "@/shared/components/layout/Footer";
+import Link from "@/shared/components/NextLink";
 import { recordFatalError, logBreadcrumb } from "../core/services/crashlytics";
 
 export default function Error({ error, reset }) {
@@ -111,7 +112,8 @@ Please describe what you were doing when this error occurred:
                 Try Again
               </Button>
 
-              <Button variant="outlined" onClick={() => (window.location.href = "/")} sx={{ flex: 1 }}>
+              {/* Client-side navigation: a transient error shouldn't cost a full reload */}
+              <Button component={Link} href="/" variant="outlined" sx={{ flex: 1 }}>
                 Go Home
               </Button>
 

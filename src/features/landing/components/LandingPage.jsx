@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/core/providers/AuthContext";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { getUserCards } from "@/core/services/api";
+import { getUserCardsShared } from "@/core/services/userCards";
 import useCardImagesData from "@/core/hooks/useCardImagesData";
 import { useRegion } from "@/core/providers/RegionContext";
 import Header, { MinimalHeader } from "@/shared/components/layout/Header";
@@ -30,7 +30,7 @@ import TopSearchs from "./sections/TopSearchs";
 import StatsSection from "./sections/StatsSection";
 import GoogleOneTap from "@/shared/components/auth/GoogleOneTap";
 import { m, useReducedMotion } from "framer-motion";
-import debounce from "lodash/debounce";
+import { debounce } from "@/core/utils/functions";
 
 // Add analytics imports - FIXED
 // These hooks provide various tracking capabilities:
@@ -64,6 +64,10 @@ const pageVariants = {
     transition: { duration: 0.3 },
   },
 };
+
+// Session flag: the landing hero uses a fixed card set for the first render
+// (LCP stability) and rotates the pick on later loads in the same session.
+const HERO_ROTATION_KEY = "heroCardsRotated";
 
 // Main LandingPage component that orchestrates all sections and tracking
 const LandingPage = ({ cardStats, region: pageRegion, browse }) => {
@@ -179,8 +183,6 @@ const LandingPage = ({ cardStats, region: pageRegion, browse }) => {
         ? "tablet"
         : "desktop",
       is_authenticated: isAuthenticated(),
-      user_agent:
-        typeof navigator !== "undefined" ? navigator.userAgent : "unknown",
     });
 
     trackJourneyStep("landing_page_loaded", {
@@ -287,11 +289,25 @@ const LandingPage = ({ cardStats, region: pageRegion, browse }) => {
         (card) => card.orientation === "horizontal"
       );
 
-      // Shuffle the cards and take first 3 for display
-      const shuffled = [...(horizontalCards || [])].sort(() => Math.random() - 0.5);
-      setCardImages(shuffled.slice(0, 3));
+      // LCP stability: the first hero render of a session uses a fixed,
+      // deterministic set, so the images the browser starts fetching are the
+      // ones it renders — the old shuffle-on-mount swapped the likely LCP
+      // element after first paint. Later loads in the same session rotate.
+      let rotatedThisSession = false;
+      try {
+        rotatedThisSession = sessionStorage.getItem(HERO_ROTATION_KEY) === "1";
+      } catch { /* sessionStorage blocked — the fixed set is fine */ }
 
-      recordCustomMetric("hero_cards_prepared", shuffled.length);
+      const picked = rotatedThisSession
+        ? [...(horizontalCards || [])].sort(() => Math.random() - 0.5).slice(0, 3)
+        : (horizontalCards || []).slice(0, 3);
+      setCardImages(picked);
+
+      if (!rotatedThisSession) {
+        try { sessionStorage.setItem(HERO_ROTATION_KEY, "1"); } catch { }
+      }
+
+      recordCustomMetric("hero_cards_prepared", horizontalCards.length);
     }
   }, [cardImagesData, region, trackEvent, recordCustomMetric]);
 
@@ -300,17 +316,15 @@ const LandingPage = ({ cardStats, region: pageRegion, browse }) => {
     const authenticated = isAuthenticated();
     if (!loading && authenticated && user?.uid && !hasCheckedCards) {
       trackJourneyStep("checking_user_cards", {
-        user_id: user.uid,
         is_new_user:
           user.metadata?.creationTime === user.metadata?.lastSignInTime,
       });
 
       const checkUserCards = async () => {
         try {
-          const fetchedCards = await getUserCards();
+          const fetchedCards = await getUserCardsShared(user.uid);
 
           trackEvent("user_cards_checked", {
-            user_id: user.uid,
             cards_count: fetchedCards.length,
             has_cards: fetchedCards.length > 0,
           });
@@ -329,7 +343,6 @@ const LandingPage = ({ cardStats, region: pageRegion, browse }) => {
         } catch (error) {
           trackEvent("user_cards_check_error", {
             error_message: error.message,
-            user_id: user.uid,
           });
 
           setAlert({
@@ -631,10 +644,12 @@ const MobileView = ({
           sx={{
             flexGrow: 1,
             bgcolor: "background.default",
-            background: (theme) =>
-              theme.palette.mode === "light"
-                ? `radial-gradient(circle at 50% 0%, ${theme.palette.primary.light}15 0%, transparent 50%), ${theme.palette.background.default}`
-                : `radial-gradient(circle at 50% 0%, ${theme.palette.primary.dark}20 0%, transparent 50%), ${theme.palette.background.default}`,
+            background: (theme) => ({
+              background: `radial-gradient(circle at 50% 0%, rgba(${theme.vars.palette.primary.lightChannel} / 0.082) 0%, transparent 50%), ${theme.vars.palette.background.default}`,
+              ...theme.applyStyles("dark", {
+                background: `radial-gradient(circle at 50% 0%, rgba(${theme.vars.palette.primary.darkChannel} / 0.125) 0%, transparent 50%), ${theme.vars.palette.background.default}`,
+              }),
+            }),
             backdropFilter: "blur(2px)",
           }}
         >
@@ -647,10 +662,12 @@ const MobileView = ({
                 fontWeight: 800,
                 mb: 2,
                 lineHeight: 1.1,
-                background: (theme) =>
-                  theme.palette.mode === "light"
-                    ? `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`
-                    : `linear-gradient(90deg, ${theme.palette.primary.light} 0%, ${theme.palette.secondary.light} 100%)`,
+                background: (theme) => ({
+                  background: `linear-gradient(90deg, ${theme.vars.palette.primary.main} 0%, ${theme.vars.palette.secondary.main} 100%)`,
+                  ...theme.applyStyles("dark", {
+                    background: `linear-gradient(90deg, ${theme.vars.palette.primary.light} 0%, ${theme.vars.palette.secondary.light} 100%)`,
+                  }),
+                }),
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 letterSpacing: "-0.02em",
@@ -683,7 +700,7 @@ const MobileView = ({
           </Box>
 
           <Box component="section" data-section="custom-gpt">
-            <CustomGPTSection theme={theme} />
+            <CustomGPTSection />
           </Box>
 
           <Box component="section" data-section="features">
@@ -915,7 +932,7 @@ const DesktopView = ({
           data-section="app-store"
           sx={{ bgcolor: "background.default" }}
         >
-          <AppStoreSection isMobile={isMobile} theme={theme} />
+          <AppStoreSection isMobile={isMobile} />
         </Box>
 
         <Box

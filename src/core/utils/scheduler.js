@@ -21,3 +21,19 @@ export function runAfterYield(fn) {
     }
     yieldToMain().then(fn);
 }
+
+// Run setup work when the browser is idle, so it never competes with the
+// initial render. requestIdleCallback has a timeout so the work still runs
+// on busy pages. Returns a cancel function for cleanup on unmount.
+export function whenIdle(callback) {
+    if (typeof window === 'undefined') {
+        callback();
+        return () => { };
+    }
+    if ('requestIdleCallback' in window) {
+        const id = window.requestIdleCallback(callback, { timeout: 4000 });
+        return () => window.cancelIdleCallback(id);
+    }
+    const id = setTimeout(callback, 1500);
+    return () => clearTimeout(id);
+}

@@ -29,6 +29,7 @@ import {
   Logout as LogoutIcon,
   LightMode as LightModeIcon,
   DarkMode as DarkModeIcon,
+  BrightnessAuto as BrightnessAutoIcon,
   SwapHoriz as SwapHorizIcon,
   Login as LoginIcon,
   Search as SearchIcon,
@@ -43,7 +44,7 @@ import { useAuth } from "@/core/providers/AuthContext";
 import SignInButtons from "@/shared/components/auth/SignInButtons";
 import { useAppTheme } from "@/core/providers/ThemeRegistry";
 import { useRegion } from "@/core/providers/RegionContext";
-import { getUserCards } from "@/core/services/api";
+import { getUserCardsShared } from "@/core/services/userCards";
 import { onCardUpdate } from "@/core/utils/events";
 import { detectDevice } from "@/core/utils/deviceUtils";
 import { buildCloudflareImageUrl } from "@/core/utils/cloudflareImages";
@@ -68,15 +69,13 @@ const REGION_CURRENCY_MAP = {
   // Add more regions as needed
 };
 
-// Header bar colour, derived from the theme. Dark mode uses primary.dark (#2563EB) so white text
-// keeps ~5:1 contrast; the brighter dark-mode primary.main (#3B82F6) would drop below 4.5:1.
+// Header bar colour, derived from the theme. One value serves both schemes:
+// light's primary.main and dark's primary.dark are both #2563EB (dark's
+// brighter primary.main would drop white text below 4.5:1 contrast).
 const getHeaderSx = (theme) => ({
   backdropFilter: "blur(20px)",
-  backgroundColor: alpha(
-    theme.palette.mode === "dark" ? theme.palette.primary.dark : theme.palette.primary.main,
-    0.9
-  ),
-  color: theme.palette.primary.contrastText,
+  backgroundColor: `rgba(${theme.vars.palette.primary.mainChannel} / 0.9)`,
+  color: theme.vars.palette.primary.contrastText,
   borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
 });
 
@@ -117,7 +116,7 @@ const logoVariants = {
 
 function Header() {
   const hideNavigation = false;
-  const { mode, toggleTheme } = useAppTheme();
+  const { mode, resolvedMode, toggleTheme } = useAppTheme();
   const { region } = useRegion();
   const { user, logout, deleteAccount, isAuthenticated, signInWithGoogle, signInWithApple } = useAuth();
   const router = useRouter();
@@ -138,11 +137,17 @@ function Header() {
   const [signInAnchorEl, setSignInAnchorEl] = useState(null);
   const [cardCount, setCardCount] = useState(0);
 
+  // Theme cycle: light → dark → system. Labels and icons describe the next mode.
+  const nextTheme = { light: "dark", dark: "system", system: "light" }[mode] || "dark";
+  const NextThemeIcon =
+    nextTheme === "dark" ? DarkModeIcon : nextTheme === "system" ? BrightnessAutoIcon : LightModeIcon;
+  const nextThemeLabel = nextTheme === "system" ? "system theme" : `${nextTheme} mode`;
+
   // Get the appropriate CCReward icon based on theme and region
   const ccrewardIconId = useMemo(() => {
     const currency = REGION_CURRENCY_MAP[region] || "dollar"; // Default to dollar if region not found
-    return CCREWARD_ICONS[mode]?.[currency] || CCREWARD_ICONS.light.dollar; // Fallback to light dollar
-  }, [mode, region]);
+    return CCREWARD_ICONS[resolvedMode]?.[currency] || CCREWARD_ICONS.light.dollar; // Fallback to light dollar
+  }, [resolvedMode, region]);
 
   // Generate the icon URL
   const ccrewardIconUrl = useMemo(() => {
@@ -155,9 +160,11 @@ function Header() {
 
   useEffect(() => {
     if (isAuthenticated() && user) {
+      // Shared with LandingPage's sign-in check: concurrent callers get one
+      // request, and the cache is dropped on every cardUpdate event.
       const updateCardCount = async () => {
         try {
-          const userCards = await getUserCards();
+          const userCards = await getUserCardsShared(user.uid);
           setCardCount(userCards.length);
         } catch (error) {
           console.error("Error fetching user cards:", error);
@@ -469,11 +476,9 @@ function Header() {
         <Box sx={{ borderTop: 1, borderColor: "divider", mt: 1, pt: 1 }}>
           <MenuItem onClick={toggleTheme} sx={{ py: 1.5, px: 2 }}>
             <ListItemIcon>
-              {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
+              <NextThemeIcon />
             </ListItemIcon>
-            <ListItemText
-              primary={`${mode === "dark" ? "Light" : "Dark"} Mode`}
-            />
+            <ListItemText primary={`Switch to ${nextThemeLabel}`} />
           </MenuItem>
 
           {!isAuthenticated() && (
@@ -634,14 +639,11 @@ function Header() {
               {renderNavItems()}
 
               {/* Theme Toggle */}
-              <Tooltip
-                title={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
-                arrow
-              >
+              <Tooltip title={`Switch to ${nextThemeLabel}`} arrow>
                 <IconButton
                   onClick={toggleTheme}
                   color="inherit"
-                  aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
+                  aria-label={`Switch to ${nextThemeLabel}`}
                   sx={{
                     ml: 1,
                     backgroundColor: "rgba(255, 255, 255, 0.1)",
@@ -655,7 +657,7 @@ function Header() {
                     },
                   }}
                 >
-                  {mode === "dark" ? <LightModeIcon aria-hidden="true" /> : <DarkModeIcon aria-hidden="true" />}
+                  <NextThemeIcon aria-hidden="true" />
                 </IconButton>
               </Tooltip>
 
@@ -773,12 +775,16 @@ function Header() {
  * Use on pages that direct mobile users to the app (e.g. mobile landing).
  */
 export function MinimalHeader() {
-  const { mode, toggleTheme } = useAppTheme();
+  const { mode, resolvedMode, toggleTheme } = useAppTheme();
   const { region } = useRegion();
+  const nextTheme = { light: "dark", dark: "system", system: "light" }[mode] || "dark";
+  const nextThemeLabel = nextTheme === "system" ? "system theme" : `${nextTheme} mode`;
+  const NextThemeIcon =
+    nextTheme === "dark" ? DarkModeIcon : nextTheme === "system" ? BrightnessAutoIcon : LightModeIcon;
   const ccrewardIconId = useMemo(() => {
     const currency = REGION_CURRENCY_MAP[region] || "dollar";
-    return CCREWARD_ICONS[mode]?.[currency] || CCREWARD_ICONS.light.dollar;
-  }, [mode, region]);
+    return CCREWARD_ICONS[resolvedMode]?.[currency] || CCREWARD_ICONS.light.dollar;
+  }, [resolvedMode, region]);
   const ccrewardIconUrl = useMemo(() => buildCloudflareImageUrl(ccrewardIconId, "public"), [ccrewardIconId]);
 
   return (
@@ -820,11 +826,11 @@ export function MinimalHeader() {
             </Box>
           </m.div>
           <Box sx={{ flexGrow: 1 }} />
-          <Tooltip title={`Switch to ${mode === "dark" ? "light" : "dark"} mode`} arrow>
+          <Tooltip title={`Switch to ${nextThemeLabel}`} arrow>
             <IconButton
               onClick={toggleTheme}
               color="inherit"
-              aria-label={`Switch to ${mode === "dark" ? "light" : "dark"} mode`}
+              aria-label={`Switch to ${nextThemeLabel}`}
               sx={{
                 backgroundColor: "rgba(255, 255, 255, 0.1)",
                 "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.2)", transform: "rotate(180deg)" },
@@ -832,7 +838,7 @@ export function MinimalHeader() {
                 "@media (prefers-reduced-motion: reduce)": { transition: "background-color 0.3s ease-in-out" },
               }}
             >
-              {mode === "dark" ? <LightModeIcon aria-hidden="true" /> : <DarkModeIcon aria-hidden="true" />}
+              <NextThemeIcon aria-hidden="true" />
             </IconButton>
           </Tooltip>
         </Toolbar>

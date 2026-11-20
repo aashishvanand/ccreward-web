@@ -141,9 +141,13 @@ export default function CardNetworkSelector({ selectedNetwork, onNetworkChange }
                                     >
                                         {item.id ? (
                                             <img
-                                                src={buildCloudflareImageUrl(item.id, "public")}
+                                                // w=200 (~22 KB) instead of the ~113 KB
+                                                // public variant: the icons render at 80px.
+                                                src={buildCloudflareImageUrl(item.id, "w=200")}
                                                 alt={item.network}
                                                 title={item.network}
+                                                width={200}
+                                                height={200}
                                                 style={{ maxWidth: '65%', maxHeight: '65%', objectFit: 'contain' }}
                                                 onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                             />
