@@ -124,7 +124,7 @@ const CardListRenderer = ({
           },
           index === 0
             ? (theme) => ({
-                bgcolor: alpha(theme.palette.success.main, 0.1),
+                bgcolor: `rgba(${theme.vars.palette.success.mainChannel} / 0.1)`,
                 border: `1px solid ${theme.palette.success.main}`,
               })
             : {

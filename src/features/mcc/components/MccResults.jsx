@@ -57,20 +57,21 @@ const ResultCard = ({ item }) => {
         <Card sx={{ 
             height: '100%', 
             borderRadius: 4, 
-            background: alpha(theme.palette.background.paper, 0.6),
+            background: `rgba(${theme.vars.palette.background.paperChannel} / 0.6)`,
             backdropFilter: 'blur(20px)',
-            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-            boxShadow: `0 4px 20px ${alpha(theme.palette.common.black, 0.05)}`,
+            border: `1px solid rgba(${theme.vars.palette.dividerChannel} / 0.1)`,
+            // common.black is scheme-independent; a literal is exact
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
             transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             overflow: 'visible',
             position: 'relative',
             '&:hover': {
                 transform: 'translateY(-6px)',
-                boxShadow: `0 12px 30px ${alpha(theme.palette.primary.main, 0.15)}`,
-                border: `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
+                boxShadow: `0 12px 30px rgba(${theme.vars.palette.primary.mainChannel} / 0.15)`,
+                border: `1px solid rgba(${theme.vars.palette.primary.mainChannel} / 0.3)`,
                 '& .icon-box': {
                     transform: 'scale(1.1) rotate(5deg)',
-                    boxShadow: `0 8px 20px ${alpha(theme.palette.primary.main, 0.5)}`,
+                    boxShadow: `0 8px 20px rgba(${theme.vars.palette.primary.mainChannel} / 0.5)`,
                 }
             }
         }}>
@@ -93,7 +94,7 @@ const ResultCard = ({ item }) => {
                             width: 56,
                             height: 56,
                             flexShrink: 0,
-                            boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`
+                            boxShadow: `0 4px 12px rgba(${theme.vars.palette.primary.mainChannel} / 0.3)`
                         }}>
                         {IndustryIcon}
                     </Box>
@@ -122,16 +123,16 @@ const ResultCard = ({ item }) => {
                                 sx={{ 
                                     fontWeight: 'bold',
                                     borderRadius: 1.5,
-                                    bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                    color: theme.palette.primary.main,
-                                    border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`
+                                    bgcolor: `rgba(${theme.vars.palette.primary.mainChannel} / 0.1)`,
+                                    color: theme.vars.palette.primary.main,
+                                    border: `1px solid rgba(${theme.vars.palette.primary.mainChannel} / 0.2)`
                                 }}
                             />
                         )}
                     </Box>
                 </Box>
 
-                <Divider sx={{ my: 2, borderColor: alpha(theme.palette.divider, 0.1) }} />
+                <Divider sx={{ my: 2, borderColor: `rgba(${theme.vars.palette.dividerChannel} / 0.1)` }} />
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     {/* Industry */}
@@ -195,9 +196,9 @@ const ResultCard = ({ item }) => {
                         <Box sx={{ 
                             mt: 1, 
                             p: 2, 
-                            bgcolor: alpha(theme.palette.background.default, 0.5), 
+                            bgcolor: `rgba(${theme.vars.palette.background.defaultChannel} / 0.5)`, 
                             borderRadius: 3,
-                            border: `1px solid ${alpha(theme.palette.divider, 0.05)}`
+                            border: `1px solid rgba(${theme.vars.palette.dividerChannel} / 0.05)`
                         }}>
                             <Typography
                                 variant="caption"
@@ -222,8 +223,8 @@ const ResultCard = ({ item }) => {
                                             fontSize: '0.75rem', 
                                             height: 24,
                                             borderRadius: 1.5,
-                                            borderColor: alpha(theme.palette.divider, 0.2),
-                                            bgcolor: alpha(theme.palette.background.paper, 0.5)
+                                            borderColor: `rgba(${theme.vars.palette.dividerChannel} / 0.2)`,
+                                            bgcolor: `rgba(${theme.vars.palette.background.paperChannel} / 0.5)`
                                         }} 
                                     />
                                 ))}
@@ -236,8 +237,8 @@ const ResultCard = ({ item }) => {
                                                 fontSize: '0.75rem', 
                                                 height: 24,
                                                 borderRadius: 2,
-                                                bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                                color: theme.palette.primary.main,
+                                                bgcolor: `rgba(${theme.vars.palette.primary.mainChannel} / 0.1)`,
+                                                color: theme.vars.palette.primary.main,
                                                 fontWeight: 'bold',
                                                 cursor: 'help'
                                             }} 

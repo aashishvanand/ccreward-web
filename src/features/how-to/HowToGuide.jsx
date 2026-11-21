@@ -15,7 +15,6 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import axios from "axios";
 import { m, AnimatePresence } from "framer-motion";
 import Header from "../../shared/components/layout/Header";
 import Footer from "../../shared/components/layout/Footer";
@@ -110,10 +109,11 @@ const HowToGuide = ({ initialGuidesData }) => {
         await Promise.all(
           platforms.map(async (platform) => {
             try {
-              const response = await axios.get(
+              const res = await fetch(
                 `https://files.ccreward.app/guides/${currentRegion.toLowerCase()}/${platform}-guides.json`
               );
-              guides[platform] = response.data;
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              guides[platform] = await res.json();
             } catch (err) {
               console.error(`Error loading ${platform} guides:`, err);
               // Create empty placeholder if guide data is missing
@@ -626,7 +626,8 @@ const HowToGuide = ({ initialGuidesData }) => {
                               sx={{
                                 fontSize: "0.75rem",
                                 color: "text.secondary",
-                                border: `1px solid ${theme.palette.divider}`,
+                                border: "1px solid",
+                                borderColor: "divider",
                                 borderRadius: 1,
                                 px: 1,
                                 py: 0.5,

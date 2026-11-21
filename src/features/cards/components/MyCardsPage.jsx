@@ -561,7 +561,7 @@ function MyCardsPage() {
               width: 80,
               height: 80,
               borderRadius: "50%",
-              bgcolor: alpha(theme.palette.primary.main, 0.1),
+              bgcolor: `rgba(${theme.vars.palette.primary.mainChannel} / 0.1)`,
               color: "primary.main",
               display: "flex",
               alignItems: "center",

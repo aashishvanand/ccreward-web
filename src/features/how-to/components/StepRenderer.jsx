@@ -85,7 +85,8 @@ const StepRenderer = ({ steps, videoUrl, platformColor, isMobile, region }) => {
             borderRadius: 2,
             position: "relative",
             overflow: "hidden",
-            border: `1px solid ${theme.palette.divider}`,
+            border: "1px solid",
+            borderColor: "divider",
             "&::before": {
               content: '""',
               position: "absolute",
@@ -93,7 +94,7 @@ const StepRenderer = ({ steps, videoUrl, platformColor, isMobile, region }) => {
               top: 0,
               bottom: 0,
               width: 4,
-              backgroundColor: platformColor || theme.palette.primary.main,
+              backgroundColor: platformColor || "primary.main",
             },
           }}
         >
@@ -130,7 +131,7 @@ const StepRenderer = ({ steps, videoUrl, platformColor, isMobile, region }) => {
                     height: 28,
                     borderRadius: "50%",
                     backgroundColor:
-                      platformColor || theme.palette.primary.main,
+                      platformColor || "primary.main",
                     color: "#fff",
                     fontWeight: "bold",
                     mr: 1.5,

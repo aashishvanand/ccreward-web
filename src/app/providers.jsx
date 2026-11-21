@@ -5,6 +5,7 @@ import { memo } from "react";
 import { LazyMotion, domAnimation } from "framer-motion";
 import { ThemeRegistry } from "../core/providers/ThemeRegistry";
 import AmbientBackground from "../shared/components/layout/AmbientBackground";
+import ConsentBanner from "../shared/components/layout/ConsentBanner";
 import { RegionProvider } from "../core/providers/RegionContext";
 // Rendered on the server so pages ship real HTML. Both providers only touch
 // Firebase/analytics inside effects, which never run during SSR.
@@ -25,6 +26,7 @@ const Providers = memo(({ children }) => {
             </AnalyticsProvider>
           </AuthProvider>
         </RegionProvider>
+        <ConsentBanner />
       </ThemeRegistry>
     </LazyMotion>
   );

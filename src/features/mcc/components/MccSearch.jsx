@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from 'react';
-import { TextField, InputAdornment, IconButton, useTheme, alpha } from '@mui/material';
+import { TextField, InputAdornment, IconButton, useTheme } from '@mui/material';
 import { Search, Clear } from '@mui/icons-material';
 import { debounce } from '@/core/utils/functions';
 
@@ -68,19 +68,20 @@ const MccSearch = ({ onSearch, initialValue = '', placeholder = "Search by merch
                     ),
                     sx: {
                         borderRadius: 4,
-                        backgroundColor: alpha(theme.palette.background.paper, 0.8),
+                        backgroundColor: `rgba(${theme.vars.palette.background.paperChannel} / 0.8)`,
                         backdropFilter: 'blur(12px)',
-                        boxShadow: isFocused 
-                            ? `0 8px 30px ${alpha(theme.palette.primary.main, 0.2)}`
-                            : `0 4px 20px ${alpha(theme.palette.common.black, 0.05)}`,
-                        border: `1px solid ${isFocused ? theme.palette.primary.main : alpha(theme.palette.divider, 0.1)}`,
+                        boxShadow: isFocused
+                            ? `0 8px 30px rgba(${theme.vars.palette.primary.mainChannel} / 0.2)`
+                            // common.black is scheme-independent; a literal is exact
+                            : '0 4px 20px rgba(0, 0, 0, 0.05)',
+                        border: `1px solid ${isFocused ? theme.vars.palette.primary.main : `rgba(${theme.vars.palette.dividerChannel} / 0.1)`}`,
                         padding: '12px 16px',
                         fontSize: '1.1rem',
                         transition: 'box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         '&:hover': {
-                            backgroundColor: theme.palette.background.paper,
-                            boxShadow: `0 8px 25px ${alpha(theme.palette.common.black, 0.1)}`,
-                            borderColor: alpha(theme.palette.primary.main, 0.5),
+                            backgroundColor: theme.vars.palette.background.paper,
+                            boxShadow: '0 8px 25px rgba(0, 0, 0, 0.1)',
+                            borderColor: `rgba(${theme.vars.palette.primary.mainChannel} / 0.5)`,
                         },
                     }
                 }

@@ -17,6 +17,7 @@ import { useAuth } from "./AuthContext";
 import { usePathname } from "next/navigation";
 import { getSafePageUrl, getSafeReferrer } from "../utils/safeUrl";
 import { whenIdle } from "@/core/utils/scheduler";
+import { isAnalyticsDenied } from "../services/consent";
 
 // Point gtag at a URL without query string or fragment, so email-link codes and
 // checkout ids never reach analytics. Applies to every later event.
@@ -40,6 +41,16 @@ export function AnalyticsProvider({ children }) {
   // Initialize gtag early for Firebase Analytics
   useEffect(() => {
     if (typeof window !== "undefined" && !window.gtagInitialized) {
+      const measurementId = process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID;
+
+      if (isAnalyticsDenied() && measurementId) {
+        // The visitor declined analytics: set the GA4 disable flag and set
+        // up nothing. initializeAnalytics() also refuses to load gtag.js.
+        window.gtagInitialized = true;
+        window[`ga-disable-${measurementId}`] = true;
+        return;
+      }
+
       window.gtagInitialized = true;
       window.dataLayer = window.dataLayer || [];
       window.gtag = function gtag() {
@@ -48,7 +59,6 @@ export function AnalyticsProvider({ children }) {
       window.gtag("js", new Date());
       setSafePageLocation();
 
-      const measurementId = process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID;
       if (measurementId) {
         window.gtag("config", measurementId, {
           page_path: window.location.pathname,

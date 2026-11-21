@@ -132,7 +132,7 @@ const SectionHeader = ({ icon: Icon, title, subtitle, color = "primary" }) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          bgcolor: alpha(theme.palette[color].main, 0.1),
+          bgcolor: `rgba(${theme.vars.palette[color].mainChannel} / 0.1)`,
           color: `${color}.main`,
         }}
       >
@@ -175,7 +175,7 @@ const StatCard = ({
         p: 2.5,
         borderRadius: 3,
         bgcolor: isFilled
-          ? alpha(theme.palette[color].main, 0.08)
+          ? `rgba(${theme.vars.palette[color].mainChannel} / 0.08)`
           : "background.paper",
         border: isFilled ? "none" : "1px solid",
         borderColor: "divider",
@@ -187,7 +187,7 @@ const StatCard = ({
         transition: "transform 0.2s ease, box-shadow 0.2s ease",
         "&:hover": {
           transform: "translateY(-2px)",
-          boxShadow: `0 8px 24px ${alpha(theme.palette[color].main, 0.15)}`,
+          boxShadow: `0 8px 24px rgba(${theme.vars.palette[color].mainChannel} / 0.15)`,
         },
       }}
     >
@@ -248,7 +248,9 @@ const AccessBadge = ({ value, isAvailable, size = "medium" }) => {
         label="Not Available"
         size={size}
         sx={{
-          bgcolor: alpha(theme.palette.grey[500], 0.1),
+          // grey shades have no *Channel CSS var; grey.500 (#9E9E9E) is
+          // scheme-independent, so a literal is exact
+          bgcolor: `rgba(158, 158, 158, 0.1)`,
           color: "text.secondary",
           fontWeight: 500,
           "& .MuiChip-icon": {
@@ -268,8 +270,8 @@ const AccessBadge = ({ value, isAvailable, size = "medium" }) => {
       size={size}
       sx={{
         bgcolor: isUnlimited
-          ? alpha(theme.palette.warning.main, 0.15)
-          : alpha(theme.palette.success.main, 0.1),
+          ? `rgba(${theme.vars.palette.warning.mainChannel} / 0.15)`
+          : `rgba(${theme.vars.palette.success.mainChannel} / 0.1)`,
         color: isUnlimited ? "warning.dark" : "success.dark",
         fontWeight: 600,
         fontSize: size === "large" ? "1rem" : "0.875rem",
@@ -303,7 +305,7 @@ const PerkItem = ({ icon: Icon, label, access, color = "primary" }) => {
         transition: "border-color 0.2s ease, background-color 0.2s ease",
         "&:hover": {
           borderColor: `${color}.main`,
-          bgcolor: alpha(theme.palette[color].main, 0.02),
+          bgcolor: `rgba(${theme.vars.palette[color].mainChannel} / 0.02)`,
         },
       }}
     >
@@ -315,7 +317,7 @@ const PerkItem = ({ icon: Icon, label, access, color = "primary" }) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          bgcolor: alpha(theme.palette[color].main, 0.1),
+          bgcolor: `rgba(${theme.vars.palette[color].mainChannel} / 0.1)`,
           color: `${color}.main`,
           flexShrink: 0,
         }}
@@ -365,7 +367,7 @@ const MilestoneCard = ({ goal, index, country }) => {
         transition: "border-color 0.3s ease, box-shadow 0.3s ease",
         "&:hover": {
           borderColor: `${color}.main`,
-          boxShadow: `0 4px 20px ${alpha(theme.palette[color].main, 0.12)}`,
+          boxShadow: `0 4px 20px rgba(${theme.vars.palette[color].mainChannel} / 0.12)`,
         },
       }}
     >
@@ -379,7 +381,7 @@ const MilestoneCard = ({ goal, index, country }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            bgcolor: alpha(theme.palette[color].main, 0.1),
+            bgcolor: `rgba(${theme.vars.palette[color].mainChannel} / 0.1)`,
             color: `${color}.main`,
             fontWeight: 700,
             fontSize: "1rem",
@@ -417,7 +419,7 @@ const MilestoneCard = ({ goal, index, country }) => {
           sx={{
             p: 2,
             borderRadius: 2,
-            bgcolor: alpha(theme.palette[color].main, 0.06),
+            bgcolor: `rgba(${theme.vars.palette[color].mainChannel} / 0.06)`,
             mb: 2,
           }}
         >
@@ -705,7 +707,7 @@ const CardPage = ({ bankName, cardName, country }) => {
                   p: { xs: 3, md: 5 },
                   mb: 4,
                   borderRadius: 4,
-                  background: `linear-gradient(135deg, ${alpha(ambientColor, 0.08)} 0%, ${alpha(theme.palette.background.paper, 0.95)} 100%)`,
+                  background: `linear-gradient(135deg, ${alpha(ambientColor, 0.08)} 0%, rgba(${theme.vars.palette.background.paperChannel} / 0.95) 100%)`,
                   border: "1px solid",
                   borderColor: "divider",
                   position: "relative",
@@ -752,7 +754,7 @@ const CardPage = ({ bankName, cardName, country }) => {
                             height: 220,
                             width: "100%",
                             maxWidth: 349,
-                            bgcolor: alpha(theme.palette.divider, 0.3),
+                            bgcolor: `rgba(${theme.vars.palette.dividerChannel} / 0.3)`,
                             borderRadius: 4,
                             display: "flex",
                             alignItems: "center",
@@ -853,9 +855,9 @@ const CardPage = ({ bankName, cardName, country }) => {
                       sx={{
                         p: 3,
                         borderRadius: 3,
-                        bgcolor: alpha(theme.palette.primary.main, 0.04),
+                        bgcolor: `rgba(${theme.vars.palette.primary.mainChannel} / 0.04)`,
                         border: "1px solid",
-                        borderColor: alpha(theme.palette.primary.main, 0.1),
+                        borderColor: `rgba(${theme.vars.palette.primary.mainChannel} / 0.1)`,
                         textAlign: "center",
                         height: "100%",
                       }}
@@ -893,9 +895,9 @@ const CardPage = ({ bankName, cardName, country }) => {
                       sx={{
                         p: 3,
                         borderRadius: 3,
-                        bgcolor: alpha(theme.palette.secondary.main, 0.04),
+                        bgcolor: `rgba(${theme.vars.palette.secondary.mainChannel} / 0.04)`,
                         border: "1px solid",
-                        borderColor: alpha(theme.palette.secondary.main, 0.1),
+                        borderColor: `rgba(${theme.vars.palette.secondary.mainChannel} / 0.1)`,
                         textAlign: "center",
                         height: "100%",
                       }}
@@ -1031,7 +1033,7 @@ const CardPage = ({ bankName, cardName, country }) => {
                     borderRadius: 4,
                     border: "1px solid",
                     borderColor: "divider",
-                    bgcolor: alpha(theme.palette.error.main, 0.02),
+                    bgcolor: `rgba(${theme.vars.palette.error.mainChannel} / 0.02)`,
                   }}
                 >
                   <SectionHeader
@@ -1048,12 +1050,12 @@ const CardPage = ({ bankName, cardName, country }) => {
                         label={category}
                         size="small"
                         sx={{
-                          bgcolor: alpha(theme.palette.error.main, 0.08),
+                          bgcolor: `rgba(${theme.vars.palette.error.mainChannel} / 0.08)`,
                           color: "error.dark",
                           fontWeight: 500,
                           borderRadius: 2,
                           "&:hover": {
-                            bgcolor: alpha(theme.palette.error.main, 0.12),
+                            bgcolor: `rgba(${theme.vars.palette.error.mainChannel} / 0.12)`,
                           },
                         }}
                       />

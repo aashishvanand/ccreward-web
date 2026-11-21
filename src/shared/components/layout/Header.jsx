@@ -445,10 +445,10 @@ function Header() {
                   py: 1.5,
                   px: 2,
                   backgroundColor: active
-                    ? alpha(theme.palette.primary.main, 0.08)
+                    ? `rgba(${theme.vars.palette.primary.mainChannel} / 0.08)`
                     : "transparent",
                   "&:hover": {
-                    backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                    backgroundColor: `rgba(${theme.vars.palette.primary.mainChannel} / 0.04)`,
                   },
                 }}
               >
@@ -508,7 +508,7 @@ function Header() {
                 py: 1.5,
                 px: 2,
                 color: "error.main",
-                "&:hover": { backgroundColor: alpha(theme.palette.error.main, 0.04) },
+                "&:hover": { backgroundColor: `rgba(${theme.vars.palette.error.mainChannel} / 0.04)` },
               }}
             >
               <ListItemIcon>
@@ -561,7 +561,7 @@ function Header() {
                     py: 1, 
                     px: 0, 
                     color: 'error.main',
-                    '&:hover': { backgroundColor: alpha(theme.palette.error.main, 0.04) }
+                    '&:hover': { backgroundColor: `rgba(${theme.vars.palette.error.mainChannel} / 0.04)` }
                 }}
             >
               <ListItemIcon sx={{ minWidth: 36 }}>

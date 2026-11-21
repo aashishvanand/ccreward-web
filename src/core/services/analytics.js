@@ -2,6 +2,7 @@
 import { firebaseApp } from '@/firebase';
 import { getSafeReferrer } from '@/core/utils/safeUrl';
 import { runAfterYield } from '@/core/utils/scheduler';
+import { isAnalyticsDenied } from './consent';
 
 let analytics = null;
 let firebasePerformance = null;
@@ -32,6 +33,10 @@ const initializeAnalytics = () => {
 };
 
 const runInitializeAnalytics = async () => {
+    // Consent gate (opt-out): a stored 'denied' skips analytics and
+    // performance monitoring entirely, so neither loads or reports.
+    if (isAnalyticsDenied()) return false;
+
     try {
         // Dynamic imports
         const { getAnalytics, logEvent, setUserId, setUserProperties } = await import('firebase/analytics');
@@ -100,8 +105,9 @@ function generateSecureRandomString(length = 9) {
 
 // Enhanced event logging (client-side only)
 const logAnalyticsEvent = (eventName, eventParams = {}) => {
-    // Only run on client-side
-    if (!analytics || typeof window === 'undefined' || !isInitialized) {
+    // Only run on client-side. The consent check also covers a mid-session
+    // decline, when analytics were initialized before the visitor said no.
+    if (!analytics || typeof window === 'undefined' || !isInitialized || isAnalyticsDenied()) {
 
         return;
     }

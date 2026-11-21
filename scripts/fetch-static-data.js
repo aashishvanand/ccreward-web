@@ -1,8 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import axios from 'axios';
-import axiosRetry from 'axios-retry';
+import { Readable } from 'node:stream';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -63,32 +62,34 @@ if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
-// Configure axios with retry
-axiosRetry(axios, {
-    retries: 3,
-    retryDelay: (retryCount) => {
-        console.log(`⚠️ Rate limit hit. Retrying attempt ${retryCount}...`);
-        return retryCount * 2000; // Exponential backoff: 2s, 4s, 6s
-    },
-    retryCondition: (error) => {
-        return error.response?.status === 429 || error.response?.status >= 500;
+// Fetch with retry on rate limits and server errors
+const fetchWithRetry = async (url, headers) => {
+    let response;
+    for (let attempt = 0; ; attempt++) {
+        response = await fetch(url, { headers });
+        if (!(response.status === 429 || response.status >= 500) || attempt >= 3) {
+            return response;
+        }
+        console.log(`⚠️ Rate limit hit. Retrying attempt ${attempt + 1}...`);
+        await new Promise(r => setTimeout(r, (attempt + 1) * 2000)); // 2s, 4s, 6s
     }
-});
+};
 
 const downloadFile = async (filename) => {
     const url = `${API_BASE_URL}${filename}`;
     const filePath = path.join(DATA_DIR, filename);
 
     try {
-        const response = await axios.get(url, {
-            headers: { 'x-api-key': API_KEY },
-            responseType: 'stream'
-        });
+        const response = await fetchWithRetry(url, { 'x-api-key': API_KEY });
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
 
+        // Stream the body straight to disk
         const writer = fs.createWriteStream(filePath);
 
-        return new Promise((resolve, reject) => {
-            response.data.pipe(writer);
+        await new Promise((resolve, reject) => {
+            Readable.fromWeb(response.body).pipe(writer);
             writer.on('finish', () => {
                 writer.close();
                 console.log(`✅ Fetched ${filename}`);

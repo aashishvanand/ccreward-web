@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Box, Container, Typography, Button, Paper, Fade, useTheme, alpha } from '@mui/material';
+import { Box, Container, Typography, Button, Paper, Fade, useTheme } from '@mui/material';
 import { Flag, Search } from '@mui/icons-material';
 import MccSearch from './MccSearch';
 import MccResults from './MccResults';
@@ -79,18 +79,18 @@ const MccLookup = () => {
                     </Fade>
                 </Box>
 
-                <Box sx={{ mt: 'auto', pt: 6, borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`, display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{ mt: 'auto', pt: 6, borderTop: `1px solid rgba(${theme.vars.palette.dividerChannel} / 0.1)`, display: 'flex', justifyContent: 'center' }}>
                     <Paper 
                         elevation={0} 
                         sx={{ 
                             p: 4, 
                             textAlign: 'center', 
-                            bgcolor: alpha(theme.palette.background.paper, 0.4),
+                            bgcolor: `rgba(${theme.vars.palette.background.paperChannel} / 0.4)`,
                             backdropFilter: 'blur(10px)', 
                             borderRadius: 4,
                             maxWidth: 700,
                             width: '100%',
-                            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`
+                            border: `1px solid rgba(${theme.vars.palette.dividerChannel} / 0.1)`
                         }}
                     >
                         <Typography
@@ -125,7 +125,7 @@ const MccLookup = () => {
                                 borderWidth: 2,
                                 '&:hover': {
                                     borderWidth: 2,
-                                    bgcolor: alpha(theme.palette.secondary.main, 0.05)
+                                    bgcolor: `rgba(${theme.vars.palette.secondary.mainChannel} / 0.05)`
                                 }
                             }}
                         >

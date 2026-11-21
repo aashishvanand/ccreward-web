@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Box, Typography, alpha } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 
 const PageHeader = ({ title, subtitle, children }) => {
@@ -51,7 +51,7 @@ const PageHeader = ({ title, subtitle, children }) => {
                     transform: 'translate(-50%, -50%)',
                     width: '90%',
                     height: '80%',
-                    background: (theme) => `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.2)}, ${alpha(theme.palette.secondary.main, 0.2)})`,
+                    background: (theme) => `linear-gradient(90deg, rgba(${theme.vars.palette.primary.mainChannel} / 0.2), rgba(${theme.vars.palette.secondary.mainChannel} / 0.2))`,
                     filter: 'blur(40px)',
                     zIndex: -1,
                 }} />

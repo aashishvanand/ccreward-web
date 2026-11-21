@@ -113,7 +113,7 @@ const CardPublicView = ({
             borderRadius: 4,
             border: "1px solid",
             borderColor: "divider",
-            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.06)} 0%, ${alpha(theme.palette.background.paper, 0.95)} 100%)`,
+            background: `linear-gradient(135deg, rgba(${theme.vars.palette.primary.mainChannel} / 0.06) 0%, rgba(${theme.vars.palette.background.paperChannel} / 0.95) 100%)`,
           }}
         >
           <Grid container spacing={4} sx={{ alignItems: "center" }}>
@@ -133,7 +133,7 @@ const CardPublicView = ({
                       height: 220,
                       width: "100%",
                       maxWidth: 349,
-                      bgcolor: alpha(theme.palette.divider, 0.3),
+                      bgcolor: `rgba(${theme.vars.palette.dividerChannel} / 0.3)`,
                       borderRadius: 4,
                       display: "flex",
                       alignItems: "center",
@@ -200,7 +200,7 @@ const CardPublicView = ({
               {facts.map((fact) => (
                 <Box
                   key={fact.label}
-                  sx={{ p: 2, borderRadius: 2, bgcolor: alpha(theme.palette.primary.main, 0.04) }}
+                  sx={{ p: 2, borderRadius: 2, bgcolor: `rgba(${theme.vars.palette.primary.mainChannel} / 0.04)` }}
                 >
                   <Typography component="dt" variant="body2" sx={{ color: "text.secondary", mb: 0.5 }}>
                     {fact.label}

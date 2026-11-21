@@ -15,6 +15,7 @@ import { m } from "framer-motion";
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/core/providers/AuthContext";
+import { resetAnalyticsConsent } from "@/core/services/consent";
 
 // Only loaded when a signed-in user opens it
 const AppFeedbackDialog = dynamic(() => import("../ui/AppFeedbackDialog"), { ssr: false });
@@ -241,6 +242,22 @@ function Footer() {
                     </Link>
                   </m.div>
                 )}
+                <m.div variants={linkVariants} whileHover="hover" whileTap="tap">
+                  <Link
+                    component="button"
+                    type="button"
+                    color="inherit"
+                    onClick={() => {
+                      // Clears the stored analytics choice and reloads, so
+                      // the consent notice reappears for a fresh decision.
+                      resetAnalyticsConsent();
+                      window.location.reload();
+                    }}
+                    sx={{ textDecoration: "none", font: "inherit", verticalAlign: "baseline" }}
+                  >
+                    Analytics choices
+                  </Link>
+                </m.div>
               </Stack>
             </m.div>
           </Box>

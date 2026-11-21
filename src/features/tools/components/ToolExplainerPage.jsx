@@ -44,7 +44,7 @@ function ToolExplainerPage({ tool, others = [] }) {
           sx={(theme) => ({
             ...sectionSx,
             p: { xs: 3, md: 5 },
-            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.06)} 0%, ${alpha(theme.palette.background.paper, 0.95)} 100%)`,
+            background: `linear-gradient(135deg, rgba(${theme.vars.palette.primary.mainChannel} / 0.06) 0%, rgba(${theme.vars.palette.background.paperChannel} / 0.95) 100%)`,
           })}
         >
           <Typography

@@ -1,5 +1,3 @@
-import axios from 'axios';
-import axiosRetry from 'axios-retry';
 import { getTurnstileToken } from './turnstile';
 import { handleSuccessHeaders, handleLimitExceeded } from './usageLimitService';
 import { initAppCheck } from '@/firebase';
@@ -37,29 +35,8 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 // Set cache duration to 24 hours
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
-// Create an axios instance with the base URL
-const api = axios.create({
-    baseURL: API_BASE_URL,
-    timeout: 10000, // 10 seconds timeout
-});
-
-// Configure retries — idempotent methods only. A POST that timed out may
-// already have reached the API, so retrying it could add a card twice,
-// double-send feedback or create a second payment order. A caller that needs
-// retry-on-failure for a POST should send an idempotency key with it.
-// (The one-shot retry for a rejected Turnstile token in the response
-// interceptor is unaffected: that request was rejected by the server,
-// never processed.)
-axiosRetry(api, {
-    retries: 3,
-    retryDelay: axiosRetry.exponentialDelay,
-    retryCondition: (error) => {
-        const method = error.config?.method?.toLowerCase();
-        const isIdempotent = ['get', 'head', 'options', 'put', 'delete'].includes(method);
-        if (!isIdempotent) return false;
-        return axiosRetry.isNetworkOrIdempotentRequestError(error) || error.code === 'ECONNABORTED';
-    }
-});
+const TIMEOUT_MS = 10_000;
+const MAX_RETRIES = 3;
 
 /**
  * Firebase ID token for the signed-in user, or null when nobody is signed in
@@ -74,121 +51,198 @@ const getToken = async () => {
     return getIdToken(user);
 };
 
-// Helper function to get data from cache
-const getFromCache = (key) => {
-    if (typeof localStorage === 'undefined') {
-        return null;
+/** Error carrying the parts of an HTTP response that the app reads. */
+class ApiError extends Error {
+    constructor(message, { response, code, isTimeout, isNetwork, cancelled } = {}) {
+        super(message);
+        this.name = 'ApiError';
+        if (response) this.response = response;
+        if (code) this.code = code;
+        if (isTimeout) {
+            this.isTimeout = true;
+            this.code = 'ECONNABORTED';
+        }
+        if (isNetwork) {
+            this.isNetwork = true;
+            // axios set error.request on requests that never got a response;
+            // handleApiError and mcpApi branch on it
+            this.request = 'fetch';
+        }
+        if (cancelled) this.cancelled = true;
     }
-    const cached = localStorage.getItem(key);
-    if (cached) {
-        try {
-            const { data, timestamp } = JSON.parse(cached);
-            if (Date.now() - timestamp < CACHE_DURATION) {
-                return data;
-            }
-        } catch (e) {
-            // If cache is corrupted, ignore it
-            return null;
+}
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Base + /v4-prefixed path + query string. Empty values are skipped (axios
+// did the same for params).
+const buildUrl = (url, params = {}) => {
+    const path = url.startsWith('/v4/') ? url : `/v4${url}`;
+    const search = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+        if (value !== undefined && value !== null && value !== '') {
+            search.append(key, value);
         }
     }
-    return null;
+    const qs = search.toString();
+    return `${API_BASE_URL}${path}${qs ? `?${qs}` : ''}`;
 };
 
-// Helper function to set data to cache. Never throws: a full or blocked
-// storage quota must not fail a request that already succeeded.
-const setToCache = (key, data) => {
-    safeSetItem(key, JSON.stringify({ data, timestamp: Date.now() }));
-};
+/**
+ * One HTTP request through fetch, replicating the old axios interceptors:
+ * the region gate, the auth/App Check/Turnstile headers, the 10s timeout,
+ * and the usage-limit bookkeeping on the response.
+ */
+const requestOnce = async (config) => {
+    const method = (config.method || 'get').toLowerCase();
+    const isPost = method === 'post';
 
-// Helper function to check if region is initialized
-const isRegionInitialized = () => {
-    if (typeof window === 'undefined') {
-        return false;
-    }
-    return !!localStorage.getItem('app-region');
-};
-
-// Enhanced getCountryCode that waits for region to be initialized
-const getCountryCode = () => {
-    if (typeof localStorage === 'undefined') {
-        return null; // Return null during SSR
-    }
-
-    const region = localStorage.getItem('app-region');
-    if (!region) {
-        console.warn('Region not initialized in localStorage');
-        return null; // Return null if region not initialized
-    }
-
-    return region.toLowerCase();
-};
-
-// Interceptor to add the token to each request
-api.interceptors.request.use(async (config) => {
     // Add the country unless the caller passed one. Without a region, cancel the
     // request before spending a Turnstile token on it.
-    const hasCountry = config.params?.country || config.url.includes('country=');
+    const hasCountry = config.params?.country || (config.url || '').includes('country=');
+    let params = config.params;
     if (!hasCountry) {
         const countryCode = getCountryCode();
         if (!countryCode) {
             console.warn('Skipping API request because region is not initialized:', config.url);
-            return Promise.reject(new Error('Region not initialized'));
+            throw new Error('Region not initialized');
         }
-        config.params = { ...config.params, country: countryCode };
+        params = { ...params, country: countryCode };
     }
-
-    const isPost = config.method?.toLowerCase() === 'post';
 
     // Auth, App Check and Turnstile (POST only) are independent, so fetch them together.
     // App Check and Turnstile are non-blocking: without them the request still goes out.
     const [authToken, appCheckToken, turnstileToken] = await Promise.all([
-        config.headers['Authorization'] ? null : getToken(),
+        config.headers?.Authorization ? null : getToken(),
         getAppCheckHeaderToken(),
         isPost ? getTurnstileToken().catch(() => null) : null,
     ]);
 
-    if (authToken) {
-        config.headers['Authorization'] = `Bearer ${authToken}`;
+    const url = buildUrl(config.url, params);
+
+    const headers = { Accept: 'application/json' };
+    for (const [key, value] of Object.entries(config.headers || {})) {
+        if (value !== undefined) headers[key] = value;
     }
-    if (appCheckToken) {
-        config.headers['X-Firebase-AppCheck'] = appCheckToken;
-    }
-    if (turnstileToken) {
-        config.headers['X-Turnstile-Token'] = turnstileToken;
+    if (authToken) headers.Authorization = `Bearer ${authToken}`;
+    if (appCheckToken) headers['X-Firebase-AppCheck'] = appCheckToken;
+    if (turnstileToken) headers['X-Turnstile-Token'] = turnstileToken;
+
+    const hasBody = config.data !== undefined && config.data !== null;
+    if (hasBody) headers['Content-Type'] = 'application/json';
+
+    // One controller per request: the timeout aborts it, and an external
+    // config.signal is bridged in so callers can cancel too.
+    const controller = new AbortController();
+    let timedOut = false;
+    const timer = setTimeout(() => {
+        timedOut = true;
+        controller.abort();
+    }, TIMEOUT_MS);
+    if (config.signal) {
+        if (config.signal.aborted) controller.abort();
+        else config.signal.addEventListener('abort', () => controller.abort(), { once: true });
     }
 
-    // Ensure URL has versioning — all endpoints now use v4
-    if (!config.url.startsWith('/v4/')) {
-        config.url = `/v4${config.url}`;
-    }
-
-    return config;
-}, (error) => Promise.reject(error));
-
-// Response interceptor: track feature usage from response headers
-api.interceptors.response.use(
-    (response) => {
-        handleSuccessHeaders(response.headers);
-        return response;
-    },
-    (error) => {
-        // A rejected Turnstile token (expired or already used): retry once with a fresh one
-        const errorCode = error.response?.data?.code;
-        if (error.response?.status === 403 && errorCode === 'TURNSTILE_FAILED'
-            && error.config && !error.config._turnstileRetried) {
-            error.config._turnstileRetried = true;
-            delete error.config.headers['X-Turnstile-Token'];
-            return api.request(error.config);
+    let response;
+    try {
+        response = await fetch(url, {
+            method: method.toUpperCase(),
+            headers,
+            body: hasBody ? JSON.stringify(config.data) : undefined,
+            signal: controller.signal,
+        });
+    } catch (error) {
+        if (controller.signal.aborted && !timedOut) {
+            // cancelled by the caller, not by the timeout
+            throw new ApiError('Request cancelled', { cancelled: true });
         }
-        if (error.response?.status === 429) {
-            const code = error.response.data?.code || error.response.data?.error;
-            if (code === 'FEATURE_LIMIT_EXCEEDED') {
-                handleLimitExceeded(error.response.headers);
+        if (timedOut) {
+            throw new ApiError('Request timed out', { isTimeout: true });
+        }
+        throw new ApiError('Network request failed', { isNetwork: true });
+    } finally {
+        clearTimeout(timer);
+    }
+
+    // Plain object of response headers: the usage-limit service reads them
+    // with bracket access.
+    const responseHeaders = {};
+    response.headers.forEach((value, key) => { responseHeaders[key] = value; });
+
+    let body = null;
+    if (response.status !== 204) {
+        const text = await response.text();
+        if (text) {
+            try { body = JSON.parse(text); } catch { body = text; }
+        }
+    }
+
+    if (response.ok) {
+        handleSuccessHeaders(responseHeaders);
+        return { data: body, headers: responseHeaders, status: response.status };
+    }
+
+    throw new ApiError(`Request failed with status code ${response.status}`, {
+        response: { status: response.status, data: body, headers: responseHeaders },
+    });
+};
+
+// Idempotent methods only. A POST that timed out may already have reached the
+// API, so retrying it could add a card twice, double-send feedback or create a
+// second payment order. (The one-shot retry for a rejected Turnstile token
+// below is unaffected: that request was rejected by the server, never
+// processed.)
+const RETRYABLE_METHODS = new Set(['get', 'head', 'options', 'put', 'delete']);
+
+/**
+ * The request entry point: a rejected Turnstile token gets one deliberate
+ * retry with a fresh one, network errors and timeouts are retried for
+ * idempotent methods with exponential backoff, and 429 FEATURE_LIMIT_EXCEEDED
+ * feeds the usage-limit service.
+ */
+const request = async (config) => {
+    const method = (config.method || 'get').toLowerCase();
+
+    for (let attempt = 0; ; attempt++) {
+        try {
+            return await requestOnce(config);
+        } catch (error) {
+            if (error.cancelled) throw error;
+
+            // A rejected Turnstile token (expired or already used): retry once.
+            // requestOnce fetches a fresh token for the repeat.
+            const errorCode = error.response?.data?.code;
+            if (error.response?.status === 403 && errorCode === 'TURNSTILE_FAILED'
+                && !config._turnstileRetried) {
+                return request({ ...config, _turnstileRetried: true });
             }
+
+            if (error.response?.status === 429) {
+                const code = error.response.data?.code || error.response.data?.error;
+                if (code === 'FEATURE_LIMIT_EXCEEDED') {
+                    handleLimitExceeded(error.response.headers);
+                }
+            }
+
+            const canRetry = attempt < MAX_RETRIES
+                && RETRYABLE_METHODS.has(method)
+                && (!error.response && (error.isNetwork || error.isTimeout));
+            if (!canRetry) throw error;
+
+            await sleep(1000 * 2 ** attempt); // ~1s, 2s, 4s
         }
-        return Promise.reject(error);
     }
-);
+};
+
+// axios-shaped facade so mcpApi.js keeps working unchanged.
+export const api = {
+    request: (config) => request(config),
+    get: (url, config = {}) => request({ ...config, method: 'get', url }),
+    post: (url, data, config = {}) => request({ ...config, method: 'post', url, data }),
+    patch: (url, data, config = {}) => request({ ...config, method: 'patch', url, data }),
+    delete: (url, config = {}) => request({ ...config, method: 'delete', url, data: config.data }),
+};
 
 // Handle API errors
 const handleApiError = (error) => {
@@ -240,6 +294,55 @@ const handleApiError = (error) => {
     throw error;
 };
 
+// Helper function to get data from cache
+const getFromCache = (key) => {
+    if (typeof localStorage === 'undefined') {
+        return null;
+    }
+    const cached = localStorage.getItem(key);
+    if (cached) {
+        try {
+            const { data, timestamp } = JSON.parse(cached);
+            if (Date.now() - timestamp < CACHE_DURATION) {
+                return data;
+            }
+        } catch (e) {
+            // If cache is corrupted, ignore it
+            return null;
+        }
+    }
+    return null;
+};
+
+// Helper function to set data to cache. Never throws: a full or blocked
+// storage quota must not fail a request that already succeeded.
+const setToCache = (key, data) => {
+    safeSetItem(key, JSON.stringify({ data, timestamp: Date.now() }));
+};
+
+// Helper function to check if region is initialized
+const isRegionInitialized = () => {
+    if (typeof window === 'undefined') {
+        return false;
+    }
+    return !!localStorage.getItem('app-region');
+};
+
+// Enhanced getCountryCode that waits for region to be initialized
+const getCountryCode = () => {
+    if (typeof localStorage === 'undefined') {
+        return null; // Return null during SSR
+    }
+
+    const region = localStorage.getItem('app-region');
+    if (!region) {
+        console.warn('Region not initialized in localStorage');
+        return null; // Return null if region not initialized
+    }
+
+    return region.toLowerCase();
+};
+
 // Generic fetch with cache helper
 const fetchWithCache = async (key, apiCall) => {
     // Check if region is initialized
@@ -272,7 +375,7 @@ const authenticatedRequest = async (method, url, data = null) => {
         if (data) {
             config.data = data;
         }
-        const response = await api(config);
+        const response = await request(config);
         return response.data;
     } catch (error) {
         return handleApiError(error);
@@ -306,8 +409,8 @@ export const fetchCards = async (bank) => {
     });
 };
 
-// Cancel token for MCC requests
-let mccCancelToken = null;
+// Abort controller for MCC requests — a new search cancels the previous one
+let mccAbortController = null;
 
 // Fetch MCC (Merchant Category Code) data
 export const fetchMCC = async (search) => {
@@ -317,20 +420,21 @@ export const fetchMCC = async (search) => {
         return [];
     }
 
-    if (mccCancelToken) {
-        mccCancelToken.cancel('Operation canceled due to new request.');
+    if (mccAbortController) {
+        mccAbortController.abort();
     }
-
-    mccCancelToken = axios.CancelToken.source();
+    mccAbortController = new AbortController();
 
     try {
-        const response = await api.get('/mcc', {
+        const response = await request({
+            method: 'get',
+            url: '/mcc',
             params: { search },
-            cancelToken: mccCancelToken.token,
+            signal: mccAbortController.signal,
         });
         return response.data;
     } catch (error) {
-        if (axios.isCancel(error)) {
+        if (error.cancelled) {
             // Request canceled
             return [];
         }
@@ -344,8 +448,8 @@ export const fetchMCC = async (search) => {
     }
 };
 
-// Cancel token for card questions requests
-let cardQuestionsCancelToken = null;
+// Abort controller for card questions requests
+let cardQuestionsAbortController = null;
 
 // Fetch card questions for a specific bank and card
 export const fetchCardQuestions = async (bank, card) => {
@@ -358,20 +462,22 @@ export const fetchCardQuestions = async (bank, card) => {
     }
 
     // Cancel any in-flight card questions request
-    if (cardQuestionsCancelToken) {
-        cardQuestionsCancelToken.cancel('Operation canceled due to new request.');
+    if (cardQuestionsAbortController) {
+        cardQuestionsAbortController.abort();
     }
-    cardQuestionsCancelToken = axios.CancelToken.source();
+    cardQuestionsAbortController = new AbortController();
 
     try {
-        const response = await api.get('/cardQuestions', {
+        const response = await request({
+            method: 'get',
+            url: '/cardQuestions',
             params: { bank, card },
-            cancelToken: cardQuestionsCancelToken.token,
+            signal: cardQuestionsAbortController.signal,
         });
         setToCache(cacheKey, response.data);
         return response.data;
     } catch (error) {
-        if (axios.isCancel(error)) {
+        if (error.cancelled) {
             return null;
         }
         if (error.message === 'Region not initialized') {
@@ -488,13 +594,6 @@ export const fetchCardDetails = async (bank, card, country) => {
         return null;
     }
 
-    // Note: The country parameter is actually typically handled by the cache key
-    // or passed implicitly via the interceptor if not provided,
-    // but preserving the signature requested or implied by existing usage.
-    // However, existing usage had country passed in query. 
-    // The interceptor adds it if missing, but let's be explicit if passed.
-
-    // We'll use the country passed in args if available, or fall back to region.
     const region = country || getCountryCode();
     if (!region) return null;
 
@@ -528,7 +627,7 @@ export const fetchCardGoals = async (bank, card, country) => {
 };
 
 // ─── User Cards (v4) ────────────────────────────────────────────────
-// All /v4/user/cards endpoints require Firebase JWT (set by interceptor).
+// All /v4/user/cards endpoints require Firebase JWT (set by the request core).
 // Only the authenticated user can access their own cards.
 
 /**
@@ -575,7 +674,7 @@ export const deleteUserCard = async ({ bank, cardName, country }) => {
 
 /**
  * Get all cards for the authenticated user.
- * GET /v4/user/cards — the request interceptor already appends the
+ * GET /v4/user/cards — the request core already appends the
  * user's current region as `?country=`, so no country needs to be passed here.
  * Returns a flat array (unwrapped from the `{ cards, count }` envelope), with
  * a synthesized `id` (`${bank}_${cardName}`) added to each card so existing
@@ -626,6 +725,3 @@ export const submitAppFeedback = async (feedback) => {
         return handleApiError(error);
     }
 };
-
-// Export the API instance
-export { api };
