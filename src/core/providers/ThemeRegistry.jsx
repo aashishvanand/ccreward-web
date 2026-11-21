@@ -181,14 +181,21 @@ const theme = createTheme({
           },
           transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
         },
-        // Gradient only while enabled: a disabled button keeps MUI's
-        // disabled text colour, which is unreadable on the blue gradient
-        // (grey-on-blue in light mode), so it falls back to the standard
-        // disabled background instead.
+        // Brand gradient for contained *primary* buttons only, so
+        // color="secondary"/"error"/… keep their own colour. Only while
+        // enabled: a disabled button keeps MUI's disabled text colour, which
+        // is unreadable on the gradient (grey-on-blue in light mode).
         contained: ({ theme }) => ({
-          '&:not(.Mui-disabled)': {
-            background: `linear-gradient(135deg, ${theme.vars.palette.primary.main} 0%, ${theme.vars.palette.primary.dark} 100%)`,
-          },
+          variants: [
+            {
+              props: { color: 'primary' },
+              style: {
+                '&:not(.Mui-disabled)': {
+                  background: `linear-gradient(135deg, ${theme.vars.palette.primary.main} 0%, ${theme.vars.palette.primary.dark} 100%)`,
+                },
+              },
+            },
+          ],
         }),
       },
     },

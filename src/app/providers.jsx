@@ -3,6 +3,9 @@
 
 import { memo } from "react";
 import { LazyMotion, domAnimation } from "framer-motion";
+// Flushes Emotion's SSR styles via useServerInsertedHTML (avoids the
+// inline-<style> hydration mismatch).
+import EmotionRegistry from "../core/providers/EmotionRegistry";
 import { ThemeRegistry } from "../core/providers/ThemeRegistry";
 import AmbientBackground from "../shared/components/layout/AmbientBackground";
 import ConsentBanner from "../shared/components/layout/ConsentBanner";
@@ -16,19 +19,21 @@ import { AnalyticsProvider } from "../core/providers/AnalyticsProvider";
 // (no layout/drag), instead of the full `motion` bundle.
 const Providers = memo(({ children }) => {
   return (
-    <LazyMotion features={domAnimation}>
-      <ThemeRegistry>
-        <AmbientBackground />
-        <RegionProvider>
-          <AuthProvider>
-            <AnalyticsProvider>
-              {children}
-            </AnalyticsProvider>
-          </AuthProvider>
-        </RegionProvider>
-        <ConsentBanner />
-      </ThemeRegistry>
-    </LazyMotion>
+    <EmotionRegistry>
+      <LazyMotion features={domAnimation}>
+        <ThemeRegistry>
+          <AmbientBackground />
+          <RegionProvider>
+            <AuthProvider>
+              <AnalyticsProvider>
+                {children}
+              </AnalyticsProvider>
+            </AuthProvider>
+          </RegionProvider>
+          <ConsentBanner />
+        </ThemeRegistry>
+      </LazyMotion>
+    </EmotionRegistry>
   );
 });
 

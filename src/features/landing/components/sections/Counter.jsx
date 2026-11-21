@@ -2,62 +2,56 @@
 
 import { useEffect, useRef } from "react";
 
+const prefersReducedMotion = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+// The real number is rendered by default (server HTML, no-JS, crawlers, and
+// before the section scrolls into view); `animate` replays a count-up from 0
+// once. A missing value (region not known yet) shows a dash instead of "0+".
+const format = (value, suffix) => (value ? `${value}${suffix}` : "–");
+
 const Counter = ({ value, animate = true, suffix = "" }) => {
   const countRef = useRef(null);
-  const currentValueRef = useRef(0);
   const rafRef = useRef(null);
   const hasStartedRef = useRef(false);
 
   useEffect(() => {
-    // Reset if animation prop changes to false
-    if (!animate) {
+    if (!animate || !value) {
       hasStartedRef.current = false;
-      currentValueRef.current = 0;
-      if (countRef.current) {
-        countRef.current.textContent = `0${suffix}`;
-      }
+      if (countRef.current) countRef.current.textContent = format(value, suffix);
       return;
     }
 
-    // Only start animation if animate is true and hasn't started yet
-    if (!hasStartedRef.current && animate) {
-      hasStartedRef.current = true;
+    if (hasStartedRef.current) return;
+    hasStartedRef.current = true;
 
-      const duration = 2000;
-      const startTime = Date.now();
-      const startValue = 0;
-      const endValue = value;
-
-      const updateCount = () => {
-        const now = Date.now();
-        const progress = Math.min((now - startTime) / duration, 1);
-        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-        const currentValue = Math.floor(
-          startValue + (endValue - startValue) * easeOutQuart
-        );
-
-        if (countRef.current) {
-          countRef.current.textContent = `${currentValue}${suffix}`;
-        }
-
-        currentValueRef.current = currentValue;
-
-        if (progress < 1) {
-          rafRef.current = requestAnimationFrame(updateCount);
-        }
-      };
-
-      rafRef.current = requestAnimationFrame(updateCount);
+    if (prefersReducedMotion()) {
+      if (countRef.current) countRef.current.textContent = format(value, suffix);
+      return;
     }
 
-    return () => {
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
+    const duration = 2000;
+    const startTime = performance.now();
+
+    const updateCount = (now) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+      const currentValue = Math.floor(value * easeOutQuart);
+      if (countRef.current) {
+        countRef.current.textContent = `${currentValue}${suffix}`;
       }
+      if (progress < 1) rafRef.current = requestAnimationFrame(updateCount);
+    };
+
+    rafRef.current = requestAnimationFrame(updateCount);
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [value, animate, suffix]);
 
-  return <span ref={countRef}>0{suffix}</span>;
+  return <span ref={countRef}>{format(value, suffix)}</span>;
 };
 
 export default Counter;

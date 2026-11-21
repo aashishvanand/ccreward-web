@@ -84,6 +84,23 @@ const CardListRenderer = ({
     );
   };
 
+  // Nothing to rank until the user runs a calculation: show a hint rather
+  // than loading placeholders that look like they never finish.
+  if (!isCalculated) {
+    return (
+      <ListItem sx={{ justifyContent: "center", py: 4 }}>
+        <Typography
+          variant="body2"
+          align="center"
+          sx={{ color: "text.secondary", maxWidth: 420 }}
+        >
+          Enter an amount and press Calculate Best Card to see which of your
+          cards earns the most.
+        </Typography>
+      </ListItem>
+    );
+  }
+
   if (isCardListLoading || isLoadingCardImages) {
     return Array(3)
       .fill(0)

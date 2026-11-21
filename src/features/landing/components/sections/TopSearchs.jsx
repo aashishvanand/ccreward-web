@@ -105,7 +105,13 @@ const TopSearchs = () => {
           gutterBottom
           sx={{
             fontWeight: 700,
-            background: "linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)",
+            // Theme gradient, same as the other section headings
+            "&": (theme) => ({
+              backgroundImage: `linear-gradient(90deg, ${theme.vars.palette.primary.main} 0%, ${theme.vars.palette.secondary.main} 100%)`,
+              ...theme.applyStyles("dark", {
+                backgroundImage: `linear-gradient(90deg, ${theme.vars.palette.primary.light} 0%, ${theme.vars.palette.secondary.light} 100%)`,
+              }),
+            }),
             backgroundClip: "text",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",

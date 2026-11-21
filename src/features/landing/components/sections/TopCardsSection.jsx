@@ -77,15 +77,9 @@ const TopCardsSection = () => {
     );
   }
 
-  if (error) {
-    return (
-      <Box sx={{ textAlign: "center", py: 4 }}>
-        <Typography color="error">
-          Error loading categories. Please try again later.
-        </Typography>
-      </Box>
-    );
-  }
+  // A marketing section: if its data can't load, leave it out rather than
+  // showing visitors an error (TopSearchs does the same).
+  if (error) return null;
 
   return (
     <Box sx={{ py: 8 }}>

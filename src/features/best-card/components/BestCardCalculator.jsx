@@ -803,6 +803,16 @@ const BestCardCalculator = () => {
               <Accordion
                 expanded={advancedMode}
                 onChange={handleAdvancedModeToggle}
+                disableGutters
+                elevation={0}
+                sx={{
+                  // Match the rounded inputs above instead of a square panel
+                  "&, &:first-of-type, &:last-of-type": { borderRadius: "16px" },
+                  border: 1,
+                  borderColor: "divider",
+                  overflow: "hidden",
+                  "&::before": { display: "none" },
+                }}
               >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Typography>Advanced Mode</Typography>

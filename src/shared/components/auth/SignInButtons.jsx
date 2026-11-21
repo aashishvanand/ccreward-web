@@ -36,6 +36,9 @@ const SignInButtons = ({
     <Stack direction={direction} spacing={1.5} sx={{ width: fullWidth ? '100%' : 'auto' }}>
       <Button
         variant="contained"
+        // Not "primary": the theme paints contained primary buttons with the
+        // brand gradient, which hid Google's white button style.
+        color="inherit"
         fullWidth={fullWidth}
         size={size}
         onClick={onGoogleSignIn}
@@ -62,6 +65,7 @@ const SignInButtons = ({
       </Button>
       <Button
         variant="contained"
+        color="inherit"
         fullWidth={fullWidth}
         size={size}
         onClick={onAppleSignIn}
