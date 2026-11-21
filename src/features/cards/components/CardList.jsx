@@ -1,13 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Typography,
   CircularProgress,
   Alert,
-  ImageList,
-  ImageListItem,
   Paper,
   Stack,
   IconButton,
@@ -92,6 +90,29 @@ const loadingSpinnerVariants = {
   },
 };
 
+// ISO/IEC 7810 ID-1 card ratio, matching TiltCard
+const CARD_RATIO = 1.586;
+// Caption strip under each card, as a fraction of column width (approximate)
+const CAPTION_HEIGHT = 0.28;
+
+// Masonry by explicit columns: each card goes to the currently shortest column,
+// using its known aspect ratio. Unlike CSS multi-column layout, a tall vertical
+// card can never be split across two columns.
+function distributeIntoColumns(cards, cols) {
+  const columns = Array.from({ length: cols }, () => ({ height: 0, items: [] }));
+  cards.forEach((card, index) => {
+    const imageHeight =
+      card.orientation === "vertical" ? CARD_RATIO : 1 / CARD_RATIO;
+    const target = columns.reduce(
+      (min, col) => (col.height < min.height - 1e-6 ? col : min),
+      columns[0]
+    );
+    target.items.push({ card, index });
+    target.height += imageHeight + CAPTION_HEIGHT;
+  });
+  return columns.map((col) => col.items);
+}
+
 const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -120,6 +141,11 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
       setProcessedCards(processed);
     }
   }, [cards, cardImagesData]);
+
+  const columns = useMemo(
+    () => distributeIntoColumns(processedCards, cols),
+    [processedCards, cols]
+  );
 
   const handleCardClick = (card) => {
     setSelectedCard(card);
@@ -240,169 +266,168 @@ const CardList = ({ cards = [], onDeleteCard, onUpdateCard }) => {
         initial="hidden"
         animate="visible"
       >
-        <ImageList
-          variant="masonry"
-          cols={cols}
-          gap={16}
-          sx={{
-            width: "100%",
-            margin: 0,
-            "& .MuiImageListItem-root": {
-              display: "block",
-              overflow: "hidden",
-              borderRadius: 1,
-              mb: 2,
-            },
-          }}
-        >
-          <AnimatePresence>
-            {processedCards.map((card, index) => {
-              const cardKey = `${card.bank}-${card.cardName}`;
-              const isRemoving = removingCard === cardKey;
+        <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}>
+          {columns.map((columnItems, colIndex) => (
+            <Box
+              key={colIndex}
+              sx={{
+                flex: "1 1 0",
+                minWidth: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+              }}
+            >
+              <AnimatePresence>
+                {columnItems.map(({ card, index }) => {
+                  const cardKey = `${card.bank}-${card.cardName}`;
+                  const isRemoving = removingCard === cardKey;
 
-              return (
-                <m.div
-                  key={cardKey}
-                  layout
-                  variants={cardVariants}
-                  initial="hidden"
-                  animate={isRemoving ? "exit" : "visible"}
-                  exit="exit"
-                  whileHover="hover"
-                  whileTap="tap"
-                  custom={index} // Pass index for staggered animations
-                  transition={{
-                    layoutId: cardKey,
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 25,
-                    delay: index * 0.05, // Stagger delay based on index
-                  }}
-                >
-                  <ImageListItem sx={{ width: "100%" }}>
+                  return (
                     <m.div
-                      onClick={() => handleCardClick(card)}
-                      style={{ cursor: "pointer" }}
+                      key={cardKey}
+                      layout
+                      variants={cardVariants}
+                      initial="hidden"
+                      animate={isRemoving ? "exit" : "visible"}
+                      exit="exit"
+                      whileHover="hover"
+                      whileTap="tap"
+                      custom={index} // Pass index for staggered animations
+                      transition={{
+                        layoutId: cardKey,
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 25,
+                        delay: index * 0.05, // Stagger delay based on index
+                      }}
                     >
-                      <Paper
-                        elevation={0}
-                        sx={{
-                          overflow: "hidden",
-                          position: "relative",
-                          bgcolor: "background.paper",
-                          boxShadow: 1,
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            position: "relative",
-                            width: "100%",
-                            marginBottom: 0,
-                          }}
+                      <Box sx={{ width: "100%", borderRadius: 1, overflow: "hidden" }}>
+                        <m.div
+                          onClick={() => handleCardClick(card)}
+                          style={{ cursor: "pointer" }}
                         >
-                          {card.image ? (
-                             <m.div
-                              initial={{ opacity: 0 }}
-                              animate={{
-                                opacity: 1,
-                                transition: { delay: 0.1 + index * 0.05 },
+                          <Paper
+                            elevation={0}
+                            sx={{
+                              overflow: "hidden",
+                              position: "relative",
+                              bgcolor: "background.paper",
+                              boxShadow: 1,
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                position: "relative",
+                                width: "100%",
+                                marginBottom: 0,
                               }}
                             >
-                            <TiltCard 
-                                src={card.image}
-                                alt={`${card.bank} ${card.cardName}`}
-                                orientation={card.orientation}
-                                width="100%"
-                                loading={index >= 4 ? "lazy" : undefined}
-                            />
-                            </m.div>
-                          ) : (
-                                <Box sx={{ 
-                                    aspectRatio: card.orientation === "vertical" ? "0.63/1" : "1.59/1",
-                                    bgcolor: 'grey.200', 
-                                    borderRadius: 4, 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
-                                    justifyContent: 'center' 
-                                }}>
-                                    <Typography variant="caption" sx={{
-                                      color: "text.secondary"
-                                    }}>No Image</Typography>
-                                </Box>
-                          )}
-                        </Box>
-                        <Box
-                          sx={{
-                            p: 1.5,
-                            borderTop: 1,
-                            borderColor: "divider",
-                          }}
-                        >
-                          <Stack spacing={0.5}>
-                            <m.div
-                              initial={{ opacity: 0, x: -5 }}
-                              animate={{
-                                opacity: 1,
-                                x: 0,
-                                transition: {
-                                  delay: 0.2 + index * 0.05,
-                                  duration: 0.3,
-                                },
+                              {card.image ? (
+                                 <m.div
+                                  initial={{ opacity: 0 }}
+                                  animate={{
+                                    opacity: 1,
+                                    transition: { delay: 0.1 + index * 0.05 },
+                                  }}
+                                >
+                                <TiltCard 
+                                    src={card.image}
+                                    alt={`${card.bank} ${card.cardName}`}
+                                    orientation={card.orientation}
+                                    width="100%"
+                                    loading={index >= 4 ? "lazy" : undefined}
+                                />
+                                </m.div>
+                              ) : (
+                                    <Box sx={{ 
+                                        aspectRatio: card.orientation === "vertical" ? "0.63/1" : "1.59/1",
+                                        bgcolor: 'grey.200', 
+                                        borderRadius: 4, 
+                                        display: 'flex', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center' 
+                                    }}>
+                                        <Typography variant="caption" sx={{
+                                          color: "text.secondary"
+                                        }}>No Image</Typography>
+                                    </Box>
+                              )}
+                            </Box>
+                            <Box
+                              sx={{
+                                p: 1.5,
+                                borderTop: 1,
+                                borderColor: "divider",
                               }}
                             >
-                              <Typography
-                                variant="subtitle2"
-                                sx={{
-                                  fontSize:
-                                    card.orientation === "vertical"
-                                      ? "0.75rem"
-                                      : "0.875rem",
-                                  fontWeight: 600,
-                                  lineHeight: 1.2,
-                                }}
-                                noWrap
-                              >
-                                {card.cardName}
-                              </Typography>
-                            </m.div>
-                            <m.div
-                              initial={{ opacity: 0, x: -5 }}
-                              animate={{
-                                opacity: 1,
-                                x: 0,
-                                transition: {
-                                  delay: 0.3 + index * 0.05,
-                                  duration: 0.3,
-                                },
-                              }}
-                            >
-                              <Typography
-                                variant="caption"
-                                noWrap
-                                sx={{
-                                  color: "text.secondary",
+                              <Stack spacing={0.5}>
+                                <m.div
+                                  initial={{ opacity: 0, x: -5 }}
+                                  animate={{
+                                    opacity: 1,
+                                    x: 0,
+                                    transition: {
+                                      delay: 0.2 + index * 0.05,
+                                      duration: 0.3,
+                                    },
+                                  }}
+                                >
+                                  <Typography
+                                    variant="subtitle2"
+                                    sx={{
+                                      fontSize:
+                                        card.orientation === "vertical"
+                                          ? "0.75rem"
+                                          : "0.875rem",
+                                      fontWeight: 600,
+                                      lineHeight: 1.2,
+                                    }}
+                                    noWrap
+                                  >
+                                    {card.cardName}
+                                  </Typography>
+                                </m.div>
+                                <m.div
+                                  initial={{ opacity: 0, x: -5 }}
+                                  animate={{
+                                    opacity: 1,
+                                    x: 0,
+                                    transition: {
+                                      delay: 0.3 + index * 0.05,
+                                      duration: 0.3,
+                                    },
+                                  }}
+                                >
+                                  <Typography
+                                    variant="caption"
+                                    noWrap
+                                    sx={{
+                                      color: "text.secondary",
 
-                                  fontSize:
-                                    card.orientation === "vertical"
-                                      ? "0.7rem"
-                                      : "0.75rem",
+                                      fontSize:
+                                        card.orientation === "vertical"
+                                          ? "0.7rem"
+                                          : "0.75rem",
 
-                                  lineHeight: 1.2,
-                                  display: "block"
-                                }}>
-                                {card.bank}
-                              </Typography>
-                            </m.div>
-                          </Stack>
-                        </Box>
-                      </Paper>
+                                      lineHeight: 1.2,
+                                      display: "block"
+                                    }}>
+                                    {card.bank}
+                                  </Typography>
+                                </m.div>
+                              </Stack>
+                            </Box>
+                          </Paper>
+                        </m.div>
+                      </Box>
                     </m.div>
-                  </ImageListItem>
-                </m.div>
-              );
-            })}
-          </AnimatePresence>
-        </ImageList>
+                  );
+                })}
+              </AnimatePresence>
+            </Box>
+          ))}
+        </Box>
       </m.div>
       <CardDetailsModal
         open={detailsModalOpen}
