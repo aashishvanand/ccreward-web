@@ -127,7 +127,7 @@ const PrivacyPolicyPage = () => {
             Privacy Policy
           </Typography>
           <Typography variant="subtitle1" gutterBottom sx={{ mb: 4, color: 'text.secondary' }}>
-            Last Updated: November 16, 2026
+            Last Updated: November 21, 2026
           </Typography>
           <Typography 
             variant="body1" 
@@ -187,7 +187,15 @@ const PrivacyPolicyPage = () => {
                 bots and abuse, and keep request logs (see section 4). We may
                 also collect pages visited, time spent on pages, coarse device
                 type (phone, tablet or desktop) and diagnostic data (such as
-                timing and error summaries) to improve performance.
+                timing and error summaries) to improve performance. The first
+                time you visit, a small notice lets you decline these
+                analytics and measurement tools (Google Analytics and
+                Microsoft Clarity); declining stops them from loading, and
+                the &ldquo;Analytics choices&rdquo; link in the footer lets
+                you change your decision at any time. Crash and error
+                reports are separate: they carry no tracking identifiers and
+                continue regardless of your choice, as they are needed to
+                keep the service working.
               </p>
 
               <p>
@@ -366,7 +374,10 @@ const PrivacyPolicyPage = () => {
                 5.3. <strong>Payment Providers:</strong> Razorpay, Stripe,
                 Apple App Store and Google Play process payments. They receive
                 your payment details directly and tell us whether a payment
-                succeeded.
+                succeeded. Premium is tied to your account, not your device:
+                a subscription bought on one platform (for example, the App
+                Store) counts on the others too; signing in with the same
+                account is enough.
               </p>
               <p>
                 5.4. <strong>AI Assistants:</strong> If you connect ccreward to
@@ -435,6 +446,11 @@ const PrivacyPolicyPage = () => {
                 <li>View, edit or delete your saved cards at any time.</li>
                 <li>Disconnect AI assistants and revoke API keys at any time.</li>
                 <li>Delete your account immediately from settings.</li>
+                <li>
+                  Turn off the &quot;Share usage and crash data&quot; switch
+                  (in the mobile apps: Profile, About &amp; Support) at any
+                  time; we then stop collecting usage and crash reports.
+                </li>
                 <li>
                   Request access to, correction of or deletion of your data, or
                   withdraw consent, by emailing{" "}
