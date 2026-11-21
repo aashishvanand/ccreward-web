@@ -34,14 +34,6 @@ const BrowseCategoriesSection = ({ region, categories = [] }) => {
               sx={{ fontWeight: 500, fontSize: "0.95rem", py: 2.25, px: 0.5 }}
             />
           ))}
-          <Chip
-            component={Link}
-            href={`/${code}/top-cards`}
-            clickable
-            label="All categories"
-            color="primary"
-            sx={{ fontWeight: 600, fontSize: "0.95rem", py: 2.25, px: 0.5 }}
-          />
         </Box>
       </Container>
     </Box>
