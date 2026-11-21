@@ -38,8 +38,10 @@ const StyledTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />
 ))(({ theme }) => ({
   [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: theme.palette.common.white,
-    color: "rgba(0, 0, 0, 0.87)",
+    // vars so the tooltip follows the active color scheme (dark in light
+    // mode, light in dark mode) instead of a hardcoded white
+    backgroundColor: theme.vars.palette.grey[700],
+    color: theme.vars.palette.grey[50],
     boxShadow: theme.shadows[1],
     fontSize: 11,
   },
@@ -47,18 +49,20 @@ const StyledTooltip = styled(({ className, ...props }) => (
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   cursor: "pointer",
-  backgroundColor: theme.palette.background.paper, // Ensure solid base
+  // vars: theme.palette.* holds the default (light) scheme in CSS
+  // variables mode and would render white rows in dark mode
+  backgroundColor: theme.vars.palette.background.paper, // Ensure solid base
   transition: theme.transitions.create("background-image", {
     duration: theme.transitions.duration.shortest,
   }),
   "&:nth-of-type(odd)": {
-    backgroundImage: `linear-gradient(${theme.palette.action.hover}, ${theme.palette.action.hover})`,
+    backgroundImage: `linear-gradient(${theme.vars.palette.action.hover}, ${theme.vars.palette.action.hover})`,
   },
   "&:hover": {
-    backgroundColor: theme.palette.background.paper, // Keep base solid
+    backgroundColor: theme.vars.palette.background.paper, // Keep base solid
     backgroundImage: `linear-gradient(${
-      theme.palette.action.selected || theme.palette.action.hover
-    }, ${theme.palette.action.selected || theme.palette.action.hover})`,
+      theme.vars.palette.action.selected || theme.vars.palette.action.hover
+    }, ${theme.vars.palette.action.selected || theme.vars.palette.action.hover})`,
   },
   // Hide last border
   "&:last-child td, &:last-child th": {
@@ -188,7 +192,7 @@ const TransferPartnerGrid = () => {
                     position: "sticky",
                     left: 0,
                     minWidth: 150,
-                    borderRight: "1px solid " + theme.palette.divider,
+                    borderRight: "1px solid " + theme.vars.palette.divider,
                   }}
                 >
                   Partner / Bank
@@ -258,7 +262,7 @@ const TransferPartnerGrid = () => {
                         position: "sticky",
                         left: 0,
                         background: "inherit",
-                        borderRight: "1px solid " + theme.palette.divider,
+                        borderRight: "1px solid " + theme.vars.palette.divider,
                         zIndex: 1,
                         fontWeight: 500,
                         p: 2,

@@ -72,11 +72,15 @@ const HeroSection = ({
             </Typography>
             <Typography
               variant="h5"
+              component="p"
               sx={{
                 color: "text.secondary",
                 mb: 4,
-                fontSize: { xs: "1.125rem", md: "1.5rem" },
-                lineHeight: 1.4,
+                maxWidth: { md: "36rem" },
+                fontSize: { xs: "1.25rem", sm: "1.5rem", md: "1.75rem" },
+                fontWeight: 400,
+                lineHeight: 1.5,
+                letterSpacing: "-0.01em",
               }}
             >
               Compare cards, calculate rewards, and find the perfect credit card

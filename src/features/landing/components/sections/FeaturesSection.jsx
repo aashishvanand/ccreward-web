@@ -8,7 +8,6 @@ import {
   Typography,
   Grid,
   Card,
-  useTheme,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -37,31 +36,13 @@ const features = [
 ];
 
 const FeaturesSection = () => {
-  const theme = useTheme();
-
   return (
     <Box
       sx={{
-        position: "relative",
-        minHeight: { md: "40vh" }, // Set minimum height for desktop
-        display: "flex",
-        alignItems: "center",
-        py: { xs: 8, md: 0 }, // Remove padding on desktop
-        "&::before": {
-          content: '""',
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: (theme) =>
-            `linear-gradient(0deg, ${theme.palette.primary.main}15 0%, ${theme.palette.background.default} 100%)`,
-          opacity: 0.8,
-          zIndex: 0,
-        },
+        py: { xs: 8, md: 10 },
       }}
     >
-      <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
+      <Container maxWidth="lg">
         <Typography
           variant="h3"
           align="center"

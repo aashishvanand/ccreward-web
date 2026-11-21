@@ -20,7 +20,8 @@ import FeaturesSection from "./sections/FeaturesSection";
 import BankSection from "./sections/BankSection";
 import CallToActionSection from "./sections/CallToActionSection";
 import AppStoreSection from "./sections/AppStoreSection";
-import CustomGPTSection from "./sections/CustomGPTSection";
+// Temporarily hidden — re-enable by restoring the import and both usages below
+// import CustomGPTSection from "./sections/CustomGPTSection";
 import TestimonialsSection from "./sections/TestimonialsSection";
 import MobileAppPromotion from "./MobileAppPromotion";
 import TopCardsSection from "./sections/TopCardsSection";
@@ -699,9 +700,10 @@ const MobileView = ({
             />
           </Box>
 
-          <Box component="section" data-section="custom-gpt">
+          {/* Temporarily hidden — re-enable with <CustomGPTSection /> */}
+          {/* <Box component="section" data-section="custom-gpt">
             <CustomGPTSection />
-          </Box>
+          </Box> */}
 
           <Box component="section" data-section="features">
             <FeaturesSection />
@@ -935,13 +937,14 @@ const DesktopView = ({
           <AppStoreSection isMobile={isMobile} />
         </Box>
 
-        <Box
+        {/* Temporarily hidden — re-enable with <CustomGPTSection theme={theme} /> */}
+        {/* <Box
           component="section"
           data-section="custom-gpt"
           sx={{ bgcolor: "background.default" }}
         >
           <CustomGPTSection theme={theme} />
-        </Box>
+        </Box> */}
 
         <Box
           component="section"

@@ -43,11 +43,13 @@ const TiltCard = ({
   // The frame reserves layout space; the card inside is sized to its exact
   // aspect ratio so tilt, scale, shadow and shine follow the card's edges.
   // - height given: frame matches the card, shrinking to fit narrow screens.
-  // - width given: frame is landscape so grids line up; vertical cards are
-  //   centred at full frame height.
-  const frameSx = height
-    ? { width: `${Math.round(height * cardRatio)}px`, aspectRatio: `${cardRatio}` }
-    : { width: width || '100%', aspectRatio: `${aspectRatio}` };
+  // - width given: frame matches the card's orientation too, so vertical
+  //   cards fill the column at portrait height instead of sitting small
+  //   inside a landscape box. Masonry stacks the mixed heights naturally.
+  const frameSx = {
+    width: height ? `${Math.round(height * cardRatio)}px` : width || '100%',
+    aspectRatio: `${cardRatio}`,
+  };
 
   // Helper to resolve image source
   const resolveSrc = (imageSrc) => {

@@ -197,7 +197,10 @@ function Footer() {
                 direction={{ xs: "column", sm: "row" }}
                 spacing={{ xs: 1, sm: 3 }}
                 sx={{
-                  alignItems: "center"
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexWrap: { sm: "wrap" },
+                  rowGap: { sm: 1 },
                 }}
               >
                 {["tools", "terms", "privacy", "accessibility", "howto", "faq"].map((page, idx) => (
@@ -213,6 +216,7 @@ function Footer() {
                       color="inherit"
                       sx={{
                         textDecoration: "none",
+                        whiteSpace: "nowrap",
                       }}
                     >
                       {page === "tools"
@@ -236,7 +240,7 @@ function Footer() {
                       type="button"
                       color="inherit"
                       onClick={() => setFeedbackOpen(true)}
-                      sx={{ textDecoration: "none", font: "inherit", verticalAlign: "baseline" }}
+                      sx={{ textDecoration: "none", font: "inherit", verticalAlign: "baseline", whiteSpace: "nowrap" }}
                     >
                       Send feedback
                     </Link>
@@ -253,7 +257,7 @@ function Footer() {
                       resetAnalyticsConsent();
                       window.location.reload();
                     }}
-                    sx={{ textDecoration: "none", font: "inherit", verticalAlign: "baseline" }}
+                    sx={{ textDecoration: "none", font: "inherit", verticalAlign: "baseline", whiteSpace: "nowrap" }}
                   >
                     Analytics choices
                   </Link>
