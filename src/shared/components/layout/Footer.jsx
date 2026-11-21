@@ -71,17 +71,50 @@ const socialIconVariants = {
   tap: { scale: 0.9 },
 };
 
-const linkVariants = {
-  hover: {
-    scale: 1.05,
-    color: "primary.main",
-    transition: {
-      type: "spring",
-      stiffness: 300,
-      damping: 10,
-    },
-  },
-  tap: { scale: 0.95 },
+const SOCIAL_LINKS = [
+  { href: "https://x.com/ccrewardapp", label: "Follow ccreward on X (Twitter)", Icon: Twitter },
+  { href: "https://www.instagram.com/ccrewardapp/", label: "Follow ccreward on Instagram", Icon: Instagram },
+  { href: "https://www.reddit.com/r/ccreward/", label: "Join ccreward on Reddit", Icon: Reddit },
+  { href: "https://t.me/ccrewardapp", label: "Join ccreward on Telegram", Icon: Telegram },
+];
+
+const EXPLORE_LINKS = [
+  { href: "/tools", label: "Tools" },
+  { href: "/howto", label: "How-to Guides" },
+  { href: "/faq", label: "FAQs" },
+];
+
+const LEGAL_LINKS = [
+  { href: "/terms", label: "Terms of Service" },
+  { href: "/privacy", label: "Privacy Policy" },
+  { href: "/accessibility", label: "Accessibility" },
+];
+
+const columnHeadingSx = {
+  fontSize: "0.75rem",
+  fontWeight: 700,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  color: "text.secondary",
+  mb: 1.5,
+};
+
+const linkSx = {
+  width: "fit-content",
+  fontSize: "0.9375rem",
+  lineHeight: 1.5,
+  textDecoration: "none",
+  transition: "color 0.2s ease",
+  "&:hover": { color: "primary.main" },
+};
+
+const buttonLinkSx = {
+  font: "inherit",
+  fontSize: "0.9375rem",
+  lineHeight: 1.5,
+  p: 0,
+  textAlign: "left",
+  verticalAlign: "baseline",
 };
 
 function Footer() {
@@ -98,7 +131,8 @@ function Footer() {
       <Box
         component="footer"
         sx={{
-          py: 4,
+          pt: { xs: 5, md: 6 },
+          pb: 4,
           px: 2,
           mt: "auto",
           backgroundColor: "background.paper",
@@ -109,220 +143,154 @@ function Footer() {
         <Container maxWidth="lg">
           <Box
             sx={{
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 3,
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr 1fr",
+                md: "minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr)",
+              },
+              columnGap: { xs: 3, md: 6 },
+              rowGap: 4,
+              pb: 4,
             }}
           >
+            {/* Brand + social */}
+            <Box sx={{ gridColumn: { xs: "1 / -1", md: "auto" } }}>
             <m.div variants={itemVariants}>
-              <Stack direction="row" spacing={2} sx={{ mb: { xs: 2, md: 0 } }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                  Follow Us
-                </Typography>
-
-                <m.div
-                  variants={socialIconVariants}
-                  whileHover="hover"
-                  whileTap="tap"
-                >
-                  <IconButton
-                    href="https://x.com/ccrewardapp"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    size="small"
-                    color="inherit"
-                    aria-label="Follow ccreward on X (Twitter)"
-                  >
-                    <Twitter aria-hidden="true" />
-                  </IconButton>
-                </m.div>
-
-                <m.div
-                  variants={socialIconVariants}
-                  whileHover="hover"
-                  whileTap="tap"
-                >
-                  <IconButton
-                    href="https://www.instagram.com/ccrewardapp/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    size="small"
-                    color="inherit"
-                    aria-label="Follow ccreward on Instagram"
-                  >
-                    <Instagram aria-hidden="true" />
-                  </IconButton>
-                </m.div>
-
-                <m.div
-                  variants={socialIconVariants}
-                  whileHover="hover"
-                  whileTap="tap"
-                >
-                  <IconButton
-                    href="https://www.reddit.com/r/ccreward/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    size="small"
-                    color="inherit"
-                    aria-label="Join ccreward on Reddit"
-                  >
-                    <Reddit aria-hidden="true" />
-                  </IconButton>
-                </m.div>
-
-                <m.div
-                  variants={socialIconVariants}
-                  whileHover="hover"
-                  whileTap="tap"
-                >
-                  <IconButton
-                    href="https://t.me/ccrewardapp"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    size="small"
-                    color="inherit"
-                    aria-label="Join ccreward on Telegram"
-                  >
-                    <Telegram aria-hidden="true" />
-                  </IconButton>
-                </m.div>
-              </Stack>
-            </m.div>
-
-            <m.div variants={itemVariants}>
-              <Stack
-                direction={{ xs: "column", sm: "row" }}
-                spacing={{ xs: 1, sm: 3 }}
-                sx={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexWrap: { sm: "wrap" },
-                  rowGap: { sm: 1 },
-                }}
+              <Typography
+                component="p"
+                sx={{ fontWeight: 700, fontSize: "1.125rem", mb: 1 }}
               >
-                {["tools", "terms", "privacy", "accessibility", "howto", "faq"].map((page, idx) => (
+                ccreward
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ color: "text.secondary", maxWidth: 360, mb: 2 }}
+              >
+                Compare cards, calculate rewards and find the right credit card
+                for how you spend.
+              </Typography>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 0.5, ml: -1 }}
+                aria-label="Follow ccreward"
+                role="group"
+              >
+                {SOCIAL_LINKS.map(({ href, label, Icon }) => (
                   <m.div
-                    key={page}
-                    variants={linkVariants}
+                    key={href}
+                    variants={socialIconVariants}
                     whileHover="hover"
                     whileTap="tap"
-                    custom={idx}
                   >
-                    <Link
-                      href={`/${page}`}
+                    <IconButton
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="small"
                       color="inherit"
-                      sx={{
-                        textDecoration: "none",
-                        whiteSpace: "nowrap",
-                      }}
+                      aria-label={label}
                     >
-                      {page === "tools"
-                        ? "Tools"
-                        : page === "terms"
-                        ? "Terms of Service"
-                        : page === "privacy"
-                        ? "Privacy Policy"
-                        : page === "accessibility"
-                        ? "Accessibility"
-                        : page === "howto"
-                        ? "How-to Guides"
-                        : "FAQs"}
-                    </Link>
+                      <Icon aria-hidden="true" fontSize="small" />
+                    </IconButton>
                   </m.div>
                 ))}
+              </Box>
+            </m.div>
+            </Box>
+
+            <m.nav variants={itemVariants} aria-label="Explore">
+              <Typography component="p" sx={columnHeadingSx}>
+                Explore
+              </Typography>
+              <Stack spacing={1.25}>
+                {EXPLORE_LINKS.map(({ href, label }) => (
+                  <Link key={href} href={href} color="inherit" sx={linkSx}>
+                    {label}
+                  </Link>
+                ))}
                 {user && (
-                  <m.div variants={linkVariants} whileHover="hover" whileTap="tap">
-                    <Link
-                      component="button"
-                      type="button"
-                      color="inherit"
-                      onClick={() => setFeedbackOpen(true)}
-                      sx={{ textDecoration: "none", font: "inherit", verticalAlign: "baseline", whiteSpace: "nowrap" }}
-                    >
-                      Send feedback
-                    </Link>
-                  </m.div>
-                )}
-                <m.div variants={linkVariants} whileHover="hover" whileTap="tap">
                   <Link
                     component="button"
                     type="button"
                     color="inherit"
-                    onClick={() => {
-                      // Clears the stored analytics choice and reloads, so
-                      // the consent notice reappears for a fresh decision.
-                      resetAnalyticsConsent();
-                      window.location.reload();
-                    }}
-                    sx={{ textDecoration: "none", font: "inherit", verticalAlign: "baseline", whiteSpace: "nowrap" }}
+                    onClick={() => setFeedbackOpen(true)}
+                    sx={{ ...linkSx, ...buttonLinkSx }}
                   >
-                    Analytics choices
+                    Send feedback
                   </Link>
-                </m.div>
+                )}
               </Stack>
-            </m.div>
+            </m.nav>
+
+            <m.nav variants={itemVariants} aria-label="Legal">
+              <Typography component="p" sx={columnHeadingSx}>
+                Legal
+              </Typography>
+              <Stack spacing={1.25}>
+                {LEGAL_LINKS.map(({ href, label }) => (
+                  <Link key={href} href={href} color="inherit" sx={linkSx}>
+                    {label}
+                  </Link>
+                ))}
+                <Link
+                  component="button"
+                  type="button"
+                  color="inherit"
+                  onClick={() => {
+                    // Clears the stored analytics choice and reloads, so
+                    // the consent notice reappears for a fresh decision.
+                    resetAnalyticsConsent();
+                    window.location.reload();
+                  }}
+                  sx={{ ...linkSx, ...buttonLinkSx }}
+                >
+                  Analytics choices
+                </Link>
+              </Stack>
+            </m.nav>
           </Box>
 
-          <m.div variants={itemVariants}>
-            <Divider sx={{ my: 2 }} />
-          </m.div>
+          <Divider />
 
           <m.div variants={itemVariants}>
-            <Box sx={{ textAlign: "center" }}>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "text.secondary",
-                  mb: 1
-                }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                justifyContent: "space-between",
+                alignItems: { xs: "flex-start", sm: "center" },
+                gap: 1,
+                pt: 3,
+              }}
+            >
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
                 © {new Date().getFullYear()} ccreward. All rights reserved.
               </Typography>
-
-              <Typography
-                variant="caption"
-                component="p"
-                sx={{
-                  color: "text.secondary",
-                  maxWidth: 720,
-                  mx: "auto",
-                  mb: 1
-                }}>
-                ccreward is an independent tool and is not affiliated with,
-                endorsed by, or sponsored by any bank or card issuer. Bank
-                names, logos and card images are trademarks or copyrights of
-                their respective owners and are used only for identification.
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                Made with{" "}
+                <Box
+                  component="span"
+                  sx={{
+                    display: "inline-block",
+                    color: "error.main",
+                    animation: "heartbeat 1.5s infinite",
+                    "@media (prefers-reduced-motion: reduce)": { animation: "none" },
+                  }}
+                >
+                  ❤️
+                </Box>{" "}
+                for credit card enthusiasts
               </Typography>
-
-              <m.div
-                initial={{ opacity: 0.6 }}
-                whileHover={{
-                  opacity: 1,
-                  scale: 1.05,
-                  transition: { duration: 0.3 },
-                }}
-              >
-                <Typography variant="body2" sx={{
-                  color: "text.secondary"
-                }}>
-                  Made with{" "}
-                  <Box
-                    component="span"
-                    sx={{
-                      display: "inline-block",
-                      color: "error.main",
-                      animation: "heartbeat 1.5s infinite",
-                      '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-                    }}
-                  >
-                    ❤️
-                  </Box>{" "}
-                  for credit card enthusiasts
-                </Typography>
-              </m.div>
             </Box>
+            <Typography
+              variant="caption"
+              component="p"
+              sx={{ color: "text.secondary", mt: 2, opacity: 0.8 }}
+            >
+              ccreward is an independent tool and is not affiliated with,
+              endorsed by, or sponsored by any bank or card issuer. Bank names,
+              logos and card images are trademarks or copyrights of their
+              respective owners and are used only for identification.
+            </Typography>
           </m.div>
         </Container>
       </Box>

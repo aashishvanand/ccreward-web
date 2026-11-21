@@ -35,7 +35,7 @@ const features = [
   },
 ];
 
-const FeaturesSection = () => {
+const FeaturesSection = ({ cardBg = "background.paper" }) => {
   return (
     <Box
       sx={{
@@ -71,7 +71,8 @@ const FeaturesSection = () => {
                   flexDirection: "column",
                   alignItems: "center",
                   p: 4,
-                  bgcolor: "background.paper", // Use theme color
+                  bgcolor: cardBg,
+                  backgroundImage: "none",
                   transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
                   "&:hover": {
                     transform: "translateY(-8px)",

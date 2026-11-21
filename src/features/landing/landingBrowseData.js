@@ -12,7 +12,7 @@ function forRegion(cards, categories, bankImages) {
     const withLogo = new Set(bankImages.map((b) => b.bank.toLowerCase()));
     return {
         categories: Object.keys(categories),
-        // BankSection shows logos; banks without one are listed as text so every bank page is linked
+        // BankSection shows logos; banks without one get a lettered tile so every bank page is linked
         banksWithoutLogo: Object.entries(cards.issuers)
             .filter(([bank]) => !withLogo.has(bank.toLowerCase()))
             .map(([bank, { cards: list = [] }]) => ({ bank, count: list.length })),

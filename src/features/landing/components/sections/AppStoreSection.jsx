@@ -9,7 +9,7 @@ const AppStoreSection = ({ isMobile }) => {
   // The App Store badge is a white image; the dark-mode variant is inverted
   const { resolvedMode } = useAppTheme();
   return (
-    <Box sx={{ bgcolor: "background.paper", py: 8 }}>
+    <Box sx={{ py: 8 }}>
       <Container maxWidth="md">
         <Box
           sx={{

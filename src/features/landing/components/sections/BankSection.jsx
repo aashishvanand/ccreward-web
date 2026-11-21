@@ -11,15 +11,20 @@ import bankImagesSG from "@/data/bankImages_sg.json";
 
 /**
  * region: "IN" | "SG" from the page (falls back to the visitor's region).
- * banksWithoutLogo: [{ bank, count }] listed as text links under the logos.
+ * banksWithoutLogo: [{ bank, count }] banks with cards but no uploaded logo; they get a
+ *   lettered tile in the same grid, so every bank page is linked from a tile.
  */
-const BankSection = ({ region: regionProp, banksWithoutLogo = [] }) => {
+const BankSection = ({ region: regionProp, banksWithoutLogo = [], tileBg = "background.paper" }) => {
   const { region: contextRegion } = useRegion();
   const region = regionProp || contextRegion;
   const regionName = region === "SG" ? "in Singapore" : region === "IN" ? "in India" : "";
   const code = region === "SG" ? "sg" : "in";
   // Bundled at build time by scripts/fetch-static-data.js, so the logos render with the page
   const bankData = region === "SG" ? bankImagesSG : bankImagesIN;
+  const banks = [
+    ...bankData.map((b) => ({ key: b.id, bank: b.bank, imageId: b.id })),
+    ...banksWithoutLogo.map((b) => ({ key: `nologo-${b.bank}`, bank: b.bank, imageId: null })),
+  ].sort((a, b) => a.bank.localeCompare(b.bank, undefined, { sensitivity: "base" }));
 
   return (
     <Box sx={{ py: 8 }}>
@@ -28,9 +33,9 @@ const BankSection = ({ region: regionProp, banksWithoutLogo = [] }) => {
           Supported Banks{regionName ? ` ${regionName}` : ""}
         </Typography>
         <Grid container spacing={2} sx={{ justifyContent: "center" }}>
-          {bankData.map((bank) => (
+          {banks.map((bank) => (
             <Grid
-              key={bank.id}
+              key={bank.key}
               size={{
                 xs: 6,
                 sm: 4,
@@ -50,6 +55,8 @@ const BankSection = ({ region: regionProp, banksWithoutLogo = [] }) => {
                     alignItems: "center",
                     justifyContent: "center",
                     p: 2,
+                    bgcolor: tileBg,
+                    backgroundImage: "none",
                     transition: "transform 0.2s ease-in-out",
                     "&:hover": {
                       transform: "scale(1.05)",
@@ -67,14 +74,39 @@ const BankSection = ({ region: regionProp, banksWithoutLogo = [] }) => {
                       mb: 1,
                     }}
                   >
-                    <Image
-                      src={buildCloudflareImageUrl(bank.id, "public")}
-                      alt={`${bank.bank.toUpperCase()} logo`}
-                      width={80}
-                      height={80}
-                      unoptimized
-                      style={{ objectFit: "contain" }}
-                    />
+                    {bank.imageId ? (
+                      <Image
+                        src={buildCloudflareImageUrl(bank.imageId, "public")}
+                        alt={`${bank.bank.toUpperCase()} logo`}
+                        width={80}
+                        height={80}
+                        unoptimized
+                        style={{ objectFit: "contain" }}
+                      />
+                    ) : (
+                      // No logo uploaded for this bank yet: lettered placeholder
+                      <Box
+                        aria-hidden="true"
+                        sx={{
+                          width: 64,
+                          height: 64,
+                          borderRadius: "50%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "1.75rem",
+                          fontWeight: 700,
+                          color: "primary.main",
+                          bgcolor: (theme) =>
+                            `rgba(${theme.vars.palette.primary.mainChannel} / 0.12)`,
+                          border: 1,
+                          borderColor: (theme) =>
+                            `rgba(${theme.vars.palette.primary.mainChannel} / 0.3)`,
+                        }}
+                      >
+                        {bank.bank.charAt(0).toUpperCase()}
+                      </Box>
+                    )}
                   </Box>
                   <Typography variant="subtitle2" align="center">
                     {bank.bank.toUpperCase()}
@@ -84,19 +116,6 @@ const BankSection = ({ region: regionProp, banksWithoutLogo = [] }) => {
             </Grid>
           ))}
         </Grid>
-        {banksWithoutLogo.length > 0 && (
-          <Typography align="center" sx={{ mt: 3, color: "text.secondary" }}>
-            Also:{" "}
-            {banksWithoutLogo.map((b, i) => (
-              <span key={b.bank}>
-                {i > 0 && ", "}
-                <Link href={bankPath(code, b.bank)}>
-                  {b.bank} ({b.count} {b.count === 1 ? "card" : "cards"})
-                </Link>
-              </span>
-            ))}
-          </Typography>
-        )}
       </Container>
     </Box>
   );

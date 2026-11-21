@@ -80,7 +80,7 @@ const StatsSection = ({ cardStats }) => {
   };
 
   return (
-    <Box ref={sectionRef} sx={{ py: 8, bgcolor: "background.paper" }}>
+    <Box ref={sectionRef} sx={{ py: 8 }}>
       <Container maxWidth="lg">
         <Typography
           variant="h3"

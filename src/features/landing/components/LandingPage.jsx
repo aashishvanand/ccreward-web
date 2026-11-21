@@ -645,7 +645,7 @@ const MobileView = ({
           sx={{
             flexGrow: 1,
             bgcolor: "background.default",
-            background: (theme) => ({
+            "&": (theme) => ({
               background: `radial-gradient(circle at 50% 0%, rgba(${theme.vars.palette.primary.lightChannel} / 0.082) 0%, transparent 50%), ${theme.vars.palette.background.default}`,
               ...theme.applyStyles("dark", {
                 background: `radial-gradient(circle at 50% 0%, rgba(${theme.vars.palette.primary.darkChannel} / 0.125) 0%, transparent 50%), ${theme.vars.palette.background.default}`,
@@ -663,10 +663,10 @@ const MobileView = ({
                 fontWeight: 800,
                 mb: 2,
                 lineHeight: 1.1,
-                background: (theme) => ({
-                  background: `linear-gradient(90deg, ${theme.vars.palette.primary.main} 0%, ${theme.vars.palette.secondary.main} 100%)`,
+                "&": (theme) => ({
+                  backgroundImage: `linear-gradient(90deg, ${theme.vars.palette.primary.main} 0%, ${theme.vars.palette.secondary.main} 100%)`,
                   ...theme.applyStyles("dark", {
-                    background: `linear-gradient(90deg, ${theme.vars.palette.primary.light} 0%, ${theme.vars.palette.secondary.light} 100%)`,
+                    backgroundImage: `linear-gradient(90deg, ${theme.vars.palette.primary.light} 0%, ${theme.vars.palette.secondary.light} 100%)`,
                   }),
                 }),
                 WebkitBackgroundClip: "text",
@@ -705,35 +705,32 @@ const MobileView = ({
             <CustomGPTSection />
           </Box> */}
 
-          <Box component="section" data-section="features">
-            <FeaturesSection />
+          {/* Bands alternate paper/default after the tinted intro and end
+              on default, so the paper footer stays distinct. */}
+          <Box
+            component="section"
+            data-section="features"
+            sx={{ bgcolor: "background.paper" }}
+          >
+            <FeaturesSection cardBg="background.default" />
           </Box>
 
           <Box
             component="section"
             data-section="stats"
-            sx={{ bgcolor: "background.paper" }}
+            sx={{ bgcolor: "background.default" }}
           >
             <StatsSection cardStats={cardStats} />
           </Box>
 
-          <>
-            <Box
-              component="section"
-              data-section="top-cards"
-              sx={{ bgcolor: "background.default" }}
-            >
+          <Box sx={{ bgcolor: "background.paper" }}>
+            <Box component="section" data-section="top-cards">
               <TopCardsSection />
             </Box>
-
-            <Box
-              component="section"
-              data-section="trending"
-              sx={{ bgcolor: "background.paper" }}
-            >
+            <Box component="section" data-section="trending">
               <TopSearchs />
             </Box>
-          </>
+          </Box>
 
           <Box
             component="section"
@@ -760,7 +757,7 @@ const MobileView = ({
           <Box
             component="section"
             data-section="testimonials"
-            sx={{ bgcolor: "background.paper" }}
+            sx={{ bgcolor: "background.default" }}
           >
             <TestimonialsSection
               visibleTweets={visibleTweets}
@@ -862,9 +859,13 @@ const DesktopView = ({
             onGoogleSignIn={() => handleSignIn(signInWithGoogle)}
             onAppleSignIn={() => handleSignIn(signInWithApple)}
             isLoading={isLoading}
+            region={region}
           />
         </Box>
 
+        {/* Bands alternate default/paper top to bottom (the hero has its own
+            tint, the CTA is primary). Top cards + trending share one band so
+            the alternation holds when trending renders nothing. */}
         <Box
           component="section"
           data-section="features"
@@ -881,39 +882,31 @@ const DesktopView = ({
           <StatsSection cardStats={cardStats} />
         </Box>
 
-        <>
-          <Box
-            component="section"
-            data-section="top-cards"
-            sx={{ bgcolor: "background.default" }}
-          >
+        <Box sx={{ bgcolor: "background.default" }}>
+          <Box component="section" data-section="top-cards">
             <TopCardsSection />
           </Box>
-
-          <Box
-            component="section"
-            data-section="trending"
-            sx={{ bgcolor: "background.paper" }}
-          >
+          <Box component="section" data-section="trending">
             <TopSearchs />
           </Box>
-        </>
+        </Box>
 
         <Box
           component="section"
           data-section="banks"
-          sx={{ bgcolor: "background.default" }}
+          sx={{ bgcolor: "background.paper" }}
         >
           <BankSection
             region={sectionRegion}
             banksWithoutLogo={browse?.[sectionRegion]?.banksWithoutLogo}
+            tileBg="background.default"
           />
         </Box>
 
         <Box
           component="section"
           data-section="categories"
-          sx={{ bgcolor: "background.paper" }}
+          sx={{ bgcolor: "background.default" }}
         >
           <BrowseCategoriesSection
             region={sectionRegion}
@@ -932,7 +925,7 @@ const DesktopView = ({
         <Box
           component="section"
           data-section="app-store"
-          sx={{ bgcolor: "background.default" }}
+          sx={{ bgcolor: "background.paper" }}
         >
           <AppStoreSection isMobile={isMobile} />
         </Box>
@@ -949,7 +942,7 @@ const DesktopView = ({
         <Box
           component="section"
           data-section="testimonials"
-          sx={{ bgcolor: "background.paper" }}
+          sx={{ bgcolor: "background.default" }}
         >
           <TestimonialsSection
             visibleTweets={visibleTweets}

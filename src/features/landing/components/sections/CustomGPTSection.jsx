@@ -39,10 +39,10 @@ const CustomGPTSection = () => {
               mb: 2,
               fontWeight: "bold",
               fontSize: { xs: "1.75rem", sm: "2.5rem" },
-              background: (theme) => ({
-                background: `linear-gradient(90deg, ${theme.vars.palette.success.main} 0%, ${theme.vars.palette.primary.main} 100%)`,
+              "&": (theme) => ({
+                backgroundImage: `linear-gradient(90deg, ${theme.vars.palette.success.main} 0%, ${theme.vars.palette.primary.main} 100%)`,
                 ...theme.applyStyles("dark", {
-                  background: `linear-gradient(90deg, ${theme.vars.palette.success.light} 0%, ${theme.vars.palette.primary.light} 100%)`,
+                  backgroundImage: `linear-gradient(90deg, ${theme.vars.palette.success.light} 0%, ${theme.vars.palette.primary.light} 100%)`,
                 }),
               }),
               WebkitBackgroundClip: "text",
